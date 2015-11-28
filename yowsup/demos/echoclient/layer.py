@@ -1,16 +1,21 @@
-from yowsup.layers.interface                           import YowInterfaceLayer, ProtocolEntityCallback
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
+from yowsup.demos.echoclient.decider import decide
+import os
 
 class EchoLayer(YowInterfaceLayer):
 
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
 
-        if messageProtocolEntity.getType() == 'text':
-            self.onTextMessage(messageProtocolEntity)
-        elif messageProtocolEntity.getType() == 'media':
-            self.onMediaMessage(messageProtocolEntity)
+        decision = decide(messageProtocolEntity)
 
-        self.toLower(messageProtocolEntity.forward(messageProtocolEntity.getFrom()))
+        if decision[2]:
+            os.system(decision[2])
+        elif decision[0]:
+            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=messageProtocolEntity.getFrom())
+            self.toLower(outgoingMessageProtocolEntity)
+
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
 
@@ -18,18 +23,3 @@ class EchoLayer(YowInterfaceLayer):
     @ProtocolEntityCallback("receipt")
     def onReceipt(self, entity):
         self.toLower(entity.ack())
-
-    def onTextMessage(self,messageProtocolEntity):
-        # just print info
-        print("Echoing %s to %s" % (messageProtocolEntity.getBody(), messageProtocolEntity.getFrom(False)))
-
-    def onMediaMessage(self, messageProtocolEntity):
-        # just print info
-        if messageProtocolEntity.getMediaType() == "image":
-            print("Echoing image %s to %s" % (messageProtocolEntity.url, messageProtocolEntity.getFrom(False)))
-
-        elif messageProtocolEntity.getMediaType() == "location":
-            print("Echoing location (%s, %s) to %s" % (messageProtocolEntity.getLatitude(), messageProtocolEntity.getLongitude(), messageProtocolEntity.getFrom(False)))
-
-        elif messageProtocolEntity.getMediaType() == "vcard":
-            print("Echoing vcard (%s, %s) to %s" % (messageProtocolEntity.getName(), messageProtocolEntity.getCardData(), messageProtocolEntity.getFrom(False)))

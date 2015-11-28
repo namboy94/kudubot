@@ -279,8 +279,8 @@ class DemosArgParser(YowArgParser):
                                                not self.args["unmoxie"])
             stack.start()
         except KeyboardInterrupt:
-            print("\nYowsdown")
-            sys.exit(0)
+            print("\nYowsdowner")
+            #sys.exit(0)
 
     def startSyncContacts(self):
         from yowsup.demos import contacts
