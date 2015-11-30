@@ -3,6 +3,7 @@ from yowsup.demos.echoclient.responses.food import *
 from yowsup.demos.echoclient.responses.it_related import *
 from yowsup.demos.echoclient.responses.smileys import *
 from yowsup.demos.echoclient.responses.pseudocommands import *
+from yowsup.demos.echoclient.responses.phrases import *
 
 def decide(messageProtocolEntity):
 
@@ -18,6 +19,7 @@ def decide(messageProtocolEntity):
     #food
     if "keks" in sentmessageMin or "cookie" in sentmessageMin: decision[0] = kekse()
     elif "kuchen" in sentmessageMin: decision[0] = kuchen()
+    elif "uups" in sentmessageMin or "ups" in sentmessageMin or "oops" in sentmessageMin: decision[0] = oops()
 
     #it_related
     elif "wã¼rfel" in sentmessageMin or "wuerfel" in sentmessageMin: decision[0] = wuerfel()
@@ -31,6 +33,7 @@ def decide(messageProtocolEntity):
     elif sentmessageMin.startswith("ls"): decision[0] = ls()
     elif sentmessageMin.startswith("man"): decision[0] = man()
     elif sentmessageMin.startswith("cat"): decision[0] = cat()
+    elif sentmessageMin.startswith("echo"): decision[0] = echo(sentmessageMin)
 
 
 

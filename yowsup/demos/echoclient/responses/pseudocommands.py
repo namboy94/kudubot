@@ -18,3 +18,8 @@ def cat():
 def man():
     options = ["Oh, I'm sure you can figure it out."]
     return getRandom(options)
+
+def echo(input):
+    if len(input) < 5: options = ["echo what?"]
+    else: options = [input.split(" ")[1]]
+    return getRandom(options)
