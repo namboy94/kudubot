@@ -10,7 +10,7 @@ def decide(messageProtocolEntity):
     # Instant replies
     if "keks" in sentmessage.lower() or "cookie" in sentmessage.lower(): decision[0] = "Ich will auch Kekse!"
     elif "kuchen" in sentmessage.lower(): decision[0] = "Ich mag Kuchen."
-    elif "wã¼rfel" in sentmessage.lower() or "wuerfel" in sentmessage.lower(): decision[0] = "https://play.google.com/store/apps/details?id=com.namibsun.android.dice"
+    elif "wã¼rfel" in sentmessage.lower() or "wuerfel" in sentmessage.lower(): decision[0] = "Ihr mögt würfel?\nhttps://play.google.com/store/apps/details?id=com.namibsun.android.dice"
     elif "ð" in sentmessage.lower(): decision[0] = "ððð"
 
     #terminal commands
