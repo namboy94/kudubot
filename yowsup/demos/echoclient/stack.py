@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from yowsup.stacks import YowStack
 from .layer import EchoLayer
 from yowsup.layers import YowLayerEvent

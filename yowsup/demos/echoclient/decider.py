@@ -1,30 +1,33 @@
+# -*- coding: utf-8 -*-
+from yowsup.demos.echoclient.responses.food import *
+from yowsup.demos.echoclient.responses.it_related import *
+from yowsup.demos.echoclient.responses.smileys import *
+
 def decide(messageProtocolEntity):
 
     sentmessage = messageProtocolEntity.getBody()
-    sender = messageProtocolEntity.getFrom(False)
-    sendername = adressbook(sender)
+    sentmessageMin = sentmessage.lower()
+    sender = messageProtocolEntity.getFrom()
+    sendername = adressbook(messageProtocolEntity.getFrom(False))
     decision = ["", sender, ""]
 
     print("recv: " + sendername + ": " + sentmessage.lower())
 
-    # Instant replies
-    if "keks" in sentmessage.lower() or "cookie" in sentmessage.lower(): decision[0] = "Ich will auch Kekse!"
-    elif "kuchen" in sentmessage.lower(): decision[0] = "Ich mag Kuchen."
-    elif "wã¼rfel" in sentmessage.lower() or "wuerfel" in sentmessage.lower(): decision[0] = "Ihr mögt würfel?\nhttps://play.google.com/store/apps/details?id=com.namibsun.android.dice"
-    elif "ð" in sentmessage.lower(): decision[0] = "ððð"
+    # Instant text replies
+    if "keks" in sentmessageMin or "cookie" in sentmessageMin: decision[0] = kekse()
+    elif "kuchen" in sentmessageMin: decision[0] = kuchen()
+    elif "wã¼rfel" in sentmessageMin or "wuerfel" in sentmessageMin: decision[0] = wuerfel()
+    elif "ð" in sentmessageMin: decision[0] = happyTears()
+    elif "ðð»" in sentmessageMin: decision[0] = middleFinger()
 
     #terminal commands
-    elif "term: " in sentmessage.lower() and sendername.split(" ")[0] == "Hermann":
-        decision[2] = sentmessage.lower().split("term: ")[1]
-    elif sentmessage.lower().startswith("term: "):
-        command = sentmessage.lower().split("term: ")[1]
-        if command.startswith("ls") \
-                or command.startswith("man") \
-                or command.startswith("cat"):
-            decision[2] = command
-        else: decision[0] = "Invalid command"
+    elif "term: " in sentmessageMin and sendername.split(" ")[0] == "Hermann":
+        decision[2] = sentmessageMin.split("term: ")[1]
 
+    #Special Text commands
+    elif sentmessageMin in ["die", "stirb", "killbot"]: decision[0] = "ð¨ð«"
 
+    #Print to console
     if decision[0]: print("sent: " + sendername + ": " + decision[0])
     elif decision[2]: print("cmnd: " + decision[2])
 
