@@ -11,3 +11,7 @@ def happyTears():
 def middleFinger():
     options = ["ð¡ðð»"]
     return getRandom(options)
+
+def kisses():
+    options =["😘"]
+    return getRandom(options)

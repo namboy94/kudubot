@@ -23,7 +23,7 @@ class EchoLayer(YowInterfaceLayer):
             decision[0] = sizeChecker(decision[0])
             print(decision[0])
 
-        if not sizeChecker(decision[0]) == "Message too long to send":
+        if not sizeChecker(decision[0]) == "Message too long to send" and decision[0]:
             outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=decision[1])
             self.toLower(outgoingMessageProtocolEntity)
 

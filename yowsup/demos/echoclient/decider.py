@@ -25,6 +25,7 @@ def decide(messageProtocolEntity):
     #smileys
     elif "ð" in sentmessageMin: decision[0] = happyTears()
     elif "ðð»" in sentmessageMin: decision[0] = middleFinger()
+    elif sentmessageMin == "ich liebe diesen bot!": decision[0] = kisses()
 
     #pseudocommands
     elif sentmessageMin.startswith("ls"): decision[0] = ls()
