@@ -13,5 +13,5 @@ def middleFinger():
     return getRandom(options)
 
 def kisses():
-    options =["😘"]
+    options = ["ð"]
     return getRandom(options)
