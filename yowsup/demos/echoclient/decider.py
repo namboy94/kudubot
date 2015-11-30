@@ -2,6 +2,7 @@
 from yowsup.demos.echoclient.responses.food import *
 from yowsup.demos.echoclient.responses.it_related import *
 from yowsup.demos.echoclient.responses.smileys import *
+from yowsup.demos.echoclient.responses.pseudocommands import *
 
 def decide(messageProtocolEntity):
 
@@ -14,18 +15,34 @@ def decide(messageProtocolEntity):
     print("recv: " + sendername + ": " + sentmessage.lower())
 
     # Instant text replies
+    #food
     if "keks" in sentmessageMin or "cookie" in sentmessageMin: decision[0] = kekse()
     elif "kuchen" in sentmessageMin: decision[0] = kuchen()
+
+    #it_related
     elif "wã¼rfel" in sentmessageMin or "wuerfel" in sentmessageMin: decision[0] = wuerfel()
+
+    #smileys
     elif "ð" in sentmessageMin: decision[0] = happyTears()
     elif "ðð»" in sentmessageMin: decision[0] = middleFinger()
+
+    #pseudocommands
+    elif sentmessageMin.startswith("ls"): decision[0] = ls()
+    elif sentmessageMin.startswith("man"): decision[0] = man()
+    elif sentmessageMin.startswith("cat"): decision[0] = cat()
+
+
 
     #terminal commands
     elif "term: " in sentmessageMin and sendername.split(" ")[0] == "Hermann":
         decision[2] = sentmessageMin.split("term: ")[1]
 
+
+
     #Special Text commands
     elif sentmessageMin in ["die", "stirb", "killbot"]: decision[0] = "ð¨ð«"
+
+
 
     #Print to console
     if decision[0]: print("sent: " + sendername + ": " + decision[0])
