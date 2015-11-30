@@ -1,6 +1,6 @@
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
-from yowsup.demos.echoclient.decider import decide
+from yowsup.demos.echoclient.decider import decide, sizeChecker
 import os
 import subprocess
 
@@ -13,13 +13,13 @@ class EchoLayer(YowInterfaceLayer):
 
         decision = decide(messageProtocolEntity)
 
-        if decision[2]:
+        if decision[2] and not sizeChecker(decision[2]) is "Message too long to send":
             decision[0] = subprocess.check_output(args=decision[2], shell=True)
-            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=messageProtocolEntity.getFrom())
+            decision[0] = sizeChecker(decision[0])
+            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=decision[1])
             self.toLower(outgoingMessageProtocolEntity)
-            os.system(decision[2])
-        elif decision[0]:
-            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=messageProtocolEntity.getFrom())
+        elif decision[0] and not sizeChecker(decision[0]) is "Message too long to send":
+            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=decision[1])
             self.toLower(outgoingMessageProtocolEntity)
 
         self.toLower(messageProtocolEntity.ack())

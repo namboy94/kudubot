@@ -7,21 +7,20 @@ def decide(messageProtocolEntity):
 
     print("recv: " + sendername + ": " + sentmessage.lower())
 
-    if "keks" in sentmessage.lower() or "cookie" in sentmessage.lower():
-        decision[0] = "Ich will auch Kekse!"
-    elif "kuchen" in sentmessage.lower():
-        decision[0] = "Ich mag Kuchen."
-    elif "wã¼rfel" in sentmessage.lower() or "wuerfel" in sentmessage.lower():
-        decision[0] = "https://play.google.com/store/apps/details?id=com.namibsun.android.dice"
-    elif "ð" in sentmessage.lower():
-        decision[0] = "ððð"
+    # Instant replies
+    if "keks" in sentmessage.lower() or "cookie" in sentmessage.lower(): decision[0] = "Ich will auch Kekse!"
+    elif "kuchen" in sentmessage.lower(): decision[0] = "Ich mag Kuchen."
+    elif "wã¼rfel" in sentmessage.lower() or "wuerfel" in sentmessage.lower(): decision[0] = "https://play.google.com/store/apps/details?id=com.namibsun.android.dice"
+    elif "ð" in sentmessage.lower(): decision[0] = "ððð"
 
+    #terminal commands
     elif "term: " in sentmessage.lower() and sendername.split(" ")[0] == "Hermann":
         decision[2] = sentmessage.lower().split("term: ")[1]
     elif sentmessage.lower().startswith("term: "):
         command = sentmessage.lower().split("term: ")[1]
         if command.startswith("ls") \
-                or command.startswith("man"):
+                or command.startswith("man") \
+                or command.startswith("cat"):
             decision[2] = command
         else: decision[0] = "Invalid command"
 
@@ -37,3 +36,7 @@ def adressbook(adress):
     elif adress == "4917628727937-1448730289":  return "Bottesting                  "
     elif adress == "4917628727937":             return "Hermann                     "
     else: return adress
+
+def sizeChecker(string):
+    if len(string) > 500: return "Message too long to send"
+    else: return string
