@@ -40,6 +40,8 @@ def decide(messageProtocolEntity):
     #terminal commands
     elif "term: " in sentmessageMin and sendername.split(" ")[0] == "Hermann":
         decision[2] = sentmessageMin.split("term: ")[1]
+    elif sentmessageMin == "rsync-backup" and sendername.split([0]) == "Hermann:":
+        decision[2] = sentmessageMin
 
 
 
