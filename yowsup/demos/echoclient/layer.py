@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.demos.echoclient.decider import decide, sizeChecker
@@ -12,6 +12,7 @@ class EchoLayer(YowInterfaceLayer):
 
         willBeKilled = False
 
+        if messageProtocolEntity.getType() == 'media': return
         if not messageProtocolEntity.getType() == 'text': return
 
         decision = decide(messageProtocolEntity)

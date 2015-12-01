@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import random
 
 def getRandom(inputs):
@@ -8,7 +10,7 @@ def kekse():
     options = ["Ich will auch Kekse!",
                "Wo gibt's Kekse?",
                "Kekse sind klasse!",
-               "Ich hab einen Gutschein fuer McDonald's Kekse!"]
+               "Ich hab einen Gutschein fÃ¼r McDonald's Kekse!"]
     return getRandom(options)
 
 def kuchen():

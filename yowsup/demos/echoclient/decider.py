@@ -1,19 +1,20 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
+
 from yowsup.demos.echoclient.responses.food import *
 from yowsup.demos.echoclient.responses.it_related import *
 from yowsup.demos.echoclient.responses.smileys import *
 from yowsup.demos.echoclient.responses.pseudocommands import *
 from yowsup.demos.echoclient.responses.phrases import *
+from yowsup.demos.echoclient.responses.functions import *
 
 def decide(messageProtocolEntity):
-
     sentmessage = messageProtocolEntity.getBody()
     sentmessageMin = sentmessage.lower()
     sender = messageProtocolEntity.getFrom()
     sendername = adressbook(messageProtocolEntity.getFrom(False))
     decision = ["", sender, ""]
 
-    print("recv: " + sendername + ": " + sentmessage.lower())
+    print("recv: " + sendername + ": " + sentmessage)
 
     # Instant text replies
     #food
@@ -23,17 +24,22 @@ def decide(messageProtocolEntity):
 
     #it_related
     elif "wã¼rfel" in sentmessageMin or "wuerfel" in sentmessageMin: decision[0] = wuerfel()
+    elif "umlaut" in sentmessageMin: decision[0] = umlaute()
 
     #smileys
     elif "ð" in sentmessageMin: decision[0] = happyTears()
     elif "ðð»" in sentmessageMin: decision[0] = middleFinger()
-    elif sentmessageMin == "ich liebe diesen bot!": decision[0] = kisses()
+    elif "liebe" in sentmessageMin and "bot" in sentmessageMin: decision[0] = kisses()
+    elif "beste bot" in sentmessage and "bester bot" in sentmessageMin: decision[0] = kisses()
 
     #pseudocommands
     elif sentmessageMin.startswith("ls"): decision[0] = ls()
     elif sentmessageMin.startswith("man"): decision[0] = man()
     elif sentmessageMin.startswith("cat"): decision[0] = cat()
     elif sentmessageMin.startswith("echo"): decision[0] = echo(sentmessageMin)
+
+    #functionality
+    elif "wetter" in sentmessageMin: decision[0] = wetter('karlsruhe')
 
 
 
