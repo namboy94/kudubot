@@ -12,8 +12,8 @@ class EchoLayer(YowInterfaceLayer):
 
         willBeKilled = False
 
-        if messageProtocolEntity.getType() == 'media': return
-        if not messageProtocolEntity.getType() == 'text': return
+        if messageProtocolEntity.getType() == 'media': outgoingMessageProtocolEntity = Proto
+        elif not messageProtocolEntity.getType() == 'text': return
 
         decision = decide(messageProtocolEntity)
 

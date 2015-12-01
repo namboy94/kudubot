@@ -8,6 +8,31 @@ def getRandom(inputs):
     return inputs[randomnumber]
 
 def wetter(city):
-    location = pywapi.get_loc_id_from_weather_com(city)[0][0]
+
+    #weatherTypes = ["sunny", "sunny/cloudy", "cloudy", "thunderstorms", "rain", "snow", "fog"]
+    weatherEmoji = ["â", "â", "â", "â¡", "â", "â", "ð"]
+
+    search = pywapi.get_loc_id_from_weather_com(city)
+    try:
+        location = search[0][0]
+    except: return "City not found"
     weather = pywapi.get_weather_from_weather_com(location)
-    return "It is " + weather['current_conditions']['text'].lower() + " and " + weather['current_conditions']['temperature'] + "Â°C now in " + city
+
+    try:
+        weatherType = weather['current_conditions']['text'].lower()
+        temp = weather['current_conditions']['temperature']
+    except: return "Error reading weather data"
+
+    weatherIcon = ""
+    if weatherType in ["fair", "fair / windy", "clear"]: weatherIcon = weatherEmoji[0]
+    elif weatherType == "partly cloudy" : weatherIcon = weatherEmoji[1]
+    elif weatherType in ["mostly cloudy", "cloudy"]: weatherIcon = weatherEmoji[2]
+    elif weatherType == "thunderstorms": weatherIcon = weatherEmoji[3]
+    elif weatherType in ["light rain", "rain shower"]: weatherIcon = weatherEmoji[4]
+    elif weatherType == "snow": weatherIcon = weatherEmoji[5]
+    elif weatherType == "haze": weatherIcon = weatherEmoji[6]
+    else: weatherIcon = "???"
+
+    print(weatherType)
+
+    return "It is " + weatherIcon + " and " + temp + "Â°C now in " + city.capitalize()
