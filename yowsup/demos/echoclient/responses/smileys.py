@@ -7,13 +7,13 @@ def getRandom(inputs):
     return inputs[randomnumber]
 
 def happyTears():
-    options = ["ððð"]
+    options = ["😂😂😂"]
     return getRandom(options)
 
 def middleFinger():
-    options = ["ð¡ðð»"]
+    options = ["😡🖕🏻"]
     return getRandom(options)
 
 def kisses():
-    options = ["ð"]
+    options = ["😘"]
     return getRandom(options)

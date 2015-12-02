@@ -10,7 +10,7 @@ def kekse():
     options = ["Ich will auch Kekse!",
                "Wo gibt's Kekse?",
                "Kekse sind klasse!",
-               "Ich hab einen Gutschein fÃ¼r McDonald's Kekse!"]
+               "Ich hab einen Gutschein für McDonald's Kekse!"]
     return getRandom(options)
 
 def kuchen():

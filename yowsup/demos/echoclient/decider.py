@@ -26,12 +26,12 @@ def decide(messageProtocolEntity):
     elif "uups" in sentmessageMin or "ups" in sentmessageMin or "oops" in sentmessageMin: decision[0] = oops()
 
     #it_related
-    elif "wã¼rfel" in sentmessageMin or "wuerfel" in sentmessageMin: decision[0] = wuerfel()
+    elif "würfel" in sentmessageMin or "wuerfel" in sentmessageMin: decision[0] = wuerfel()
     elif "umlaut" in sentmessageMin: decision[0] = umlaute()
 
     #smileys
-    elif "ð" in sentmessageMin: decision[0] = happyTears()
-    elif "ðð»" in sentmessageMin: decision[0] = middleFinger()
+    elif "😂" in sentmessageMin: decision[0] = happyTears()
+    elif "🖕🏻" in sentmessageMin: decision[0] = middleFinger()
     elif "liebe" in sentmessageMin and "bot" in sentmessageMin: decision[0] = kisses()
     elif "beste bot" in sentmessage or "bester bot" in sentmessageMin: decision[0] = kisses()
 
@@ -52,8 +52,7 @@ def decide(messageProtocolEntity):
 
 
     #Special Text commands
-    elif sentmessageMin in ["die", "stirb", "killbot"]: decision[0] = "ð¨ð«"
-
+    elif sentmessageMin in ["die", "stirb", "killbot"]: decision[0] = "😨🔫"
 
 
     #Print to console

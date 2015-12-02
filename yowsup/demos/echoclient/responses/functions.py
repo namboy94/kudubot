@@ -10,7 +10,7 @@ def getRandom(inputs):
 def wetter(city):
 
     #weatherTypes = ["sunny", "sunny/cloudy", "cloudy", "thunderstorms", "rain", "snow", "fog"]
-    weatherEmoji = ["â", "â", "â", "â¡", "â", "â", "ð"]
+    weatherEmoji = ["☀", "⛅", "☁", "⚡", "☔", "❄", "🌁"]
 
     search = pywapi.get_loc_id_from_weather_com(city)
     try:

@@ -7,11 +7,11 @@ def getRandom(inputs):
     return inputs[randomnumber]
 
 def wuerfel():
-    options = ["WÃ¼rfel sind toll",
-               "Du hast eine " + str(random.randint(1,6)) + " gewÃ¼rfelt!",
+    options = ["Würfel sind toll",
+               "Du hast eine " + str(random.randint(1,6)) + " gewürfelt!",
                "https://play.google.com/store/apps/details?id=com.namibsun.android.dice"]
     return getRandom(options)
 
 def umlaute():
-    options = ["Ã", "Ã¤", "Ã", "Ã¼", "Ã", "Ã¶", "Ã"]
+    options = ["Ä", "ä", "Ü", "ü", "Ö", "ö", "ß"]
     return getRandom(options)
