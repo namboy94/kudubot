@@ -4,6 +4,7 @@ from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.demos.echoclient.decider import decide, sizeChecker
 import subprocess
 import sys
+import time
 
 class EchoLayer(YowInterfaceLayer):
 
@@ -12,26 +13,28 @@ class EchoLayer(YowInterfaceLayer):
 
         willBeKilled = False
 
-        if messageProtocolEntity.getType() == 'media': outgoingMessageProtocolEntity = Proto
-        elif not messageProtocolEntity.getType() == 'text': return
+        if not messageProtocolEntity.getType() == 'text': return
 
         decision = decide(messageProtocolEntity)
 
-        if decision[0] == "ð¨ð«":
+        if decision[0] == "😨🔫":
             willBeKilled = True
-        elif decision[2] and not sizeChecker(decision[2]) == "Message too long to send":
+        elif decision[2]:
             decision[0] = subprocess.check_output(args=decision[2], shell=True)
             decision[0] = sizeChecker(decision[0])
             print(decision[0])
 
-        if not sizeChecker(decision[0]) == "Message too long to send" and decision[0]:
+        if decision[0]:
+            decision[0] = sizeChecker(decision[0])
             outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=decision[1])
             self.toLower(outgoingMessageProtocolEntity)
 
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
 
-        if willBeKilled: sys.exit(0)
+        if willBeKilled:
+            time.sleep(2)            
+            sys.exit(0)
 
 
     @ProtocolEntityCallback("receipt")
