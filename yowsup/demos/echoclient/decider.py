@@ -22,8 +22,11 @@ def decide(messageProtocolEntity):
     print("recv: " + sendername + ": " + sentmessage)
 
     # Instant text replies
-    #functionality
-    if re.compile("(weather|wetter) [^ ]+").match(sentmessageMin): decision[0] = wetter(sentmessageMin.split(" ")[1])
+    #weather
+    if re.compile("(weather|wetter) [^ ]+").match(sentmessageMin): decision[0] = wetter(sentmessageMin.split(" ", 1)[1], True)
+    elif re.compile("(weather|wetter):text [^ ]+").match(sentmessageMin): decision[0] = wetter(sentmessageMin.split(" ", 1)[1], False)
+    elif sentmessageMin in ["wetter", "weather"]: decision[0] = wetter("karlsruhe", True)
+    elif sentmessageMin in ["wetter:text", "weather:text"]: decision[0] = wetter("karlsruhe", False)
 
     #food
     elif "keks" in sentmessageMin or "cookie" in sentmessageMin: decision[0] = kekse()

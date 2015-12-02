@@ -7,7 +7,7 @@ def getRandom(inputs):
     randomnumber = random.randint(0, len(inputs) - 1)
     return inputs[randomnumber]
 
-def wetter(city):
+def wetter(city, emojis):
 
     weatherEmoji = ["☀",   #sunny / clear
                     "🌤", #fair
@@ -51,4 +51,5 @@ def wetter(city):
     elif weatherType in ["haze", "fog"]: weatherIcon = weatherEmoji[12]
     else: weatherIcon = "???"
 
-    return "It is " + weatherIcon + " and " + temp + "°C now in " + city.capitalize()
+    if emojis: return "It is " + weatherIcon + " and " + temp + "°C now in " + city.capitalize()
+    else: return "It is " + weatherType + " and " + temp + "°C now in " + city.capitalize()
