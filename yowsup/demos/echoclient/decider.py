@@ -11,9 +11,12 @@ def decide(messageProtocolEntity):
     sentmessage = messageProtocolEntity.getBody()
     sentmessageMin = sentmessage.lower()
     sender = messageProtocolEntity.getFrom()
+
     sendername = adressbook(messageProtocolEntity.getFrom(False))
-    participant = messageProtocolEntity.getParticipant(False)
-    print(participant)
+
+    try:
+        participant = messageProtocolEntity.getParticipant(False)
+    except: participant = ""
     decision = ["", sender, ""]
 
     print("recv: " + sendername + ": " + sentmessage)
