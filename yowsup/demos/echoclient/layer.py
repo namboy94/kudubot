@@ -15,6 +15,10 @@ class EchoLayer(YowInterfaceLayer):
 
         if not messageProtocolEntity.getType() == 'text': return
 
+        #Notify whatsapp that message was read
+        self.toLower(messageProtocolEntity.ack())
+        self.toLower(messageProtocolEntity.ack(True))
+
         decision = decide(messageProtocolEntity)
 
         if decision[0] == "😨🔫":
@@ -28,9 +32,6 @@ class EchoLayer(YowInterfaceLayer):
             decision[0] = sizeChecker(decision[0])
             outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=decision[1])
             self.toLower(outgoingMessageProtocolEntity)
-
-        self.toLower(messageProtocolEntity.ack())
-        self.toLower(messageProtocolEntity.ack(True))
 
         if willBeKilled:
             time.sleep(2)            
