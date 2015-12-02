@@ -35,4 +35,4 @@ def wetter(city):
 
     print(weatherType)
 
-    return "It is " + weatherIcon + " and " + temp + "Â°C now in " + city.capitalize()
+    return "It is " + weatherIcon + " and " + temp + "°C now in " + city.capitalize()
