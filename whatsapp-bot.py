@@ -23,6 +23,8 @@ if args.install:
         os.system("mkdir " + homeDir + "/.whatsapp-bot")
         print("Please put a valid config file in ~/.whatsapp-bot")
         sys.exit(0)
+    if not os.path.isdir(homeDir + "/.whatsapp-bot/logs"):
+        os.system("mkdir " + homeDir + "/.whatsapp-bot/logs")
     if not os.path.isfile("/usr/bin/whatsapp-bot"):
         startScript = open(thisDir + "/whatsapp-bot", "w")
         startScript.write("#!/bin/bash\n")
@@ -36,5 +38,11 @@ if args.install:
 elif args.update:
     os.system("rm -rf " + homeDir + "/.whatsapp-bot/program")
     os.system("cp -r " + thisDir + " " + homeDir + "/.whatsapp-bot/program")
+elif not os.path.isdir(homeDir + "/.whatsapp-bot") \
+    or not os.path.isfile("/usr/bin/whatsapp-bot") \
+    or not os.path.isdir(homeDir + "/.whatsapp-bot/program") \
+    or not os.path.isdir(homeDir + "/.whatsapp-bot/logs"):
+    print("Not installed correctly. Please run this with the --install option")
+    sys.exit(0)
 else:
     os.system("python " + thisDir + "/yowsup-cli demos -c \"" + homeDir + "/.whatsapp-bot/config\" -e")

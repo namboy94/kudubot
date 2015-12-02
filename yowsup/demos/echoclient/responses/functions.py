@@ -24,11 +24,14 @@ def wetter(city, emojis):
                     "🌪", #tornado 
                     "🌫"] #fog
 
-    search = pywapi.get_loc_id_from_weather_com(city)
+    #search = pywapi.get_loc_id_from_weather_com(city)
+    search = pywapi.get_location_ids(city)
     try:
         location = search[0][0]
     except: return "City not found"
-    weather = pywapi.get_weather_from_weather_com(location)
+    #weather = pywapi.get_weather_from_weather_com(location)
+    weather = pywapi.get_weather_from_yahoo(location)
+    #weather = pywapi.get_weather_from_google(location)
 
     try:
         weatherType = weather['current_conditions']['text'].lower()
@@ -48,7 +51,7 @@ def wetter(city, emojis):
     elif weatherType in ["snow"]: weatherIcon = weatherEmoji[9]
     elif weatherType in ["windy"]: weatherIcon = weatherEmoji[10]
     elif weatherType in ["tornado"]: weatherIcon = weatherEmoji[11]
-    elif weatherType in ["haze", "fog"]: weatherIcon = weatherEmoji[12]
+    elif weatherType in ["haze", "fog", "mist"]: weatherIcon = weatherEmoji[12]
     else: weatherIcon = "???"
 
     if emojis: return "It is " + weatherIcon + " and " + temp + "°C now in " + city.capitalize()

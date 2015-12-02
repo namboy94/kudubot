@@ -1,11 +1,14 @@
 # coding=utf-8
 import re
+import os
+import time
 from yowsup.demos.echoclient.responses.food import *
 from yowsup.demos.echoclient.responses.it_related import *
 from yowsup.demos.echoclient.responses.smileys import *
 from yowsup.demos.echoclient.responses.pseudocommands import *
 from yowsup.demos.echoclient.responses.phrases import *
 from yowsup.demos.echoclient.responses.functions import *
+from yowsup.demos.echoclient.responses.publicterm import *
 
 def decide(messageProtocolEntity):
     sentmessage = messageProtocolEntity.getBody()
@@ -17,9 +20,9 @@ def decide(messageProtocolEntity):
     try:
         participant = messageProtocolEntity.getParticipant(False)
     except: participant = ""
-    decision = ["", sender, ""]
+    participantname = adressbook(participant)
 
-    print("recv: " + sendername + ": " + sentmessage)
+    decision = ["", sender, ""]
 
     # Instant text replies
     #weather
@@ -48,32 +51,42 @@ def decide(messageProtocolEntity):
     elif sentmessageMin.startswith("man"): decision[0] = man()
     elif sentmessageMin.startswith("cat"): decision[0] = cat()
     elif sentmessageMin.startswith("echo"): decision[0] = echo(sentmessageMin)
+    elif sentmessageMin == "uptime": decision[0] = uptime()
+
+    #public terminal
+    elif sentmessageMin.startswith("term:ls "): decision[2] = publicLs(sentmessage)
+    elif sentmessageMin == "term:uptime": decision[2] = "uptime"
 
 
+    #Restricted Terminal
+    elif sendername == "Hermann" or participantname == "Hermann":
+        if sentmessageMin == "rsync-backup" and sendername.split([0]) == "Hermann:":
+            decision[2] = sentmessageMin
 
-    #terminal commands
-    elif "term: " in sentmessageMin and sendername.split(" ")[0] == "Hermann":
-        decision[2] = sentmessageMin.split("term: ")[1]
-    elif sentmessageMin == "rsync-backup" and sendername.split([0]) == "Hermann:":
-        decision[2] = sentmessageMin
-
-
-
-    #Special Text commands
-    elif sentmessageMin in ["die", "stirb", "killbot"]: decision[0] = "😨🔫"
+        #Special Text commands
+        elif sentmessageMin in ["die", "stirb", "killbot"]: decision[0] = "😨🔫"
 
 
-    #Print to console
-    if decision[0]: print("sent: " + sendername + ": " + decision[0])
-    elif decision[2]: print("cmnd: " + decision[2])
+    #Print to console and log
+    log = open(os.getenv("HOME") + "/.whatsapp-bot/logs/" + time.strftime("%Y-%m-%d"), "a")
+    print("recv: " + sendername + ": " + sentmessage)
+    log.write("recv: " + sendername + ": " + sentmessage + "\n")
+    if decision[0]:
+        print("sent: " + sendername + ": " + decision[0])
+        log.write("sent: " + sendername + ": " + decision[0] + "\n")
+    elif decision[2]:
+        print("cmnd: " + decision[2])
+        log.write("cmnd: " + decision[2] + "\n")
+
+    log.close()
 
     return decision
 
 
 def adressbook(adress):
-    if adress == "4915779781557-1418747022":    return "Land of the very Brave      "
-    elif adress == "4917628727937-1448730289":  return "Bottesting                  "
-    elif adress == "4917628727937":             return "Hermann                     "
+    if adress == "4915779781557-1418747022":    return "Land of the very Brave"
+    elif adress == "4917628727937-1448730289":  return "Bottesting"
+    elif adress == "4917628727937":             return "Hermann"
     else: return adress
 
 def sizeChecker(string):

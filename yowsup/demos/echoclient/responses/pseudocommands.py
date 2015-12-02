@@ -25,3 +25,7 @@ def echo(input):
     if len(input) < 5: options = ["echo what?"]
     else: options = [input.split(" ")[1]]
     return getRandom(options)
+
+def uptime():
+    options = ["Much too long, I'm tired"]
+    return getRandom(options)
