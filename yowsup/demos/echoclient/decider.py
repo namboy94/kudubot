@@ -7,15 +7,19 @@ from yowsup.demos.echoclient.responses.it_related import *
 from yowsup.demos.echoclient.responses.smileys import *
 from yowsup.demos.echoclient.responses.pseudocommands import *
 from yowsup.demos.echoclient.responses.phrases import *
-from yowsup.demos.echoclient.responses.functions import *
+from yowsup.demos.echoclient.responses.weather import *
 from yowsup.demos.echoclient.responses.publicterm import *
+from yowsup.demos.echoclient.utils.emojicode import *
 
 def decide(messageProtocolEntity):
-    sentmessage = messageProtocolEntity.getBody()
+
+    group = False
+    sentmessage = fixBrokenUnicode(messageProtocolEntity.getBody())
     sentmessageMin = sentmessage.lower()
     sender = messageProtocolEntity.getFrom()
-
-    sendername = adressbook(messageProtocolEntity.getFrom(False))
+    pureSender = messageProtocolEntity.getFrom(False)
+    if re.compile("[0-9]+-[0-9]+").match(pureSender): group = True;
+    sendername = adressbook(pureSender)
 
     try:
         participant = messageProtocolEntity.getParticipant(False)
@@ -26,13 +30,12 @@ def decide(messageProtocolEntity):
 
     # Instant text replies
     #weather
-    if re.compile("(weather|wetter) [^ ]+").match(sentmessageMin): decision[0] = wetter(sentmessageMin.split(" ", 1)[1], True)
-    elif re.compile("(weather|wetter):text [^ ]+").match(sentmessageMin): decision[0] = wetter(sentmessageMin.split(" ", 1)[1], False)
-    elif sentmessageMin in ["wetter", "weather"]: decision[0] = wetter("karlsruhe", True)
-    elif sentmessageMin in ["wetter:text", "weather:text"]: decision[0] = wetter("karlsruhe", False)
+    if re.compile("(weather|wetter)(:(;text|;verbose)*)? [^ ]*").match(sentmessageMin) \
+            or re.compile("(weather|wetter)(;text|;verbose;)*").match(sentmessageMin):
+        decision[0] = weather(sentmessageMin, group).getWeather()
 
     #food
-    elif "keks" in sentmessageMin or "cookie" in sentmessageMin: decision[0] = kekse()
+    if "keks" in sentmessageMin or "cookie" in sentmessageMin: decision[0] = kekse()
     elif "kuchen" in sentmessageMin: decision[0] = kuchen()
     elif "uups" in sentmessageMin or "ups" in sentmessageMin or "oops" in sentmessageMin: decision[0] = oops()
 
@@ -41,10 +44,10 @@ def decide(messageProtocolEntity):
     elif "umlaut" in sentmessageMin: decision[0] = umlaute()
 
     #smileys
-    elif "😂" in sentmessageMin: decision[0] = happyTears()
-    elif "🖕🏻" in sentmessageMin: decision[0] = middleFinger()
-    elif "liebe" in sentmessageMin and "bot" in sentmessageMin: decision[0] = kisses()
-    elif "beste bot" in sentmessage or "bester bot" in sentmessageMin: decision[0] = kisses()
+    elif "😂" in sentmessageMin: decision[0] = happyTears(group)
+    elif "🖕🏻" in sentmessageMin: decision[0] = middleFinger(group)
+    elif "liebe" in sentmessageMin and "bot" in sentmessageMin: decision[0] = kisses(group)
+    elif "beste bot" in sentmessage or "bester bot" in sentmessageMin: decision[0] = kisses(group)
 
     #pseudocommands
     elif sentmessageMin.startswith("ls"): decision[0] = ls()

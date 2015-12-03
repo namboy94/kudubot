@@ -36,6 +36,7 @@ class YowCoderLayer(YowLayer):
 
     def write(self, i):
         if(type(i) in(list, tuple)):
+            #print(i)
             self.toLower(bytearray(i))
         else:
             self.toLower(bytearray([i]))
