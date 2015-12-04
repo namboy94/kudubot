@@ -7,19 +7,14 @@ def getRandom(inputs):
     randomnumber = random.randint(0, len(inputs) - 1)
     return inputs[randomnumber]
 
-def happyTears(group):
-    if group: options=[convertToBrokenUnicode("😂😂😂", 3)]
-    else: options = ["😂😂😂"]
-    print(options)
+def happyTears():
+    options = ["😂😂😂"]
     return getRandom(options)
 
-def middleFinger(group):
-    if group: options = [convertToBrokenUnicode("😡", 1) + convertToBrokenUnicode("🖕🏻", 2)]
-    else: options = ["😡🖕🏻"]
+def middleFinger():
+    options = ["😡🖕🏻"]
     return getRandom(options)
 
-def kisses(group):
-    if group: options = [convertToBrokenUnicode("😘", 1)]
-    else: options = ["😘"]
-
+def kisses():
+    options = ["😘"]
     return getRandom(options)

@@ -7,11 +7,9 @@ class weather(object):
     city = ""
     emojis = True
     verbose = False
-    group = False
 
-    def __init__(self, userInput, group):
+    def __init__(self, userInput):
         self.parseUserInput(userInput)
-        self.group = group
 
     def getWeather(self):
 
@@ -39,25 +37,10 @@ class weather(object):
 
         #Get weather data
         locationCode = location[0]
+        location = self.repairAmericanLocation(location)
         weather = self.getWeatherData(locationCode)
 
-        try:
-            weatherType = weather['current_conditions']['text'].lower()
-            temp = weather['current_conditions']['temperature'].lower()
-        except: return "Error reading weather data"
-
-        location = self.repairAmericanLocation(location)
-        cityName = location[1].split(", ")[0]
-        provinceName = location[1].split(", ")[1]
-        countryName = location[1].split(", ")[2]
-        locationstring = cityName + ", " + countryName
-        verboseLocationString = location[1] + " (" + locationCode + ")"
-
-        if self.group: deg = convertToBrokenUnicode("°")
-        else: deg = "°"
-
-        if self.emojis: return "It is " + self.getWeatherEmoji(weatherType) + " and " + temp + deg + "C now in " + locationstring
-        else: return "It is " +weatherType + " and " + temp + deg + "C in " + locationstring
+        return self.messageGenerator(weather, location)
 
     def specialPlaces(self, city):
 
@@ -96,36 +79,21 @@ class weather(object):
 
     def getWeatherEmoji(self, weatherType):
 
-        if self.group:
-            weatherEmoji = [convertToBrokenUnicode("☀"),   #sunny / clear
-                            convertToBrokenUnicode("🌤"), #fair
-                            convertToBrokenUnicode("⛅"),  #partly cloudy
-                            convertToBrokenUnicode("🌥"), #mostly cloudy
-                            convertToBrokenUnicode("🌦"), #clouds sun and rain?
-                            convertToBrokenUnicode("🌧"), #light rain
-                            convertToBrokenUnicode("☁"), #cloudy
-                            convertToBrokenUnicode("⛈"), #thunderstorms
-                            convertToBrokenUnicode("🌩"), #thunderclouds
-                            convertToBrokenUnicode("☔"), #rain
-                            convertToBrokenUnicode("🌨"), #snow
-                            convertToBrokenUnicode("🌬"), #windy
-                            convertToBrokenUnicode("🌪"), #tornado
-                            convertToBrokenUnicode("🌫")] #fog
-        else:
-            weatherEmoji = ["☀",   #sunny / clear
-                            "🌤", #fair
-                            "⛅",  #partly cloudy
-                            "🌥", #mostly cloudy
-                            "🌦", #clouds sun and rain?
-                            "🌧", #light rain
-                            "☁", #cloudy
-                            "⛈", #thunderstorms
-                            "🌩", #thunderclouds
-                            "☔", #rain
-                            "🌨", #snow
-                            "🌬", #windy
-                            "🌪", #tornado
-                            "🌫"] #fog
+#TODO halve the code
+        weatherEmoji = ["☀",   #sunny / clear
+                        "🌤", #fair
+                        "⛅",  #partly cloudy
+                        "🌥", #mostly cloudy
+                        "🌦", #clouds sun and rain?
+                        "🌧", #light rain
+                        "☁", #cloudy
+                        "⛈", #thunderstorms
+                        "🌩", #thunderclouds
+                        "☔", #rain
+                        "🌨", #snow
+                        "🌬", #windy
+                        "🌪", #tornado
+                        "🌫"] #fog
 
         weatherIcon = ""
         if weatherType in ["sunny", "clear"]: weatherIcon = weatherEmoji[0]
@@ -147,25 +115,35 @@ class weather(object):
 
     def parseUserInput(self, userInput):
 
-
-        trimmedInput = userInput.split(";")
+        trimmedInput = userInput.split(":")
         args = []
-        print(trimmedInput)
-
-        if not len(trimmedInput) == 1:
-            i = 1
-            while i < len(trimmedInput):
-                args.append(trimmedInput[i])
-                i += 1
-
-        print(args)
+        if len(trimmedInput) > 1:
+            args = trimmedInput[1].split(";")
+            if not args[len(args) - 1] in ["verbose", args]:
+                args.pop()
 
         for arg in args:
             if arg == "verbose": self.verbose = True
             if arg == "text": self.emojis = False
 
-        try:
-            cityString = userInput.split(" ")[1]
+        cityString = ""
+        try: cityString = userInput.split(" ", 1)[1]
         except: cityString = "karlsruhe"
 
         self.city = cityString
+
+    def messageGenerator(self, weather, location):
+
+        print (weather)
+        print(location)
+        try:
+            weatherType = weather['current_conditions']['text'].lower()
+            temp = weather['current_conditions']['temperature'].lower()
+        except: return "Weather data currently unavailable"
+
+        cityString = location[1].split(", ")[0] + ", " + location[1].split(", ")[2]
+        weatherMessage = weatherType
+        if self.emojis: weatherMessage = self.getWeatherEmoji(weatherType)
+        if self.verbose: cityString = location[1].split(", ")[0] + ", " + location[1].split(", ")[1] + ", " + location[1].split(", ")[2]
+
+        return "It is " + weatherMessage + " and " + temp + "°C now in " + cityString
