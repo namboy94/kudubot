@@ -7,6 +7,7 @@ import re
 
 from bot.utils.weather import weather
 from bot.utils.FootballScores import FootballScores
+from bot.utils.Mensa import Mensa
 from bot.deciders.Decision import Decision
 
 """
@@ -32,9 +33,13 @@ class RegexDecider(object):
         weatherRegex = re.search(r"(weather|wetter)(:(text;|verbose;)*)?([ ][^:;])?", self.message.lower())
         #timeRegex = re.search(r"(time|zeit) in [^ ]+", self.message.lower())
         bundesligaDayRegex = re.search(r"bundesliga spieltag", self.message.lower())
+        bundesligaTableRegex = re.search(r"bundesliga tabelle", self.message.lower())
+        mensaRegex = re.search(r"mensa", self.message.lower())
 
         #Do stuff
         if weatherRegex: return Decision(weather(self.message.lower()).getWeather(), self.sender)
         if bundesligaDayRegex: return Decision(FootballScores().getBundesligaScores(), self.sender)
+        if bundesligaTableRegex: return Decision(FootballScores().getBundesligaTable(), self.sender)
+        if mensaRegex: return Decision(Mensa().getTodaysPlan(), self.sender)
 
         return False

@@ -88,14 +88,14 @@ class weather(object):
     """
     def getWeatherEmoji(self, weatherType):
 
-        if weatherType in ["sunny", "clear", "sunny / windy"]: return "☀"
+        if weatherType in ["sunny", "clear", "sunny / windy", "clear / windy"]: return "☀"
         elif weatherType in ["fair"]: return "🌤"
         elif weatherType in ["partly cloudy"]: return "⛅"
         elif weatherType in ["mostly cloudy"]: return "🌥"
         elif weatherType in ["not definded"]: return "🌦"
         elif weatherType in ["light rain"]: return "🌧"
         elif weatherType in ["cloudy"]: return"☁"
-        elif weatherType in ["thunderstorms"]: return "⛈"
+        elif weatherType in ["thunderstorms", "t-storm"]: return "⛈"
         elif weatherType in ["rain shower"]: return "☔"
         elif weatherType in ["thunderclouds"]: return "🌩"
         elif weatherType in ["snow"]: return "🌨"

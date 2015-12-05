@@ -4,6 +4,8 @@
 The layer component of the bot. Used to send and receive messages
 """
 import re
+import time
+import random
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
@@ -45,34 +47,10 @@ class EchoLayer(YowInterfaceLayer):
         decision = GeneralDecider(message, sender, participant).decide()
 
         if decision:
+            time.sleep(random.randint(0, 2))
             writeLogAndPrint("sent", getContact(decision.sender), decision.message)
             outgoingMessageProtocolEntity = TextMessageProtocolEntity(convertToBrokenUnicode(decision.message), to=decision.sender)
             self.toLower(outgoingMessageProtocolEntity)
-
-
-
-        """
-        willBeKilled = False
-
-        if decision[0] == "😨🔫":
-            willBeKilled = True
-        elif decision[2]:
-            decision[0] = subprocess.check_output(args=decision[2], shell=True)
-            decision[0] = sizeChecker(decision[0])
-            print(decision[0])
-
-        if decision[0]:
-            decision[0] = sizeChecker(decision[0])
-            if group: decision[0] = convertToBrokenUnicode(decision[0])
-            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision[0], to=decision[1])
-            self.toLower(outgoingMessageProtocolEntity)
-
-        if willBeKilled:
-            time.sleep(2)            
-            sys.exit(0)
-
-        """
-
 
     """
     method run whenever a whatsapp receipt is issued
