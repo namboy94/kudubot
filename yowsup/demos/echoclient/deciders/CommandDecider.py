@@ -1,5 +1,5 @@
 """
-Decider for strings that starts with a certain substring
+Decider for strings that are defined as commands
 @author Hermann Krumrey <hermann@krumreyh.com>
 """
 
@@ -7,9 +7,9 @@ from yowsup.demos.echoclient.utils.randomizer import getRandom
 from yowsup.demos.echoclient.deciders.Decision import Decision
 
 """
-StartsWithDecider Class
+CommandDecider Class
 """
-class StartsWithDecider(object):
+class CommandDecider(object):
 
     """
     Constructor
@@ -20,19 +20,17 @@ class StartsWithDecider(object):
         self.message = message
         self.sender = sender
 
-        self.options = [[["ls"], ["something\nsomething else\n...\nsome more stuff"]],
-                   [["cat"], ["You're a kitty!",
-                              "https://xkcd.com/231/",
-                              "https://xkcd.com/729/",
-                              "https://xkcd.com/26/"]],
-                   [["man"], ["Oh, I'm sure you can figure it out."]],
-                   [["echo"], [self.message, "Echo what now?"]]
-                   ]
+        self.options = [[["insult"], ["Nein, wieso?"]]
+                        ]
 
     """
     Decides the user input
     """
     def decide(self):
+
+        if not self.message.startswith("/") or len(self.message) < 2: return False
+
+        self.message = self.message.split("/")[1].lower()
 
         i = 0
         while i < len(self.options):

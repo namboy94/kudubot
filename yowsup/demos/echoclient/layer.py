@@ -8,6 +8,7 @@ from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.demos.echoclient.deciders.GeneralDecider import GeneralDecider
 from yowsup.demos.echoclient.utils.emojicode import *
 from yowsup.demos.echoclient.utils.adressbook import *
+from yowsup.demos.echoclient.utils.logwriter import writeLogAndPrint
 import subprocess
 import sys
 import time
@@ -29,20 +30,29 @@ class EchoLayer(YowInterfaceLayer):
         self.toLower(messageProtocolEntity.ack(True))
 
         sender = messageProtocolEntity.getFrom()
-        senderNumber = messageProtocolEntity.getFrom(False)
-        message = fixBrokenUnicode(messageProtocolEntity.getBody())
+        message = messageProtocolEntity.getBody()
 
         group = False
-        if re.compile("[0-9]+-[0-9]+").match(senderNumber): group = True
+        if re.compile("[0-9]+-[0-9]+").match(sender.split("@")[0]): group = True
+
+        if group: message = fixBrokenUnicode(message)
 
         try:
             participant = messageProtocolEntity.getParticipant(False)
         except: participant = ""
 
-        decision = GeneralDecider(message, sender, senderNumber, participant).decide()
+        writeLogAndPrint("recv", getContact(sender), message)
+
+        decision = GeneralDecider(message, sender, participant).decide()
+
+        if decision:
+            writeLogAndPrint("sent", getContact(decision.sender), decision.message)
+            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision.message, to=decision.sender)
+            self.toLower(outgoingMessageProtocolEntity)
 
 
-        #TODO remove everything except the last toLower and a few lines to make this possible
+
+        """
         willBeKilled = False
 
         if decision[0] == "😨🔫":
@@ -61,6 +71,8 @@ class EchoLayer(YowInterfaceLayer):
         if willBeKilled:
             time.sleep(2)            
             sys.exit(0)
+
+        """
 
 
     """

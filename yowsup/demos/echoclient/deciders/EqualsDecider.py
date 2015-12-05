@@ -20,18 +20,19 @@ class EqualsDecider(object):
         self.message = message
         self.sender = sender
 
+        self.options = [[["uptime"], ["Much too long, I'm tired"]]
+                   ]
+
     """
     Decides the user input
     """
     def decide(self):
 
-        options = [[["uptime"], ["Much too long, I'm tired"]]
-                   ]
-
         i = 0
-        while i < len(options):
-            if self.message.lower() == options[i]:
-                return Decision(getRandom(options[i][1]), self.sender)
+        while i < len(self.options):
+            for key in self.options[i][0]:
+                if self.message.lower() == key:
+                    return Decision(getRandom(self.options[i][1]), self.sender)
             i += 1
 
         return False

@@ -22,12 +22,7 @@ class ContainsDecider(object):
         self.message = message
         self.sender = sender
 
-    """
-    Decides the user input
-    """
-    def decide(self):
-
-        options = [[["keks", "cookie"], ["Ich will auch Kekse!",
+        self.options = [[["keks", "cookie"], ["Ich will auch Kekse!",
                                          "Wo gibt's Kekse?",
                                          "Kekse sind klasse!",
                                          "Ich hab einen Gutschein für McDonald's Kekse!"]],
@@ -43,10 +38,15 @@ class ContainsDecider(object):
                    [["beste bot", "bester bot"], ["😘"]]
                    ]
 
+    """
+    Decides the user input
+    """
+    def decide(self):
+
         i = 0
-        while i < len(options):
-            if self.message.lower() in options[i]:
-                return Decision(getRandom(options[i][1]), self.sender)
+        while i < len(self.options):
+            if self.message.lower() in self.options[i][0]:
+                return Decision(getRandom(self.options[i][1]), self.sender)
             i += 1
 
         return False
