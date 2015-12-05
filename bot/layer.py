@@ -46,7 +46,7 @@ class EchoLayer(YowInterfaceLayer):
 
         if decision:
             writeLogAndPrint("sent", getContact(decision.sender), decision.message)
-            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision.message, to=decision.sender)
+            outgoingMessageProtocolEntity = TextMessageProtocolEntity(convertToBrokenUnicode(decision.message), to=decision.sender)
             self.toLower(outgoingMessageProtocolEntity)
 
 

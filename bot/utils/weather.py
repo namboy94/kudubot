@@ -20,6 +20,7 @@ class weather(object):
     def __init__(self, userInput):
         self.emojis = True
         self.verbose = False
+        self.lang = "en"
         self.parseUserInput(userInput)
 
     """
@@ -36,7 +37,6 @@ class weather(object):
             self.location = self.repairAmericanLocation()
             self.weather = pywapi.get_weather_from_weather_com(self.locationCode)
         except: return "City not Found"
-
 
         return self.messageGenerator()
 
@@ -88,7 +88,7 @@ class weather(object):
     """
     def getWeatherEmoji(self, weatherType):
 
-        if weatherType in ["sunny", "clear"]: return "☀"
+        if weatherType in ["sunny", "clear", "sunny / windy"]: return "☀"
         elif weatherType in ["fair"]: return "🌤"
         elif weatherType in ["partly cloudy"]: return "⛅"
         elif weatherType in ["mostly cloudy"]: return "🌥"
@@ -116,7 +116,9 @@ class weather(object):
             args = trimmedInput[1].split(";")
             if not args[len(args) - 1] in ["verbose", args]:
                 args.pop()
-
+            if trimmedInput[0] == "wetter": self.lang = "de"
+        else:
+            if userInput.split(" ")[0] == "wetter": self.lang = "de"
         for arg in args:
             if arg == "verbose": self.verbose = True
             if arg == "text": self.emojis = False
@@ -150,7 +152,12 @@ class weather(object):
 
         cityString = self.location[1].split(", ")[0] + ", " + self.location[1].split(", ")[2]
         weatherMessage = weatherType
+
         if self.emojis: weatherMessage = self.getWeatherEmoji(weatherType)
         if self.verbose: cityString = self.location[1].split(", ")[0] + ", " + self.location[1].split(", ")[1] + ", " + self.location[1].split(", ")[2]
 
-        return "It is " + weatherMessage + " and " + temp + "°C now in " + cityString
+        if self.lang == "en":
+            return "It is " + weatherMessage + " and " + temp + "°C now in " + cityString
+        elif self.lang == "de":
+            return "Es ist " + weatherMessage + " und " + temp + "°C in " + cityString
+        else: return "Unknown language error"

@@ -6,7 +6,7 @@ Decider for strings that follow a certain regex pattern
 import re
 
 from bot.utils.weather import weather
-
+from bot.utils.FootballScores import FootballScores
 from bot.deciders.Decision import Decision
 
 """
@@ -29,9 +29,12 @@ class RegexDecider(object):
     def decide(self):
 
         #Regex Checks
-        weatherRegex = re.compile("(weather|wetter)((:){1}(;text|;verbose)*)?( [^ :;]*)?").match(self.message.lower())
+        weatherRegex = re.search(r"(weather|wetter)(:(text;|verbose;)*)?([ ][^:;])?", self.message.lower())
+        #timeRegex = re.search(r"(time|zeit) in [^ ]+", self.message.lower())
+        bundesligaDayRegex = re.search(r"bundesliga spieltag", self.message.lower())
 
         #Do stuff
         if weatherRegex: return Decision(weather(self.message.lower()).getWeather(), self.sender)
+        if bundesligaDayRegex: return Decision(FootballScores().getBundesligaScores(), self.sender)
 
         return False

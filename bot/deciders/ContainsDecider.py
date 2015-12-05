@@ -36,7 +36,9 @@ class ContainsDecider(object):
                                             "https://play.google.com/store/apps/details?id=com.namibsun.android.dice"]],
                    [["😂"], ["😂😂😂"]],
                    [["🖕🏻"], ["😡🖕🏻"]],
-                   [["beste bot", "bester bot"], ["😘"]]
+                   [["beste bot", "bester bot"], ["😘"]],
+                   [["chicken", "nuggets", "huhn", "hühnchen"], ["🐤", "Die armen Kücken!\n🐤🐤🐤"]],
+                   [["scheiße", "kacke"], ["💩"]]
                    ]
 
     """
@@ -46,8 +48,9 @@ class ContainsDecider(object):
 
         i = 0
         while i < len(self.options):
-            if self.message.lower() in self.options[i][0]:
-                return Decision(getRandom(self.options[i][1]), self.sender)
+            for key in self.options[i][0]:
+                if key in self.message.lower():
+                    return Decision(getRandom(self.options[i][1]), self.sender)
             i += 1
 
         return False
