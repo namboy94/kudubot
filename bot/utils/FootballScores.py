@@ -15,8 +15,27 @@ class FootballScores(object):
     """
     Constructor (Does nothing)
     """
-    def __init__(self):
-        print()
+    def __init__(self, userInput):
+        self.bundesliga = False
+        if not "bundesliga" in userInput:
+            self.mode = userInput.split(" ")[0]
+            countryLeague = userInput.split(" ", 1)[1]
+            self.country = countryLeague.split(", ")[0]
+            self.league = countryLeague.split(", ")[1]
+        else:
+            self.bundesliga = userInput
+
+    def getResult(self):
+        if self.bundesliga:
+            if self.bundesliga == "bundesliga tabelle":
+                return self.getBundesligaTable()
+            if self.bundesliga == "bundesliga spieltag":
+                return self.getBundesligaScores()
+        else:
+            if self.mode in ["table", "tabelle"]:
+                return self.getGenericTable()
+            if self.mode in ["matchday", "spieltag"]:
+                return self.getGenericMatchDay()
 
     """
     Fetches data for the current Bundesliga match day and returns it
@@ -42,29 +61,25 @@ class FootballScores(object):
 
         returnString = ""
 
-        teamurl = "http://www.livescore.com/soccer/germany/bundesliga/"
-        teamhtml = requests.get(teamurl).text
-        teamsoup = BeautifulSoup(teamhtml, "html.parser")
-        teamres = teamsoup.select('.team')
+        url = "http://www.livescore.com/soccer/germany/bundesliga/"
 
-        ptsurl = "http://www.livescore.com/soccer/germany/bundesliga/"
-        ptshtml = requests.get(ptsurl).text
-        ptssoup = BeautifulSoup(ptshtml, "html.parser")
-        ptsres = ptssoup.select('.pts')
+        html = requests.get(url).text
+        soup = BeautifulSoup(html, "html.parser")
+        teamres = soup.select('.team')
+        ptsres = soup.select('.pts')
 
         i = 1 #teamnames
         j = 15 #points
         k = 12 #goals for
         l = 13 #goals against
         while i < 19:
-            place = str(i) + ". "
+            place = str(i) + ".\t"
             team = self.makeBundesligaReadable(teamres[i].text)
-            team = self.formatNameForTable(team)
+            team = self.formatNameForBundesLiga(team)
             points = ptsres[j].text
             goalsFor = ptsres[k].text
             goalsAgainst = ptsres[l].text
             spacer = "\t"
-            if len(goalsAgainst + goalsFor) < 4: spacer += "\t"
             returnString += place + team + goalsFor + ":" + goalsAgainst + spacer + points + "\n"
             i += 1; j += 8; k += 8; l += 8
 
@@ -81,7 +96,7 @@ class FootballScores(object):
         returnString = returnString.replace("FC Cologne", "1.FC Köln")
         return returnString
 
-    def formatNameForTable(self, string):
+    def formatNameForBundesLiga(self, string):
 
         bundesLigaDict = {"FC Bayern München": "\t",
                           "Borussia Dortmund": "\t",
@@ -98,9 +113,40 @@ class FootballScores(object):
                           "Eintracht Frankfurt": "\t",
                           "Hannover 96": "\t\t",
                           "Augsburg": "\t\t\t",
-                          "Werder Bremen": "\t",
-                          "Hoffenheim": "\t\t",
-                          "VfB Stuttgart": "\t\t"
+                          "Werder Bremen": "\t\t",
+                          "Hoffenheim": "\t\t\t",
+                          "VfB Stuttgart": "\t\t\t"
                           }
 
         return string + bundesLigaDict[string]
+
+    def getGenericMatchDay(self):
+
+        returnString = ""
+
+        url = "http://www.livescore.com/soccer/" + self.country + "/" + self.league + "/"
+        html = requests.get(url).text
+        soup = BeautifulSoup(html, "html.parser")
+        res = soup.select('.row-gray')
+
+        for r in res:
+            returnString += r.text + "\n"
+
+        return self.makeBundesligaReadable(returnString)
+
+    def getGenericTable(self):
+
+        returnString = ""
+
+        url = "http://www.livescore.com/soccer/germany/" + self.country + "/" + self.league + "/"
+
+        html = requests.get(url).text
+        soup = BeautifulSoup(html, "html.parser")
+        teamres = soup.select('.team')
+
+        i = 1
+        for team in teamres:
+            returnString += str(i) + ".\t" + team
+            i += 1
+
+        return returnString

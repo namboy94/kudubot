@@ -14,6 +14,7 @@ from bot.deciders.GeneralDecider import GeneralDecider
 from bot.utils.adressbook import *
 from bot.utils.emojicode import *
 from bot.utils.logwriter import writeLogAndPrint
+from bot.deciders.Decision import Decision
 
 class EchoLayer(YowInterfaceLayer):
 
@@ -44,12 +45,15 @@ class EchoLayer(YowInterfaceLayer):
 
         writeLogAndPrint("recv", getContact(sender), message)
 
-        decision = GeneralDecider(message, sender, participant).decide()
+        try:
+            decision = GeneralDecider(message, sender, participant).decide()
+        except: decision = Decision("An exception occured", sender)
 
         if decision:
             time.sleep(random.randint(0, 2))
             writeLogAndPrint("sent", getContact(decision.sender), decision.message)
-            outgoingMessageProtocolEntity = TextMessageProtocolEntity(convertToBrokenUnicode(decision.message), to=decision.sender)
+            if group: decision.message = convertToBrokenUnicode(decision.message)
+            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision.message, to=decision.sender)
             self.toLower(outgoingMessageProtocolEntity)
 
     """

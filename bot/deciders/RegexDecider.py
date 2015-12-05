@@ -35,11 +35,13 @@ class RegexDecider(object):
         bundesligaDayRegex = re.search(r"bundesliga spieltag", self.message.lower())
         bundesligaTableRegex = re.search(r"bundesliga tabelle", self.message.lower())
         mensaRegex = re.search(r"mensa", self.message.lower())
+        genericMatchDayRegex = re.search(r"(spieltag|matchday|table|tabelle) [^ ]+", self.message.lower())
 
         #Do stuff
         if weatherRegex: return Decision(weather(self.message.lower()).getWeather(), self.sender)
-        if bundesligaDayRegex: return Decision(FootballScores().getBundesligaScores(), self.sender)
-        if bundesligaTableRegex: return Decision(FootballScores().getBundesligaTable(), self.sender)
+        if bundesligaDayRegex: return Decision(FootballScores(self.message).getBundesligaScores(), self.sender)
+        if bundesligaTableRegex: return Decision(FootballScores(self.message).getBundesligaTable(), self.sender)
         if mensaRegex: return Decision(Mensa().getTodaysPlan(), self.sender)
+        if genericMatchDayRegex: return Decision(FootballScores(self.message).getResult(), self.sender)
 
         return False
