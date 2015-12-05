@@ -28,7 +28,10 @@ if args.install:
     if not os.path.isfile("/usr/bin/whatsapp-bot"):
         startScript = open(thisDir + "/whatsapp-bot", "w")
         startScript.write("#!/bin/bash\n")
-        startScript.write("python " + homeDir + "/.whatsapp-bot/program/whatsapp-bot.py")
+        startScript.write("while true\n")
+        startScript.write("#do\n")
+        startScript.write("python " + homeDir + "/.whatsapp-bot/program/whatsapp-bot.py\n")
+        startScript.write("#done")
         startScript.close()
         os.system("gksudo mv " + thisDir + "/whatsapp-bot /usr/bin/whatsapp-bot")
         os.system("gksudo chmod 755 /usr/bin/whatsapp-bot")

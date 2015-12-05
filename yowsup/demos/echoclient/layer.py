@@ -1,7 +1,11 @@
-# coding=utf-8
+"""
+@author Hermann Krumrey<hermann@krumreyh.com>
+
+The layer component of the bot. Used to send and receive messages
+"""
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
-from yowsup.demos.echoclient.decider import decide, sizeChecker
+from yowsup.demos.echoclient.deciders.GeneralDecider import GeneralDecider
 from yowsup.demos.echoclient.utils.emojicode import *
 from yowsup.demos.echoclient.utils.adressbook import *
 import subprocess
@@ -11,6 +15,10 @@ import re
 
 class EchoLayer(YowInterfaceLayer):
 
+    """
+    Method run when a message is received
+    @param: messageProtocolEntity - the message received
+    """
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
 
@@ -22,9 +30,7 @@ class EchoLayer(YowInterfaceLayer):
 
         sender = messageProtocolEntity.getFrom()
         senderNumber = messageProtocolEntity.getFrom(False)
-        senderName = getContact(senderNumber)
         message = fixBrokenUnicode(messageProtocolEntity.getBody())
-        minMessage = message.lower()
 
         group = False
         if re.compile("[0-9]+-[0-9]+").match(senderNumber): group = True
@@ -32,11 +38,11 @@ class EchoLayer(YowInterfaceLayer):
         try:
             participant = messageProtocolEntity.getParticipant(False)
         except: participant = ""
-        participantName = getContact(participant)
 
-        decision = decide(sender, senderNumber, senderName, message, minMessage, participant, participantName)
+        decision = GeneralDecider(message, sender, senderNumber, participant).decide()
 
 
+        #TODO remove everything except the last toLower and a few lines to make this possible
         willBeKilled = False
 
         if decision[0] == "😨🔫":
@@ -57,6 +63,9 @@ class EchoLayer(YowInterfaceLayer):
             sys.exit(0)
 
 
+    """
+    method run whenever a whatsapp receipt is issued
+    """
     @ProtocolEntityCallback("receipt")
     def onReceipt(self, entity):
         self.toLower(entity.ack())
