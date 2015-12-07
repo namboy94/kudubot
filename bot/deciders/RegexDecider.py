@@ -30,10 +30,10 @@ class RegexDecider(object):
     def decide(self):
 
         #Regex Checks
-        weatherRegex = re.search(r"^(weather|wetter)(:)?(text;|verbose;)*( )?(([^ ]+){0,3})?", self.message.lower())
+        weatherRegex = re.search(r"^(weather|wetter)(:)?(text;|verbose;)*( )?(([^ ]+| ){0,5})?$", self.message.lower())
         #timeRegex = re.search(r"(time|zeit) in [^ ]+", self.message.lower())
         mensaRegex = re.search(r"^(mensa)( )?(linie (1|2|3|4|5|6)|schnitzelbar|curry queen|abend|cafeteria vormittag|cafeteria nachmittag)?$", self.message.lower())
-        footballRegex = re.search(r"(^(table|tabelle|spieltag|matchday)( )?(([^ ]+){0,2})?)", self.message.lower())
+        footballRegex = re.search(r"^(table|tabelle|spieltag|matchday)( )?(([^ ]+| ){0,3})?$", self.message.lower())
 
         #Do stuff
         if weatherRegex: return Decision(weather(self.message.lower()).getWeather(), self.sender)

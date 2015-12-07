@@ -9,6 +9,7 @@ import random
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 
 from bot.deciders.GeneralDecider import GeneralDecider
 from bot.utils.adressbook import *
@@ -46,14 +47,16 @@ class EchoLayer(YowInterfaceLayer):
         writeLogAndPrint("recv", getContact(sender), message)
 
         try:
-            decision = GeneralDecider(message, sender, participant).decide()
+            decision = GeneralDecider(message, sender, participant, self).decide()
+            if decision:
+                if len(decision.message) > 2500: decision.message = "Message too long to send"
         except Exception as e:
             print(str(e))
             decision = Decision("An exception occured", sender)
 
         if decision:
             if decision.message:
-                time.sleep(random.randint(0, 2))
+                time.sleep(random.randint(0, 3))
                 writeLogAndPrint("sent", getContact(decision.sender), decision.message)
                 if group: decision.message = convertToBrokenUnicode(decision.message)
                 outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision.message, to=decision.sender)

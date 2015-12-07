@@ -8,7 +8,6 @@ from bot.deciders.EqualsDecider import EqualsDecider
 from bot.deciders.RegexDecider import RegexDecider
 from bot.deciders.StartsWithDecider import StartsWithDecider
 from bot.utils.adressbook import getContact
-
 from bot.deciders.CommandDecider import CommandDecider
 
 """
@@ -23,13 +22,14 @@ class GeneralDecider(object):
     @:param senderNumber - the number of the sender
     @:param participant - the participant number of a whatsapp group
     """
-    def __init__(self, message, sender, participant):
+    def __init__(self, message, sender, participant, layer):
 
         self.message = message
         self.mimMessage = message.lower()
         self.sender = sender
         self.senderName = getContact(sender)
         self.participant = participant
+        self.layer = layer
 
     """
     handles the decision making
@@ -37,6 +37,8 @@ class GeneralDecider(object):
     def decide(self):
 
         if self.participant == "4915733871694": return False
+        if self.participant == "4915202589244": return False
+        if self.participant == "4915202589168": return False
 
         decision = False
 
