@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+import sys
+splitPath = sys.argv[0].split("/")
+lengthToCut = len(splitPath[len(splitPath) - 1]) + len(splitPath[len(splitPath) - 2]) + 2
+upperDirectory = sys.argv[0][:-lengthToCut]
+sys.path.append(upperDirectory)
+
 from yowsup.stacks import YowStack
 from layer import EchoLayer
 from yowsup.layers import YowLayerEvent
@@ -17,7 +23,6 @@ from yowsup.common import YowConstants
 from yowsup import env
 from bot.parsers.configparse import configParse
 import argparse
-import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--install", help="installs the program", action="store_true")
