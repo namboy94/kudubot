@@ -47,14 +47,17 @@ class EchoLayer(YowInterfaceLayer):
 
         try:
             decision = GeneralDecider(message, sender, participant).decide()
-        except: decision = Decision("An exception occured", sender)
+        except Exception as e:
+            print(str(e))
+            decision = Decision("An exception occured", sender)
 
         if decision:
-            time.sleep(random.randint(0, 2))
-            writeLogAndPrint("sent", getContact(decision.sender), decision.message)
-            if group: decision.message = convertToBrokenUnicode(decision.message)
-            outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision.message, to=decision.sender)
-            self.toLower(outgoingMessageProtocolEntity)
+            if decision.message:
+                time.sleep(random.randint(0, 2))
+                writeLogAndPrint("sent", getContact(decision.sender), decision.message)
+                if group: decision.message = convertToBrokenUnicode(decision.message)
+                outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision.message, to=decision.sender)
+                self.toLower(outgoingMessageProtocolEntity)
 
     """
     method run whenever a whatsapp receipt is issued

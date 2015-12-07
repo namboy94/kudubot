@@ -93,7 +93,7 @@ class weather(object):
         elif weatherType in ["partly cloudy"]: return "⛅"
         elif weatherType in ["mostly cloudy"]: return "🌥"
         elif weatherType in ["not definded"]: return "🌦"
-        elif weatherType in ["light rain"]: return "🌧"
+        elif weatherType in ["light rain", "light rain shower"]: return "🌧"
         elif weatherType in ["cloudy"]: return"☁"
         elif weatherType in ["thunderstorms", "t-storm"]: return "⛈"
         elif weatherType in ["rain shower"]: return "☔"

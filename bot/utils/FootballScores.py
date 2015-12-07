@@ -17,19 +17,25 @@ class FootballScores(object):
     """
     def __init__(self, userInput):
         self.bundesliga = False
-        if not "bundesliga" in userInput:
-            self.mode = userInput.split(" ")[0]
+        if not len(userInput.split(" ")) == 1 and not "bundesliga" in userInput:
             countryLeague = userInput.split(" ", 1)[1]
             self.country = countryLeague.split(", ")[0]
             self.league = countryLeague.split(", ")[1]
         else:
-            self.bundesliga = userInput
+            self.bundesliga = True
 
+        self.mode = userInput.split(" ")[0].lower()
+        if self.mode in ["tabelle", "spieltag"]: self.lang = "de"
+        else: self.lang = "en"
+
+    """
+    Returns the result of the user defined search
+    """
     def getResult(self):
         if self.bundesliga:
-            if self.bundesliga == "bundesliga tabelle":
+            if self.mode in ["tabelle", "table"]:
                 return self.getBundesligaTable()
-            if self.bundesliga == "bundesliga spieltag":
+            if self.mode in ["spieltag", "matchday"]:
                 return self.getBundesligaScores()
         else:
             if self.mode in ["table", "tabelle"]:
@@ -75,12 +81,12 @@ class FootballScores(object):
         while i < 19:
             place = str(i) + ".\t"
             team = self.makeBundesligaReadable(teamres[i].text)
-            team = self.formatNameForBundesLiga(team)
             points = ptsres[j].text
             goalsFor = ptsres[k].text
             goalsAgainst = ptsres[l].text
             spacer = "\t"
-            returnString += place + team + goalsFor + ":" + goalsAgainst + spacer + points + "\n"
+            if len(goalsAgainst + goalsFor) < 4: spacer += "\t"
+            returnString += place + goalsFor + ":" + goalsAgainst + spacer + points + "\t" + team + "\n"
             i += 1; j += 8; k += 8; l += 8
 
         return self.makeBundesligaReadable(returnString)
@@ -95,30 +101,6 @@ class FootballScores(object):
         returnString = returnString.replace("Bayern Munich", "FC Bayern München")
         returnString = returnString.replace("FC Cologne", "1.FC Köln")
         return returnString
-
-    def formatNameForBundesLiga(self, string):
-
-        bundesLigaDict = {"FC Bayern München": "\t",
-                          "Borussia Dortmund": "\t",
-                          "Gladbach": "\t\t\t",
-                          "Hertha Berlin": "\t\t",
-                          "Wolfsburg": "\t\t\t",
-                          "Schalke 04": "\t\t\t",
-                          "Mainz 05": "\t\t\t",
-                          "Bayer Leverkusen": "\t",
-                          "Hamburger SV": "\t\t",
-                          "1.FC Köln": "\t\t\t",
-                          "Ingolstadt": "\t\t\t",
-                          "Darmstadt": "\t\t\t",
-                          "Eintracht Frankfurt": "\t",
-                          "Hannover 96": "\t\t",
-                          "Augsburg": "\t\t\t",
-                          "Werder Bremen": "\t\t",
-                          "Hoffenheim": "\t\t\t",
-                          "VfB Stuttgart": "\t\t\t"
-                          }
-
-        return string + bundesLigaDict[string]
 
     def getGenericMatchDay(self):
 

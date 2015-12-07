@@ -30,18 +30,14 @@ class RegexDecider(object):
     def decide(self):
 
         #Regex Checks
-        weatherRegex = re.search(r"(weather|wetter)(:(text;|verbose;)*)?([ ][^:;])?", self.message.lower())
+        weatherRegex = re.search(r"^(weather|wetter)(:)?(text;|verbose;)*( )?(([^ ]+){0,3})?", self.message.lower())
         #timeRegex = re.search(r"(time|zeit) in [^ ]+", self.message.lower())
-        bundesligaDayRegex = re.search(r"bundesliga spieltag", self.message.lower())
-        bundesligaTableRegex = re.search(r"bundesliga tabelle", self.message.lower())
-        mensaRegex = re.search(r"mensa", self.message.lower())
-        genericMatchDayRegex = re.search(r"(spieltag|matchday|table|tabelle) [^ ]+", self.message.lower())
+        mensaRegex = re.search(r"^(mensa)( )?(linie (1|2|3|4|5|6)|schnitzelbar|curry queen|abend|cafeteria vormittag|cafeteria nachmittag)?$", self.message.lower())
+        footballRegex = re.search(r"(^(table|tabelle|spieltag|matchday)( )?(([^ ]+){0,2})?)", self.message.lower())
 
         #Do stuff
         if weatherRegex: return Decision(weather(self.message.lower()).getWeather(), self.sender)
-        if bundesligaDayRegex: return Decision(FootballScores(self.message).getBundesligaScores(), self.sender)
-        if bundesligaTableRegex: return Decision(FootballScores(self.message).getBundesligaTable(), self.sender)
-        if mensaRegex: return Decision(Mensa().getTodaysPlan(), self.sender)
-        if genericMatchDayRegex: return Decision(FootballScores(self.message).getResult(), self.sender)
+        if mensaRegex: return Decision(Mensa(self.message.lower()).getResponse(), self.sender)
+        if footballRegex: return Decision(FootballScores(self.message).getResult(), self.sender)
 
         return False

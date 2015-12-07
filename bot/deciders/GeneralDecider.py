@@ -36,6 +36,8 @@ class GeneralDecider(object):
     """
     def decide(self):
 
+        if self.participant == "4915733871694": return False
+
         decision = False
 
         if not decision: decision = RegexDecider(self.message, self.sender).decide()
