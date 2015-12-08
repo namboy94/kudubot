@@ -14,6 +14,7 @@ class Decision(object):
     @:param message = the message to be sent
     @:param sender = the recipient of the message
     """
-    def __init__(self, message="", sender=""):
+    def __init__(self, message="", sender="", image=False):
         self.message = message
         self.sender = sender
+        self.image = image

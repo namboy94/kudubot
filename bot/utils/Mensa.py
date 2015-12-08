@@ -9,15 +9,17 @@ class Mensa(object):
 
     def __init__(self, userInput):
         self.userInput = userInput
-        self.getTodaysPlan()
+        self.future = False
         self.mode = "all"
         self.parseUserInput()
+        self.getTodaysPlan()
 
     def parseUserInput(self):
         splitInput = self.userInput.split(" ", 1)
         if len(splitInput) == 1: self.mode = "all"
         else:
             arg = splitInput[1]
+            if "morgen" in arg: self.future = True
             if arg == "all" or arg == "alle": self.mode = "all"
             elif "1" in arg: self.mode = "1"
             elif "2" in arg: self.mode = "2"
@@ -32,7 +34,8 @@ class Mensa(object):
 
     def getTodaysPlan(self):
 
-        url = "http://mensa.akk.uni-karlsruhe.de/?DATUM=heute&uni=1"
+        if self.future: url = "http://mensa.akk.uni-karlsruhe.de/?DATUM=morgen&uni=1"
+        else: url = "http://mensa.akk.uni-karlsruhe.de/?DATUM=heute&uni=1"
         html = requests.get(url).text
         soup = BeautifulSoup(html, "html.parser")
         res = soup.select('body')

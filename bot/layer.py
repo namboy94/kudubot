@@ -8,9 +8,8 @@ import time
 import random
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
+from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
-
 from bot.deciders.GeneralDecider import GeneralDecider
 from bot.utils.adressbook import *
 from bot.utils.emojicode import *
@@ -59,8 +58,7 @@ class EchoLayer(YowInterfaceLayer):
                 time.sleep(random.randint(0, 3))
                 writeLogAndPrint("sent", getContact(decision.sender), decision.message)
                 if group: decision.message = convertToBrokenUnicode(decision.message)
-                outgoingMessageProtocolEntity = TextMessageProtocolEntity(decision.message, to=decision.sender)
-                self.toLower(outgoingMessageProtocolEntity)
+                self.toLower(TextMessageProtocolEntity(decision.message, to=decision.sender))
 
     """
     method run whenever a whatsapp receipt is issued
