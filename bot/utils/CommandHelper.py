@@ -19,7 +19,7 @@ class CommandHelper(object):
                    "/(table|tabelle)\tSends football table information\n" \
                    "syntax: /<table/tabeller> [country], [league]\n\n" \
                    "/(matchday|spieltag)\tSends football matchday information\n" \
-                   "syntax: /<matchday|spieltag> [country], [league]\\n"
+                   "syntax: /<matchday|spieltag> [country], [league]"
 
         elif self.language == "de":
             return "Befehle:\n\n\n" \
@@ -34,4 +34,4 @@ class CommandHelper(object):
                    "/(table|tabelle)\tSchcikt Fußball Tabelleninformationen\n" \
                    "syntax: /<table/tabeller> [country], [league]\n\n" \
                    "/(matchday|spieltag)\tSchickt Fußball Spieltaginformationen\n" \
-                   "syntax: /<matchday|spieltag> [country], [league]\\n"
+                   "syntax: /<matchday|spieltag> [country], [league]"

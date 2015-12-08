@@ -56,9 +56,10 @@ class Mensa(object):
 
     def getResponse(self):
 
-        if self.mode == "all": return self.linie1 + self.linie2 + self.linie3 + self.linie45 + self.linie6\
-                                      + self.linieschnitzel + self.liniecurry + self.linieabend + self.liniecafeteria\
-                                      + self.liniecafeteria1430
+        nl = "\n"
+        if self.mode == "all": return self.linie1 + nl + self.linie2 + nl + self.linie3 + nl + self.linie45 + nl \
+                                      + self.linie6 + nl + self.linieschnitzel + nl + self.liniecurry + nl + \
+                                      self.linieabend + nl + self.liniecafeteria + nl + self.liniecafeteria1430
         elif self.mode == "1": return self.linie1
         elif self.mode == "2": return self.linie2
         elif self.mode == "3": return self.linie3
