@@ -26,11 +26,12 @@ class EchoLayer(YowInterfaceLayer):
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
 
-        if not messageProtocolEntity.getType() == 'text': return
-
         #Notify whatsapp that message was read
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
+
+        if not messageProtocolEntity.getType() == 'text': return
+        if messageProtocolEntity.getTimestamp() < int(time.time()) - 200: return
 
         sender = messageProtocolEntity.getFrom()
         message = messageProtocolEntity.getBody()
