@@ -17,7 +17,7 @@ class CommandHelper(object):
                    "/tvdb\tSends episode name of an episode from TVDB\n" \
                    "syntax: /tvdb <show> s<season> e<episode>\n\n" \
                    "/(table|tabelle)\tSends football table information\n" \
-                   "syntax: /<table/tabeller> [country], [league]\n\n" \
+                   "syntax: /<table/tabelle> [country] [league]\n\n" \
                    "/(matchday|spieltag)\tSends football matchday information\n" \
                    "syntax: /<matchday|spieltag> [country], [league]"
 
@@ -32,6 +32,6 @@ class CommandHelper(object):
                    "/tvdb\tSchickt den Episodennamen einer Episode auf TVDB\n" \
                    "syntax: /tvdb <show> s<season> e<episode>\n\n" \
                    "/(table|tabelle)\tSchcikt Fußball Tabelleninformationen\n" \
-                   "syntax: /<table/tabeller> [country], [league]\n\n" \
+                   "syntax: /<table/tabelle> [country] [league]\n\n" \
                    "/(matchday|spieltag)\tSchickt Fußball Spieltaginformationen\n" \
                    "syntax: /<matchday|spieltag> [country], [league]"
