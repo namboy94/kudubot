@@ -3,6 +3,7 @@
 
 The layer component of the bot. Used to send and receive messages
 """
+import os
 import re
 import time
 import random

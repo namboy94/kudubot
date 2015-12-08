@@ -22,22 +22,37 @@ from yowsup.layers.protocol_calls              import YowCallsProtocolLayer
 from yowsup.common import YowConstants
 from yowsup import env
 from bot.parsers.configparse import configParse
+from bot.parsers.installparser import *
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--install", help="installs the program", action="store_true")
+parser.add_argument("-u", "--update", help="updates the program", action="store_true")
 args = parser.parse_args()
 
-if args.install:
-    print()
+installed = isInstalled()
 
-installed = True
+if args.install:
+    if installed:
+        print("Program already installed. Use --update to update to the newest version")
+        sys.exit(1)
+    install()
+    sys.exit(0)
 
 if not installed:
     print("Program not installed correctly, please use the --install option")
     sys.exit(1)
 
-CREDENTIALS = configParse()
+if args.update:
+    update()
+    sys.exit(0)
+
+try:
+    CREDENTIALS = configParse()
+except:
+    print("No valid login credentials provided in config file")
+    sys.exit(1)
+
 encryptionEnabled = True
 
 if encryptionEnabled:

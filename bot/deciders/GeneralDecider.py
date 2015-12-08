@@ -2,6 +2,7 @@
 Decides the course of action when receiving a whatsapp message
 @author Hermann Krumrey <hermann@krumreyh.com>
 """
+import os
 
 from bot.deciders.ContainsDecider import ContainsDecider
 from bot.deciders.EqualsDecider import EqualsDecider

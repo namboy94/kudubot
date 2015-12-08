@@ -1,5 +1,6 @@
 import os
 import platform
+import re
 
 def configParse():
 
@@ -17,8 +18,11 @@ def configParse():
         if line.startswith("password="):
             password = line.split("password=")[1].split("\n")[0]
     if number and password:
+        if not re.search(r"^[0-9]+$", number): raise Exception("Invalid Number")
+        if not re.search(r"^[^ ]+$", password): raise Exception("Invalid Password")
         credentials = (number, password)
         return credentials
+    else: raise Exception("Invalid Config")
 
 
 def openLinuxConf():
