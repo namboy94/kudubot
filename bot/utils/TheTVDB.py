@@ -13,8 +13,13 @@ class TheTVDB(object):
 
     def getEpisodeName(self):
 
-        tvdb = tvdb_api.Tvdb()
-        episodeInfo = tvdb[self.tvshow][self.season][self.episode]
-        episodeName = episodeInfo['episodename']
-
-        return episodeName
+        try:
+            tvdb = tvdb_api.Tvdb()
+            episodeInfo = tvdb[self.tvshow][self.season][self.episode]
+            episodeName = episodeInfo['episodename']
+            return episodeName
+        except Exception as e:
+            if "cannot find show on TVDB" in str(e):
+                return "Show not found"
+            else:
+                raise Exception("Unspecified Exception")
