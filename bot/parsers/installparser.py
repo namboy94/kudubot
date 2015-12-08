@@ -1,5 +1,6 @@
 import os
 import platform
+import sys
 
 def isInstalled():
 
@@ -25,8 +26,7 @@ def install():
         if not os.path.isdir(whatsappbotdir):
             os.system("mkdir " + whatsappbotdir)
         if not os.path.isdir(programdir):
-            os.system("mkdir " + programdir)
-            os.system("cp -rf ../ " + programdir)
+            os.system("cp -rf " + getSourceDir() + " " + programdir)
         if not os.path.isdir(whatsappbotdir + "/logs"):
             os.system("mkdir " + whatsappbotdir + "/logs")
         if not os.path.isfile(whatsappbotdir + "/config"):
@@ -34,7 +34,7 @@ def install():
             file.write("number=\npassword=")
             file.close()
         if not os.path.isfile("/usr/bin/whatsapp-bot"):
-            os.system("gksudo cp continuousscript /usr/bin/whatsapp-bot")
+            os.system("gksudo cp " + getSourceDir() + "/bot/continuousscript /usr/bin/whatsapp-bot")
             os.system("gksudo chmod 755 /usr/bin/whatsapp-bot")
 
     elif platform.system() == "Windows":
@@ -46,6 +46,10 @@ def update():
         whatsappbotdir = homedir + "/.whatsapp-bot"
         programdir = whatsappbotdir + "/program"
         os.system("rm -rf " + programdir)
-        os.system("cp -rf ../ " + programdir)
+        os.system("cp -rf " + getSourceDir() + " " + programdir)
     elif platform.system() == "Windows":
         return False
+
+def getSourceDir():
+    directory = os.path.dirname(sys.argv[0])
+    return str(os.path.abspath(directory).rsplit("/", 1)[0])

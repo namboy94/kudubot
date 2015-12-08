@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
 splitPath = sys.argv[0].split("/")
 lengthToCut = len(splitPath[len(splitPath) - 1]) + len(splitPath[len(splitPath) - 2]) + 2
 upperDirectory = sys.argv[0][:-lengthToCut]
