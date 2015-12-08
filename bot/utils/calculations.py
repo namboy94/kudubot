@@ -1,16 +1,5 @@
 import math
 
-def binaryToDecimal(binaryString):
-
-    exponent = len(binaryString) - 1
-    result = 0
-
-    for char in binaryString:
-        if char == "1": result += pow(2, exponent)
-        exponent -= 1
-
-    return str(result)
-
 def anyBaseToN(base, input):
 
     exponent = len(input) - 1
