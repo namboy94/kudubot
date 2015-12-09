@@ -43,7 +43,7 @@ class GeneralDecider(object):
 
         decision = False
 
-        if not decision: decision = RegexDecider(self.message, self.sender).decide()
+        if not decision: decision = RegexDecider(self.message, self.sender, self.participant).decide()
         if not decision: decision = ContainsDecider(self.message, self.sender).decide()
         if not decision: decision = StartsWithDecider(self.message, self.sender).decide()
         if not decision: decision = CommandDecider(self.message, self.sender).decide()

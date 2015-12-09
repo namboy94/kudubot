@@ -3,10 +3,12 @@
 
 The layer component of the bot. Used to send and receive messages
 """
-import os
 import re
 import time
 import random
+
+from threading import Thread
+from time import sleep
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
@@ -15,6 +17,7 @@ from bot.utils.adressbook import *
 from bot.utils.emojicode import *
 from bot.utils.logwriter import writeLogAndPrint
 from bot.deciders.Decision import Decision
+from bot.utils.Reminder import Reminder
 
 class EchoLayer(YowInterfaceLayer):
 
@@ -28,6 +31,10 @@ class EchoLayer(YowInterfaceLayer):
         #Notify whatsapp that message was read
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
+
+        #Start reminder checking loop
+        thread = Thread(target=self.reminderChecker)
+        thread.start()
 
         if not messageProtocolEntity.getType() == 'text': return
         if messageProtocolEntity.getTimestamp() < int(time.time()) - 200: return
@@ -67,3 +74,13 @@ class EchoLayer(YowInterfaceLayer):
     @ProtocolEntityCallback("receipt")
     def onReceipt(self, entity):
         self.toLower(entity.ack())
+
+
+    def reminderChecker(self):
+        while True:
+            reminders = Reminder().findReminder()
+            for decision in reminders:
+                writeLogAndPrint("sent", getContact(decision.sender), decision.message)
+                self.toLower(TextMessageProtocolEntity(decision.message, to=decision.sender))
+                time.sleep(1)
+            time.sleep(1)

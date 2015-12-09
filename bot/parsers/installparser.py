@@ -17,6 +17,7 @@ def isInstalled():
         homedir = os.getenv("HOME")
         if not os.path.isdir(homedir + "/.whatsapp-bot"): return False
         if not os.path.isdir(homedir + "/.whatsapp-bot/logs"): return False
+        if not os.path.isdir(homedir + "/.whatsapp-bot/reminders"): return False
         if not os.path.isdir(homedir + "/.whatsapp-bot/program"): return False
         if not os.path.isfile(homedir + "/.whatsapp-bot/config"): return False
         if not os.path.isfile("/usr/bin/whatsapp-bot"): return False
@@ -44,6 +45,8 @@ def install():
             file = open(whatsappbotdir + "/config", "w")
             file.write("number=\npassword=")
             file.close()
+        if not os.path.isdir(whatsappbotdir + "/reminders"):
+            os.system("mkdir " + whatsappbotdir + "/reminders")
         if not os.path.isfile("/usr/bin/whatsapp-bot"):
             os.system("gksudo cp " + getSourceDir() + "/bot/continuousscript /usr/bin/whatsapp-bot")
             os.system("gksudo chmod 755 /usr/bin/whatsapp-bot")
