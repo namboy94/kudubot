@@ -1,3 +1,12 @@
+"""
+Methods used to handle broken Unicode strings.
+@author Hermann Krumrey<hermann@krumreyh.com>
+"""
+
+"""
+Fixes a broken Unicode string
+@:return the fixed string
+"""
 def fixBrokenUnicode(brokenEmoji):
 
     byteEmoji = bytes(brokenEmoji, 'utf-8')
@@ -20,7 +29,9 @@ def fixBrokenUnicode(brokenEmoji):
     goodByteEmoji = bytes(goodByteEmoji)
     return goodByteEmoji.decode()
 
-
+"""
+Converts a good Unicode string to a broken Unicode string
+"""
 def convertToBrokenUnicode(goodUnicode):
 
     newWord = ""

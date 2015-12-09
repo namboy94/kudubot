@@ -1,4 +1,7 @@
 #!/bin/bash
+
+#Script to combat yowsup's problem with disconnecting
+
 while true
 do
 python $HOME/.whatsapp-bot/program/bot/run.py

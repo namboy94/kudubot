@@ -30,6 +30,7 @@ class FootballScores(object):
 
     """
     Returns the result of the user defined search
+    @:return the result of the user defined search
     """
     def getResult(self):
         if self.bundesliga:
@@ -45,6 +46,7 @@ class FootballScores(object):
 
     """
     Fetches data for the current Bundesliga match day and returns it
+    @:return the bundesliga matchday scores
     """
     def getBundesligaScores(self):
 
@@ -63,6 +65,10 @@ class FootballScores(object):
 
         return self.makeBundesligaReadable(returnString)
 
+    """
+    Fetches the current bundesliga table
+    @return: a formatted string containing the bundesliga table
+    """
     def getBundesligaTable(self):
 
         returnString = ""
@@ -93,6 +99,7 @@ class FootballScores(object):
 
     """
     Replaces Names of clubs that are simply too long, or English
+    @:return the replaced name
     """
     def makeBundesligaReadable(self, string):
 
@@ -102,6 +109,10 @@ class FootballScores(object):
         returnString = returnString.replace("FC Cologne", "1.FC Köln")
         return returnString
 
+    """
+    Fetches information about a generic country/league matchday
+    @:return the matchday as string
+    """
     def getGenericMatchDay(self):
 
         returnString = ""
@@ -116,6 +127,10 @@ class FootballScores(object):
 
         return self.makeBundesligaReadable(returnString)
 
+    """
+    Fetches the information about a generic country/league table
+    @:return the league table as string
+    """
     def getGenericTable(self):
 
         returnString = ""

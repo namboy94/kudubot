@@ -1,10 +1,17 @@
+"""
+@author Hermann Krumrey<hermann@krumreyh.com>
+"""
+
 import os
 import time
 
-def writeLogAndPrint(sentRecCmd, sender, message):
+"""
+Writes the log of an event, sent or received.
+"""
+def writeLogAndPrint(sentRec, sender, message):
 
     log = open(os.getenv("HOME") + "/.whatsapp-bot/logs/" + time.strftime("%Y-%m-%d"), "a")
-    string = sentRecCmd + ": " + sender + ": " + message
+    string = sentRec + ": " + sender + ": " + message
     print(string)
     log.write(string)
     log.close()

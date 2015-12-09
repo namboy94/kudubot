@@ -1,7 +1,15 @@
+"""
+@author Hermann Krumrey <hermann@krumreyh.com>
+"""
+
 import os
 import platform
 import re
 
+"""
+Parses a config file and extracts its password and number
+@:return the number and password as tuple of strings
+"""
 def configParse():
 
     file = ""
@@ -24,10 +32,15 @@ def configParse():
         return credentials
     else: raise Exception("Invalid Config")
 
-
+"""
+Opens the config file under Linux
+"""
 def openLinuxConf():
     return open(os.getenv("HOME") + "/.whatsapp-bot/config", 'r')
 
+"""
+Opens the config file under Windows
+"""
 def openWindoesConf():
     username = os.environ.get("USERNAME")
     return open("C:/Users/" + username + "/Documents/whatsapp-bot/config.txt", 'r')

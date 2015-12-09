@@ -1,17 +1,33 @@
-import math
+"""
+Module containing methods that calculate stuff
+@author Hermann Krumrey <hermann@krumreyh.com>
+"""
 
+import math
+"""
+Turns any based number (up to 35) into a decimal number
+@:return the resulting decimal number
+"""
 def anyBaseToN(base, input):
 
     exponent = len(input) - 1
     result = 0
 
-    for char in input:
-        value = turnLettersToInt(char)
-        result += value * pow(base, exponent)
-        exponent -= 1
+    try:
+        for char in input:
+            value = turnLettersToInt(char)
+            if value > base - 1: raise Exception("Invalid Number for this base")
+            result += value * pow(base, exponent)
+            exponent -= 1
+    except Exception as e:
+        return str(e)
 
     return str(result)
 
+"""
+Turns letters into their decimal values
+@:return the resulting decimal value
+"""
 def turnLettersToInt(letter):
 
     try:

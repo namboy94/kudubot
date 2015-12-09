@@ -1,12 +1,20 @@
 """
 Class that retrieves information from the KIT Mensa webpage
+@author Hermann Krumrey<hermann@krumreyh.com>
 """
 
 from bs4 import BeautifulSoup
 import requests
 
+"""
+the Mensa class
+"""
 class Mensa(object):
 
+    """
+    Constructor
+    @:param userInput - the user input used to parse the exact mode to use
+    """
     def __init__(self, userInput):
         self.userInput = userInput
         self.future = False
@@ -14,6 +22,9 @@ class Mensa(object):
         self.parseUserInput()
         self.getTodaysPlan()
 
+    """
+    Parses the user input
+    """
     def parseUserInput(self):
         splitInput = self.userInput.split(" ", 1)
         if len(splitInput) == 1: self.mode = "all"
@@ -32,6 +43,10 @@ class Mensa(object):
             elif "cafeteria" in arg and not "nachmittag" in arg: self.mode = "cafeteriavm"
             elif "cafeteria" in arg and "nachmittag" in arg: self.mode = "cafeterianm"
 
+    """
+    Retrieves the information about today's (or tomorrow's) mensa plan
+    @:return the plan
+    """
     def getTodaysPlan(self):
 
         if self.future: url = "http://mensa.akk.uni-karlsruhe.de/?DATUM=morgen&uni=1"
@@ -54,6 +69,10 @@ class Mensa(object):
 
         return "Curry Queen\nSchnitzel-Bar"
 
+    """
+    Decides which information to send back to the user
+    @:return the string to be sent back
+    """
     def getResponse(self):
 
         nl = "\n"

@@ -1,3 +1,11 @@
+"""
+@author Hermann Krumrey<hermann@krumreyh.com>
+"""
+
+"""
+Matches a Whatsapp-number with a contact name
+@:return the name of the established contact, or the original number if no contact was found
+"""
 def getContact(sender):
 
     number = sender.split("@")[0]

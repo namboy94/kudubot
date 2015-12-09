@@ -9,7 +9,6 @@ import time
 import random
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
-from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from bot.deciders.GeneralDecider import GeneralDecider
 from bot.utils.adressbook import *

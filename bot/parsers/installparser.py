@@ -1,7 +1,16 @@
+"""
+Module that contains methods that install whatsapp-bot or update an existing installation
+@author Hermann Krumrey<hermann@krumreyh.com>
+"""
+
 import os
 import platform
 import sys
 
+"""
+Checks if whatsapp-bot is installed corectly
+@:return True, if installed correctly, otherwise False
+"""
 def isInstalled():
 
     if platform.system() == "Linux":
@@ -16,7 +25,9 @@ def isInstalled():
     elif platform.system() == "Windows":
         return False
 
-
+"""
+Installs whatsapp-bot
+"""
 def install():
 
     if platform.system() == "Linux":
@@ -40,6 +51,9 @@ def install():
     elif platform.system() == "Windows":
         return False
 
+"""
+Updates installed whatsapp-bot
+"""
 def update():
     if platform.system() == "Linux":
         homedir = os.getenv("HOME")
@@ -50,6 +64,10 @@ def update():
     elif platform.system() == "Windows":
         return False
 
+"""
+Gets the source directory of the python program running
+@:return the source directory
+"""
 def getSourceDir():
     directory = os.path.dirname(sys.argv[0])
     return str(os.path.abspath(directory).rsplit("/", 1)[0])

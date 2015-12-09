@@ -4,7 +4,6 @@ Decider for strings that are defined as commands
 """
 
 from bot.deciders.Decision import Decision
-
 from bot.utils.randomizer import getRandom
 
 """
