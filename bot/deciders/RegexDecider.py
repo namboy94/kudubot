@@ -3,17 +3,6 @@ Decider for strings that follow a certain regex pattern
 @author Hermann Krumrey <hermann@krumreyh.com>
 """
 
-import re
-
-from bot.utils.weather import weather
-from bot.utils.FootballScores import FootballScores
-from bot.utils.Mensa import Mensa
-from bot.deciders.Decision import Decision
-from bot.utils.calculations import anyBaseToN
-from bot.utils.TheTVDB import TheTVDB
-from bot.utils.CommandHelper import CommandHelper
-from bot.utils.Reminder import Reminder
-
 """
 RegexDecider Class
 """
@@ -34,8 +23,9 @@ class RegexDecider(object):
     """
     def decide(self):
 
+        """
         #Regex Checks
-        weatherRegex = re.search(r"^/(weather|wetter)(:)?(text;|verbose;)*( )?(([^ ]+| ){0,5})?$", self.message.lower())
+        weatherRegex = re.search(r"", self.message.lower())
         mensaRegex = re.search(r"^/(mensa)( )?(linie (1|2|3|4|5|6)|schnitzelbar|curry queen|abend|cafeteria vormittag|cafeteria nachmittag)?( morgen)?$", self.message.lower())
         footballRegex = re.search(r"^/(table|tabelle|spieltag|matchday)( )?(([^ ]+| ){0,3})?$", self.message.lower())
         binaryRegex = re.search(r"^(0|1)+$", self.message)
@@ -59,5 +49,6 @@ class RegexDecider(object):
         if tvdbRegex: return Decision(TheTVDB(self.message.lower()).getEpisodeName(), self.sender)
         if remindRegex: Reminder(self.message, self.sender, self.participant).storeRemind(); return False
         if helpRegex: return Decision(CommandHelper(self.message.lower()).generateHelp(), self.sender)
+        """
 
         return False

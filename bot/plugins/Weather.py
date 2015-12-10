@@ -1,17 +1,16 @@
 """
 @author Hermann Krumrey<hermann@krumreyh.com>
 
-weather module for a whatsapp bot
+weather plugin for a whatsapp bot
 """
 
+from plugins.GenericPlugin import GenericPlugin
 import pywapi
 
 """
 class that stores relevant information, parses user input and gets weather data
 """
-class weather(object):
-
-    #local variables
+class Weather(GenericPlugin):
 
     """
     Constructor
@@ -24,10 +23,53 @@ class weather(object):
         self.parseUserInput(userInput)
 
     """
+    """
+    @staticmethod
+    def getRegex():
+        return r"^/(weather|wetter)(:)?(text;|verbose;)*( )?(([^ ]+| ){0,5})?$"
+
+
+    """
+    Parses the user input
+    @param userInput - the user input
+    """
+    def parseUserInput(self, userInput):
+
+        trimmedInput = userInput.split(":")
+        args = []
+        if len(trimmedInput) > 1:
+            args = trimmedInput[1].split(";")
+            if not args[len(args) - 1] in ["verbose", args]:
+                args.pop()
+            if trimmedInput[0] == "wetter": self.lang = "de"
+        else:
+            if userInput.split(" ")[0] == "wetter": self.lang = "de"
+        for arg in args:
+            if arg == "verbose": self.verbose = True
+            if arg == "text": self.emojis = False
+
+        cityString = ""
+        try: cityString = userInput.split(" ", 1)[1]
+        except: cityString = "karlsruhe"
+
+        splitCity = cityString.split(", ")
+
+        self.city = splitCity[0]
+        if len(splitCity) == 2:
+            self.province = False
+            self.country = splitCity[1]
+        elif len(splitCity) == 3:
+            self.province = splitCity[1]
+            self.province = splitCity[2]
+        else:
+            self.province = False
+            self.country = False
+
+    """
     Gets the weather data for the location specified by the user input
     @returns the weather data
     """
-    def getWeather(self):
+    def getResponse(self):
 
         try:
             self.location = self.specialPlaces(self.city)
@@ -103,42 +145,6 @@ class weather(object):
         elif weatherType in ["tornado"]: return "🌪"
         elif weatherType in ["haze", "fog", "mist"]: return "🌫"
         else: return "???"
-
-    """
-    Parses the user input
-    @param userInput - the user input
-    """
-    def parseUserInput(self, userInput):
-
-        trimmedInput = userInput.split(":")
-        args = []
-        if len(trimmedInput) > 1:
-            args = trimmedInput[1].split(";")
-            if not args[len(args) - 1] in ["verbose", args]:
-                args.pop()
-            if trimmedInput[0] == "wetter": self.lang = "de"
-        else:
-            if userInput.split(" ")[0] == "wetter": self.lang = "de"
-        for arg in args:
-            if arg == "verbose": self.verbose = True
-            if arg == "text": self.emojis = False
-
-        cityString = ""
-        try: cityString = userInput.split(" ", 1)[1]
-        except: cityString = "karlsruhe"
-
-        splitCity = cityString.split(", ")
-
-        self.city = splitCity[0]
-        if len(splitCity) == 2:
-            self.province = False
-            self.country = splitCity[1]
-        elif len(splitCity) == 3:
-            self.province = splitCity[1]
-            self.province = splitCity[2]
-        else:
-            self.province = False
-            self.country = False
 
     """
     Generates a message string to send back

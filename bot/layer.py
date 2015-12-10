@@ -3,21 +3,21 @@
 
 The layer component of the bot. Used to send and receive messages
 """
+import random
 import re
 import time
-import random
-
 from threading import Thread
-from time import sleep
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+
+from bot.deciders.Decision import Decision
 from bot.deciders.GeneralDecider import GeneralDecider
 from bot.utils.adressbook import *
 from bot.utils.emojicode import *
 from bot.utils.logwriter import writeLogAndPrint
-from bot.deciders.Decision import Decision
-from bot.utils.Reminder import Reminder
+from plugins.Reminder import Reminder
+
 
 class EchoLayer(YowInterfaceLayer):
 
