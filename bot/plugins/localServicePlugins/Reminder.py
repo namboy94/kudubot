@@ -11,6 +11,7 @@ from threading import Thread
 
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
+from utils.emojicode import convertEntityToBrokenUnicode
 from utils.logwriter import writeLogAndPrint
 
 """
@@ -113,7 +114,8 @@ class Reminder(GenericPlugin):
             reminders = self.__findReminders__()
             for reminder in reminders:
                 writeLogAndPrint("sent", reminder)
-                self.layer.toLower(reminder)
+                message = convertEntityToBrokenUnicode(reminder)
+                self.layer.toLower(message)
                 time.sleep(1)
             time.sleep(1)
 
