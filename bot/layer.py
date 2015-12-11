@@ -10,6 +10,7 @@ from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocol
 
 from utils.encoding.Unicoder import Unicoder
 from utils.logging.LogWriter import LogWriter
+from utils.contacts.AddressBook import AddressBook
 from plugins.PluginManager import PluginManager
 
 
@@ -28,8 +29,11 @@ class EchoLayer(YowInterfaceLayer):
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
 
+        #Cases in which responses won't trigger
         if not messageProtocolEntity.getType() == 'text': return
         if messageProtocolEntity.getTimestamp() < int(time.time()) - 200: return
+        if AddressBook().isBlackListed(messageProtocolEntity.getFrom(False)): return
+        if AddressBook().isBlackListed(messageProtocolEntity.getParticipant(False)): return
 
         try:
 

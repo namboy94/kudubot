@@ -15,6 +15,7 @@ class AddressBook(object):
         self.contacts = [["4915779781557-1418747022", "Land of the very Brave"],
                     ["4917628727937-1448730289", "Bottesting"],
                     ["4917628727937", "Hermann"]]
+        self.blacklist = ["4915733871694", "4915202589244", "4915202589168"]
 
     """
     Searches for a contact name belonging to a number given via parameter
@@ -35,3 +36,10 @@ class AddressBook(object):
             if name == contact[1]:
                 return contact[0]
         return name
+
+    """
+    Checks if a number is blacklisted
+    """
+    def isBlackListed(self, number):
+        if number in self.blacklist: return True
+        else: return False

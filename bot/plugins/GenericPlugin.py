@@ -15,8 +15,11 @@ class GenericPlugin(object):
     @:param messageProtocolEntity - the received message information
     """
     def __init__(self, layer, messageProtocolEntity=None):
-        #add this to the top:
         if messageProtocolEntity is None: self.layer = layer; return
+        self.layer = layer
+        self.entity = messageProtocolEntity
+        self.message = self.entity.getBody()
+        self.sender = self.entity.getFrom()
         raise NotImplementedError()
 
     """

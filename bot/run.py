@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+"""
 import sys
 import os
 splitPath = sys.argv[0].split("/")
 lengthToCut = len(splitPath[len(splitPath) - 1]) + len(splitPath[len(splitPath) - 2]) + 2
 upperDirectory = sys.argv[0][:-lengthToCut]
 sys.path.append(upperDirectory)
+"""
 
+import argparse
+import sys
 from yowsup.stacks import YowStack
 from layer import EchoLayer
 from yowsup.layers import YowLayerEvent
@@ -22,22 +26,21 @@ from yowsup.layers.protocol_iq                 import YowIqProtocolLayer
 from yowsup.layers.protocol_calls              import YowCallsProtocolLayer
 from yowsup.common import YowConstants
 from yowsup import env
-from bot.parsers.configparse import configParse
-from bot.parsers.installparser import *
-import argparse
+from startup.config.ConfigParser import ConfigParser
+from startup.installation.Installer import Installer
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--install", help="installs the program", action="store_true")
 parser.add_argument("-u", "--update", help="updates the program", action="store_true")
 args = parser.parse_args()
 
-installed = isInstalled()
+installed = Installer.isInstalled()
 
 if args.install:
     if installed:
         print("Program already installed. Use --update to update to the newest version")
         sys.exit(1)
-    install()
+    Installer.install()
     sys.exit(0)
 
 if not installed:
@@ -45,11 +48,11 @@ if not installed:
     sys.exit(1)
 
 if args.update:
-    update()
+    Installer.update()
     sys.exit(0)
 
 try:
-    CREDENTIALS = configParse()
+    CREDENTIALS = ConfigParser.configParse()
 except:
     print("No valid login credentials provided in config file")
     sys.exit(1)

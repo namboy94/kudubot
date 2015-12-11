@@ -20,8 +20,8 @@ class LogWriter(object):
 
         log = open(os.getenv("HOME") + "/.whatsapp-bot/logs/" + time.strftime("%Y-%m-%d"), "a")
 
-        if event == "recv": contact = AddressBook.getContactName(entity.getTo(False))
-        else: contact = AddressBook.getContactName(entity.getFrom(False))
+        if event == "recv": contact = AddressBook().getContactName(entity.getFrom(False))
+        else: contact = AddressBook().getContactName(entity.getTo(False))
 
         string = event + ": " + contact + ": " + entity.getBody()
         print(string)
