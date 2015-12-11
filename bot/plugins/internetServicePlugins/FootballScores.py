@@ -1,6 +1,5 @@
 """
 Plugin that provides Football (mostly Bundesliga) Information
-
 @:author Hermann Krumrey <hermann@krumreyh.com>
 """
 

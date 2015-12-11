@@ -1,7 +1,7 @@
 from threading import Thread
 
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from plugins.internetServicePlugins import Weather, Mensa, FootballScores, TheTVDB
+from plugins.internetServicePlugins import Weather, Mensa, FootballScores, TheTVDB, KVV
 from plugins.localServicePlugins import Reminder
 
 """
@@ -22,16 +22,17 @@ class PluginManager(object):
         plugins.append(Reminder.Reminder(self.layer, self.messageProtocolEntity))
         plugins.append(Mensa.Mensa(self.layer, self.messageProtocolEntity))
         plugins.append(FootballScores.FootballScores(self.layer, self.messageProtocolEntity))
+        plugins.append(KVV.KVV(self.layer, self.messageProtocolEntity))
         ### ADD NEW PLUGINS HERE ###
 
         if self.messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:
-            helpString = ""
+            helpString = "/help\tDisplays this help message"
             for plugin in plugins:
+                helpString += "\n\n\n"
                 if self.messageProtocolEntity.getBody().lower() == "/help":
                     helpString += plugin.getDescription("en")
                 elif self.messageProtocolEntity.getBody().lower() == "/hilfe":
                     helpString += plugin.getDescription("de")
-                helpString += "\n\n\n"
             return TextMessageProtocolEntity(helpString, to=self.messageProtocolEntity.getFrom())
 
         for plugin in plugins:
@@ -39,47 +40,14 @@ class PluginManager(object):
                 plugin.parseUserInput()
                 return plugin.getResponse()
 
-        """
-        weather = Weather.Weather(self.layer, self.messageProtocolEntity)
-        if weather.regexCheck():
-            weather.parseUserInput()
-            return weather.getResponse()
-
-        theTVDB = TheTVDB.TheTVDB(self.layer, self.messageProtocolEntity)
-        if theTVDB.regexCheck():
-            theTVDB.parseUserInput()
-            return theTVDB.getResponse()
-
-        reminder = Reminder.Reminder(self.layer, self.messageProtocolEntity)
-        if reminder.regexCheck():
-            reminder.parseUserInput()
-            return reminder.getResponse()
-
-        mensa = Mensa.Mensa(self.layer, self.messageProtocolEntity)
-        if mensa.regexCheck():
-            mensa.parseUserInput()
-            return mensa.getResponse()
-
-        football = FootballScores.FootballScores(self.layer, self.messageProtocolEntity)
-        if football.regexCheck():
-            football.parseUserInput()
-            return football.getResponse()
-        """
-
-
-
         return False
 
     def startParallelRuns(self):
 
         threads = []
 
-        threads.append(Thread(target=Weather.Weather(self.layer).parallelRun))
-        threads.append(Thread(target=TheTVDB.TheTVDB(self.layer).parallelRun))
         threads.append(Thread(target=Reminder.Reminder(self.layer).parallelRun))
-        threads.append(Thread(target=Mensa.Mensa(self.layer).parallelRun))
-
-        ### ADD NEW PLUGINS HERE ###
+        ### ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE ###
 
         for thread in threads:
             thread.start()

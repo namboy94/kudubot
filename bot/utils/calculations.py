@@ -3,7 +3,6 @@ Module containing methods that calculate stuff
 @author Hermann Krumrey <hermann@krumreyh.com>
 """
 
-import math
 """
 Turns any based number (up to 35) into a decimal number
 @:return the resulting decimal number

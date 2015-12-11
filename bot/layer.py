@@ -6,9 +6,10 @@ The layer component of the bot. Used to send and receive messages
 import time
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 
-from bot.utils.emojicode import *
-from bot.utils.logwriter import writeLogAndPrint
+from utils.encoding.Unicoder import Unicoder
+from utils.logging.LogWriter import LogWriter
 from plugins.PluginManager import PluginManager
 
 
@@ -30,48 +31,32 @@ class EchoLayer(YowInterfaceLayer):
         if not messageProtocolEntity.getType() == 'text': return
         if messageProtocolEntity.getTimestamp() < int(time.time()) - 200: return
 
-        messageProtocolEntity = fixEntity(messageProtocolEntity)
-
-        writeLogAndPrint("recv", messageProtocolEntity)
-
-        pluginManager = PluginManager(self, messageProtocolEntity)
-        response = pluginManager.runPlugins()
-        if not self.parallelRunning:
-            print("Starting Parallel Threads")
-            PluginManager(self).startParallelRuns()
-            self.parallelRunning = True
-
-        if response:
-            writeLogAndPrint("sent", response)
-            response = convertEntityToBrokenUnicode(response)
-            self.toLower(response)
-
-        """
-
-        sender = messageProtocolEntity.getFrom()
-        message = messageProtocolEntity.getBody()
-
         try:
-            participant = messageProtocolEntity.getParticipant(False)
-        except: participant = ""
 
-        writeLogAndPrint("recv", getContact(sender), message)
+            messageProtocolEntity = Unicoder.fixIncominEntity(messageProtocolEntity)
 
-        try:
-            decision = GeneralDecider(message, sender, participant, self).decide()
-            if decision:
-                if len(decision.message) > 2500: decision.message = "Message too long to send"
+            LogWriter.writeEventLog("recv", messageProtocolEntity)
+
+            pluginManager = PluginManager(self, messageProtocolEntity)
+            response = pluginManager.runPlugins()
+            if not self.parallelRunning:
+                print("Starting Parallel Threads")
+                PluginManager(self).startParallelRuns()
+                self.parallelRunning = True
+
+            if response:
+                LogWriter.writeEventLog("sent", response)
+                response = Unicoder.fixOutgoingEntity(response)
+                self.toLower(response)
+
         except Exception as e:
-            print(str(e))
-            decision = Decision("An exception occured", sender)
+            exception = TextMessageProtocolEntity("Exception: " + str(e), to=messageProtocolEntity.getFrom())
+            LogWriter.writeEventLog("exep", exception)
+            self.toLower(exception)
 
-        if decision:
-            if decision.message:
-                time.sleep(random.randint(0, 3))
-                writeLogAndPrint("sent", getContact(decision.sender), decision.message)
-                #if group: decision.message = convertToBrokenUnicode(decision.message)
-                self.toLower(TextMessageProtocolEntity(decision.message, to=decision.sender))
-        """
+
+
+    #YOWSUP SPECIFIC METHODS
 
     """
     method run whenever a whatsapp receipt is issued
