@@ -1,41 +1,58 @@
 """
-@author Hermann Krumrey<hermann@krumreyh.com>
+Weather plugin for a whatsapp bot
 
-weather plugin for a whatsapp bot
+@:author Hermann Krumrey<hermann@krumreyh.com>
 """
 
-from plugins.GenericPlugin import GenericPlugin
+import re
 import pywapi
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+from plugins.GenericPlugin import GenericPlugin
 
 """
-class that stores relevant information, parses user input and gets weather data
+Class that stores relevant information, parses user input and gets weather data
 """
 class Weather(GenericPlugin):
 
     """
     Constructor
-    @param userInput - the complete string send via whatsapp
+    @:param layer - the overlying yowsup layer
+    @:param messageProtocolEntity - the received message information
+    @:override
     """
-    def __init__(self, userInput):
+    def __init__(self, layer, messageProtocolEntity=None):
+        if messageProtocolEntity is None: self.layer = layer; return
         self.emojis = True
         self.verbose = False
         self.lang = "en"
-        self.parseUserInput(userInput)
+
+        self.layer = layer
+        self.entity = messageProtocolEntity
+        self.message = messageProtocolEntity.getBody().lower()
+        self.sender = messageProtocolEntity.getFrom()
+
+        self.city = ""
+        self.province = ""
+        self.country = ""
 
     """
+    Checks if the user input matches the regex needed for the plugin to function correctly
+    @:override
     """
-    @staticmethod
-    def getRegex():
-        return r"^/(weather|wetter)(:)?(text;|verbose;)*( )?(([^ ]+| ){0,5})?$"
+    def regexCheck(self):
+        regex = r"^/(weather|wetter)(:)?(text;|verbose;)*( )?(([^ ]+| ){0,5})?$"
+        if re.search(regex, self.message): return True
+        else: return False
 
 
     """
     Parses the user input
-    @param userInput - the user input
+    @:param userInput - the user input
+    @:override
     """
-    def parseUserInput(self, userInput):
+    def parseUserInput(self):
 
-        trimmedInput = userInput.split(":")
+        trimmedInput = self.message.split(":")
         args = []
         if len(trimmedInput) > 1:
             args = trimmedInput[1].split(";")
@@ -43,13 +60,13 @@ class Weather(GenericPlugin):
                 args.pop()
             if trimmedInput[0] == "wetter": self.lang = "de"
         else:
-            if userInput.split(" ")[0] == "wetter": self.lang = "de"
+            if self.message.split(" ")[0] == "wetter": self.lang = "de"
         for arg in args:
             if arg == "verbose": self.verbose = True
             if arg == "text": self.emojis = False
 
         cityString = ""
-        try: cityString = userInput.split(" ", 1)[1]
+        try: cityString = self.message.split(" ", 1)[1]
         except: cityString = "karlsruhe"
 
         splitCity = cityString.split(", ")
@@ -67,27 +84,51 @@ class Weather(GenericPlugin):
 
     """
     Gets the weather data for the location specified by the user input
-    @returns the weather data
+    @returns the weather data as a TextMessageProtocolEntity
+    @:override
     """
     def getResponse(self):
 
         try:
-            self.location = self.specialPlaces(self.city)
+            self.location = self.__specialPlaces__(self.city)
             if not self.location:
-                self.location = self.getLocation()
+                self.location = self.__getLocation__()
             self.locationCode = self.location[0]
-            self.location = self.repairAmericanLocation()
+            self.location = self.__repairAmericanLocation__()
             self.weather = pywapi.get_weather_from_weather_com(self.locationCode)
-        except: return "City not Found"
+        except:
+            return TextMessageProtocolEntity("City not Found", self.sender)
 
-        return self.messageGenerator()
+        return TextMessageProtocolEntity(self.__messageGenerator__(), to=self.sender)
+
+    """
+    Returns a description about this plugin
+    @:override
+    """
+    @staticmethod
+    def getDescription(language):
+        if language == "en":
+            return "/weather\tSends weather information\n" \
+                   "syntax:\t/weather[:][options;] <cityname>[, <region>][, <country>]\n" \
+                   "options: text,verbose\n\n"
+        elif language == "de":
+            return "/wetter\tSchickt Wetterinformationen\n" \
+                   "syntax:\t/wetter[optionen;] <stadtname>[, <region>][, <land>]\n" \
+                   "options: text,verbose\n\n"
+        else:
+            return "Help not available in this language"
+
+
+
+### private methods ###
+
 
     """
     Helper method for getWeather(), which catches special, predefined cities.
     For example, the default search result for Windhoek is Windhoek in South Africa, but with the help of
     this method, the search is overriden and Windhoek in Namibia is displayed
     """
-    def specialPlaces(self, city):
+    def __specialPlaces__(self, city):
 
         if city == "windhoek": return ('WAXX0004', 'Windhoek, KH, Namibia')
         if city == "???": raise NameError("Invalid City")
@@ -96,7 +137,7 @@ class Weather(GenericPlugin):
     """
     Gets the location code of a city
     """
-    def getLocation(self):
+    def __getLocation__(self):
         if not self.country and not self.province:
             return pywapi.get_loc_id_from_weather_com(self.city)[0]
         elif self.country and not self.province:
@@ -119,7 +160,7 @@ class Weather(GenericPlugin):
     Repairs American Locations (since they only store the state, not the country)
     @returns the repaired location data
     """
-    def repairAmericanLocation(self):
+    def __repairAmericanLocation__(self):
         if len(self.location[1].split(", ")) == 2:
             return [self.location[0], self.location[1] + ', USA']
         else: return self.location
@@ -128,7 +169,7 @@ class Weather(GenericPlugin):
     Determines the weather emoji for all weather types
     @returns the weatherEmoji to the corresponding weatherType
     """
-    def getWeatherEmoji(self, weatherType):
+    def __getWeatherEmoji__(self, weatherType):
 
         if weatherType in ["sunny", "clear", "sunny / windy", "clear / windy"]: return "☀"
         elif weatherType in ["fair"]: return "🌤"
@@ -149,7 +190,7 @@ class Weather(GenericPlugin):
     """
     Generates a message string to send back
     """
-    def messageGenerator(self):
+    def __messageGenerator__(self):
 
         try:
             weatherType = self.weather['current_conditions']['text'].lower()
@@ -159,7 +200,7 @@ class Weather(GenericPlugin):
         cityString = self.location[1].split(", ")[0] + ", " + self.location[1].split(", ")[2]
         weatherMessage = weatherType
 
-        if self.emojis: weatherMessage = self.getWeatherEmoji(weatherType)
+        if self.emojis: weatherMessage = self.__getWeatherEmoji__(weatherType)
         if self.verbose: cityString = self.location[1].split(", ")[0] + ", " + self.location[1].split(", ")[1] + ", " + self.location[1].split(", ")[2]
 
         if self.lang == "en":

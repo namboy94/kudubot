@@ -3,23 +3,18 @@
 
 The layer component of the bot. Used to send and receive messages
 """
-import random
-import re
 import time
-from threading import Thread
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 
-from bot.deciders.Decision import Decision
-from bot.deciders.GeneralDecider import GeneralDecider
-from bot.utils.adressbook import *
 from bot.utils.emojicode import *
 from bot.utils.logwriter import writeLogAndPrint
-from plugins.Reminder import Reminder
+from plugins.PluginManager import PluginManager
 
 
 class EchoLayer(YowInterfaceLayer):
+
+    parallelRunning = False
 
     """
     Method run when a message is received
@@ -32,20 +27,29 @@ class EchoLayer(YowInterfaceLayer):
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
 
-        #Start reminder checking loop
-        thread = Thread(target=self.reminderChecker)
-        thread.start()
-
         if not messageProtocolEntity.getType() == 'text': return
         if messageProtocolEntity.getTimestamp() < int(time.time()) - 200: return
 
+        messageProtocolEntity = fixEntity(messageProtocolEntity)
+
+        writeLogAndPrint("recv", messageProtocolEntity)
+
+        pluginManager = PluginManager(self, messageProtocolEntity)
+        response = pluginManager.runPlugins()
+        if not self.parallelRunning:
+            print("Starting Parallel Threads")
+            PluginManager(self).startParallelRuns()
+            self.parallelRunning = True
+
+        if response:
+            writeLogAndPrint("sent", response)
+            response = convertEntityToBrokenUnicode(response)
+            self.toLower(response)
+
+        """
+
         sender = messageProtocolEntity.getFrom()
         message = messageProtocolEntity.getBody()
-
-        group = False
-        if re.compile("[0-9]+-[0-9]+").match(sender.split("@")[0]): group = True
-
-        if group: message = fixBrokenUnicode(message)
 
         try:
             participant = messageProtocolEntity.getParticipant(False)
@@ -65,8 +69,9 @@ class EchoLayer(YowInterfaceLayer):
             if decision.message:
                 time.sleep(random.randint(0, 3))
                 writeLogAndPrint("sent", getContact(decision.sender), decision.message)
-                if group: decision.message = convertToBrokenUnicode(decision.message)
+                #if group: decision.message = convertToBrokenUnicode(decision.message)
                 self.toLower(TextMessageProtocolEntity(decision.message, to=decision.sender))
+        """
 
     """
     method run whenever a whatsapp receipt is issued
@@ -74,13 +79,3 @@ class EchoLayer(YowInterfaceLayer):
     @ProtocolEntityCallback("receipt")
     def onReceipt(self, entity):
         self.toLower(entity.ack())
-
-
-    def reminderChecker(self):
-        while True:
-            reminders = Reminder().findReminder()
-            for decision in reminders:
-                writeLogAndPrint("sent", getContact(decision.sender), decision.message)
-                self.toLower(TextMessageProtocolEntity(decision.message, to=decision.sender))
-                time.sleep(1)
-            time.sleep(1)

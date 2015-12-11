@@ -26,12 +26,12 @@ class RegexDecider(object):
         """
         #Regex Checks
         weatherRegex = re.search(r"", self.message.lower())
-        mensaRegex = re.search(r"^/(mensa)( )?(linie (1|2|3|4|5|6)|schnitzelbar|curry queen|abend|cafeteria vormittag|cafeteria nachmittag)?( morgen)?$", self.message.lower())
-        footballRegex = re.search(r"^/(table|tabelle|spieltag|matchday)( )?(([^ ]+| ){0,3})?$", self.message.lower())
+        mensaRegex = re.search(, self.message.lower())
+        footballRegex = re.search(, self.message.lower())
         binaryRegex = re.search(r"^(0|1)+$", self.message)
         hexRegex = re.search(r"^(0x)(0|1|2|3|4|5|6|7|8|9|a|b|c|d|e|f)+$", self.message.lower())
         custBaseRegex = re.search(r"^[0-9a-z]+ (base|basis) [0-9]+$", self.message.lower())
-        tvdbRegex = re.search(r"^/(tvdb) ([^ ]+| )+ s[0-9]{1,2} e[0-9]{1,4}$", self.message.lower())
+        tvdbRegex = re.search(, self.message.lower())
         remindRegex = re.search(r"^/remind \"[^\"]+\" (tomorrow|morgen|[0-9]+ "
                                 r"(years|yahre|months|monate|days|tage|hours|stunden|minutes|minuten|seconds|sekunden)"
                                 r"|[0-9]{4}-[0-9]{2}-[0-9]{2}(-[0-9]{2}-[0-9]{2}-[0-9]{2})?)$", self.message.lower())
