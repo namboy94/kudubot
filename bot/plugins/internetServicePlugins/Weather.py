@@ -110,11 +110,11 @@ class Weather(GenericPlugin):
         if language == "en":
             return "/weather\tSends weather information\n" \
                    "syntax:\t/weather[:][options;] <cityname>[, <region>][, <country>]\n" \
-                   "options: text,verbose\n\n"
+                   "options: text,verbose"
         elif language == "de":
             return "/wetter\tSchickt Wetterinformationen\n" \
                    "syntax:\t/wetter[optionen;] <stadtname>[, <region>][, <land>]\n" \
-                   "options: text,verbose\n\n"
+                   "options: text,verbose"
         else:
             return "Help not available in this language"
 

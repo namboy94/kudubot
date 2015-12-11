@@ -105,11 +105,11 @@ class Mensa(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return "syntax: /mensa [<linie>] [morgen]\n\n" \
-                   "/table\tSends football table information\n"
+            return "/mensa\tSends the Mensa Plan\n" \
+                   "syntax: /mensa [<linie>] [morgen]"
         elif language == "de":
             return "/mensa\tSchickt den Mensa Plan\n" \
-                   "syntax: /mensa [<linie>] [morgen]\n\n"
+                   "syntax: /mensa [<linie>] [morgen]"
         else:
             return "Help not available in this language"
 

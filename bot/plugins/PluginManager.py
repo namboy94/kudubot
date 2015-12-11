@@ -1,5 +1,6 @@
 from threading import Thread
 
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.internetServicePlugins import Weather, Mensa, FootballScores, TheTVDB
 from plugins.localServicePlugins import Reminder
 
@@ -22,6 +23,16 @@ class PluginManager(object):
         plugins.append(Mensa.Mensa(self.layer, self.messageProtocolEntity))
         plugins.append(FootballScores.FootballScores(self.layer, self.messageProtocolEntity))
         ### ADD NEW PLUGINS HERE ###
+
+        if self.messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:
+            helpString = ""
+            for plugin in plugins:
+                if self.messageProtocolEntity.getBody().lower() == "/help":
+                    helpString += plugin.getDescription("en")
+                elif self.messageProtocolEntity.getBody().lower() == "/hilfe":
+                    helpString += plugin.getDescription("de")
+                helpString += "\n\n\n"
+            return TextMessageProtocolEntity(helpString, to=self.messageProtocolEntity.getFrom())
 
         for plugin in plugins:
             if plugin.regexCheck():

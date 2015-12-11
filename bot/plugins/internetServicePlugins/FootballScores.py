@@ -84,15 +84,15 @@ class FootballScores(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return "/table|\tSends football table information\n" \
+            return "/table\tSends football table information\n" \
                    "syntax: /table [<country>][, <league>]\n\n" \
-                   "/matchday|\tSends football matchday information\n" \
-                   "syntax: /matchday [<country>][, <league>]\n\n"
+                   "/matchday\tSends football matchday information\n" \
+                   "syntax: /matchday [<country>][, <league>]"
         elif language == "de":
             return "/tabelle\tSchickt Fußball Tabelleninformationen\n" \
                    "syntax: /tabelle [<land>][, <league>]\n\n" \
                    "/spieltag\tSchickt Fußball Spieltaginformationen\n" \
-                   "syntax: /spieltag [<country>][, <league>]\n\n"
+                   "syntax: /spieltag [<country>][, <league>]"
         else:
             return "Help not available in this language"
 

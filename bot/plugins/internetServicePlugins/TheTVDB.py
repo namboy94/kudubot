@@ -77,9 +77,9 @@ class TheTVDB(GenericPlugin):
     def getDescription(language):
         if language == "en":
             return "/tvdb\tSends episode name of an episode from TVDB\n" \
-                   "syntax: /tvdb <show> s<season> e<episode>\n\n"
+                   "syntax: /tvdb <show> s<season> e<episode>"
         elif language == "de":
             return "/tvdb\tSchickt den Episodennamen einer Episode auf TVDB\n" \
-                   "syntax: /tvdb <show> s<staffel> e<episode>\n\n"
+                   "syntax: /tvdb <show> s<staffel> e<episode>"
         else:
             return "Help not available in this language"

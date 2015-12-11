@@ -20,8 +20,8 @@ class GenericPlugin(object):
         raise NotImplementedError()
 
     """
-    Returns the regex(or an array of multiple regex's) used to identify this plugin
-    @:return the regex or array of regex's
+    Checks if the user input is valid for this plugin to continue
+    @:return True if input is valid, False otherwise
     """
     def regexCheck(self):
         raise NotImplementedError()
