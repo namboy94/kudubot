@@ -55,7 +55,7 @@ class Installer(object):
             if not os.path.isdir(whatsappbotdir + "/reminders"):
                 os.system("mkdir " + whatsappbotdir + "/reminders")
             if not os.path.isfile("/usr/bin/whatsapp-bot"):
-                os.system("gksudo cp " + Installer.getSourceDir() + "/bot/continuousscript /usr/bin/whatsapp-bot")
+                os.system("gksudo cp " + Installer.getSourceDir() + "/bot/startup/continuousscript /usr/bin/whatsapp-bot")
                 os.system("gksudo chmod 755 /usr/bin/whatsapp-bot")
 
         elif platform.system() == "Windows":
