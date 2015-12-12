@@ -59,13 +59,13 @@ class SimpleContainsResponse(GenericPlugin):
         for option in self.caseSensitiveOptions:
             match = False
             for opt in option[0]:
-                if self.message in opt:
+                if opt in self.message:
                     match = True
             if match: matches += 1
         for option in self.caseInsensitiveOptions:
             match = False
             for opt in option[0]:
-                if self.minMessage in opt:
+                if opt in self.minMessage:
                     match = True
             if match: matches += 1
         if matches == 1: return True
@@ -78,12 +78,12 @@ class SimpleContainsResponse(GenericPlugin):
     def parseUserInput(self):
         for option in self.caseSensitiveOptions:
             for opt in option[0]:
-                if self.message in opt:
+                if opt in self.message:
                     self.response = Randomizer.getRandomElement(option[1])
                     return
         for option in self.caseInsensitiveOptions:
             for opt in option[0]:
-                if self.minMessage in opt:
+                if opt in self.minMessage:
                     self.response = Randomizer.getRandomElement(option[1])
                     return
 

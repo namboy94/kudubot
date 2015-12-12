@@ -37,15 +37,14 @@ class SimpleEqualsResponse(GenericPlugin):
     """
     def regexCheck(self):
         for option in self.caseSensitiveOptions:
-            match = False
             for opt in option[0]:
                 if self.message == opt:
-                    match = True
+                    return True
         for option in self.caseInsensitiveOptions:
-            match = False
             for opt in option[0]:
                 if self.minMessage == opt:
-                    match = True
+                    return True
+        return False
 
     """
     Parses the user's input

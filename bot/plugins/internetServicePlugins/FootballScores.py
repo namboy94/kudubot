@@ -38,7 +38,7 @@ class FootballScores(GenericPlugin):
     @:override
     """
     def regexCheck(self):
-        regex = r"^/(table|tabelle|spieltag|matchday)( )?(([^ ]+| ){0,3})?$"
+        regex = r"^/(table|tabelle|spieltag|matchday)( [^ ]+ [^ ]+)?$"
         if re.search(regex, self.message): return True
         else: return False
 
@@ -54,7 +54,7 @@ class FootballScores(GenericPlugin):
         else:
             self.bundesliga = True
 
-        self.mode = self.message.split(" ")[0].lower()
+        self.mode = self.message.split(" ")[0].split("/")[1].lower()
         if self.mode in ["tabelle", "spieltag"]: self.lang = "de"
 
     """
@@ -63,6 +63,7 @@ class FootballScores(GenericPlugin):
     A:override
     """
     def getResponse(self):
+        print(self.mode)
         response = ""
         if self.bundesliga:
             if self.mode in ["tabelle", "table"]:
