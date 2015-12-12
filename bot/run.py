@@ -26,7 +26,7 @@ from yowsup.layers.protocol_messages           import YowMessagesProtocolLayer
 from yowsup.layers.protocol_receipts           import YowReceiptProtocolLayer
 from yowsup.layers.stanzaregulator             import YowStanzaRegulator
 from yowsup.stacks import YowStack
-from layers.layer import EchoLayer
+from layers.layer import BotLayer
 from startup.config.ConfigParser import ConfigParser
 from startup.installation.Installer import Installer
 
@@ -63,7 +63,7 @@ encryptionEnabled = True
 if encryptionEnabled:
     from yowsup.layers.axolotl                     import YowAxolotlLayer
     layers = (
-        EchoLayer,
+        BotLayer,
         (YowAuthenticationProtocolLayer, YowMessagesProtocolLayer, YowReceiptProtocolLayer, YowAckProtocolLayer, YowMediaProtocolLayer, YowIqProtocolLayer, YowCallsProtocolLayer),
         YowAxolotlLayer,
         YowLoggerLayer,
@@ -74,7 +74,7 @@ if encryptionEnabled:
         )
 else:
     layers = (
-        EchoLayer,
+        BotLayer,
         (YowAuthenticationProtocolLayer, YowMessagesProtocolLayer, YowReceiptProtocolLayer, YowAckProtocolLayer, YowMediaProtocolLayer, YowIqProtocolLayer, YowCallsProtocolLayer),
         YowLoggerLayer,
         YowCoderLayer,

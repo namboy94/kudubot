@@ -1,22 +1,27 @@
 """
 @author Hermann Krumrey<hermann@krumreyh.com>
-
 The layer component of the bot. Used to send and receive messages
 """
 import time
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
+from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity, \
+    RequestUploadIqProtocolEntity
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 
 from utils.encoding.Unicoder import Unicoder
 from utils.logging.LogWriter import LogWriter
 from utils.contacts.AddressBook import AddressBook
 from plugins.PluginManager import PluginManager
+from plugins.PluginManagerGui import PluginManagerGUI
 
 
-class EchoLayer(YowInterfaceLayer):
+class BotLayer(YowInterfaceLayer):
 
     parallelRunning = False
+    pluginManager = None
+    muted = False
+
 
     """
     Method run when a message is received
@@ -24,6 +29,14 @@ class EchoLayer(YowInterfaceLayer):
     """
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
+
+        if self.pluginManager is None:
+            self.pluginManager = PluginManager(self)
+            PluginManagerGUI(self.pluginManager)
+            if not self.parallelRunning:
+                print("Starting Parallel Threads")
+                PluginManager(self).startParallelRuns()
+                self.parallelRunning = True
 
         #Notify whatsapp that message was read
         self.toLower(messageProtocolEntity.ack())
@@ -33,7 +46,9 @@ class EchoLayer(YowInterfaceLayer):
         if not messageProtocolEntity.getType() == 'text': return
         if messageProtocolEntity.getTimestamp() < int(time.time()) - 200: return
         if AddressBook().isBlackListed(messageProtocolEntity.getFrom(False)): return
-        if AddressBook().isBlackListed(messageProtocolEntity.getParticipant(False)): return
+        try:
+            if AddressBook().isBlackListed(messageProtocolEntity.getParticipant(False)): return
+        except: print()
 
         try:
 
@@ -41,24 +56,23 @@ class EchoLayer(YowInterfaceLayer):
 
             LogWriter.writeEventLog("recv", messageProtocolEntity)
 
-            pluginManager = PluginManager(self, messageProtocolEntity)
-            response = pluginManager.runPlugins()
-            if not self.parallelRunning:
-                print("Starting Parallel Threads")
-                PluginManager(self).startParallelRuns()
-                self.parallelRunning = True
+            response = self.pluginManager.runPlugins(messageProtocolEntity)
 
             if response:
-                LogWriter.writeEventLog("sent", response)
-                response = Unicoder.fixOutgoingEntity(response)
-                self.toLower(response)
+                if not self.muted:
+                    LogWriter.writeEventLog("sent", response)
+                    response = Unicoder.fixOutgoingEntity(response)
+                    self.toLower(response)
+                else:
+                    LogWriter.writeEventLog("s(m)", response)
 
         except Exception as e:
             exception = TextMessageProtocolEntity("Exception: " + str(e), to=messageProtocolEntity.getFrom())
-            LogWriter.writeEventLog("exep", exception)
-            self.toLower(exception)
-
-
+            if not self.muted:
+                LogWriter.writeEventLog("exep", exception)
+                self.toLower(exception)
+            else:
+                LogWriter.writeEventLog("e(m)", exception)
 
     #YOWSUP SPECIFIC METHODS
 

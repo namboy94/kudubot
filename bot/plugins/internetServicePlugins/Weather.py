@@ -39,7 +39,7 @@ class Weather(GenericPlugin):
     @:override
     """
     def regexCheck(self):
-        regex = r"^/(weather|wetter)(:)?(text;|verbose;)*( )?(([^ ]+| ){0,5})?$"
+        regex = r"^/(weather|wetter)(:(text;|verbose;)+)?( ([^ ]+| )+(, ([^ ]+| )+)?(, ([^ ]+| )+)?)?$"
         if re.search(regex, self.message): return True
         else: return False
 
@@ -76,7 +76,7 @@ class Weather(GenericPlugin):
             self.country = splitCity[1]
         elif len(splitCity) == 3:
             self.province = splitCity[1]
-            self.province = splitCity[2]
+            self.country = splitCity[2]
         else:
             self.province = False
             self.country = False
@@ -96,7 +96,7 @@ class Weather(GenericPlugin):
             self.location = self.__repairAmericanLocation__()
             self.weather = pywapi.get_weather_from_weather_com(self.locationCode)
         except:
-            return TextMessageProtocolEntity("City not Found", self.sender)
+            return TextMessageProtocolEntity("City not Found", to=self.sender)
 
         return TextMessageProtocolEntity(self.__messageGenerator__(), to=self.sender)
 

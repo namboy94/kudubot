@@ -16,6 +16,7 @@ class AddressBook(object):
                     ["4917628727937-1448730289", "Bottesting"],
                     ["4917628727937", "Hermann"]]
         self.blacklist = ["4915733871694", "4915202589244", "4915202589168"]
+        self.authenticated = ["4917628727937"]
 
     """
     Searches for a contact name belonging to a number given via parameter
@@ -39,7 +40,17 @@ class AddressBook(object):
 
     """
     Checks if a number is blacklisted
+    @:return true if the number is blacklisted, false otherwise
     """
     def isBlackListed(self, number):
         if number in self.blacklist: return True
+        else: return False
+
+    """
+    Checks if a number is authenticated
+    @:return true if the number is authenticated, false otherwise
+    """
+    def isAuthenticated(self, number):
+        pureNumber = number.split("@")[0]
+        if pureNumber in self.authenticated: return True
         else: return False

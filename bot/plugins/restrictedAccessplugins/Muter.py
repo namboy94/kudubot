@@ -5,13 +5,14 @@ plugin that allows muting of the bot
 
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
+from utils.encoding.Unicoder import Unicoder
+from utils.contacts.AddressBook import AddressBook
 
 """
-The  Class
+The Muter Class
 """
+class Muter(GenericPlugin):
 
-
-class(GenericPlugin):
     """
     Constructor
     Defines parameters for the plugin.
@@ -19,41 +20,53 @@ class(GenericPlugin):
     @:param messageProtocolEntity - the received message information
     @:override
     """
-
     def __init__(self, layer, messageProtocolEntity=None):
         if messageProtocolEntity is None: self.layer = layer; return
         self.layer = layer
         self.entity = messageProtocolEntity
-        self.message = self.entity.getBody()
+        self.message = self.entity.getBody().lower()
         self.sender = self.entity.getFrom()
-        raise NotImplementedError()
+
+        self.authenticated = False
 
     """
     Checks if the user input is valid for this plugin to continue
     @:return True if input is valid, False otherwise
     @:override
     """
-
     def regexCheck(self):
-        raise NotImplementedError()
+        if self.message in ["/unmute", "/mute"]:
+            return True
+        else: return False
 
     """
     Parses the user's input
     @:override
     """
-
     def parseUserInput(self):
-        raise NotImplementedError()
+        self.authenticated = AddressBook().isAuthenticated(self.entity.getFrom(False)) \
+                             or AddressBook().isAuthenticated(self.entity.getParticipant())
+
+        if self.authenticated:
+            if self.message == "/unmute":
+                self.layer.muted = False
+            elif self.message == "/mute":
+                self.layer.muted = True
 
     """
     Returns the response calculated by the plugin
     @:return the response as a MessageProtocolEntity
     @:override
     """
-
     def getResponse(self):
-        return TextMessageProtocolEntity(, to=)
-        raise NotImplementedError()
+        if self.layer.muted:
+            messageProtocolEntity = TextMessageProtocolEntity("🤐", to=self.sender)
+            messageProtocolEntity = Unicoder.fixOutgoingEntity(messageProtocolEntity)
+            self.layer.toLower(messageProtocolEntity)
+            return messageProtocolEntity
+
+        else:
+            return TextMessageProtocolEntity("😄", to=self.sender)
 
     """
     Returns a helpful description of the plugin's syntax and functionality
@@ -61,7 +74,6 @@ class(GenericPlugin):
     @:return the description as string
     @:override
     """
-
     @staticmethod
     def getDescription(language):
         if language == "en":
@@ -70,13 +82,3 @@ class(GenericPlugin):
             return ""
         else:
             return "Help not available in this language"
-
-    """
-    Starts a parallel background activity if this class has one.
-    Defaults to False if not implemented
-    @:return False, if no parallel activity defined, should be implemented to return True if one is implmented.
-    @:override
-    """
-
-    def parallelRun(self):
-        return False

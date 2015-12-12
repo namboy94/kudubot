@@ -5,9 +5,16 @@ Class that manages the plugins. Acts as facade to the Yowsup layer
 
 from threading import Thread
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from plugins.internetServicePlugins import Weather, Mensa, FootballScores, TheTVDB, KVV
-from plugins.localServicePlugins import Reminder
-from plugins.simpleTextResponses import SimpleContainsResponse
+from plugins.internetServicePlugins.Weather import Weather
+from plugins.internetServicePlugins.Mensa import Mensa
+from plugins.internetServicePlugins.FootballScores import FootballScores
+from plugins.internetServicePlugins.TheTVDB import TheTVDB
+from plugins.internetServicePlugins.KVV import KVV
+from plugins.internetServicePlugins.KinoZKM import KinoZKM
+from plugins.localServicePlugins.Reminder import Reminder
+from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
+from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
+from plugins.restrictedAccessplugins.Muter import Muter
 
 """
 The PluginManager class
@@ -19,37 +26,50 @@ class PluginManager(object):
     @:param layer - the overlying yowsup layer
     @:param messageProtocolEntity - the incoming MessageProtocolEntity
     """
-    def __init__(self, layer, messageProtocolEntity=None):
+    def __init__(self, layer):
         self.layer = layer
-        self.messageProtocolEntity = messageProtocolEntity
+        self.plugins = {"Weather Plugin": True,
+                        "TVDB Plugin": True,
+                        "Reminder Plugin": True,
+                        "Mensa Plugin": True,
+                        "Football Scores Plugin": True,
+                        "KVV Plugin": True,
+                        "Simple Contains Plugin": True,
+                        "Simple Equals Plugin": True,
+                        "Muter": True,
+                        "KinoZKM": True}
+        ### ADD NEW PLUGINS HERE ###
 
     """
     Runs all plugins
     """
-    def runPlugins(self):
+    def runPlugins(self, messageProtocolEntity):
 
-        if self.messageProtocolEntity is None: raise Exception("Wrong initialization")
+        if messageProtocolEntity is None: raise Exception("Wrong initialization")
 
         plugins = []
-        plugins.append(Weather.Weather(self.layer, self.messageProtocolEntity))
-        plugins.append(TheTVDB.TheTVDB(self.layer, self.messageProtocolEntity))
-        plugins.append(Reminder.Reminder(self.layer, self.messageProtocolEntity))
-        plugins.append(Mensa.Mensa(self.layer, self.messageProtocolEntity))
-        plugins.append(FootballScores.FootballScores(self.layer, self.messageProtocolEntity))
-        plugins.append(KVV.KVV(self.layer, self.messageProtocolEntity))
-        plugins.append(SimpleContainsResponse.SimpleContainsResponse(self.layer, self.messageProtocolEntity))
+        if self.plugins["Weather Plugin"]: plugins.append(Weather(self.layer, messageProtocolEntity))
+        if self.plugins["TVDB Plugin"]: plugins.append(TheTVDB(self.layer, messageProtocolEntity))
+        if self.plugins["Reminder Plugin"]: plugins.append(Reminder(self.layer, messageProtocolEntity))
+        if self.plugins["Mensa Plugin"]: plugins.append(Mensa(self.layer, messageProtocolEntity))
+        if self.plugins["Football Scores Plugin"]: plugins.append(FootballScores(self.layer, messageProtocolEntity))
+        if self.plugins["KVV Plugin"]: plugins.append(KVV(self.layer, messageProtocolEntity))
+        if self.plugins["Simple Contains Plugin"]: plugins.append(SimpleContainsResponse(self.layer, messageProtocolEntity))
+        if self.plugins["Simple Equals Plugin"]: plugins.append(SimpleEqualsResponse(self.layer, messageProtocolEntity))
+        if self.plugins["Muter"]: plugins.append(Muter(self.layer, messageProtocolEntity))
+        if self.plugins["KinoZKM"]: plugins.append(KinoZKM(self.layer, messageProtocolEntity))
         ### ADD NEW PLUGINS HERE ###
 
-        if self.messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:
+        if messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:
             helpString = "/help\tDisplays this help message"
             for plugin in plugins:
                 if not plugin.getDescription("en") == "":
                     helpString += "\n\n\n"
-                if self.messageProtocolEntity.getBody().lower() == "/help":
+                if messageProtocolEntity.getBody().lower() == "/help":
                     helpString += plugin.getDescription("en")
-                elif self.messageProtocolEntity.getBody().lower() == "/hilfe":
+                elif messageProtocolEntity.getBody().lower() == "/hilfe":
                     helpString += plugin.getDescription("de")
-            return TextMessageProtocolEntity(helpString, to=self.messageProtocolEntity.getFrom())
+            return TextMessageProtocolEntity(helpString, to=messageProtocolEntity.getFrom())
 
         for plugin in plugins:
             if plugin.regexCheck():
@@ -66,7 +86,7 @@ class PluginManager(object):
 
         threads = []
 
-        threads.append(Thread(target=Reminder.Reminder(self.layer).parallelRun))
+        threads.append(Thread(target=Reminder(self.layer).parallelRun))
         ### ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE ###
 
         for thread in threads:
