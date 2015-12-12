@@ -12,6 +12,7 @@ from plugins.internetServicePlugins.TheTVDB import TheTVDB
 from plugins.internetServicePlugins.KVV import KVV
 from plugins.internetServicePlugins.KinoZKM import KinoZKM
 from plugins.localServicePlugins.Reminder import Reminder
+from plugins.localServicePlugins.Terminal import Terminal
 from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
 from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
 from plugins.restrictedAccessplugins.Muter import Muter
@@ -36,8 +37,9 @@ class PluginManager(object):
                         "KVV Plugin": True,
                         "Simple Contains Plugin": True,
                         "Simple Equals Plugin": True,
-                        "Muter": True,
-                        "KinoZKM": True}
+                        "Muter Plugin": True,
+                        "KinoZKM Plugin": True,
+                        "Terminal Plugin": True}
         ### ADD NEW PLUGINS HERE ###
 
     """
@@ -56,8 +58,9 @@ class PluginManager(object):
         if self.plugins["KVV Plugin"]: plugins.append(KVV(self.layer, messageProtocolEntity))
         if self.plugins["Simple Contains Plugin"]: plugins.append(SimpleContainsResponse(self.layer, messageProtocolEntity))
         if self.plugins["Simple Equals Plugin"]: plugins.append(SimpleEqualsResponse(self.layer, messageProtocolEntity))
-        if self.plugins["Muter"]: plugins.append(Muter(self.layer, messageProtocolEntity))
-        if self.plugins["KinoZKM"]: plugins.append(KinoZKM(self.layer, messageProtocolEntity))
+        if self.plugins["Muter Plugin"]: plugins.append(Muter(self.layer, messageProtocolEntity))
+        if self.plugins["KinoZKM Plugin"]: plugins.append(KinoZKM(self.layer, messageProtocolEntity))
+        if self.plugins["Terminal Plugin"]: plugins.append(Terminal(self.layer, messageProtocolEntity))
         ### ADD NEW PLUGINS HERE ###
 
         if messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:
