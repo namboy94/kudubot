@@ -49,10 +49,7 @@ class BotLayer(YowInterfaceLayer):
         self.toLower(messageProtocolEntity.ack(True))
 
         #Cases in which responses won't trigger
-        if not messageProtocolEntity.getType() == 'text':
-            print("Recveived Image")
-            self.image_send(messageProtocolEntity.getFrom(False), "/home/hermann/IDEs/Projects/PyCharm/whatsapp-bot/resources/divby0.jpg",  "")
-            return
+        if not messageProtocolEntity.getType() == 'text': return
         if messageProtocolEntity.getTimestamp() < int(time.time()) - 200: return
         if AddressBook().isBlackListed(messageProtocolEntity.getFrom(False)): return
         try:
@@ -79,7 +76,7 @@ class BotLayer(YowInterfaceLayer):
             exception = TextMessageProtocolEntity("Exception: " + str(e), to=messageProtocolEntity.getFrom())
             if not self.muted:
                 LogWriter.writeEventLog("exep", exception)
-                self.toLower(exception)
+                self.sendImage(messageProtocolEntity.getFrom(False), "../resources/images/exception.jpg",  exception.getBody())
             else:
                 LogWriter.writeEventLog("e(m)", exception)
 
@@ -109,7 +106,7 @@ class BotLayer(YowInterfaceLayer):
     def onReceipt(self, entity):
         self.toLower(entity.ack())
 
-    def image_send(self, number, path, caption = None):
+    def sendImage(self, number, path, caption = None):
         jid = self.aliasToJid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
         successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity, caption)
