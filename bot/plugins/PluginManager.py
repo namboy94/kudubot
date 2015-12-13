@@ -11,6 +11,7 @@ from plugins.internetServicePlugins.FootballScores import FootballScores
 from plugins.internetServicePlugins.TheTVDB import TheTVDB
 from plugins.internetServicePlugins.KVV import KVV
 from plugins.internetServicePlugins.KinoZKM import KinoZKM
+from plugins.internetServicePlugins.KickTipp import KickTipp
 from plugins.localServicePlugins.Reminder import Reminder
 from plugins.localServicePlugins.Terminal import Terminal
 from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
@@ -39,7 +40,8 @@ class PluginManager(object):
                         "Simple Equals Plugin": True,
                         "Muter Plugin": True,
                         "KinoZKM Plugin": True,
-                        "Terminal Plugin": True}
+                        "Terminal Plugin": True,
+                        "Kicktipp Plugin": True}
         ### ADD NEW PLUGINS HERE ###
 
     """
@@ -61,6 +63,7 @@ class PluginManager(object):
         if self.plugins["Muter Plugin"]: plugins.append(Muter(self.layer, messageProtocolEntity))
         if self.plugins["KinoZKM Plugin"]: plugins.append(KinoZKM(self.layer, messageProtocolEntity))
         if self.plugins["Terminal Plugin"]: plugins.append(Terminal(self.layer, messageProtocolEntity))
+        if self.plugins["Kicktipp Plugin"]: plugins.append(KickTipp(self.layer, messageProtocolEntity))
         ### ADD NEW PLUGINS HERE ###
 
         if messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:

@@ -38,7 +38,7 @@ class FootballScores(GenericPlugin):
     @:override
     """
     def regexCheck(self):
-        regex = r"^/(table|tabelle|spieltag|matchday)( [^ ]+ [^ ]+)?$"
+        regex = r"^/(table|tabelle|spieltag|matchday)( [^ ]+, [^ ]+)?$"
         if re.search(regex, self.message): return True
         else: return False
 
@@ -63,7 +63,6 @@ class FootballScores(GenericPlugin):
     A:override
     """
     def getResponse(self):
-        print(self.mode)
         response = ""
         if self.bundesliga:
             if self.mode in ["tabelle", "table"]:
@@ -179,7 +178,7 @@ class FootballScores(GenericPlugin):
         for r in res:
             returnString += r.text + "\n"
 
-        return self.__makeBundesligaReadable__(returnString)
+        return returnString
 
     """
     Fetches the information about a generic country/league table
@@ -189,15 +188,15 @@ class FootballScores(GenericPlugin):
 
         returnString = ""
 
-        url = "http://www.livescore.com/soccer/germany/" + self.country + "/" + self.league + "/"
+        url = "http://www.livescore.com/soccer/" + self.country + "/" + self.league + "/"
 
         html = requests.get(url).text
         soup = BeautifulSoup(html, "html.parser")
         teamres = soup.select('.team')
 
         i = 1
-        for team in teamres:
-            returnString += str(i) + ".\t" + team
+        while i < len(teamres):
+            returnString += str(i) + ".\t" + teamres[i].text + "\n"
             i += 1
 
         return returnString

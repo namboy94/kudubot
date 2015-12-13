@@ -70,7 +70,7 @@ class Mensa(GenericPlugin):
             elif "curry" in arg: self.mode = "curry"
             elif "cafeteria" in arg and not "nachmittag" in arg: self.mode = "cafeteriavm"
             elif "cafeteria" in arg and "nachmittag" in arg: self.mode = "cafeterianm"
-        self.getTodaysPlan()
+        self.__getTodaysPlan__()
 
     """
     Decides which information to send back to the user
@@ -120,7 +120,7 @@ class Mensa(GenericPlugin):
     """
     Retrieves the information about today's (or tomorrow's) mensa plan
     """
-    def getTodaysPlan(self):
+    def __getTodaysPlan__(self):
 
         try:
             if self.future: url = "http://mensa.akk.uni-karlsruhe.de/?DATUM=morgen&uni=1"

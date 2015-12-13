@@ -37,7 +37,7 @@ class KinoZKM(GenericPlugin):
     @:override
     """
     def regexCheck(self):
-        if re.search(r"/kinozkm summaries", self.message):
+        if re.search(r"^/kinozkm summaries$", self.message):
             return True
         else: return False
 
@@ -67,13 +67,46 @@ class KinoZKM(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return ""
+            return "/kinozkm\tFetches current information regarding the cinema at the ZKM in Karlsruhe\n" \
+                   "syntax: /kinozkm [summaries]"
         elif language == "de":
-            return ""
+            return "/kinozkm\tZeigt Aktuelle Kinoinformationen für das Kino am ZKM in Karlsruhe an\n" \
+                   "syntax: /kinozkm [summaries]"
         else:
             return "Help not available in this language"
 
     ### Local Methods ###
+
+    """
+    Returns all currently running movies and movie descriptions.
+    @:return the movie titles and descriptions as formatted string.
+    """
+    def __getAllSummaries__(self):
+
+        html = requests.get("http://www.filmpalast.net/programm.html").text
+        soup = BeautifulSoup(html, "html.parser")
+        allMovieDescriptions = soup.select('.gwfilmdb-film-description')
+        allMovieTitles = soup.select('.gwfilmdb-film-title')
+
+        movieTitles = []
+
+        skip = False
+        for title in allMovieTitles:
+            if not skip:
+                movieTitles.append(title)
+                skip = True
+            else:
+                skip = False
+
+        allDescriptions = "Zusammenfassungen Aktuelle Filme:\n\n"
+
+        i = 0
+        while i < len(movieTitles):
+            allDescriptions += movieTitles[i].text + "\n"
+            allDescriptions += allMovieDescriptions[i].text + "\n\n"
+            i += 1
+
+        return allDescriptions
 
     """
     def __getTimes__(self):
@@ -128,30 +161,3 @@ class KinoZKM(GenericPlugin):
         return ""
 
     """
-
-    def __getAllSummaries__(self):
-
-        html = requests.get("http://www.filmpalast.net/programm.html").text
-        soup = BeautifulSoup(html, "html.parser")
-        allMovieDescriptions = soup.select('.gwfilmdb-film-description')
-        allMovieTitles = soup.select('.gwfilmdb-film-title')
-
-        movieTitles = []
-
-        skip = False
-        for title in allMovieTitles:
-            if not skip:
-                movieTitles.append(title)
-                skip = True
-            else:
-                skip = False
-
-        allDescriptions = "Zusammenfassungen Aktuelle Filme:\n\n"
-
-        i = 0
-        while i < len(movieTitles):
-            allDescriptions += movieTitles[i].text + "\n"
-            allDescriptions += allMovieDescriptions[i].text + "\n\n"
-            i += 1
-
-        return allDescriptions
