@@ -10,7 +10,6 @@ sys.path.append(upperDirectory)
 
 import argparse
 import sys
-
 from yowsup import env
 from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
@@ -94,3 +93,4 @@ stack.setProp(YowCoderLayer.PROP_RESOURCE, env.CURRENT_ENV.getResource())       
 stack.broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT))   #sending the connect signal
 # this is the program mainloop
 stack.loop()
+print("Dead")

@@ -12,6 +12,8 @@ from plugins.internetServicePlugins.TheTVDB import TheTVDB
 from plugins.internetServicePlugins.KVV import KVV
 from plugins.internetServicePlugins.KinoZKM import KinoZKM
 from plugins.internetServicePlugins.KickTipp import KickTipp
+from plugins.internetServicePlugins.XKCD import XKCD
+from plugins.internetServicePlugins.ImageSender import ImageSender
 from plugins.localServicePlugins.Reminder import Reminder
 from plugins.localServicePlugins.Terminal import Terminal
 from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
@@ -41,7 +43,9 @@ class PluginManager(object):
                         "Muter Plugin": True,
                         "KinoZKM Plugin": True,
                         "Terminal Plugin": True,
-                        "Kicktipp Plugin": True}
+                        "Kicktipp Plugin": True,
+                        "XKCD Plugin": True,
+                        "ImageSender Plugin": True}
         ### ADD NEW PLUGINS HERE ###
 
     """
@@ -64,6 +68,8 @@ class PluginManager(object):
         if self.plugins["KinoZKM Plugin"]: plugins.append(KinoZKM(self.layer, messageProtocolEntity))
         if self.plugins["Terminal Plugin"]: plugins.append(Terminal(self.layer, messageProtocolEntity))
         if self.plugins["Kicktipp Plugin"]: plugins.append(KickTipp(self.layer, messageProtocolEntity))
+        if self.plugins["XKCD Plugin"]: plugins.append(XKCD(self.layer, messageProtocolEntity))
+        if self.plugins["ImageSender Plugin"]: plugins.append(ImageSender(self.layer, messageProtocolEntity))
         ### ADD NEW PLUGINS HERE ###
 
         if messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:
@@ -96,6 +102,7 @@ class PluginManager(object):
         ### ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE ###
 
         for thread in threads:
+            thread.setDaemon(True)
             thread.start()
 
         return threads

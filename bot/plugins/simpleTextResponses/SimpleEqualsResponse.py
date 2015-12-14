@@ -28,7 +28,8 @@ class SimpleEqualsResponse(GenericPlugin):
         self.sender = self.entity.getFrom()
 
         self.caseInsensitiveOptions = [[["uptime"], ["Much too long, I'm tired"]]]
-        self.caseSensitiveOptions = [[[], []]]
+        self.caseSensitiveOptions = [[["ping"], ["pong"]],
+                                     [["Ping"], ["Pong"]]]
 
     """
     Checks if the user input is valid for this plugin to continue

@@ -7,7 +7,6 @@ import datetime
 import os
 import re
 import time
-from threading import Thread
 
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin

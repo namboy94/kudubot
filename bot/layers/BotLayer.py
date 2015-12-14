@@ -76,7 +76,8 @@ class BotLayer(YowInterfaceLayer):
             exception = TextMessageProtocolEntity("Exception: " + str(e), to=messageProtocolEntity.getFrom())
             if not self.muted:
                 LogWriter.writeEventLog("exep", exception)
-                self.sendImage(messageProtocolEntity.getFrom(False), "../resources/images/exception.jpg",  exception.getBody())
+                exceptionImage = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
+                self.sendImage(messageProtocolEntity.getFrom(False), exceptionImage,  exception.getBody())
             else:
                 LogWriter.writeEventLog("e(m)", exception)
 

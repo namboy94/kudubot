@@ -21,7 +21,8 @@ class Installer(object):
 
         if platform.system() == "Linux":
             homedir = os.getenv("HOME")
-            if not os.path.isdir(homedir + "/.whatsapp-bot"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/logs"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/images/temp"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/logs"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/reminders"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/program"): return False
@@ -48,6 +49,11 @@ class Installer(object):
                 os.system("cp -rf " + Installer.getSourceDir() + " " + programdir)
             if not os.path.isdir(whatsappbotdir + "/logs"):
                 os.system("mkdir " + whatsappbotdir + "/logs")
+            if not os.path.isdir(whatsappbotdir + "/images"):
+                os.system("mkdir " + whatsappbotdir + "/images")
+                os.system("cp -rf " + Installer.getSourceDir() + "/resources/images/ " + whatsappbotdir)
+            if not os.path.isdir(whatsappbotdir + "/images/temp"):
+                os.system("mkdir " + whatsappbotdir + "/images/temp")
             if not os.path.isfile(whatsappbotdir + "/config"):
                 file = open(whatsappbotdir + "/config", "w")
                 file.write("number=\npassword=")
@@ -72,6 +78,9 @@ class Installer(object):
             programdir = whatsappbotdir + "/program"
             os.system("rm -rf " + programdir)
             os.system("cp -rf " + Installer.getSourceDir() + " " + programdir)
+            os.system("rm -rf " + whatsappbotdir + "/images")
+            os.system("cp -rf " + Installer.getSourceDir() + "/resources/images " + whatsappbotdir)
+            os.system("mkdir " + whatsappbotdir + "/images/temp")
         elif platform.system() == "Windows":
             return False
 
