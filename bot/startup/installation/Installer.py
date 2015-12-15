@@ -27,6 +27,7 @@ class Installer(object):
             if not os.path.isdir(homedir + "/.whatsapp-bot/reminders"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/program"): return False
             if not os.path.isfile(homedir + "/.whatsapp-bot/config"): return False
+            if not os.path.isfile(homedir + "/.whatsapp-bot/plugins"): return False
             if not os.path.isfile("/usr/bin/whatsapp-bot"): return False
             return True
 
@@ -57,6 +58,10 @@ class Installer(object):
             if not os.path.isfile(whatsappbotdir + "/config"):
                 file = open(whatsappbotdir + "/config", "w")
                 file.write("number=\npassword=")
+                file.close()
+            if not os.path.isfile(whatsappbotdir + "/plugins"):
+                file = open(whatsappbotdir + "/plugins", "w")
+                file.write("Plugin Name=0")
                 file.close()
             if not os.path.isdir(whatsappbotdir + "/reminders"):
                 os.system("mkdir " + whatsappbotdir + "/reminders")

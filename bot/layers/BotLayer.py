@@ -12,6 +12,7 @@ from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMedia
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
 
+from startup.config.PluginConfigParser import PluginConfigParser
 from utils.encoding.Unicoder import Unicoder
 from utils.logging.LogWriter import LogWriter
 from utils.contacts.AddressBook import AddressBook
@@ -38,6 +39,7 @@ class BotLayer(YowInterfaceLayer):
 
         if self.pluginManager is None:
             self.pluginManager = PluginManager(self)
+            self.pluginManager.setPlugins(PluginConfigParser().readPlugins())
             PluginManagerGUI(self.pluginManager)
             if not self.parallelRunning:
                 print("Starting Parallel Threads")

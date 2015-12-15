@@ -106,3 +106,9 @@ class PluginManager(object):
             thread.start()
 
         return threads
+
+    def getPlugins(self):
+        return self.plugins
+
+    def setPlugins(self, pluginDictionary):
+        self.plugins = pluginDictionary
