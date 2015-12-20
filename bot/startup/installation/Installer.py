@@ -23,8 +23,9 @@ class Installer(object):
             homedir = os.getenv("HOME")
             if not os.path.isdir(homedir + "/.whatsapp-bot/logs"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/images/temp"): return False
-            if not os.path.isdir(homedir + "/.whatsapp-bot/logs"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/reminders"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/casino/users"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/casino/roulette"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/program"): return False
             if not os.path.isfile(homedir + "/.whatsapp-bot/config"): return False
             if not os.path.isfile(homedir + "/.whatsapp-bot/plugins"): return False
@@ -65,6 +66,10 @@ class Installer(object):
                 file.close()
             if not os.path.isdir(whatsappbotdir + "/reminders"):
                 os.system("mkdir " + whatsappbotdir + "/reminders")
+            if not os.path.isdir(whatsappbotdir + "/casino/users"):
+                os.system("mkdir -p " + whatsappbotdir + "/casino/users")
+            if not os.path.isdir(whatsappbotdir + "/casino/roulette"):
+                os.system("mkdir -p " + whatsappbotdir + "/casino/roulette")
             if not os.path.isfile("/usr/bin/whatsapp-bot"):
                 os.system("gksudo cp " + Installer.getSourceDir() + "/bot/startup/continuousscript /usr/bin/whatsapp-bot")
                 os.system("gksudo chmod 755 /usr/bin/whatsapp-bot")

@@ -19,6 +19,7 @@ from plugins.localServicePlugins.Terminal import Terminal
 from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
 from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
 from plugins.restrictedAccessplugins.Muter import Muter
+from plugins.localServicePlugins.Roulette import Roulette
 
 """
 The PluginManager class
@@ -45,7 +46,8 @@ class PluginManager(object):
                         "Terminal Plugin": True,
                         "Kicktipp Plugin": True,
                         "XKCD Plugin": True,
-                        "ImageSender Plugin": True}
+                        "ImageSender Plugin": True,
+                        "Roulette Plugin": True}
         ### ADD NEW PLUGINS HERE ###
 
     """
@@ -70,6 +72,8 @@ class PluginManager(object):
         if self.plugins["Kicktipp Plugin"]: plugins.append(KickTipp(self.layer, messageProtocolEntity))
         if self.plugins["XKCD Plugin"]: plugins.append(XKCD(self.layer, messageProtocolEntity))
         if self.plugins["ImageSender Plugin"]: plugins.append(ImageSender(self.layer, messageProtocolEntity))
+        if self.plugins["Roulette Plugin"]: plugins.append(Roulette(self.layer, messageProtocolEntity))
+
         ### ADD NEW PLUGINS HERE ###
 
         if messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:
@@ -99,6 +103,7 @@ class PluginManager(object):
         threads = []
 
         threads.append(Thread(target=Reminder(self.layer).parallelRun))
+        threads.append(Thread(target=Roulette(self.layer).parallelRun))
         ### ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE ###
 
         for thread in threads:
@@ -107,8 +112,15 @@ class PluginManager(object):
 
         return threads
 
+    """
+    @:return a dictionary of the current plugin configuration
+    """
     def getPlugins(self):
         return self.plugins
 
+    """
+    Sets a new status of the plugins
+    @:param the new plugin states as a dictionary
+    """
     def setPlugins(self, pluginDictionary):
         self.plugins = pluginDictionary
