@@ -29,7 +29,7 @@ class Roulette(GenericPlugin):
         if messageProtocolEntity is None: self.layer = layer; return
         self.layer = layer
         self.entity = messageProtocolEntity
-        self.message = self.entity.getBody()
+        self.message = self.entity.getBody().lower()
         self.sender = self.entity.getFrom()
         self.user = self.entity.getFrom(False)
         if not self.user: self.user = self.entity.getFrom(False)
