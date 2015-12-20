@@ -24,6 +24,8 @@ class Roulette(GenericPlugin):
     """
     def __init__(self, layer, messageProtocolEntity=None):
         self.outcome = -1
+        self.userDir = os.getenv("HOME") + "/.whatsapp-bot/casino/users"
+        self.rouletteDir = os.getenv("HOME") + "/.whatsapp-bot/casino/roulette"
         if messageProtocolEntity is None: self.layer = layer; return
         self.layer = layer
         self.entity = messageProtocolEntity
@@ -34,9 +36,6 @@ class Roulette(GenericPlugin):
         if not os.path.isfile(self.userDir + "/" + self.user): self.__addUser__()
         userDetails = configparser.ConfigParser().read(self.userDir + "/" + self.user)
         self.balance = float(dict(userDetails.items("account"))["balance"])
-
-        self.userDir = os.getenv("HOME") + "/.whatsapp-bot/casino/users"
-        self.rouletteDir = os.getenv("HOME") + "/.whatsapp-bot/casino/roulette"
 
         self.insufficientFunds = False
 
@@ -70,6 +69,7 @@ class Roulette(GenericPlugin):
         betFile.write("betamount=" + str(self.betAmount) + "\n")
         betFile.write("br\n")
         betFile.close()
+        self.__transferFunds(self.user, self.betAmount)
 
     """
     Returns the response calculated by the plugin
@@ -106,17 +106,28 @@ class Roulette(GenericPlugin):
             minutes = 2
             seconds = 1
             if minutes % 2 == 0 and seconds == 0:
+                recipients = []
                 self.outcome = random.randint(0, 36)
-                for betFile in os.listdir(self.rouletteDir):
-                    file = open(self.rouletteDir + "/" + betFile, 'r')
+                for better in os.listdir(self.rouletteDir):
+                    winnings = 0.0
+
+                    file = open(self.rouletteDir + "/" + better, 'r')
                     fileContent = file.read()
                     file.close()
-                    Popen(["rm", self.rouletteDir + "/" + betFile])
+                    Popen(["rm", self.rouletteDir + "/" + better])
                     rawBets = fileContent.split("br\n")
                     for betString in rawBets:
                         sender = betString.split("sender=")[1].split("\n")[0]
+                        if not sender in recipients:
+                            recipients.append(sender)
                         bet = betString.split("bet=")[1].split("\n")[0]
                         betAmount = float(betString.split("betamount=")[1].split("\n")[0])
+                        winnings += self.__evaluateBet__(bet, betAmount)
+                    self.__transferFunds(better, winnings)
+                for sender in recipients:
+                    winningMessage = TextMessageProtocolEntity("The winning number is " + str(self.outcome), to=sender)
+                    self.layer.toLower(winningMessage)
+
 
 
     ###LOCAL METHODS###
@@ -129,6 +140,44 @@ class Roulette(GenericPlugin):
         file.write("[account]\nbalance = " + str(value))
         file.close()
 
+    """
+    Evaluates a bet
+    @:return the amount won by the player
+    """
     def __evaluateBet__(self, bet, betAmount):
+        try:
+            intbet = int(bet)
+            if self.outcome == intbet:
+                return betAmount * 35
+            else:
+                return 0.0
+        except:
+            if bet == "red":
+                #TODO Find out which numbers are red and which are black
+                if self.outcome in [0,1,2,3]:
+                    return betAmount * 2
+            elif bet == "black":
+                #TODO Find out which numbers are red and which are black
+                if self.outcome in [0,1,2,3]:
+                    return betAmount * 2
+            elif bet == "even":
+                if self.outcome % 2 == 0:
+                    return betAmount * 2
+            elif bet == "odd":
+                if self.outcome % 2 == 1:
+                    return betAmount * 2
+        return 0.0
 
+    """
+    Adds or subtracts an amount from the balance of a player
+    """
+    def __transferFunds(self, user, amount):
+        file = open(self.userDir + "/" + user, 'r')
+        content = file.read()
+        file.close()
+        balance = float(content.split("balance = ")[1])
+        balance += amount
+        file = open(self.userDir + "/" + user, 'w')
+        file.write("[account]\nbalance = " + str(balance))
+        file.close()
 

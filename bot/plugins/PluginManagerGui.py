@@ -27,7 +27,7 @@ class PluginManagerGUI(object):
             if self.pluginDictionary[key]: color = "green"
             button = Button(self.gui, text=key, background=color, command=lambda key=key:self.__toggleValue__(key))
             self.buttons[key] = button
-            button.pack()
+            button.pack(fill=X)
 
         Button(self.gui, text="Confirm", command=self.gui.destroy).pack()
 

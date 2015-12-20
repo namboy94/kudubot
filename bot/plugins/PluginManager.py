@@ -72,7 +72,7 @@ class PluginManager(object):
         if self.plugins["Kicktipp Plugin"]: plugins.append(KickTipp(self.layer, messageProtocolEntity))
         if self.plugins["XKCD Plugin"]: plugins.append(XKCD(self.layer, messageProtocolEntity))
         if self.plugins["ImageSender Plugin"]: plugins.append(ImageSender(self.layer, messageProtocolEntity))
-        if self.plugins["Roulette Plugin"]: plugins.append(Roulette(self.layer, messageProtocolEntity))
+        #if self.plugins["Roulette Plugin"]: plugins.append(Roulette(self.layer, messageProtocolEntity))
 
         ### ADD NEW PLUGINS HERE ###
 
@@ -103,7 +103,7 @@ class PluginManager(object):
         threads = []
 
         threads.append(Thread(target=Reminder(self.layer).parallelRun))
-        threads.append(Thread(target=Roulette(self.layer).parallelRun))
+        #threads.append(Thread(target=Roulette(self.layer).parallelRun))
         ### ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE ###
 
         for thread in threads:
