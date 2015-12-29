@@ -4,6 +4,8 @@ Roulette Game Plugin for the whatsapp bot
 """
 import os
 import re
+import time
+import datetime
 import random
 import configparser
 from subprocess import Popen
@@ -24,6 +26,7 @@ class Roulette(GenericPlugin):
     """
     def __init__(self, layer, messageProtocolEntity=None):
         self.outcome = -1
+        self.mode = "bet"
         self.userDir = os.getenv("HOME") + "/.whatsapp-bot/casino/users"
         self.rouletteDir = os.getenv("HOME") + "/.whatsapp-bot/casino/roulette"
         if messageProtocolEntity is None: self.layer = layer; return
@@ -48,9 +51,18 @@ class Roulette(GenericPlugin):
     @:override
     """
     def regexCheck(self):
-        return re.search(r"^/roulette ([0-9]+\.[0-9]{2}) ([0-9]+|black|red)$", self.message)
-        #TODO Check how to force a number between 0 and 36
-        #TODO Make a time check to avoid conflicts with writing/reading/deleting files
+        currentTime = datetime.datetime.now()
+        cMin = int(currentTime.minute)
+        cSec = int(currentTime.second)
+        if cMin % 2 == 0 or cSec < 54:
+            self.layer.toLower(TextMessageProtocolEntity("No more bets!"), to=self.sender)
+            return False
+        if re.search(r"^/roulette ([0-9]+\.[0-9]{2}) ([0-9]+|black|red)$", self.message):
+            try:
+                betNumber = int(self.message.split(" ")[2])
+                return betNumber < 37
+            except Exception:
+                return True
 
     """
     Parses the user's input
@@ -58,6 +70,9 @@ class Roulette(GenericPlugin):
     """
     def parseUserInput(self):
         splitString = self.message.split("/roulette ")[1]
+        if splitString == "balance":
+            self.mode = "balance"
+            return
         self.betAmount = float(splitString.split(" ")[0])
         self.bet = splitString.split(" ")[1]
         if self.betAmount > self.balance:
@@ -77,7 +92,13 @@ class Roulette(GenericPlugin):
     @:override
     """
     def getResponse(self):
-        return TextMessageProtocolEntity("Bet Saved", to=self.sender)
+        if self.mode == "bet":
+            if self.insufficientFunds:
+                return TextMessageProtocolEntity("Insufficient Funds", to=self.sender)
+            else:
+                return TextMessageProtocolEntity("Bet Saved", to=self.sender)
+        elif self.mode == "balance":
+            return TextMessageProtocolEntity("balance: " + str(self.balance), to=self.sender)
 
     """
     Returns a helpful description of the plugin's syntax and functionality
@@ -102,10 +123,12 @@ class Roulette(GenericPlugin):
     """
     def parallelRun(self):
         while True:
-            #TODO get time in minutes and seconds
-            minutes = 2
-            seconds = 1
-            if minutes % 2 == 0 and seconds == 0:
+
+            currentTime = datetime.datetime.now()
+            minutes = int(currentTime.minute)
+            seconds = int(currentTime.second)
+
+            if minutes % 2 == 1 and seconds >= 55:
                 recipients = []
                 self.outcome = random.randint(0, 36)
                 for better in os.listdir(self.rouletteDir):
@@ -127,6 +150,8 @@ class Roulette(GenericPlugin):
                 for sender in recipients:
                     winningMessage = TextMessageProtocolEntity("The winning number is " + str(self.outcome), to=sender)
                     self.layer.toLower(winningMessage)
+                time.sleep(90)
+            time.sleep(3)
 
 
 
