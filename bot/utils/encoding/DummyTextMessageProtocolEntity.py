@@ -16,12 +16,14 @@ class DummyTextMessageProtocolEntity(object):
     @:param senderNumber - entity.getFrom(False) (Can also be the recipient's number)
     @:param participant - entity.getParticipant()
     @:param participantNumber - entity.getParticipant(False)
+    @:param notify - entity.getNotify()
     """
-    def __init__(self, message, sender, senderNumber, participant):
+    def __init__(self, message, sender, senderNumber, participant, notify):
         self.message = message
         self.sender = sender
         self.senderNumber = senderNumber
         self.participant = participant
+        self.notify = notify
 
     """
     @:return the sender or senderNumber
@@ -49,3 +51,9 @@ class DummyTextMessageProtocolEntity(object):
     """
     def getParticipant(self):
         return self.participant
+
+    """
+    @:returns the notify/whatsapp username
+    """
+    def getNotify(self):
+        return self.notify

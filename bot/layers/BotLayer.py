@@ -58,8 +58,9 @@ class BotLayer(YowInterfaceLayer):
             if AddressBook().isBlackListed(messageProtocolEntity.getParticipant(False)): return
         except: print()
 
-        try:
+        debug = True
 
+        try:
             messageProtocolEntity = Unicoder.fixIncominEntity(messageProtocolEntity)
 
             LogWriter.writeEventLog("recv", messageProtocolEntity)
@@ -82,6 +83,7 @@ class BotLayer(YowInterfaceLayer):
                 self.sendImage(messageProtocolEntity.getFrom(False), exceptionImage,  exception.getBody())
             else:
                 LogWriter.writeEventLog("e(m)", exception)
+            raise(e)
 
     #YOWSUP SPECIFIC METHODS
 

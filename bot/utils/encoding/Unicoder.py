@@ -22,7 +22,8 @@ class Unicoder(object):
         if re.compile("[0-9]+-[0-9]+").match(entity.getFrom(True).split("@")[0]):
             fixedMessage = Unicoder.__fixIncomingUnicode__(entity.getBody())
             fixedEntity = DummyTextMessageProtocolEntity(fixedMessage, entity.getFrom(),
-                                                         entity.getFrom(False), entity.getParticipant())
+                                                         entity.getFrom(False), entity.getParticipant(),
+                                                         entity.getNotify())
         return fixedEntity
 
     """

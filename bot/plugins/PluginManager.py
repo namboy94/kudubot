@@ -46,8 +46,8 @@ class PluginManager(object):
                         "Terminal Plugin": True,
                         "Kicktipp Plugin": True,
                         "XKCD Plugin": True,
-                        "ImageSender Plugin": True,
-                        "Roulette Plugin": True}
+                        "Roulette Plugin": True,
+                        "ImageSender Plugin": True}
         ### ADD NEW PLUGINS HERE ###
 
     """
