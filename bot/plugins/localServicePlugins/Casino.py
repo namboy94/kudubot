@@ -6,7 +6,6 @@ Whatsapp Bot plugin that offers common interfaces for casino plugins, as well as
 import re
 import os
 import configparser
-from subprocess import Popen
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
 
@@ -90,6 +89,7 @@ class Casino(GenericPlugin):
     def createUser(self, messageEntity):
         userID = messageEntity.getParticipant()
         if not userID: userID = messageEntity.getFrom(False)
+        userID = userID.split("@")[0]
         userNick = messageEntity.getNotify()
         userFile = self.userDir + userID
 
