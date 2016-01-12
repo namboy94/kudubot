@@ -26,12 +26,14 @@ from yowsup.layers.protocol_receipts           import YowReceiptProtocolLayer
 from yowsup.layers.stanzaregulator             import YowStanzaRegulator
 from yowsup.stacks import YowStack
 from layers.BotLayer import BotLayer
+from layers.BotLayerWithGUI import BotLayerWithGUI
 from startup.config.ConfigParser import ConfigParser
 from startup.installation.Installer import Installer
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--install", help="installs the program", action="store_true")
 parser.add_argument("-u", "--update", help="updates the program", action="store_true")
+parser.add_argument("-g", "--gui", help="starts the bot with a gui to disable certain plugins", action="store_true")
 args = parser.parse_args()
 
 installed = Installer.isInstalled()
@@ -57,9 +59,7 @@ except:
     print("No valid login credentials provided in config file")
     sys.exit(1)
 
-encryptionEnabled = True
-
-if encryptionEnabled:
+if not args.gui:
     from yowsup.layers.axolotl                     import YowAxolotlLayer
     layers = (
         BotLayer,
@@ -72,15 +72,17 @@ if encryptionEnabled:
         YowNetworkLayer
         )
 else:
+    from yowsup.layers.axolotl                     import YowAxolotlLayer
     layers = (
-        BotLayer,
+        BotLayerWithGUI,
         (YowAuthenticationProtocolLayer, YowMessagesProtocolLayer, YowReceiptProtocolLayer, YowAckProtocolLayer, YowMediaProtocolLayer, YowIqProtocolLayer, YowCallsProtocolLayer),
+        YowAxolotlLayer,
         YowLoggerLayer,
         YowCoderLayer,
         YowCryptLayer,
         YowStanzaRegulator,
         YowNetworkLayer
-    )
+        )
 
 
 

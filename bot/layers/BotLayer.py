@@ -17,10 +17,12 @@ from utils.encoding.Unicoder import Unicoder
 from utils.logging.LogWriter import LogWriter
 from utils.contacts.AddressBook import AddressBook
 from plugins.PluginManager import PluginManager
-from plugins.PluginManagerGui import PluginManagerGUI
 
 logger = logging.getLogger(__name__)
 
+"""
+The BotLayer class
+"""
 class BotLayer(YowInterfaceLayer):
 
     DISCONNECT_ACTION_PROMPT = 0
@@ -37,14 +39,7 @@ class BotLayer(YowInterfaceLayer):
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
 
-        if self.pluginManager is None:
-            self.pluginManager = PluginManager(self)
-            self.pluginManager.setPlugins(PluginConfigParser().readPlugins())
-            PluginManagerGUI(self.pluginManager)
-            if not self.parallelRunning:
-                print("Starting Parallel Threads")
-                PluginManager(self).startParallelRuns()
-                self.parallelRunning = True
+        self.pluginManagerSetup()
 
         #Notify whatsapp that message was read
         self.toLower(messageProtocolEntity.ack())
@@ -84,6 +79,19 @@ class BotLayer(YowInterfaceLayer):
             else:
                 LogWriter.writeEventLog("e(m)", exception)
             raise(e)
+
+    """
+    Sets up the plugin manager
+    """
+    def pluginManagerSetup(self):
+        if self.pluginManager is None:
+            self.pluginManager = PluginManager(self)
+            self.pluginManager.setPlugins(PluginConfigParser().readPlugins())
+            #PluginManagerGUI(self.pluginManager)
+            if not self.parallelRunning:
+                print("Starting Parallel Threads")
+                PluginManager(self).startParallelRuns()
+                self.parallelRunning = True
 
     #YOWSUP SPECIFIC METHODS
 
