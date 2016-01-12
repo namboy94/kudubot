@@ -19,6 +19,7 @@ from plugins.localServicePlugins.Terminal import Terminal
 from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
 from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
 from plugins.restrictedAccessplugins.Muter import Muter
+from plugins.localServicePlugins.Casino import Casino
 from plugins.localServicePlugins.Roulette import Roulette
 
 """
@@ -46,8 +47,9 @@ class PluginManager(object):
                         "Terminal Plugin": True,
                         "Kicktipp Plugin": True,
                         "XKCD Plugin": True,
-                        "Roulette Plugin": True,
-                        "ImageSender Plugin": True}
+                        "ImageSender Plugin": True,
+                        "Casino Plugin": True,
+                        "Roulette Plugin": True}
         ### ADD NEW PLUGINS HERE ###
 
     """
@@ -72,6 +74,7 @@ class PluginManager(object):
         if self.plugins["Kicktipp Plugin"]: plugins.append(KickTipp(self.layer, messageProtocolEntity))
         if self.plugins["XKCD Plugin"]: plugins.append(XKCD(self.layer, messageProtocolEntity))
         if self.plugins["ImageSender Plugin"]: plugins.append(ImageSender(self.layer, messageProtocolEntity))
+        if self.plugins["Casino Plugin"]: plugins.append(Casino(self.layer, messageProtocolEntity))
         if self.plugins["Roulette Plugin"]: plugins.append(Roulette(self.layer, messageProtocolEntity))
 
         ### ADD NEW PLUGINS HERE ###
