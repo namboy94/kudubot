@@ -205,7 +205,10 @@ class Casino(GenericPlugin):
     """
     def getBetStrings(self, game, userID):
         betString = "You have bet on the following:"
-        bets = self.getBets(game, userID)
-        for bet in bets:
-            betString += "\nBet: " + bet["bet"] + "     Amount: " + bet["value"] + "€"
+        try:
+            bets = self.getBets(game, userID)
+            for bet in bets:
+                betString += "\nBet: " + bet["bet"] + "     Amount: " + bet["value"] + "€"
+        except:
+            print()
         return betString

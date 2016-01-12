@@ -8,6 +8,7 @@ import time
 import datetime
 import random
 from subprocess import Popen
+from utils.encoding.Unicoder import Unicoder
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.localServicePlugins.Casino import Casino
 
@@ -152,7 +153,7 @@ class Roulette(Casino):
                     for better in betters:
                         winningText += "\n" + better[0] + " won " + better[1] + "€"
                     winningMessage = TextMessageProtocolEntity(winningText, to=sender)
-                    self.layer.toLower(winningMessage)
+                    self.layer.toLower(Unicoder.fixOutgoingEntity(winningMessage))
             time.sleep(1)
 
     """
