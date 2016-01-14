@@ -42,7 +42,12 @@ class ImageSender(GenericPlugin):
     @:override
     """
     def regexCheck(self):
-        return re.search(r"^/img (http(s)?://|www.)[^;>\| ]+(.png|.jpg)$", self.message)
+        if re.search(r"^/img (http(s)?://|www.)[^;>\| ]+(.png|.jpg)$", self.message):
+            if "&&" in self.message:
+                self.layer.toLower(TextMessageProtocolEntity("Nice try.", to=self.sender))
+                return False
+            else: return True
+        else: return False
 
     """
     Parses the user's input

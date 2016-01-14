@@ -54,7 +54,9 @@ class Roulette(Casino):
         cMin = int(currentTime.minute)
         cSec = int(currentTime.second)
 
-        if re.search(r"^/roulette (board|time|bets|([0-9]+(\.[0-9]{2})?) ([0-9]{1,2}|batch [0-9]{1,2}(-[0-9]{1,2}){3}|batch [0-9]{1,2}-[0-9]{1,2}|black|red|odd|even|half (1|2)|(row|group) (1|2|3)))$", self.message):
+        if re.search(r"^/roulette (cancel|board|time|bets|([0-9]+(\.[0-9]{2})?)"
+                     r" ([0-9]{1,2}|batch [0-9]{1,2}(-[0-9]{1,2}){3}|batch [0-9]{1,2}-[0-9]{1,2}|"
+                     r"black|red|odd|even|half (1|2)|(row|group) (1|2|3)))$", self.message):
             if cMin % 2 == 1 and cSec >= 55:
                 self.layer.toLower(TextMessageProtocolEntity("Currently spinning the wheel!", to=self.sender))
                 return False
@@ -94,6 +96,7 @@ class Roulette(Casino):
         if mode == "time": self.mode = "time"
         elif mode == "bets": self.mode = "bets"
         elif mode == "board": self.mode = "board"
+        elif mode == "cancel": self.mode = "cancel"
         else:
             self.mode = "newBet"
             dollars, cents = self.decodeMoneyString(self.message.split(" ")[1])
@@ -123,13 +126,16 @@ class Roulette(Casino):
             rouletteImage = os.getenv("HOME") + "/.whatsapp-bot/images/roulette/table.jpg"
             self.layer.sendImage(self.sender, rouletteImage, "")
             return None
+        elif self.mode == "cancel":
+            Popen(["rm", self.casinoDir + "roulette/" + self.userID]).wait()
+            return TextMessageProtocolEntity("Bets cancelled", to=self.sender)
         elif self.mode == "time":
             currentTime = datetime.datetime.now()
             cMin = int(currentTime.minute)
             cSec = int(currentTime.second)
             timeLeft = 120 - cSec - 5
             if cMin % 2 == 1: timeLeft -= 60
-            self.layer.toLower(TextMessageProtocolEntity(str(timeLeft) + "s to turn.", to=self.sender))
+            return TextMessageProtocolEntity(str(timeLeft) + "s to turn.", to=self.sender)
 
     """
     Returns a helpful description of the plugin's syntax and functionality
@@ -145,7 +151,8 @@ class Roulette(Casino):
                    "valid bets: 0-36 | red | black | odd | even | half 1-2 | group 1-3 | row 1-3 | batch 0-36{2|4}\n" \
                    "/roulette time\n" \
                    "/roulette board\n" \
-                   "/roulette bets"
+                   "/roulette bets\n" \
+                   "/roulette spin(admin)"
         elif language == "de":
             return ""
         else:

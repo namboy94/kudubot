@@ -44,7 +44,7 @@ class Casino(GenericPlugin):
     @:override
     """
     def regexCheck(self):
-        return re.search(r"^/casino (balance)$", self.message)
+        return re.search(r"^/casino (balance|beg)$", self.message)
 
     """
     Parses the user's input
@@ -58,6 +58,9 @@ class Casino(GenericPlugin):
         if mode == "balance":
             balance = self.getBalance(self.userID)
             replyText = "Your balance is: " + self.encodeMoneyString(balance[0], balance[1]) + "€"
+        elif mode == "beg":
+            self.transferFunds(self.userID, 1, 0)
+            replyText = "You earn 1€ while begging for money"
 
         self.reply = TextMessageProtocolEntity(replyText, to=self.sender)
 
