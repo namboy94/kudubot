@@ -5,22 +5,22 @@ Class that manages the plugins. Acts as facade to the Yowsup layer
 
 from threading import Thread
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from plugins.internetServicePlugins.Weather import Weather
-from plugins.internetServicePlugins.Mensa import Mensa
 from plugins.internetServicePlugins.FootballScores import FootballScores
-from plugins.internetServicePlugins.TheTVDB import TheTVDB
-from plugins.internetServicePlugins.KVV import KVV
-from plugins.internetServicePlugins.KinoZKM import KinoZKM
-from plugins.internetServicePlugins.KickTipp import KickTipp
-from plugins.internetServicePlugins.XKCD import XKCD
 from plugins.internetServicePlugins.ImageSender import ImageSender
+from plugins.internetServicePlugins.KVV import KVV
+from plugins.internetServicePlugins.KickTipp import KickTipp
+from plugins.internetServicePlugins.KinoZKM import KinoZKM
+from plugins.internetServicePlugins.Mensa import Mensa
+from plugins.internetServicePlugins.TheTVDB import TheTVDB
+from plugins.internetServicePlugins.Weather import Weather
+from plugins.internetServicePlugins.XKCD import XKCD
+from plugins.localServicePlugins.Casino import Casino
 from plugins.localServicePlugins.Reminder import Reminder
 from plugins.localServicePlugins.Terminal import Terminal
+from plugins.localServicePlugins.casino.Roulette import Roulette
+from plugins.restrictedAccessplugins.Muter import Muter
 from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
 from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
-from plugins.restrictedAccessplugins.Muter import Muter
-from plugins.localServicePlugins.Casino import Casino
-from plugins.localServicePlugins.Roulette import Roulette
 
 """
 The PluginManager class
@@ -106,6 +106,7 @@ class PluginManager(object):
         threads = []
 
         threads.append(Thread(target=Reminder(self.layer).parallelRun))
+        threads.append(Thread(target=Casino(self.layer).parallelRun))
         threads.append(Thread(target=Roulette(self.layer).parallelRun))
         ### ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE ###
 

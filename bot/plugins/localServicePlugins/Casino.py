@@ -5,6 +5,8 @@ Whatsapp Bot plugin that offers common interfaces for casino plugins, as well as
 
 import re
 import os
+import time
+import datetime
 import configparser
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
@@ -83,6 +85,16 @@ class Casino(GenericPlugin):
             return ""
         else:
             return "Help not available in this language"
+
+    def parallelRun(self):
+        while True:
+            currentTime = datetime.datetime.now()
+            hours = int(currentTime.hour)
+            if not hours < 23:
+                for user in os.listdir(self.userDir):
+                    self.transferFunds(user, 2000, 0)
+            time.sleep(3600)
+
 
     """
     """
