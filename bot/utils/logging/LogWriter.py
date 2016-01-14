@@ -25,5 +25,5 @@ class LogWriter(object):
 
         string = event + ": " + contact + ": " + entity.getBody()
         print(string)
-        log.write(string)
+        log.write(string + "\n")
         log.close()

@@ -11,6 +11,7 @@ from subprocess import Popen
 from utils.encoding.Unicoder import Unicoder
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.localServicePlugins.Casino import Casino
+from utils.contacts.AddressBook import AddressBook
 
 """
 The Roulette Class
@@ -54,7 +55,7 @@ class Roulette(Casino):
         cMin = int(currentTime.minute)
         cSec = int(currentTime.second)
 
-        if re.search(r"^/roulette (cancel|board|time|bets|([0-9]+(\.[0-9]{2})?)"
+        if re.search(r"^/roulette (spin|cancel|board|time|bets|([0-9]+(\.[0-9]{2})?)"
                      r" ([0-9]{1,2}|batch [0-9]{1,2}(-[0-9]{1,2}){3}|batch [0-9]{1,2}-[0-9]{1,2}|"
                      r"black|red|odd|even|half (1|2)|(row|group) (1|2|3)))$", self.message):
             if cMin % 2 == 1 and cSec >= 55:
@@ -97,6 +98,7 @@ class Roulette(Casino):
         elif mode == "bets": self.mode = "bets"
         elif mode == "board": self.mode = "board"
         elif mode == "cancel": self.mode = "cancel"
+        elif mode == "spin": self.mode = "spin"
         else:
             self.mode = "newBet"
             dollars, cents = self.decodeMoneyString(self.message.split(" ")[1])
@@ -122,6 +124,12 @@ class Roulette(Casino):
                 return TextMessageProtocolEntity("Bet Saved", to=self.sender)
         elif self.mode == "bets":
             return TextMessageProtocolEntity(self.getBetStrings("roulette", self.userID), to=self.sender)
+        elif self.mode == "spin":
+            if AddressBook().isAuthenticated(self.userID):
+                self.parallelRun(True)
+                return None
+            else:
+                return TextMessageProtocolEntity("Sorry.", to=self.sender)
         elif self.mode == "board":
             rouletteImage = os.getenv("HOME") + "/.whatsapp-bot/images/roulette/table.jpg"
             self.layer.sendImage(self.sender, rouletteImage, "")
@@ -152,6 +160,7 @@ class Roulette(Casino):
                    "/roulette time\n" \
                    "/roulette board\n" \
                    "/roulette bets\n" \
+                   "/roulette cancel\n" \
                    "/roulette spin(admin)"
         elif language == "de":
             return ""
@@ -164,14 +173,14 @@ class Roulette(Casino):
     @:return False, if no parallel activity defined, should be implemented to return True if one is implmented.
     @:override
     """
-    def parallelRun(self):
+    def parallelRun(self, once=False):
         while True:
 
             currentTime = datetime.datetime.now()
             minutes = int(currentTime.minute)
             seconds = int(currentTime.second)
 
-            if minutes % 2 == 1 and seconds >= 55:
+            if (minutes % 2 == 1 and seconds >= 55) or once:
                 recipients = []
                 betters = []
                 self.outcome = random.randint(0, 36)
@@ -208,7 +217,8 @@ class Roulette(Casino):
                         winningText += "\n" + better[0] + " won " + better[1] + "€"
                     winningMessage = TextMessageProtocolEntity(winningText, to=sender)
                     self.layer.toLower(Unicoder.fixOutgoingEntity(winningMessage))
-                time.sleep(5)
+                if not once: time.sleep(5)
+            if once: break
             time.sleep(1)
 
     """
