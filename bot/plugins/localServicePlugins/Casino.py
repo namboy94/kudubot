@@ -57,7 +57,7 @@ class Casino(GenericPlugin):
         replyText = ""
         if mode == "balance":
             balance = self.getBalance(self.userID)
-            replyText = "Your balance is: " + self.encodeMoneyString(balance[0], balance[1]) + "€"
+            replyText = "Your balance is: " + self.encodeMoneyString(balance[0], balance[1], True) + "€"
         elif mode == "beg":
             self.transferFunds(self.userID, 1, 0)
             replyText = "You earn 1€ while begging for money"
@@ -158,11 +158,25 @@ class Casino(GenericPlugin):
 
     """
     """
-    def encodeMoneyString(self, dollars, cents):
+    def encodeMoneyString(self, dollars, cents, delimiters=False):
         centString = str(cents)
         if len(centString) < 2: centString = "0" + centString
         if len(centString) < 2: centString = "0" + centString
-        return str(dollars) + "." + centString
+        if not delimiters:
+            return str(dollars) + "." + centString
+        else:
+            dollarString = str(dollars)
+            dollarList = []
+            for char in dollarString: dollarList.insert(0, char)
+            print(dollarList)
+            formatedDollarString = ""
+            i = 0
+            while i < len(dollarList):
+                if i > 0 and i % 3 == 0:
+                    formatedDollarString = " " + formatedDollarString
+                formatedDollarString = dollarList[i] + formatedDollarString
+                i += 1
+            return formatedDollarString + "." + centString
 
     """
     """
@@ -223,7 +237,9 @@ class Casino(GenericPlugin):
         try:
             bets = self.getBets(game, userID)
             for bet in bets:
-                betString += "\nBet: " + bet["bet"] + "     Amount: " + bet["value"] + "€"
+                dollars, cents = self.decodeMoneyString(bet["value"])
+                betVal = self.encodeMoneyString(dollars, cents, True)
+                betString += "\nBet: " + bet["bet"] + "     Amount: " + betVal + "€"
         except:
             print()
         return betString

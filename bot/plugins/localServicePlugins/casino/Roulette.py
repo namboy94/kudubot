@@ -205,7 +205,7 @@ class Roulette(Casino):
 
                     self.transferFunds(better, winDollars, winCents)
 
-                    betters.append((user, self.encodeMoneyString(winDollars, winCents)))
+                    betters.append((user, self.encodeMoneyString(winDollars, winCents, True)))
 
                 for sender in recipients:
                     colour = ""
