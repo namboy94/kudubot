@@ -11,6 +11,7 @@ sys.path.append(upperDirectory)
 
 import argparse
 import sys
+if sys.version_info[0] == 2: reload(sys); sys.setdefaultencoding('utf8')
 from yowsup import env
 from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
@@ -30,6 +31,8 @@ from layers.BotLayer import BotLayer
 from layers.BotLayerWithGUI import BotLayerWithGUI
 from startup.config.ConfigParser import ConfigParser
 from startup.installation.Installer import Installer
+
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--install", help="installs the program", action="store_true")
