@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that provides Football (mostly Bundesliga) Information
 @:author Hermann Krumrey <hermann@krumreyh.com>
@@ -158,7 +160,7 @@ class FootballScores(GenericPlugin):
 
         returnString = string
         returnString = returnString.replace("Borussia Moenchengladbach", "Gladbach")
-        returnString = returnString.replace("Bayern Munich", "F\0C\0 B\0a\0y\0e\0r\0n M\0ü\0n\0c\0h\0e\0n") #Overliste Johannes' Bot.
+        returnString = returnString.replace("Bayern Munich", "F\0C\0 B\0a\0y\0e\0r\0n M\0ü\0n\0c\0hen") #Overliste Johannes' Bot.
         returnString = returnString.replace("FC Cologne", "1.FC Köln")
         return returnString
 

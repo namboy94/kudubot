@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Class that implements a BotLayer with a GUI that can disable certain plugins on startup
 @author Hermann Krumrey<hermann@krumreyh.com>

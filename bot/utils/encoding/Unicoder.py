@@ -1,9 +1,12 @@
+# coding=utf-8
+
 """
 Collection of static methods that handle Unicode encoding
 @:author Hermann Krumrey <hermann@krumreyh.com>
 """
 
 import re
+import sys
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from utils.encoding.DummyTextMessageProtocolEntity import DummyTextMessageProtocolEntity
 
@@ -18,6 +21,7 @@ class Unicoder(object):
     """
     @staticmethod
     def fixIncominEntity(entity):
+        if sys.version_info[0] == 2: return entity
         fixedEntity = entity
         if re.compile("[0-9]+-[0-9]+").match(entity.getFrom(True).split("@")[0]):
             fixedMessage = Unicoder.__fixIncomingUnicode__(entity.getBody())
@@ -32,6 +36,7 @@ class Unicoder(object):
     """
     @staticmethod
     def fixOutgoingEntity(entity):
+        if sys.version_info[0] == 2: return TextMessageProtocolEntity(entity.getBody(), to=entity.getTo)
         brokenEntity = entity
         if re.compile("[0-9]+-[0-9]+").match(entity.getTo(True).split("@")[0]):
             fixedMessage = Unicoder.__fixOutgoingUnicode__(entity.getBody())

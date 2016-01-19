@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that can perform various terminal commands
 @author Hermann Krumrey <hermann@krumreyh.com>

@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Class that retrieves information from the KIT Mensa webpage
 @:author Hermann Krumrey<hermann@krumreyh.com>

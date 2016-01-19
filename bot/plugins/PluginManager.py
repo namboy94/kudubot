@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Class that manages the plugins. Acts as facade to the Yowsup layer
 @:author Hermann Krumrey

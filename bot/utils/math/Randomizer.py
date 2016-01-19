@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Class that handles randomness
 @author Hermann Krumrey <hermann@krumreyh.com>

@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 KVV Plugin that highjacks Johannes Bucher's KVV plugin.
 @author Hermann Krumrey <hermann@krumreyh.com>

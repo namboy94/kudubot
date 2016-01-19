@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 plugin that allows muting of the bot
 @author Hermann Krumrey <hermann@krumreyh.com>

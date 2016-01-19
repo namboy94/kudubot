@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that fetches Information about current movies at the Cinema by the ZKM in Karlsruhe
 @author Hermann Krumrey <hermann@krumreyh.com>

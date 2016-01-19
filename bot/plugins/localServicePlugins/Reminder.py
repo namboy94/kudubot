@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that handles reminders
 @:author Hermann Krumrey <hermann@krumreyh.com>

@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that allows the sending of images from links
 @author Hermann Krumrey <hermann@krumreyh.com>

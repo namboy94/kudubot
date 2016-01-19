@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Class that handles config parsing
 @author Hermann Krumrey <hermann@krumreyh.com>

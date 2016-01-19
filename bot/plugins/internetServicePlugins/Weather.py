@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Weather plugin for a whatsapp bot
 @:author Hermann Krumrey<hermann@krumreyh.com>

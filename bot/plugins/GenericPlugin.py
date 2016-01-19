@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Generic Plugin that defines the required  by the Plugin Manager
 @author Hermann Krumrey <hermann@krumreyh.com>

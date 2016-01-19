@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that handles requests to the TV Database
 @:author Hermann Krumrey <hermann@krumreyh.com>

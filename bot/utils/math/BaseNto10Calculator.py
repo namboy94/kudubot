@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Collection of methods containing methods that convert numbers of different bases into the decimal system
 @author Hermann Krumrey <hermann@krumreyh.com>

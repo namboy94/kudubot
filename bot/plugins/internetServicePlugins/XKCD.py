@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that sends XKCD comics
 @author Hermann Krumrey <hermann@krumreyh.com>

@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that sends simple text responses to exact strings
 @author Hermann Krumrey <hermann@krumreyh.com>

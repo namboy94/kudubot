@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Collection of static methods that handle logging
 @author Hermann Krumrey<hermann@krumreyh.com>

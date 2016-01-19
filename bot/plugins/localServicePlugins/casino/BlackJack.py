@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Blackjack Game Plugin for the whatsapp bot
 @author Hermann Krumrey <hermann@krumreyh.com>

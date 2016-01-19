@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Plugin that fetches information from kicktipp.de
 @author Hermann Krumrey <hermann@krumreyh.com>

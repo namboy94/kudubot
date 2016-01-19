@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Module that contains methods that install whatsapp-bot or update an existing installation
 @author Hermann Krumrey<hermann@krumreyh.com>
@@ -75,7 +77,7 @@ class Installer(object):
                 file.write("XKCD Plugin=1\n")
                 file.write("Terminal Plugin=1\n")
                 file.write("Football Scores Plugin=1\n")
-                file.write("Simple Contains Plugin=1=0\n")
+                file.write("Simple Contains Plugin=1\n")
                 file.write("KVV Plugin=1\n")
                 file.write("Simple Equals Plugin=1\n")
                 file.write("Reminder Plugin=1\n")

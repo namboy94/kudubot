@@ -1,9 +1,14 @@
+# coding=utf-8
+
 """
 A GUI for the Plugin Manager
 @author Hermann Krumrey<hermann@krumreyh.com>
 """
-
-from tkinter import *
+import sys
+if sys.version_info[0] == 2:
+    from Tkinter import *
+else:
+    from tkinter import *
 from startup.config.PluginConfigParser import PluginConfigParser
 
 """

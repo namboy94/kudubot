@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Class that emulates an incoming TextMessageProtocolEntity, to enable correct handling of unicode characters with
 enabled encryption

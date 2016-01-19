@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Whatsapp Bot plugin that offers common interfaces for casino plugins, as well as overarching functionality
 @author Hermann Krumrey <hermann@krumreyh.com>

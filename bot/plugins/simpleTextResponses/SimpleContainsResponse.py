@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 plugin that answers to strings containing specific substrings
 @author Hermann Krumrey <hermann@krumreyh.com>

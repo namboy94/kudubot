@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Configparse that determines which plugins to run
 @author Hermann Krumrey <hermann@krumreyh.com>

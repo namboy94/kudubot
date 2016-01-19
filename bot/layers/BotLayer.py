@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 @author Hermann Krumrey<hermann@krumreyh.com>
 The layer component of the bot. Used to send and receive messages
