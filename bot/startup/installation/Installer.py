@@ -6,6 +6,7 @@ Module that contains methods that install whatsapp-bot or update an existing ins
 import os
 import platform
 import sys
+from subprocess import Popen
 
 """
 The Installer Class
@@ -21,7 +22,10 @@ class Installer(object):
 
         if platform.system() == "Linux":
             homedir = os.getenv("HOME")
-            if not os.path.isdir(homedir + "/.whatsapp-bot/logs"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/logs/exceptions"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/logs/users"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/logs/groups"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/logs/bugs"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/images/temp"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/reminders"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/casino/users"): return False
@@ -46,16 +50,17 @@ class Installer(object):
             whatsappbotdir = homedir + "/.whatsapp-bot"
             programdir = whatsappbotdir + "/program"
             if not os.path.isdir(whatsappbotdir):
-                os.system("mkdir " + whatsappbotdir)
+                Popen(["mkdir", whatsappbotdir]).wait()
             if not os.path.isdir(programdir):
-                os.system("cp -rf " + Installer.getSourceDir() + " " + programdir)
+                Popen(["cp", "-rf", Installer.getSourceDir(), programdir]).wait()
             if not os.path.isdir(whatsappbotdir + "/logs"):
-                os.system("mkdir " + whatsappbotdir + "/logs")
+                Popen(["mkdir", "-p", whatsappbotdir + "/logs/exceptions"]).wait()
+                Popen(["mkdir", "-p", whatsappbotdir + "/logs/users"]).wait()
+                Popen(["mkdir", "-p", whatsappbotdir + "/logs/groups"]).wait()
+                Popen(["mkdir", "-p", whatsappbotdir + "/logs/bugs"]).wait()
             if not os.path.isdir(whatsappbotdir + "/images"):
-                os.system("mkdir " + whatsappbotdir + "/images")
-                os.system("cp -rf " + Installer.getSourceDir() + "/resources/images/ " + whatsappbotdir)
-            if not os.path.isdir(whatsappbotdir + "/images/temp"):
-                os.system("mkdir " + whatsappbotdir + "/images/temp")
+                Popen(["mkdir", "-p", whatsappbotdir + "/images/temp"]).wait()
+                Popen(["cp", "-rf", Installer.getSourceDir() + "resources/images/", whatsappbotdir]).wait()
             if not os.path.isfile(whatsappbotdir + "/config"):
                 file = open(whatsappbotdir + "/config", "w")
                 file.write("number=\npassword=")
@@ -65,14 +70,14 @@ class Installer(object):
                 file.write("Plugin Name=0")
                 file.close()
             if not os.path.isdir(whatsappbotdir + "/reminders"):
-                os.system("mkdir " + whatsappbotdir + "/reminders")
+                Popen(["mkdir", whatsappbotdir + "/reminders"]).wait()
             if not os.path.isdir(whatsappbotdir + "/casino/users"):
-                os.system("mkdir -p " + whatsappbotdir + "/casino/users")
+                Popen(["mkdir", "-p", whatsappbotdir + "/casino/users"]).wait()
             if not os.path.isdir(whatsappbotdir + "/casino/roulette"):
-                os.system("mkdir -p " + whatsappbotdir + "/casino/roulette")
+                Popen(["mkdir", "-p", whatsappbotdir + "/casino/roulette"]).wait()
             if not os.path.isfile("/usr/bin/whatsapp-bot"):
-                os.system("gksudo cp " + Installer.getSourceDir() + "/bot/startup/continuousscript /usr/bin/whatsapp-bot")
-                os.system("gksudo chmod 755 /usr/bin/whatsapp-bot")
+                Popen(["gksudo", "cp", Installer.getSourceDir() + "/bot/startup/continuousscript", "/usr/bin/whatsapp-bot"]).wait()
+                Popen(["gksudo", "chmod", "755", "/usr/bin/whatsapp-bot"]).wait()
 
         elif platform.system() == "Windows":
             return False
@@ -86,11 +91,11 @@ class Installer(object):
             homedir = os.getenv("HOME")
             whatsappbotdir = homedir + "/.whatsapp-bot"
             programdir = whatsappbotdir + "/program"
-            os.system("rm -rf " + programdir)
-            os.system("cp -rf " + Installer.getSourceDir() + " " + programdir)
-            os.system("rm -rf " + whatsappbotdir + "/images")
-            os.system("cp -rf " + Installer.getSourceDir() + "/resources/images " + whatsappbotdir)
-            os.system("mkdir " + whatsappbotdir + "/images/temp")
+            Popen(["rm", "-rf", programdir]).wait()
+            Popen(["cp", "-rf", Installer.getSourceDir(), programdir]).wait()
+            Popen(["rm", "-rf", whatsappbotdir + "/images"]).wait()
+            Popen(["cp", "-rf", Installer.getSourceDir() + "/resources/images", whatsappbotdir]).wait()
+            Popen(["mkdir", whatsappbotdir + "/images/temp"]).wait()
         elif platform.system() == "Windows":
             return False
 

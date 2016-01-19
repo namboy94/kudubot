@@ -3,6 +3,10 @@ Generic Plugin that defines the required  by the Plugin Manager
 @author Hermann Krumrey <hermann@krumreyh.com>
 """
 
+from utils.logging.LogWriter import LogWriter
+from utils.encoding.Unicoder import Unicoder
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+
 """
 The GenericPlugin Class
 """
@@ -58,3 +62,28 @@ class GenericPlugin(object):
     """
     def parallelRun(self):
         return False
+
+    """
+    Sends a message outside of the normal yowsup loop
+    @:param entity - the entity to be sent
+    """
+    def sendMessage(self, entity):
+        if self.layer.muted:
+            LogWriter.writeEventLog("s(m)", entity)
+        else:
+            LogWriter.writeEventLog("sent", entity)
+            fixedEntity = Unicoder.fixOutgoingEntity(entity)
+            self.layer.toLower(fixedEntity)
+
+    """
+    Sends an image outside of the normal yowsup loop
+    @:param recipient - the receiver of the image
+    @:param imagePath - the file path to the image
+    @:param caption - the caption to be sent
+    """
+    def sendImage(self, recipient, imagePath, caption):
+        if self.layer.muted:
+            LogWriter.writeEventLog("i(m)", TextMessageProtocolEntity(imagePath + " --- " + caption, to=recipient))
+        else:
+            LogWriter.writeEventLog("imgs", TextMessageProtocolEntity(imagePath + " --- " + caption, to=recipient))
+            self.layer.sendImage(recipient.split("@")[0], imagePath, caption)

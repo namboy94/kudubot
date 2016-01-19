@@ -22,11 +22,15 @@ class AddressBook(object):
     Searches for a contact name belonging to a number given via parameter
     @:return the number if no name is found, otherwise the number of the contact
     """
-    def getContactName(self, sender):
+    def getContactName(self, entity, received):
+        if received:
+            sender = entity.getFrom(False)
+        else:
+            sender = entity.getTo(False)
         for contact in self.contacts:
             if sender == contact[0]:
                 return contact[1]
-        return sender
+        return entity.getNotify()
 
     """
     Searches for a contact number belonging to a name given via parameter

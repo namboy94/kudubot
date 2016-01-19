@@ -6,6 +6,7 @@ import time
 import logging
 import sys
 import os
+import traceback
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity, \
     RequestUploadIqProtocolEntity, AudioDownloadableMediaMessageProtocolEntity
@@ -53,8 +54,6 @@ class BotLayer(YowInterfaceLayer):
             if AddressBook().isBlackListed(messageProtocolEntity.getParticipant(False)): return
         except: print()
 
-        debug = True
-
         try:
             messageProtocolEntity = Unicoder.fixIncominEntity(messageProtocolEntity)
 
@@ -71,14 +70,14 @@ class BotLayer(YowInterfaceLayer):
                     LogWriter.writeEventLog("s(m)", response)
 
         except Exception as e:
-            exception = TextMessageProtocolEntity("Exception: " + str(e), to=messageProtocolEntity.getFrom())
+            trace = traceback.format_exc()
+            exception = TextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n", to=messageProtocolEntity.getFrom())
             if not self.muted:
                 LogWriter.writeEventLog("exep", exception)
                 exceptionImage = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
                 self.sendImage(messageProtocolEntity.getFrom(False), exceptionImage,  exception.getBody())
             else:
                 LogWriter.writeEventLog("e(m)", exception)
-            raise(e)
 
     """
     Sets up the plugin manager

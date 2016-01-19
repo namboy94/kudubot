@@ -114,7 +114,7 @@ class Reminder(GenericPlugin):
             for reminder in reminders:
                 LogWriter.writeEventLog("sent", reminder)
                 message = Unicoder.fixOutgoingEntity(reminder)
-                self.layer.toLower(message)
+                self.sendMessage(message)
                 time.sleep(1)
             time.sleep(1)
 

@@ -62,7 +62,7 @@ class Muter(GenericPlugin):
         if self.layer.muted:
             messageProtocolEntity = TextMessageProtocolEntity("🤐", to=self.sender)
             messageProtocolEntity = Unicoder.fixOutgoingEntity(messageProtocolEntity)
-            self.layer.toLower(messageProtocolEntity)
+            self.sendMessage(messageProtocolEntity)
             return messageProtocolEntity
 
         else:

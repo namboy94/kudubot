@@ -44,7 +44,7 @@ class ImageSender(GenericPlugin):
     def regexCheck(self):
         if re.search(r"^/img (http(s)?://|www.)[^;>\| ]+(.png|.jpg)$", self.message):
             if "&&" in self.message:
-                self.layer.toLower(TextMessageProtocolEntity("Nice try.", to=self.sender))
+                self.sendMessage(TextMessageProtocolEntity("Nice try.", to=self.sender))
                 return False
             else: return True
         else: return False
@@ -80,7 +80,7 @@ class ImageSender(GenericPlugin):
                 if im.size[0] > 8000 or im.size[1] > 4000:
                     raise Exception("Resolution too high")
                 else:
-                    self.layer.sendImage(self.entity.getFrom(False), self.imagesDir + self.imageName, self.link)
+                    self.sendImage(self.entity.getFrom(), self.imagesDir + self.imageName, self.link)
         except:
             return TextMessageProtocolEntity("Sorry, image could not be sent", to=self.sender)
 

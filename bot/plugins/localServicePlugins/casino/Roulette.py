@@ -8,7 +8,6 @@ import time
 import datetime
 import random
 from subprocess import Popen
-from utils.encoding.Unicoder import Unicoder
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.localServicePlugins.Casino import Casino
 from utils.contacts.AddressBook import AddressBook
@@ -59,7 +58,7 @@ class Roulette(Casino):
                      r" ([0-9]{1,2}|batch [0-9]{1,2}(-[0-9]{1,2}){3}|batch [0-9]{1,2}-[0-9]{1,2}|"
                      r"black|red|odd|even|half (1|2)|(row|group) (1|2|3)))$", self.message):
             if cMin % 2 == 1 and cSec >= 55:
-                self.layer.toLower(TextMessageProtocolEntity("Currently spinning the wheel!", to=self.sender))
+                self.sendMessage(TextMessageProtocolEntity("Currently spinning the wheel!", to=self.sender))
                 return False
             try:
                 betNumber = int(self.message.split(" ")[2])
@@ -82,7 +81,7 @@ class Roulette(Casino):
                                     and numbers[2] in quad and numbers[3] in quad:
                                 return True
                     else: return True
-                    self.layer.toLower(TextMessageProtocolEntity("Invalid batch!", to=self.sender))
+                    self.sendMessage(TextMessageProtocolEntity("Invalid batch!", to=self.sender))
                     return False
                 except:
                     return True
@@ -132,7 +131,7 @@ class Roulette(Casino):
                 return TextMessageProtocolEntity("Sorry.", to=self.sender)
         elif self.mode == "board":
             rouletteImage = os.getenv("HOME") + "/.whatsapp-bot/images/roulette/table.jpg"
-            self.layer.sendImage(self.sender, rouletteImage, "")
+            self.sendImage(self.sender, rouletteImage, "")
             return None
         elif self.mode == "cancel":
             Popen(["rm", self.casinoDir + "roulette/" + self.userID]).wait()
@@ -215,8 +214,7 @@ class Roulette(Casino):
                     winningText = "The winning number is " + str(self.outcome) + colour
                     for better in betters:
                         winningText += "\n" + better[0] + " won " + better[1] + "€"
-                    winningMessage = TextMessageProtocolEntity(winningText, to=sender)
-                    self.layer.toLower(Unicoder.fixOutgoingEntity(winningMessage))
+                    self.sendMessage(TextMessageProtocolEntity(winningText, to=sender))
                 if not once: time.sleep(5)
             if once: break
             time.sleep(1)
