@@ -60,14 +60,31 @@ class Installer(object):
                 Popen(["mkdir", "-p", whatsappbotdir + "/logs/bugs"]).wait()
             if not os.path.isdir(whatsappbotdir + "/images"):
                 Popen(["mkdir", "-p", whatsappbotdir + "/images/temp"]).wait()
-                Popen(["cp", "-rf", Installer.getSourceDir() + "resources/images/", whatsappbotdir]).wait()
+                Popen(["cp", "-rf", Installer.getSourceDir() + "/resources/images/", whatsappbotdir]).wait()
             if not os.path.isfile(whatsappbotdir + "/config"):
                 file = open(whatsappbotdir + "/config", "w")
                 file.write("number=\npassword=")
                 file.close()
             if not os.path.isfile(whatsappbotdir + "/plugins"):
                 file = open(whatsappbotdir + "/plugins", "w")
-                file.write("Plugin Name=0")
+                file.write("Weather Plugin=1\n")
+                file.write("Roulette Plugin=1\n")
+                file.write("Muter Plugin=1\n")
+                file.write("TVDB Plugin=1\n")
+                file.write("KinoZKM Plugin=1\n")
+                file.write("XKCD Plugin=1\n")
+                file.write("Terminal Plugin=1\n")
+                file.write("Football Scores Plugin=1\n")
+                file.write("Simple Contains Plugin=1=0\n")
+                file.write("KVV Plugin=1\n")
+                file.write("Simple Equals Plugin=1\n")
+                file.write("Reminder Plugin=1\n")
+                file.write("Mensa Plugin=1\n")
+                file.write("Kicktipp Plugin=1\n")
+                file.write("Casino Plugin=1\n")
+                file.write("ImageSender Plugin=1")
+
+
                 file.close()
             if not os.path.isdir(whatsappbotdir + "/reminders"):
                 Popen(["mkdir", whatsappbotdir + "/reminders"]).wait()
