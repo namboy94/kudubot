@@ -60,7 +60,7 @@ class Installer(object):
                 Popen(["mkdir", "-p", whatsappbotdir + "/logs/bugs"]).wait()
             if not os.path.isdir(whatsappbotdir + "/images"):
                 Popen(["mkdir", "-p", whatsappbotdir + "/images/temp"]).wait()
-                Popen(["cp", "-rf", Installer.getSourceDir() + "resources/images/", whatsappbotdir]).wait()
+                Popen(["cp", "-rf", Installer.getSourceDir() + "/resources/images/", whatsappbotdir]).wait()
             if not os.path.isfile(whatsappbotdir + "/config"):
                 file = open(whatsappbotdir + "/config", "w")
                 file.write("number=\npassword=")
