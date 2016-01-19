@@ -72,12 +72,14 @@ class BotLayer(YowInterfaceLayer):
         except Exception as e:
             trace = traceback.format_exc()
             exception = TextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n", to=messageProtocolEntity.getFrom())
+            exceptionImage = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
             if not self.muted:
                 LogWriter.writeEventLog("exep", exception)
-                exceptionImage = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
+                LogWriter.writeEventLog("imgs", TextMessageProtocolEntity(exceptionImage + " --- " + exception.getBody(), to=messageProtocolEntity.getFrom(False)))
                 self.sendImage(messageProtocolEntity.getFrom(False), exceptionImage,  exception.getBody())
             else:
                 LogWriter.writeEventLog("e(m)", exception)
+                LogWriter.writeEventLog("i(m)", TextMessageProtocolEntity(exceptionImage + " --- " + exception.getBody(), to=messageProtocolEntity.getFrom()))
 
     """
     Sets up the plugin manager
