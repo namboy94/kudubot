@@ -95,8 +95,8 @@ class Installer(object):
             if not os.path.isdir(whatsappbotdir + "/casino/roulette"):
                 Popen(["mkdir", "-p", whatsappbotdir + "/casino/roulette"]).wait()
             if not os.path.isfile("/usr/bin/whatsapp-bot"):
-                Popen(["gksudo", "cp", Installer.getSourceDir() + "/bot/startup/continuousscript", "/usr/bin/whatsapp-bot"]).wait()
-                Popen(["gksudo", "chmod", "755", "/usr/bin/whatsapp-bot"]).wait()
+                Popen(["sudo", "cp", Installer.getSourceDir() + "/bot/startup/continuousscript", "/usr/bin/whatsapp-bot"]).wait()
+                Popen(["sudo", "chmod", "755", "/usr/bin/whatsapp-bot"]).wait()
 
         elif platform.system() == "Windows":
             return False
