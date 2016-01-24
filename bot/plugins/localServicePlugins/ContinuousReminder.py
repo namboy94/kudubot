@@ -1,7 +1,7 @@
 # coding=utf-8
 
 """
-Plugin that handles reminders
+Plugin that handles continuous reminders
 @:author Hermann Krumrey <hermann@krumreyh.com>
 """
 
@@ -39,6 +39,7 @@ class ContinuousReminder(GenericPlugin):
         self.params = ""
 
         self.continuous = False
+        self.mode = "store"
 
     """
     Checks if the user input matches the regex needed for the plugin to function correctly
@@ -50,6 +51,8 @@ class ContinuousReminder(GenericPlugin):
         regex = r"^/cremind \"[^\"]+\" (monday|tuesday|wednesday|thursday|friday|saturday|sunday|" \
                 r"montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag) ([0-9]{2}-[0-9]{2}-[0-9]{2})$"
         if re.search(regex, self.userInput): return True
+        regex = r"^/cremind (list|delete [0-9]+)$"
+        if re.search(regex, self.userInput): return True
         else: return False
 
     """
@@ -57,8 +60,15 @@ class ContinuousReminder(GenericPlugin):
     @:override
     """
     def parseUserInput(self):
-        self.reminderMessage = self.capitalUserInput.split("\"", 1)[1].rsplit("\"", 1)[0]
-        self.params = self.userInput.split("\" ", 1)[1]
+        self.params = self.userInput.split(" ", 1)[1]
+        if self.params == "list":
+            self.mode = "list"
+        elif self.params.startswith("delete"):
+            self.mode = "delete"
+        else:
+            self.params = self.userInput.split("\" ", 1)[1]
+            self.reminderMessage = self.capitalUserInput.split("\"", 1)[1].rsplit("\"", 1)[0]
+
 
     """
     Sends a confirmation back to the sender that the message was stored
@@ -66,8 +76,11 @@ class ContinuousReminder(GenericPlugin):
     @:override
     """
     def getResponse(self):
-        self.__setContinuousReminder__(self.params)
-        return TextMessageProtocolEntity("Reminder Stored", to=self.sender)
+        if self.mode == "store":
+            self.__setContinuousReminder__(self.params)
+            return TextMessageProtocolEntity("Reminder Stored", to=self.sender)
+        elif self.mode == "list":
+            return TextMessageProtocolEntity(self.__getStored__(), to=self.sender)
 
     """
     Continuously checks if reminders are due and sends them to the intended recipient if needed.
@@ -181,3 +194,24 @@ class ContinuousReminder(GenericPlugin):
             file.close()
 
         return reminderEntities
+
+    def __getStored__(self):
+        file = open(os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + self.sender, 'r')
+        fileContent = file.read()
+        file.close()
+        fileContent = fileContent.split("\n")
+        if not fileContent[len(fileContent) - 1]: fileContent.pop()
+
+        storedString = ""
+
+        i = 0
+        for reminder in fileContent:
+            message = reminder.split("---endofmessage---")[0].split("message=")[1]
+            reminderTime = reminder.split("---endofmessage---")[1].split("@")[0].split("time=")[1]
+            reminderDay = reminder.split("---endofmessage---")[1].split("@")[1]
+
+            storedString += str(i) + " \"" + message + "\" on " + reminderDay + "@" + reminderTime + "\n"
+
+            i += 1
+
+        return storedString
