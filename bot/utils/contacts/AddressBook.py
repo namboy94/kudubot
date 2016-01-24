@@ -32,7 +32,7 @@ class AddressBook(object):
         for contact in self.contacts:
             if sender == contact[0]:
                 return contact[1]
-        return entity.getNotify()
+        return str(entity.getNotify())
 
     """
     Searches for a contact number belonging to a name given via parameter

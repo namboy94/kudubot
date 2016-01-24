@@ -196,7 +196,9 @@ class ContinuousReminder(GenericPlugin):
         return reminderEntities
 
     def __getStored__(self):
-        file = open(os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + self.sender, 'r')
+        path = os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + self.sender
+        if not os.path.isfile(path): return "None"
+        file = open(path, 'r')
         fileContent = file.read()
         file.close()
         fileContent = fileContent.split("\n")
