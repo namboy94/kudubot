@@ -176,7 +176,6 @@ class ContinuousReminder(GenericPlugin):
                         refreshedReminders.append(reminder)
 
             file = open(receiver, 'w')
-            print(refreshedReminders)
             for reminder in refreshedReminders:
                 file.write(reminder + "\n")
             file.close()
