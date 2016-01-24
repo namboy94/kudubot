@@ -29,7 +29,7 @@ class Installer(object):
             if not os.path.isdir(homedir + "/.whatsapp-bot/logs/groups"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/logs/bugs"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/images/temp"): return False
-            if not os.path.isdir(homedir + "/.whatsapp-bot/reminders"): return False
+            if not os.path.isdir(homedir + "/.whatsapp-bot/reminders/continuous"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/casino/users"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/casino/roulette"): return False
             if not os.path.isdir(homedir + "/.whatsapp-bot/program"): return False
@@ -84,12 +84,11 @@ class Installer(object):
                 file.write("Mensa Plugin=1\n")
                 file.write("Kicktipp Plugin=1\n")
                 file.write("Casino Plugin=1\n")
+                file.write("Continuous Reminder Plugin=1\n")
                 file.write("ImageSender Plugin=1")
-
-
                 file.close()
-            if not os.path.isdir(whatsappbotdir + "/reminders"):
-                Popen(["mkdir", whatsappbotdir + "/reminders"]).wait()
+            if not os.path.isdir(whatsappbotdir + "/reminders/continuous"):
+                Popen(["mkdir", "-p", whatsappbotdir + "/reminders/continuous"]).wait()
             if not os.path.isdir(whatsappbotdir + "/casino/users"):
                 Popen(["mkdir", "-p", whatsappbotdir + "/casino/users"]).wait()
             if not os.path.isdir(whatsappbotdir + "/casino/roulette"):

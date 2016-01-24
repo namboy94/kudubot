@@ -17,6 +17,7 @@ from plugins.internetServicePlugins.TheTVDB import TheTVDB
 from plugins.internetServicePlugins.Weather import Weather
 from plugins.internetServicePlugins.XKCD import XKCD
 from plugins.localServicePlugins.Casino import Casino
+from plugins.localServicePlugins.ContinuousReminder import ContinuousReminder
 from plugins.localServicePlugins.Reminder import Reminder
 from plugins.localServicePlugins.Terminal import Terminal
 from plugins.localServicePlugins.casino.Roulette import Roulette
@@ -51,6 +52,7 @@ class PluginManager(object):
                         "XKCD Plugin": True,
                         "ImageSender Plugin": True,
                         "Casino Plugin": True,
+                        "Continuous Reminder Plugin": True,
                         "Roulette Plugin": True}
         ### ADD NEW PLUGINS HERE ###
 
@@ -78,6 +80,7 @@ class PluginManager(object):
         if self.plugins["ImageSender Plugin"]: plugins.append(ImageSender(self.layer, messageProtocolEntity))
         if self.plugins["Casino Plugin"]: plugins.append(Casino(self.layer, messageProtocolEntity))
         if self.plugins["Roulette Plugin"]: plugins.append(Roulette(self.layer, messageProtocolEntity))
+        if self.plugins["Continuous Reminder Plugin"]: plugins.append(ContinuousReminder(self.layer, messageProtocolEntity))
 
         ### ADD NEW PLUGINS HERE ###
 
@@ -110,6 +113,7 @@ class PluginManager(object):
         threads.append(Thread(target=Reminder(self.layer).parallelRun))
         threads.append(Thread(target=Casino(self.layer).parallelRun))
         threads.append(Thread(target=Roulette(self.layer).parallelRun))
+        threads.append(Thread(target=ContinuousReminder(self.layer).parallelRun))
         ### ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE ###
 
         for thread in threads:

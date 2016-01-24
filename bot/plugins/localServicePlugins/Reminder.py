@@ -114,9 +114,7 @@ class Reminder(GenericPlugin):
         while True:
             reminders = self.__findReminders__()
             for reminder in reminders:
-                LogWriter.writeEventLog("sent", reminder)
-                message = Unicoder.fixOutgoingEntity(reminder)
-                self.sendMessage(message)
+                self.sendMessage(reminder)
                 time.sleep(1)
             time.sleep(1)
 
@@ -213,7 +211,9 @@ class Reminder(GenericPlugin):
         reminderEntities = []
         reminderPaths = []
         for reminder in reminders:
-            reminderPaths.append(os.getenv("HOME") + "/.whatsapp-bot/reminders/" + reminder)
+            path = os.getenv("HOME") + "/.whatsapp-bot/reminders/" + reminder
+            if not os.path.isdir(path):
+                reminderPaths.append(path)
         for reminder in reminderPaths:
             file = open(reminder, "r")
             fileContent = file.read()
