@@ -81,6 +81,9 @@ class ContinuousReminder(GenericPlugin):
             return TextMessageProtocolEntity("Reminder Stored", to=self.sender)
         elif self.mode == "list":
             return TextMessageProtocolEntity(self.__getStored__(), to=self.sender)
+        elif self.mode == "delete":
+            index = int(self.params.split(" ")[1])
+            return TextMessageProtocolEntity(self.__deleteReminder__(index), to=self.sender)
 
     """
     Continuously checks if reminders are due and sends them to the intended recipient if needed.
@@ -217,3 +220,17 @@ class ContinuousReminder(GenericPlugin):
             i += 1
 
         return storedString
+
+    def __deleteReminder__(self, index):
+        path = os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + self.sender
+        if not os.path.isfile(path): return "Nothing to delete"
+        file = open(path, 'r')
+        fileContent = file.read()
+        file.close()
+        fileContent = fileContent.split("\n")
+        if not fileContent[len(fileContent) - 1]: fileContent.pop()
+        deleted = fileContent.pop(index)
+        file = open(path, 'w')
+        for line in fileContent: file.write(line + "\n")
+        file.close()
+        return "Deleted:\n" + deleted
