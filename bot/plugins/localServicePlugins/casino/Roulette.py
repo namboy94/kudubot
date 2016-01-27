@@ -23,6 +23,7 @@ class Roulette(Casino):
     mode = ""
     insufficientFunds = False
 
+    #Constant Values
     red = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
     black = [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35]
     board = [[3,6,9,12,15,18,21,24,27,30,33,36],
@@ -155,16 +156,23 @@ class Roulette(Casino):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return "/roulette\n" \
+            return "/roulette\tAllows the sender to play roulette\n" \
                    "syntax: /roulette <amount> <bet>\n" \
                    "valid bets: 0-36 | red | black | odd | even | half 1-2 | group 1-3 | row 1-3 | batch 0-36{2|4}\n" \
-                   "/roulette time\n" \
-                   "/roulette board\n" \
-                   "/roulette bets\n" \
-                   "/roulette cancel\n" \
-                   "/roulette spin(admin)"
+                   "/roulette time\tDisplays the time left until the wheel is spun again\n" \
+                   "/roulette board\tSends an image of a Roulette board as reference\n" \
+                   "/roulette bets\tDisplays all bets of a user\n" \
+                   "/roulette cancel\tCancels all bet of a user\n" \
+                   "/roulette spin\tImmediately spins the wheel(admin)"
         elif language == "de":
-            return ""
+            return "/roulette\tErmöglicht das Spielen von Roulette\n" \
+                   "syntax: /roulette <einsatz> <wette>\n" \
+                   "Mögliche Wetten: 0-36 | red | black | odd | even | half 1-2 | group 1-3 | row 1-3 | batch 0-36{2|4}\n" \
+                   "/roulette time\tZeigt die verbleibende Zeit bis zum nächsten Drehen des Roulette-Rads an.\n" \
+                   "/roulette board\tSchickt ein Bild eines Roulettebretts als Referenz\n" \
+                   "/roulette bets\tZeigt alle Wetten eines Nutzers an\n" \
+                   "/roulette cancel\tBricht alle Wetten des Nutzers ab\n" \
+                   "/roulette spin\tDreht das Rouletterad(admin)"
         else:
             return "Help not available in this language"
 

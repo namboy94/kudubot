@@ -17,6 +17,7 @@ from PIL import Image
 The ImageSender Class
 """
 class ImageSender(GenericPlugin):
+
     """
     Constructor
     Defines parameters for the plugin.
@@ -24,7 +25,6 @@ class ImageSender(GenericPlugin):
     @:param messageProtocolEntity - the received message information
     @:override
     """
-
     def __init__(self, layer, messageProtocolEntity=None):
         if messageProtocolEntity is None: self.layer = layer; return
         self.layer = layer
@@ -62,8 +62,6 @@ class ImageSender(GenericPlugin):
         thread.start()
         thread.join(timeout=5)
 
-
-
     """
     Returns the response calculated by the plugin
     @:return the response as a MessageProtocolEntity
@@ -95,9 +93,11 @@ class ImageSender(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return ""
+            return "/img\tSends images from an URL\n" \
+                   "syntax: /img <url>"
         elif language == "de":
-            return ""
+            return "/img\tVerschickt Bilder von URLs\n" \
+                   "syntax: /img <url>"
         else:
             return "Help not available in this language"
 

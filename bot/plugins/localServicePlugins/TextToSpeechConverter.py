@@ -67,12 +67,19 @@ class TextToSpeechConverter(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return ""
+            return "/speak\tA text-to-speech engine\n" \
+                   "syntax:\n" \
+                   "/speak \"<text>\" <language>"
         elif language == "de":
-            return ""
+            return "/speak\tEine text-to-speech Funktion\n" \
+                   "syntax:\n" \
+                   "/speak \"<text>\" <sprache>"
         else:
             return "Help not available in this language"
 
+    """
+    Generates an audio file
+    """
     def __generateAudio__(self):
         file = open("/tmp/messageText", 'w')
         file.write(self.voiceMessage)

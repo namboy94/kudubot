@@ -43,6 +43,7 @@ class ContinuousReminder(GenericPlugin):
 
     """
     Checks if the user input matches the regex needed for the plugin to function correctly
+    @:return True if input is valid, False otherwise
     @:override
     """
     def regexCheck(self):
@@ -99,14 +100,24 @@ class ContinuousReminder(GenericPlugin):
 
     """
     Returns a description about this plugin
+    @:param language - the language in which to display the description
+    @:return the description in the specified language
     @:override
     """
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return "/cremind"
+            return "/cremind\tStores a continuous (weekly) reminder\n" \
+                   "syntax:\n" \
+                   "/cremind \"<message>\" <day> <hh-mm-ss>\n" \
+                   "/cremind list\tLists all reminders currently stored" \
+                   "/cremind delete <index>\tDeletes the reminder at the given index"
         elif language == "de":
-            return "/cremind"
+            return "/cremind\tSpeichert eine wöchentliche Errinnerung\n" \
+                   "syntax:\n" \
+                   "/cremind \"<nachricht>\" <tag> <hh-mm-ss>\n" \
+                   "/cremind list\tListet alle Erinnerungen " \
+                   "/cremind delete <index>\tDeletes the reminder at the given index"
         else:
             return "Help not available in this language"
 
@@ -139,6 +150,7 @@ class ContinuousReminder(GenericPlugin):
 
     """
     Searches all continuous reminders
+    @:return the due TextMessageProtocolEntitiies found
     """
     def __findContinuousReminders__(self):
 

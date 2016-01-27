@@ -87,10 +87,18 @@ class Casino(GenericPlugin):
                    "syntax:\n" \
                    "/casino balance\tsends you your current balance"
         elif language == "de":
-            return ""
+            return "/casino\tBietet simple Casino Funktionen\n" \
+                   "syntax:\n" \
+                   "/casino balance\tSchickt den momentanen Kontostand des Nutzers"
         else:
             return "Help not available in this language"
 
+    """
+    Starts a parallel background activity if this class has one.
+    Defaults to False if not implemented
+    @:return False, if no parallel activity defined, should be implemented to return True if one is implmented.
+    @:override
+    """
     def parallelRun(self):
         while True:
             currentTime = datetime.datetime.now()
@@ -102,6 +110,8 @@ class Casino(GenericPlugin):
 
 
     """
+    Creates a new user file
+    @:param messageEntity - a messageEntity sent from the user
     """
     def createUser(self, messageEntity):
         userID = messageEntity.getParticipant()
@@ -113,6 +123,12 @@ class Casino(GenericPlugin):
         if not os.path.isfile(userFile):
             self.generateUser(userID, userNick, "1000.00")
 
+    """
+    Generates a user account
+    @:param userID - the user's ID
+    @:param userNick - the user's (nick)name
+    @:param balance - the user's balance
+    """
     def generateUser(self, userID, userNick, balance):
         userFile = self.userDir + userID
         file = open(userFile, "w")
@@ -121,6 +137,9 @@ class Casino(GenericPlugin):
         file.write("balance=" + balance)
 
     """
+    Gets the user's (nick)name from his/her account
+    @:param userId - the user's ID
+    @:return the user's (nick)name
     """
     def getUserNick(self, userId):
         userFile = self.userDir + userId
@@ -131,6 +150,9 @@ class Casino(GenericPlugin):
 
 
     """
+    Gets the balance of a user
+    @:param userID - the user's ID
+    @:return the user's balance
     """
     def getBalance(self, userID):
         userFile = self.userDir + userID
@@ -140,6 +162,10 @@ class Casino(GenericPlugin):
         return self.decodeMoneyString(balance)
 
     """
+    Sets a user's balance to a specified value
+    @:param userID - the user's ID
+    @:param dollars - the amount of dollars
+    @:param cents - the amount of cents
     """
     def setBalance(self, userID, dollars, cents):
         balanceString = self.encodeMoneyString(dollars, cents)
@@ -147,6 +173,9 @@ class Casino(GenericPlugin):
         self.generateUser(userID, userNick, balanceString)
 
     """
+    Decodes a money string
+    @:param moneyString - the String to be decoded
+    @:return the monetary value as a tuple of dollars and cents
     """
     def decodeMoneyString(self, moneyString):
         dollars = int(moneyString.split(".")[0])
@@ -159,6 +188,11 @@ class Casino(GenericPlugin):
         return (dollars, cents)
 
     """
+    Encodes a tuple of dollars and cents to a moneyString
+    @:param dollars - the amount of dollars
+    @:param cents - the amount of cents
+    @:param delimiters - switch for enabling delimiters
+    @:return the encoded dollar string
     """
     def encodeMoneyString(self, dollars, cents, delimiters=False):
         centString = str(cents)
@@ -181,6 +215,11 @@ class Casino(GenericPlugin):
             return formatedDollarString + "." + centString
 
     """
+    Multiplies a monetary value by a given factor
+    @:param factor - the actor with which to multiply
+    @:param dollars - the initial amount of dollars
+    @:param cents - the initial amount of cents
+    @:return the multiplied monetary value as a tuple of dollars and cents
     """
     def multiplyMoney(self, factor, dollars, cents):
         multipliedDollars = factor * dollars
@@ -191,6 +230,9 @@ class Casino(GenericPlugin):
 
     """
     Adds or subtracts an amount from the balance of a player
+    @:param userID - the user's ID
+    @:param dollars - the amount of dollars to be transferred
+    @:param cents - the amount of cents to be transferred
     """
     def transferFunds(self, userID, dollars, cents):
         currentDollars, currentCents = self.getBalance(userID)
@@ -201,6 +243,11 @@ class Casino(GenericPlugin):
         self.setBalance(userID, newDollars, newCents)
 
     """
+    Checks if a user has enough funds for a specified bet
+    @:param userID - the user's ID
+    @:param dollars - the amount of dollars to be bet
+    @:param cents - the amount of cents to be bet
+    @:return True if the user has enough funds, False otherwise
     """
     def hasSufficientFunds(self, userID, dollars, cents):
         currentDollars, currentCents = self.getBalance(userID)
@@ -209,6 +256,13 @@ class Casino(GenericPlugin):
         return queryValue <= currentMoney
 
     """
+    Stores a bet to a user's bet file
+    @:param game - the game played
+    @:param userID - the user's ID
+    @:param sender - the sender of the bet
+    @:param dollars - the bet mount (dollars)
+    @:param cents - the bet amount (cents)
+    @:param betType - the bet type identifier
     """
     def storeBet(self, game, userID, sender, dollars, cents, betType):
         betString = sender + ";" + self.encodeMoneyString(dollars, cents) + ";" + betType + "\n"
@@ -217,6 +271,10 @@ class Casino(GenericPlugin):
         userBets.close()
 
     """
+    Gets the bets from a user's bet file
+    @:param game - the game played
+    @:param userID - the user's ID
+    @:return the bets as a list of strings
     """
     def getBets(self, game, userID):
         betFile = open(self.casinoDir + game + "/" + userID, "r")
@@ -233,6 +291,10 @@ class Casino(GenericPlugin):
         return bets
 
     """
+    Gets the bets of a user as strings
+    @:param game - the game played
+    @:param userID - the user's ID
+    return the bets as a string
     """
     def getBetStrings(self, game, userID):
         betString = "You have bet on the following:"

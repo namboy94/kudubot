@@ -61,9 +61,11 @@ class XKCD(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return ""
+            return "/kvv\tUses Johannes bucher's bot to display XKCD comics\n" \
+                   "syntax: /xkcd <comic_number>"
         elif language == "de":
-            return ""
+            return "/kvv\tBenutzt Johannes Buchers bot um XKCD Comics anzuzeigen\n" \
+                   "syntax: /xkcd <comic_number>"
         else:
             return "Help not available in this language"
 

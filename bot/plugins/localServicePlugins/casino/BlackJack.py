@@ -75,13 +75,19 @@ class BlackJack(Casino):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return "/roulette\n" \
+            return "/roulette\tAllows the sender to play roulette\n" \
                    "syntax: /roulette <amount> <bet>\n" \
-                   "valid bets: 0-36 | red | black | odd | even\n" \
-                   "/roulette time\n" \
-                   "/roulette bets"
+                   "valid bets: 0-36 | red | black | odd | even | batch <1-2-3-4> |" \
+                   " batch <1-2> | group <1-3> | row <1-3> | half <1-2>\n" \
+                   "/roulette time\tDisplays the time until the roulette wheel is spun next.\n" \
+                   "/roulette bets\tDisplays all bets of the user"
         elif language == "de":
-            return ""
+            return "/roulette\tErmöglicht es, Roulette zu spielen\n" \
+                   "syntax: /roulette <einsatz> <wette>\n" \
+                   "Mögliche Wetten: 0-36 | red | black | odd | even | batch <1-2-3-4> |" \
+                   " batch <1-2> | group <1-3> | row <1-3> | half <1-2>\n" \
+                   "/roulette time\tZeigt die verbleibende Zeit bis zum nächsten Drehen des Roulette-Rads an\n" \
+                   "/roulette bets\tZeigt alle Wetten des Nutzers an."
         else:
             return "Help not available in this language"
 

@@ -69,13 +69,19 @@ class Terminal(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return ""
+            return "/term\tAllows limit access to the server's terminal\n" \
+                   "syntax:\n" \
+                   "/term uptime\tShow's the server's uptime"
         elif language == "de":
-            return ""
+            return "/term\tErmöglicht beschränkten Zugriff auf das Terminal des Servers\n" \
+                   "syntax:\n" \
+                   "/term uptime\tZeigt die uptime des Servers"
         else:
             return "Help not available in this language"
 
     """
+    Executes a command and returns its output.
+    @:return stdout of the command
     """
     def __executeCommand__(self, command):
         return subprocess.check_output(command, shell=True).decode()

@@ -34,6 +34,7 @@ class TheTVDB(GenericPlugin):
 
     """
     Checks if the user input matches the regex needed for the plugin to function correctly
+    @:return True if input is valid, False otherwise
     @:override
     """
     def regexCheck(self):
@@ -73,6 +74,8 @@ class TheTVDB(GenericPlugin):
 
     """
     Returns a description about this plugin
+    @:param language - the language in which to display the description
+    @:return the description in the specified language
     @:override
     """
     @staticmethod

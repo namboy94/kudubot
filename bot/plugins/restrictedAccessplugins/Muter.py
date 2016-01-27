@@ -79,8 +79,10 @@ class Muter(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return ""
+            return "/mute\tmutes the bot (admin)\n" \
+                   "/unmute\tunmutes the bot (admin)\n"
         elif language == "de":
-            return ""
+            return "/mute\tStellt den Bot auf lautlos (admin)\n" \
+                   "/unmute\tHolt den Bot wieder aus dem Lautlosmodus aus (admin)\n"
         else:
             return "Help not available in this language"
