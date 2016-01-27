@@ -84,6 +84,7 @@ class Installer(object):
                 file.write("Mensa Plugin=1\n")
                 file.write("Kicktipp Plugin=1\n")
                 file.write("Casino Plugin=1\n")
+                file.write("Text To Speech Plugin=1\n")
                 file.write("Continuous Reminder Plugin=1\n")
                 file.write("ImageSender Plugin=1")
                 file.close()

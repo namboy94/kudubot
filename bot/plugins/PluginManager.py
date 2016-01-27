@@ -19,6 +19,7 @@ from plugins.internetServicePlugins.XKCD import XKCD
 from plugins.localServicePlugins.Casino import Casino
 from plugins.localServicePlugins.ContinuousReminder import ContinuousReminder
 from plugins.localServicePlugins.Reminder import Reminder
+from plugins.localServicePlugins.TextToSpeechConverter import TextToSpeechConverter
 from plugins.localServicePlugins.Terminal import Terminal
 from plugins.localServicePlugins.casino.Roulette import Roulette
 from plugins.restrictedAccessplugins.Muter import Muter
@@ -53,6 +54,7 @@ class PluginManager(object):
                         "ImageSender Plugin": True,
                         "Casino Plugin": True,
                         "Continuous Reminder Plugin": True,
+                        "Text To Speech Plugin": True,
                         "Roulette Plugin": True}
         ### ADD NEW PLUGINS HERE ###
 
@@ -81,6 +83,7 @@ class PluginManager(object):
         if self.plugins["Casino Plugin"]: plugins.append(Casino(self.layer, messageProtocolEntity))
         if self.plugins["Roulette Plugin"]: plugins.append(Roulette(self.layer, messageProtocolEntity))
         if self.plugins["Continuous Reminder Plugin"]: plugins.append(ContinuousReminder(self.layer, messageProtocolEntity))
+        if self.plugins["Text To Speech Plugin"]: plugins.append(TextToSpeechConverter(self.layer, messageProtocolEntity))
 
         ### ADD NEW PLUGINS HERE ###
 

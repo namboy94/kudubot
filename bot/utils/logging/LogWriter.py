@@ -22,7 +22,7 @@ class LogWriter(object):
     def writeEventLog(event, entity):
 
         logFile = os.getenv("HOME") + "/.whatsapp-bot/logs/"
-        if event == "recv" or event == "sent" or event == "s(m)" or event == "i(m)" or event == "imgs":
+        if event in ["recv", "sent", "s(m)", "i(m)", "imgs", "a(m)", "audi"]:
             if event == "recv":
                 userName = entity.getFrom(False)
             else:
@@ -44,6 +44,7 @@ class LogWriter(object):
         if event == "recv": contact = AddressBook().getContactName(entity, True)
         elif event == "sent" or event == "s(m)": contact = AddressBook().getContactName(entity, False)
         elif event == "imgs" or event == "i(m)": contact = AddressBook().getContactName(entity, False)
+        elif event == "audi" or event == "a(m)": contact = AddressBook().getContactName(entity, False)
         elif event == "exep" or event == "e(m)": contact = "Exception"
         elif event == "bugs" or event == "b(m)": contact = "Bug"
 

@@ -42,8 +42,6 @@ class BotLayer(YowInterfaceLayer):
     @ProtocolEntityCallback("message")
     def onMessage(self, messageProtocolEntity):
 
-        self.pluginManagerSetup()
-
         #Notify whatsapp that message was read
         self.toLower(messageProtocolEntity.ack())
         self.toLower(messageProtocolEntity.ack(True))
@@ -90,7 +88,6 @@ class BotLayer(YowInterfaceLayer):
         if self.pluginManager is None:
             self.pluginManager = PluginManager(self)
             self.pluginManager.setPlugins(PluginConfigParser().readPlugins())
-            #PluginManagerGUI(self.pluginManager)
             if not self.parallelRunning:
                 print("Starting Parallel Threads")
                 PluginManager(self).startParallelRuns()
@@ -107,13 +104,10 @@ class BotLayer(YowInterfaceLayer):
         self.sendReceipts = True
         self.disconnectAction = self.__class__.DISCONNECT_ACTION_PROMPT
         self.credentials = None
+        self.jidAliases = {}
 
-        #add aliases to make it user to use commands. for example you can then do:
-        # /message send foobar "HI"
-        # and then it will get automaticlaly mapped to foobar's jid
-        self.jidAliases = {
-            # "NAME": "PHONE@s.whatsapp.net"
-        }
+        self.pluginManagerSetup()
+
 
     """
     method run whenever a whatsapp receipt is issued
@@ -127,8 +121,15 @@ class BotLayer(YowInterfaceLayer):
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
         successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity, caption)
         errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
-
         self._sendIq(entity, successFn, errorFn)
+
+    def sendAudio(self, number, path):
+        jid = self.aliasToJid(number)
+        entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO, filePath=path)
+        successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity)
+        errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
+        self._sendIq(entity, successFn, errorFn)
+
 
     def onRequestUploadResult(self, jid, filePath, resultRequestUploadIqProtocolEntity, requestUploadIqProtocolEntity, caption = None):
 

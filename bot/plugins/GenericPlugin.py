@@ -89,3 +89,16 @@ class GenericPlugin(object):
         else:
             LogWriter.writeEventLog("imgs", TextMessageProtocolEntity(imagePath + " --- " + caption, to=recipient))
             self.layer.sendImage(recipient.split("@")[0], imagePath, caption)
+
+    """
+    Sends an audio file outside of the normal yowsup loop
+    @:param recipient - the receiver of the audio
+    @:param audioPath - the audio file to be send
+    @:param audioText - text for logging purposes
+    """
+    def sendAudio(self, recipient, audioPath, audioText="Audio"):
+        if self.layer.muted:
+            LogWriter.writeEventLog("a(m)", TextMessageProtocolEntity(audioText, to=recipient))
+        else:
+            LogWriter.writeEventLog("audi", TextMessageProtocolEntity(audioText, to=recipient))
+            self.layer.sendAudio(recipient.split("@")[0], audioPath)
