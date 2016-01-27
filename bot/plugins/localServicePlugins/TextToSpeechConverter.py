@@ -29,7 +29,7 @@ class TextToSpeechConverter(GenericPlugin):
         self.message = self.capitalMessage.lower()
         self.sender = self.entity.getFrom()
         self.voiceMessage = ""
-        self.language = "en-US"
+        self.language = "en-us"
 
     """
     Checks if the user input is valid for this plugin to continue
@@ -45,8 +45,8 @@ class TextToSpeechConverter(GenericPlugin):
     """
     def parseUserInput(self):
         self.voiceMessage = self.capitalMessage.split("\"", 1)[1].rsplit("\"", 1)[0]
-        if self.message.endswith("german"): self.language = "de-DE"
-        if self.message.endswith("french"): self.language = "fr-FR"
+        if self.message.endswith("german"): self.language = "de-de"
+        if self.message.endswith("french"): self.language = "fr-fr"
 
     """
     Returns the response calculated by the plugin
@@ -78,4 +78,5 @@ class TextToSpeechConverter(GenericPlugin):
         file.write(self.voiceMessage)
         file.close()
         #Popen(["pico2wave", "-l=" + self.language, "-w=/tmp/tempAudio.wav", "$(cat", "/tmp/messageText)"]).wait()
-        os.system("pico2wave -l=" + self.language + " -w=/tmp/tempAudio.wav \"$(cat /tmp/messageText)\"")
+        #os.system("pico2wave -l=" + self.language + " -w=/tmp/tempAudio.wav \"$(cat /tmp/messageText)\"")
+        os.system("espeak -v " + self.language + " -f /tmp/messageText -w /tmp/tempAudio.wav")
