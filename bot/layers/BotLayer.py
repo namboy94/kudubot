@@ -14,6 +14,8 @@ from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMedia
     RequestUploadIqProtocolEntity, AudioDownloadableMediaMessageProtocolEntity
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
+from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
+from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 
 from startup.config.PluginConfigParser import PluginConfigParser
 from utils.encoding.Unicoder import Unicoder
@@ -107,6 +109,8 @@ class BotLayer(YowInterfaceLayer):
         self.jidAliases = {}
 
         self.pluginManagerSetup()
+        self.setPresenceName("Whatsapp-Bot")
+        self.profile_setStatus("I am a bot.")
 
 
     """
@@ -182,3 +186,17 @@ class BotLayer(YowInterfaceLayer):
     def doSendAudio(self, filePath, url, to, ip = None, caption = None):
         entity = AudioDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, ip, to)
         self.toLower(entity)
+
+    def setPresenceName(self, name):
+        entity = PresenceProtocolEntity(name=name)
+        self.toLower(entity)
+
+    def profile_setStatus(self, text):
+        def onSuccess(resultIqEntity, originalIqEntity):
+            print()
+
+        def onError(errorIqEntity, originalIqEntity):
+            logger.error("Error updating status")
+
+        entity = SetStatusIqProtocolEntity(text)
+        self._sendIq(entity, onSuccess, onError)
