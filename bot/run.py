@@ -93,6 +93,24 @@ def main():
     else:
         selected_layer = BotLayer
 
+    # This may have to be implemented some day if passing layers as tuples will be
+    # deprecated, as being warned by yowsup currently. Sadly, this will also change
+    # how the layer classes are built up, and I honestly would rather not do that now.
+    """
+    stack_builder = YowStackBuilder()
+    stack = stack_builder.pushDefaultLayers(True).push(selected_layer).build()
+    stack.setCredentials(credentials)
+    stack.broadcastEvent(YowLayerEvent(selected_layer.EVENT_START))
+
+    try:
+        stack.loop(timeout=0.5, discrete=0.5)
+    except AuthError as e:
+        print("Auth Error, reason %s" % e)
+    except KeyboardInterrupt:
+        print("\nBot Dead")
+        sys.exit(0)
+    """
+
     layers = (
         selected_layer,
         (YowAuthenticationProtocolLayer,
