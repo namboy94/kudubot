@@ -5,6 +5,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="sys.setdefaultencoding" />
+          <option value="run.reload" />
         </list>
       </option>
     </inspection_tool>

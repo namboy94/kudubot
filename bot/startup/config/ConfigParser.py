@@ -55,7 +55,7 @@ class ConfigParser(object):
             if not re.search(r"^[^ ]+$", password): raise Exception("Invalid Password")
             credentials = (number, password)
             return credentials
-        else: raise Exception("Invalid Config")
+        else: raise EOFError("Invalid Config")
 
     """
     Opens the config file under Linux
