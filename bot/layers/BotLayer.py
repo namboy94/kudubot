@@ -21,15 +21,7 @@ This file is part of whatsapp-bot.
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-@author Hermann Krumrey<hermann@krumreyh.com>
-The layer component of the bot. Used to send and receive messages
-"""
-import time
-import logging
-import sys
-import os
-import traceback
+# imports
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity, \
     RequestUploadIqProtocolEntity, AudioDownloadableMediaMessageProtocolEntity
@@ -37,52 +29,57 @@ from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocol
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
-
 from startup.config.PluginConfigParser import PluginConfigParser
 from utils.encoding.Unicoder import Unicoder
 from utils.logging.LogWriter import LogWriter
 from utils.contacts.AddressBook import AddressBook
 from plugins.PluginManager import PluginManager
+import time
+import logging
+import sys
+import os
+import traceback
 
 logger = logging.getLogger(__name__)
 
-"""
-The BotLayer class
-"""
+
 class BotLayer(YowInterfaceLayer):
+    """
+    The BotLayer class
+    The layer component of the bot. Used to send and receive messages
+    """
 
+    # class variables
     DISCONNECT_ACTION_PROMPT = 0
-
     parallelRunning = False
     pluginManager = None
     muted = False
 
-
-    """
-    Method run when a message is received
-    @param: messageProtocolEntity - the message received
-    """
     @ProtocolEntityCallback("message")
-    def onMessage(self, messageProtocolEntity):
+    def on_message(self, message_protocol_entity):
+        """
+        Method run when a message is received
+        :param message_protocol_entity: the message received
+        """
 
-        #Notify whatsapp that message was read
-        self.toLower(messageProtocolEntity.ack())
-        self.toLower(messageProtocolEntity.ack(True))
+        # Notify whatsapp that message was read
+        self.toLower(message_protocol_entity.ack())
+        self.toLower(message_protocol_entity.ack(True))
 
-        #Cases in which responses won't trigger
-        if not messageProtocolEntity.getType() == 'text': return
-        if messageProtocolEntity.getTimestamp() < int(time.time()) - 200: return
-        if AddressBook().isBlackListed(messageProtocolEntity.getFrom(False)): return
+        # Cases in which responses won't trigger
+        if not message_protocol_entity.getType() == 'text': return
+        if message_protocol_entity.getTimestamp() < int(time.time()) - 200: return
+        if AddressBook().isBlackListed(message_protocol_entity.getFrom(False)): return
         try:
-            if AddressBook().isBlackListed(messageProtocolEntity.getParticipant(False)): return
+            if AddressBook().isBlackListed(message_protocol_entity.getParticipant(False)): return
         except: print()
 
         try:
-            messageProtocolEntity = Unicoder.fixIncominEntity(messageProtocolEntity)
+            message_protocol_entity = Unicoder.fixIncominEntity(message_protocol_entity)
 
-            LogWriter.writeEventLog("recv", messageProtocolEntity)
+            LogWriter.writeEventLog("recv", message_protocol_entity)
 
-            response = self.pluginManager.runPlugins(messageProtocolEntity)
+            response = self.pluginManager.runPlugins(message_protocol_entity)
 
             if response:
                 if not self.muted:
