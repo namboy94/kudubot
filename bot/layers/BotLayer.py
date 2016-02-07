@@ -60,6 +60,7 @@ class BotLayer(YowInterfaceLayer):
         """
         Method run when a message is received
         :param message_protocol_entity: the message received
+        :return: void
         """
 
         # Notify whatsapp that message was read
@@ -99,7 +100,7 @@ class BotLayer(YowInterfaceLayer):
                 LogWriter.writeEventLog("imgs",
                                         TextMessageProtocolEntity(exception_image + " --- " + exception.getBody(),
                                                                   to=message_protocol_entity.getFrom(False)))
-                self.sendImage(message_protocol_entity.getFrom(False), exception_image,  exception.getBody())
+                self.send_image(message_protocol_entity.getFrom(False), exception_image, exception.getBody())
             else:
                 LogWriter.writeEventLog("e(m)", exception)
                 LogWriter.writeEventLog("i(m)",
@@ -109,6 +110,7 @@ class BotLayer(YowInterfaceLayer):
     def plugin_manager_setup(self):
         """
         Sets up the plugin manager
+        :return: void
         """
         if self.plugin_manager is None:
             self.plugin_manager = PluginManager(self)
@@ -122,7 +124,8 @@ class BotLayer(YowInterfaceLayer):
 
     def __init__(self):
         """
-        Constructor
+        Constructor, can be expanded for more functionality
+        :return: void
         """
         # Required by Yowsup
         super(BotLayer, self).__init__()
@@ -137,69 +140,141 @@ class BotLayer(YowInterfaceLayer):
 
         # Methods to run on start
         self.plugin_manager_setup()
-        self.setPresenceName("Whatsapp-Bot")
-        self.profile_setStatus("I am a bot.")
+        self.set_presence_name("Whatsapp-Bot")
+        self.profile_set_status("I am a bot.")
 
     @ProtocolEntityCallback("receipt")
     def on_receipt(self, entity):
         """
         method run whenever a whatsapp receipt is issued
         :param entity: The receipt entity
+        :return: void
         """
         self.toLower(entity.ack())
 
-    # TODO Continue here
+    # Todo get rid of the lambdas
     def send_image(self, number, path, caption=None):
-        jid = self.aliasToJid(number)
+        """
+        Sends an image
+        :param number: the receiver of the image
+        :param path: the path to the image file
+        :param caption: the caption to be shown
+        :return: void
+        """
+        jid = self.alias_to_jid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
-        successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity, caption)
-        errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
-        self._sendIq(entity, successFn, errorFn)
+        success_fn = lambda success_entity, original_entity:\
+            self.on_request_upload_result(jid, path, success_entity, original_entity, caption)
+        error_fn = lambda error_entity, original_entity:\
+            BotLayer.on_request_upload_error(jid, path, error_entity, original_entity)
+        self._sendIq(entity, success_fn, error_fn)
 
-    def sendAudio(self, number, path):
-        jid = self.aliasToJid(number)
+    # Todo get rid of the lambdas
+    def send_audio(self, number, path):
+        """
+        Sends an audio file
+        :param number: the number of the receiver of the file
+        :param path: the path to the audio file
+        :return: void
+        """
+        jid = self.alias_to_jid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO, filePath=path)
-        successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity)
-        errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
-        self._sendIq(entity, successFn, errorFn)
+        success_fn = lambda success_entity, original_entity:\
+            self.on_request_upload_result(jid, path, success_entity, original_entity)
+        error_fn = lambda error_entity, original_entity:\
+            BotLayer.on_request_upload_error(jid, path, error_entity, original_entity)
+        self._sendIq(entity, success_fn, error_fn)
 
+    # TODO get rid of the lambdas
+    def on_request_upload_result(self, jid, file_path, result_request_upload_iq_protocol_entity,
+                                 request_upload_iq_protocol_entity, caption=None):
+        """
+        Method run when a media upload result is positive
+        :param jid: the jid to receive the media
+        :param file_path: the path to the media file
+        :param result_request_upload_iq_protocol_entity: the result entity
+        :param request_upload_iq_protocol_entity: the request entity
+        :param caption: the media caption, if applicable
+        :return: void
+        """
 
-    def onRequestUploadResult(self, jid, filePath, resultRequestUploadIqProtocolEntity, requestUploadIqProtocolEntity, caption = None):
-
-        if requestUploadIqProtocolEntity.mediaType == RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO:
-            doSendFn = self.doSendAudio
+        if request_upload_iq_protocol_entity.mediaType == RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO:
+            do_send_fn = self.do_send_audio
         else:
-            doSendFn = self.doSendImage
+            do_send_fn = self.do_send_image
 
-        if resultRequestUploadIqProtocolEntity.isDuplicate():
-            doSendFn(filePath, resultRequestUploadIqProtocolEntity.getUrl(), jid,
-                             resultRequestUploadIqProtocolEntity.getIp(), caption)
+        if result_request_upload_iq_protocol_entity.isDuplicate():
+            do_send_fn(file_path, result_request_upload_iq_protocol_entity.getUrl(), jid,
+                       result_request_upload_iq_protocol_entity.getIp(), caption)
         else:
-            successFn = lambda filePath, jid, url: doSendFn(filePath, url, jid, resultRequestUploadIqProtocolEntity.getIp(), caption)
-            mediaUploader = MediaUploader(jid, self.getOwnJid(), filePath,
-                                      resultRequestUploadIqProtocolEntity.getUrl(),
-                                      resultRequestUploadIqProtocolEntity.getResumeOffset(),
-                                      successFn, self.onUploadError, self.onUploadProgress, async=False)
-            mediaUploader.start()
+            # TODO Fix the shadowing problems
+            success_fn = lambda file_path, jid, url: do_send_fn(file_path, url, jid,
+                                                                result_request_upload_iq_protocol_entity.getIp(),
+                                                                caption)
+            media_uploader = MediaUploader(jid, self.getOwnJid(), file_path,
+                                           result_request_upload_iq_protocol_entity.getUrl(),
+                                           result_request_upload_iq_protocol_entity.getResumeOffset(), success_fn,
+                                           BotLayer.on_upload_error, BotLayer.on_upload_progress, async=False)
+            media_uploader.start()
 
-    def onRequestUploadError(self, jid, path, errorRequestUploadIqProtocolEntity, requestUploadIqProtocolEntity):
-        logger.error("Request upload for file %s for %s failed" % (path, jid))
+    @staticmethod
+    def on_request_upload_error(jid, path, error_request_upload_iq_protocol_entity,
+                                request_upload_iq_protocol_entity):
+        """
+        Method run when a media upload result is negative
+        :param jid: the jid to receive the media
+        :param path: the file path to the media
+        :param error_request_upload_iq_protocol_entity: the error result entity
+        :param request_upload_iq_protocol_entity: the request entity
+        :return: void
+        """
+        if error_request_upload_iq_protocol_entity and request_upload_iq_protocol_entity:
+            logger.error("Request upload for file %s for %s failed" % (path, jid))
 
-    def onUploadError(self, filePath, jid, url):
-        logger.error("Upload file %s to %s for %s failed!" % (filePath, url, jid))
+    @staticmethod
+    def on_upload_error(file_path, jid, url):
+        """
+        Method run when an upload error occurs
+        :param file_path: the file path of the file to upload
+        :param jid: the jid of the receiver of the file
+        :param url: the upload url
+        :return: void
+        """
+        logger.error("Upload file %s to %s for %s failed!" % (file_path, url, jid))
 
-    def onUploadProgress(self, filePath, jid, url, progress):
-        sys.stdout.write("%s => %s, %d%% \r" % (os.path.basename(filePath), jid, progress))
-        sys.stdout.flush()
+    @staticmethod
+    def on_upload_progress(file_path, jid, url, progress):
+        """
+        Method that keeps track of the upload process
+        :param file_path: the file path of the media file
+        :param jid: the jid of the receiver
+        :param url: the whatsapp upload url
+        :param progress: the current progress
+        :return:
+        """
+        if url:
+            sys.stdout.write("%s => %s, %d%% \r" % (os.path.basename(file_path), jid, progress))
+            sys.stdout.flush()
 
-    def aliasToJid(self, calias):
-        for alias, ajid in self.jidAliases.items():
-            if calias.lower() == alias.lower():
-                return self.normalizeJid(ajid)
+    def alias_to_jid(self, c_alias):
+        """
+        Turns an alias into a jid
+        :param c_alias: the current alias
+        :return: the jid
+        """
+        for alias, a_jid in self.jidAliases.items():
+            if c_alias.lower() == alias.lower():
+                return BotLayer.normalize_jid(a_jid)
 
-        return self.normalizeJid(calias)
+        return BotLayer.normalize_jid(c_alias)
 
-    def normalizeJid(self, number):
+    @staticmethod
+    def normalize_jid(number):
+        """
+        Normalizes a jid
+        :param number: the number to be receive a normalized jid
+        :return: the normalized jid
+        """
         if '@' in number:
             return number
         elif "-" in number:
@@ -207,25 +282,65 @@ class BotLayer(YowInterfaceLayer):
 
         return "%s@s.whatsapp.net" % number
 
-
-    def doSendImage(self, filePath, url, to, ip = None, caption = None):
-        entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, ip, to, caption = caption)
+    def do_send_image(self, file_path, url, to, ip=None, caption=None):
+        """
+        Sends an image file
+        :param file_path: the path to the file
+        :param url: the whatsapp upload url
+        :param to: the receiver
+        :param ip: the ip of the receiver
+        :param caption: the caption to be displayed together with the image
+        :return: void
+        """
+        entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
         self.toLower(entity)
 
-    def doSendAudio(self, filePath, url, to, ip = None, caption = None):
-        entity = AudioDownloadableMediaMessageProtocolEntity.fromFilePath(filePath, url, ip, to)
+    def do_send_audio(self, file_path, url, to, ip=None):
+        """
+        Sends an audio file
+        :param file_path: the path to the audio file
+        :param url: the whatsapp upload url
+        :param to: the receiver of the file
+        :param ip: the ip of the receiver
+        :return: void
+        """
+        entity = AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to)
         self.toLower(entity)
 
-    def setPresenceName(self, name):
+    def set_presence_name(self, name):
+        """
+        Sets the presence name of the bot
+        :param name: the presence name to set
+        :return: void
+        """
         entity = PresenceProtocolEntity(name=name)
         self.toLower(entity)
 
-    def profile_setStatus(self, text):
-        def onSuccess(resultIqEntity, originalIqEntity):
-            print()
+    def profile_set_status(self, text):
+        """
+        Sets the profile status of the bot
+        :param text:
+        :return:
+        """
+        def on_success(result_iq_entity, original_iq_entity):
+            """
+            Run when successful
+            :param result_iq_entity: the result entity
+            :param original_iq_entity: the original entity
+            :return: void
+            """
+            if result_iq_entity and original_iq_entity:
+                print()
 
-        def onError(errorIqEntity, originalIqEntity):
-            logger.error("Error updating status")
+        def on_error(error_iq_entity, original_iq_entity):
+            """
+            Run when the profile status change failed
+            :param error_iq_entity: the error entity
+            :param original_iq_entity: the original entity
+            :return: void
+            """
+            if error_iq_entity and original_iq_entity:
+                logger.error("Error updating status")
 
         entity = SetStatusIqProtocolEntity(text)
-        self._sendIq(entity, onSuccess, onError)
+        self._sendIq(entity, on_success, on_error)
