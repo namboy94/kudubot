@@ -51,8 +51,8 @@ class BotLayer(YowInterfaceLayer):
 
     # class variables
     DISCONNECT_ACTION_PROMPT = 0
-    parallelRunning = False
-    pluginManager = None
+    parallel_running = False
+    plugin_manager = None
     muted = False
 
     @ProtocolEntityCallback("message")
@@ -67,19 +67,19 @@ class BotLayer(YowInterfaceLayer):
         self.toLower(message_protocol_entity.ack(True))
 
         # Cases in which responses won't trigger
-        if not message_protocol_entity.getType() == 'text': return
-        if message_protocol_entity.getTimestamp() < int(time.time()) - 200: return
-        if AddressBook().isBlackListed(message_protocol_entity.getFrom(False)): return
-        try:
-            if AddressBook().isBlackListed(message_protocol_entity.getParticipant(False)): return
-        except: print()
+        if not message_protocol_entity.getType() == 'text':
+            return
+        if message_protocol_entity.getTimestamp() < int(time.time()) - 200:
+            return
+        if AddressBook().isBlackListed(message_protocol_entity.getFrom(False)):
+            return
+        if AddressBook().isBlackListed(message_protocol_entity.getParticipant(False)):
+            return
 
         try:
             message_protocol_entity = Unicoder.fixIncominEntity(message_protocol_entity)
-
             LogWriter.writeEventLog("recv", message_protocol_entity)
-
-            response = self.pluginManager.runPlugins(message_protocol_entity)
+            response = self.plugin_manager.runPlugins(message_protocol_entity)
 
             if response:
                 if not self.muted:
@@ -91,31 +91,40 @@ class BotLayer(YowInterfaceLayer):
 
         except Exception as e:
             trace = traceback.format_exc()
-            exception = TextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n", to=messageProtocolEntity.getFrom())
-            exceptionImage = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
+            exception = TextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n",
+                                                  to=message_protocol_entity.getFrom())
+            exception_image = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
             if not self.muted:
                 LogWriter.writeEventLog("exep", exception)
-                LogWriter.writeEventLog("imgs", TextMessageProtocolEntity(exceptionImage + " --- " + exception.getBody(), to=messageProtocolEntity.getFrom(False)))
-                self.sendImage(messageProtocolEntity.getFrom(False), exceptionImage,  exception.getBody())
+                LogWriter.writeEventLog("imgs",
+                                        TextMessageProtocolEntity(exception_image + " --- " + exception.getBody(),
+                                                                  to=message_protocol_entity.getFrom(False)))
+                self.sendImage(message_protocol_entity.getFrom(False), exception_image,  exception.getBody())
             else:
                 LogWriter.writeEventLog("e(m)", exception)
-                LogWriter.writeEventLog("i(m)", TextMessageProtocolEntity(exceptionImage + " --- " + exception.getBody(), to=messageProtocolEntity.getFrom()))
+                LogWriter.writeEventLog("i(m)",
+                                        TextMessageProtocolEntity(exception_image + " --- " + exception.getBody(),
+                                                                  to=message_protocol_entity.getFrom()))
 
-    """
-    Sets up the plugin manager
-    """
-    def pluginManagerSetup(self):
-        if self.pluginManager is None:
-            self.pluginManager = PluginManager(self)
-            self.pluginManager.setPlugins(PluginConfigParser().readPlugins())
-            if not self.parallelRunning:
+    def plugin_manager_setup(self):
+        """
+        Sets up the plugin manager
+        """
+        if self.plugin_manager is None:
+            self.plugin_manager = PluginManager(self)
+            self.plugin_manager.setPlugins(PluginConfigParser().readPlugins())
+            if not self.parallel_running:
                 print("Starting Parallel Threads")
                 PluginManager(self).startParallelRuns()
-                self.parallelRunning = True
+                self.parallel_running = True
 
-    #YOWSUP SPECIFIC METHODS
+    # YOWSUP SPECIFIC METHODS
 
     def __init__(self):
+        """
+        Constructor
+        """
+        # Required by Yowsup
         super(BotLayer, self).__init__()
         YowInterfaceLayer.__init__(self)
         self.accountDelWarnings = 0
@@ -126,19 +135,21 @@ class BotLayer(YowInterfaceLayer):
         self.credentials = None
         self.jidAliases = {}
 
-        self.pluginManagerSetup()
+        # Methods to run on start
+        self.plugin_manager_setup()
         self.setPresenceName("Whatsapp-Bot")
         self.profile_setStatus("I am a bot.")
 
-
-    """
-    method run whenever a whatsapp receipt is issued
-    """
     @ProtocolEntityCallback("receipt")
-    def onReceipt(self, entity):
+    def on_receipt(self, entity):
+        """
+        method run whenever a whatsapp receipt is issued
+        :param entity: The receipt entity
+        """
         self.toLower(entity.ack())
 
-    def sendImage(self, number, path, caption = None):
+    # TODO Continue here
+    def send_image(self, number, path, caption=None):
         jid = self.aliasToJid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
         successFn = lambda successEntity, originalEntity: self.onRequestUploadResult(jid, path, successEntity, originalEntity, caption)
