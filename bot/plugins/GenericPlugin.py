@@ -21,100 +21,109 @@ This file is part of whatsapp-bot.
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# imports
 from utils.logging.LogWriter import LogWriter
 from utils.encoding.Unicoder import Unicoder
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 
-"""
-The GenericPlugin Class
-"""
-class GenericPlugin(object):
 
+class GenericPlugin(object):
     """
-    Constructor
-    Defines parameters for the plugin.
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
+    The GenericPlugin Class
     """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
+
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        Defines parameters for the plugin.
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        if message_protocol_entity is None:
+            self.layer = layer
+            return
         self.layer = layer
-        self.entity = messageProtocolEntity
+        self.entity = message_protocol_entity
         self.message = self.entity.getBody()
         self.sender = self.entity.getFrom()
+
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return True if input is valid, False otherwise
+        """
         raise NotImplementedError()
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    """
-    def regexCheck(self):
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        :return: void
+        """
         raise NotImplementedError()
 
-    """
-    Parses the user's input
-    """
-    def parseUserInput(self):
+    def get_response(self):
+        """
+        Returns the response calculated by the plugin
+        :return the response as a MessageProtocolEntity
+        """
         raise NotImplementedError()
 
-    """
-    Returns the response calculated by the plugin
-    @:return the response as a MessageProtocolEntity
-    """
-    def getResponse(self):
-        raise NotImplementedError()
-
-    """
-    Returns a helpful description of the plugin's syntax and functionality
-    @:param language - the language to be returned
-    @:return the description as string
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a helpful description of the plugin's syntax and functionality
+        :param language: the language to be returned
+        :return the description as string
+        """
         raise NotImplementedError()
 
-    """
-    Starts a parallel background activity if this class has one.
-    Defaults to False if not implemented
-    @:return False, if no parallel activity defined, should be implemented to return True if one is implmented.
-    """
-    def parallelRun(self):
-        return False
+    def parallel_run(self):
+        """
+        Starts a parallel background activity if this class has one.
+        Defaults to False if not implemented
+        @:return False, if no parallel activity defined, should be implemented to return True if one is implemented.
+        """
+        if self:
+            return False
 
-    """
-    Sends a message outside of the normal yowsup loop
-    @:param entity - the entity to be sent
-    """
-    def sendMessage(self, entity):
+    def send_message(self, entity):
+        """
+        Sends a message outside of the normal yowsup loop
+        :param entity: the entity to be sent
+        :return: void
+        """
         if self.layer.muted:
             LogWriter.writeEventLog("s(m)", entity)
         else:
             LogWriter.writeEventLog("sent", entity)
-            fixedEntity = Unicoder.fixOutgoingEntity(entity)
-            self.layer.toLower(fixedEntity)
+            fixed_entity = Unicoder.fixOutgoingEntity(entity)
+            self.layer.toLower(fixed_entity)
 
-    """
-    Sends an image outside of the normal yowsup loop
-    @:param recipient - the receiver of the image
-    @:param imagePath - the file path to the image
-    @:param caption - the caption to be sent
-    """
-    def sendImage(self, recipient, imagePath, caption):
+    def send_image(self, recipient, image_path, caption):
+        """
+        Sends an image outside of the normal yowsup loop
+        :param recipient: the receiver of the image
+        :param image_path: the file path to the image
+        :param caption: the caption to be sent
+        :return: void
+        """
         if self.layer.muted:
-            LogWriter.writeEventLog("i(m)", TextMessageProtocolEntity(imagePath + " --- " + caption, to=recipient))
+            LogWriter.write_event_log("i(m)", TextMessageProtocolEntity(image_path + " --- " + caption, to=recipient))
         else:
-            LogWriter.writeEventLog("imgs", TextMessageProtocolEntity(imagePath + " --- " + caption, to=recipient))
-            self.layer.sendImage(recipient.split("@")[0], imagePath, caption)
+            LogWriter.write_event_log("imgs", TextMessageProtocolEntity(image_path + " --- " + caption, to=recipient))
+            self.layer.send_image(recipient.split("@")[0], image_path, caption)
 
-    """
-    Sends an audio file outside of the normal yowsup loop
-    @:param recipient - the receiver of the audio
-    @:param audioPath - the audio file to be send
-    @:param audioText - text for logging purposes
-    """
-    def sendAudio(self, recipient, audioPath, audioText="Audio"):
+    def send_audio(self, recipient, audio_path, audio_text="Audio"):
+        """
+        Sends an audio file outside of the normal yowsup loop
+        :param recipient: the receiver of the audio
+        :param audio_path: the audio file to be send
+        :param audio_text: text for logging purposes
+        :return: void
+        """
         if self.layer.muted:
-            LogWriter.writeEventLog("a(m)", TextMessageProtocolEntity(audioText, to=recipient))
+            LogWriter.write_event_log("a(m)", TextMessageProtocolEntity(audio_text, to=recipient))
         else:
-            LogWriter.writeEventLog("audi", TextMessageProtocolEntity(audioText, to=recipient))
-            self.layer.sendAudio(recipient.split("@")[0], audioPath)
+            LogWriter.write_event_log("audi", TextMessageProtocolEntity(audio_text, to=recipient))
+            self.layer.send_audio(recipient.split("@")[0], audio_path)

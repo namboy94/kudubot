@@ -250,7 +250,7 @@ class BotLayer(YowInterfaceLayer):
         :param jid: the jid of the receiver
         :param url: the whatsapp upload url
         :param progress: the current progress
-        :return:
+        :return:void
         """
         if url:
             sys.stdout.write("%s => %s, %d%% \r" % (os.path.basename(file_path), jid, progress))
@@ -320,7 +320,7 @@ class BotLayer(YowInterfaceLayer):
         """
         Sets the profile status of the bot
         :param text:
-        :return:
+        :return: void
         """
         def on_success(result_iq_entity, original_iq_entity):
             """

@@ -21,54 +21,58 @@ This file is part of whatsapp-bot.
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-A GUI for the Plugin Manager
-@author Hermann Krumrey<hermann@krumreyh.com>
-"""
+# imports
+from startup.config.PluginConfigParser import PluginConfigParser
 import sys
 if sys.version_info[0] == 2:
     from Tkinter import *
 else:
     from tkinter import *
-from startup.config.PluginConfigParser import PluginConfigParser
 
-"""
-The PluginManagerGUI class
-"""
+
 class PluginManagerGUI(object):
-
     """
-    Constructor that starts the GUI
+    The PluginManagerGUI class
+    A GUI for the Plugin Manager
     """
-    def __init__(self, pluginManager):
 
-        self.pluginManager = pluginManager
-        self.pluginDictionary = pluginManager.getPlugins()
+    def __init__(self, plugin_manager):
+        """
+        Constructor that starts the GUI
+        :param plugin_manager: The plugin manager linked to this GUI
+        :return: void
+        """
+        self.plugin_manager = plugin_manager
+        self.plugin_dictionary = plugin_manager.getPlugins()
         self.gui = Tk()
 
         self.buttons = {}
 
-        for key in self.pluginDictionary:
+        for key in self.plugin_dictionary:
             color = "red"
-            if self.pluginDictionary[key]: color = "green"
-            button = Button(self.gui, text=key, background=color, command=lambda key=key:self.__toggleValue__(key))
+            if self.plugin_dictionary[key]:
+                color = "green"
+            button = Button(self.gui, text=key, background=color,
+                            command=lambda lambda_key=key: self.__toggleValue__(lambda_key))
             self.buttons[key] = button
             button.pack(fill=X)
 
         Button(self.gui, text="Confirm", command=self.gui.destroy).pack()
 
         self.gui.mainloop()
-        PluginConfigParser().writePlugins(self.pluginDictionary)
-        self.pluginManager.setPlugins(self.pluginDictionary)
+        PluginConfigParser().writePlugins(self.plugin_dictionary)
+        self.plugin_manager.setPlugins(self.plugin_dictionary)
 
-    """
-    Toggles the value of a button
-    """
     def __toggleValue__(self, key):
+        """
+        Toggles the value of a button
+        :param key: the key name of the plugin to toggle
+        :return: void
+        """
 
-        if self.pluginDictionary[key]:
-            self.pluginDictionary[key] = False
+        if self.plugin_dictionary[key]:
+            self.plugin_dictionary[key] = False
             self.buttons[key].config(background='red')
         else:
-            self.pluginDictionary[key] = True
+            self.plugin_dictionary[key] = True
             self.buttons[key].config(background='green')

@@ -21,27 +21,29 @@ This file is part of whatsapp-bot.
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-Class that implements a BotLayer with a GUI that can disable certain plugins on startup
-@author Hermann Krumrey<hermann@krumreyh.com>
-"""
-
+# imports
 from layers.BotLayer import BotLayer
 from plugins.PluginManager import PluginManager
 from plugins.PluginManagerGui import PluginManagerGUI
 from startup.config.PluginConfigParser import PluginConfigParser
 
-"""
-The BotLayerWithGUI class
-"""
-class BotLayerWithGUI(BotLayer):
 
-    def pluginManagerSetup(self):
-        if self.pluginManager is None:
-            self.pluginManager = PluginManager(self)
-            self.pluginManager.setPlugins(PluginConfigParser().readPlugins())
-            PluginManagerGUI(self.pluginManager)
-            if not self.parallelRunning:
+class BotLayerWithGUI(BotLayer):
+    """
+    The BotLayerWithGUI class
+    Class that implements a BotLayer with a GUI that can disable or enable certain plugins on startup
+    """
+
+    def plugin_manager_setup(self):
+        """
+        Sets up the plugin Manager via a GUI
+        :return: void
+        """
+        if self.plugin_manager is None:
+            self.plugin_manager = PluginManager(self)
+            self.plugin_manager.set_plugins(PluginConfigParser().readPlugins())
+            PluginManagerGUI(self.plugin_manager)
+            if not self.parallel_running:
                 print("Starting Parallel Threads")
-                PluginManager(self).startParallelRuns()
-                self.parallelRunning = True
+                PluginManager(self).start_parallel_runs()
+                self.parallel_running = True

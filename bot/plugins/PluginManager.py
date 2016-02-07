@@ -21,6 +21,7 @@ This file is part of whatsapp-bot.
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# imports
 from threading import Thread
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.internetServicePlugins.FootballScores import FootballScores
@@ -49,13 +50,12 @@ class PluginManager(object):
     Handles plugin activity
     """
 
-    """
-    Constructor
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the incoming MessageProtocolEntity
-    """
-
     def __init__(self, layer):
+        """
+        Constructor
+        :param: layer - the overlying yowsup layer
+        :return: void
+        """
         self.layer = layer
         self.plugins = {"Weather Plugin": True,
                         "TVDB Plugin": True,
@@ -77,11 +77,12 @@ class PluginManager(object):
                         "Roulette Plugin": True}
         # ADD NEW PLUGINS HERE
 
-    """
-    Runs all plugins
-    """
-
     def run_plugins(self, message_protocol_entity):
+        """
+        Checks all plugins for a specified input
+        :param message_protocol_entity: the incoming message protocol entity
+        :return: void
+        """
 
         if message_protocol_entity is None:
             raise Exception("Wrong initialization")
@@ -143,12 +144,12 @@ class PluginManager(object):
 
         return False
 
-    """
-    Starts all parallel threads needed by the plugins.
-    Intended to only be used once.
-    """
-
     def start_parallel_runs(self):
+        """
+        Starts all parallel threads needed by the plugins.
+        Intended to only be used once.
+        :return: void
+        """
 
         threads = [Thread(target=Reminder(self.layer).parallelRun), Thread(target=Casino(self.layer).parallelRun),
                    Thread(target=Roulette(self.layer).parallelRun),
@@ -161,17 +162,17 @@ class PluginManager(object):
 
         return threads
 
-    """
-    @:return a dictionary of the current plugin configuration
-    """
-
     def get_plugins(self):
+        """
+        Getter method to get the active plugins as a dictionary
+        :return: a dictionary of the current plugin configuration
+        """
         return self.plugins
 
-    """
-    Sets a new status of the plugins
-    @:param the new plugin states as a dictionary
-    """
-
     def set_plugins(self, plugin_dictionary):
+        """
+        Sets a new status of the plugins
+        :param plugin_dictionary: the new plugin states as a dictionary
+        :return: void
+        """
         self.plugins = plugin_dictionary

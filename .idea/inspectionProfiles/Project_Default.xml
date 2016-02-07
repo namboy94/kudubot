@@ -6,6 +6,7 @@
         <list>
           <option value="sys.setdefaultencoding" />
           <option value="run.reload" />
+          <option value="plugins.PluginManagerGui.Tkinter" />
         </list>
       </option>
     </inspection_tool>
