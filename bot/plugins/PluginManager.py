@@ -42,16 +42,19 @@ from plugins.restrictedAccessplugins.Muter import Muter
 from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
 from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
 
-"""
-The PluginManager class
-"""
+
 class PluginManager(object):
+    """
+    The PluginManager class
+    Handles plugin activity
+    """
 
     """
     Constructor
     @:param layer - the overlying yowsup layer
     @:param messageProtocolEntity - the incoming MessageProtocolEntity
     """
+
     def __init__(self, layer):
         self.layer = layer
         self.plugins = {"Weather Plugin": True,
@@ -72,47 +75,66 @@ class PluginManager(object):
                         "Continuous Reminder Plugin": True,
                         "Text To Speech Plugin": True,
                         "Roulette Plugin": True}
-        ### ADD NEW PLUGINS HERE ###
+        # ADD NEW PLUGINS HERE
 
     """
     Runs all plugins
     """
-    def runPlugins(self, messageProtocolEntity):
 
-        if messageProtocolEntity is None: raise Exception("Wrong initialization")
+    def run_plugins(self, message_protocol_entity):
+
+        if message_protocol_entity is None:
+            raise Exception("Wrong initialization")
 
         plugins = []
-        if self.plugins["Weather Plugin"]: plugins.append(Weather(self.layer, messageProtocolEntity))
-        if self.plugins["TVDB Plugin"]: plugins.append(TheTVDB(self.layer, messageProtocolEntity))
-        if self.plugins["Reminder Plugin"]: plugins.append(Reminder(self.layer, messageProtocolEntity))
-        if self.plugins["Mensa Plugin"]: plugins.append(Mensa(self.layer, messageProtocolEntity))
-        if self.plugins["Football Scores Plugin"]: plugins.append(FootballScores(self.layer, messageProtocolEntity))
-        if self.plugins["KVV Plugin"]: plugins.append(KVV(self.layer, messageProtocolEntity))
-        if self.plugins["Simple Contains Plugin"]: plugins.append(SimpleContainsResponse(self.layer, messageProtocolEntity))
-        if self.plugins["Simple Equals Plugin"]: plugins.append(SimpleEqualsResponse(self.layer, messageProtocolEntity))
-        if self.plugins["Muter Plugin"]: plugins.append(Muter(self.layer, messageProtocolEntity))
-        if self.plugins["KinoZKM Plugin"]: plugins.append(KinoZKM(self.layer, messageProtocolEntity))
-        if self.plugins["Terminal Plugin"]: plugins.append(Terminal(self.layer, messageProtocolEntity))
-        if self.plugins["Kicktipp Plugin"]: plugins.append(KickTipp(self.layer, messageProtocolEntity))
-        if self.plugins["XKCD Plugin"]: plugins.append(XKCD(self.layer, messageProtocolEntity))
-        if self.plugins["ImageSender Plugin"]: plugins.append(ImageSender(self.layer, messageProtocolEntity))
-        if self.plugins["Casino Plugin"]: plugins.append(Casino(self.layer, messageProtocolEntity))
-        if self.plugins["Roulette Plugin"]: plugins.append(Roulette(self.layer, messageProtocolEntity))
-        if self.plugins["Continuous Reminder Plugin"]: plugins.append(ContinuousReminder(self.layer, messageProtocolEntity))
-        if self.plugins["Text To Speech Plugin"]: plugins.append(TextToSpeechConverter(self.layer, messageProtocolEntity))
+        if self.plugins["Weather Plugin"]:
+            plugins.append(Weather(self.layer, message_protocol_entity))
+        if self.plugins["TVDB Plugin"]:
+            plugins.append(TheTVDB(self.layer, message_protocol_entity))
+        if self.plugins["Reminder Plugin"]:
+            plugins.append(Reminder(self.layer, message_protocol_entity))
+        if self.plugins["Mensa Plugin"]:
+            plugins.append(Mensa(self.layer, message_protocol_entity))
+        if self.plugins["Football Scores Plugin"]:
+            plugins.append(FootballScores(self.layer, message_protocol_entity))
+        if self.plugins["KVV Plugin"]:
+            plugins.append(KVV(self.layer, message_protocol_entity))
+        if self.plugins["Simple Contains Plugin"]:
+            plugins.append(SimpleContainsResponse(self.layer, message_protocol_entity))
+        if self.plugins["Simple Equals Plugin"]:
+            plugins.append(SimpleEqualsResponse(self.layer, message_protocol_entity))
+        if self.plugins["Muter Plugin"]:
+            plugins.append(Muter(self.layer, message_protocol_entity))
+        if self.plugins["KinoZKM Plugin"]:
+            plugins.append(KinoZKM(self.layer, message_protocol_entity))
+        if self.plugins["Terminal Plugin"]:
+            plugins.append(Terminal(self.layer, message_protocol_entity))
+        if self.plugins["Kicktipp Plugin"]:
+            plugins.append(KickTipp(self.layer, message_protocol_entity))
+        if self.plugins["XKCD Plugin"]:
+            plugins.append(XKCD(self.layer, message_protocol_entity))
+        if self.plugins["ImageSender Plugin"]:
+            plugins.append(ImageSender(self.layer, message_protocol_entity))
+        if self.plugins["Casino Plugin"]:
+            plugins.append(Casino(self.layer, message_protocol_entity))
+        if self.plugins["Roulette Plugin"]:
+            plugins.append(Roulette(self.layer, message_protocol_entity))
+        if self.plugins["Continuous Reminder Plugin"]:
+            plugins.append(ContinuousReminder(self.layer, message_protocol_entity))
+        if self.plugins["Text To Speech Plugin"]:
+            plugins.append(TextToSpeechConverter(self.layer, message_protocol_entity))
+        # ADD NEW PLUGINS HERE
 
-        ### ADD NEW PLUGINS HERE ###
-
-        if messageProtocolEntity.getBody().lower() in ["/help", "/hilfe"]:
-            helpString = "/help\tDisplays this help message"
+        if message_protocol_entity.getBody().lower() in ["/help", "/hilfe"]:
+            help_string = "/help\tDisplays this help message"
             for plugin in plugins:
                 if not plugin.getDescription("en") == "":
-                    helpString += "\n\n\n"
-                if messageProtocolEntity.getBody().lower() == "/help":
-                    helpString += plugin.getDescription("en")
-                elif messageProtocolEntity.getBody().lower() == "/hilfe":
-                    helpString += plugin.getDescription("de")
-            return TextMessageProtocolEntity(helpString, to=messageProtocolEntity.getFrom())
+                    help_string += "\n\n\n"
+                if message_protocol_entity.getBody().lower() == "/help":
+                    help_string += plugin.getDescription("en")
+                elif message_protocol_entity.getBody().lower() == "/hilfe":
+                    help_string += plugin.getDescription("de")
+            return TextMessageProtocolEntity(help_string, to=message_protocol_entity.getFrom())
 
         for plugin in plugins:
             if plugin.regexCheck():
@@ -125,15 +147,13 @@ class PluginManager(object):
     Starts all parallel threads needed by the plugins.
     Intended to only be used once.
     """
-    def startParallelRuns(self):
 
-        threads = []
+    def start_parallel_runs(self):
 
-        threads.append(Thread(target=Reminder(self.layer).parallelRun))
-        threads.append(Thread(target=Casino(self.layer).parallelRun))
-        threads.append(Thread(target=Roulette(self.layer).parallelRun))
-        threads.append(Thread(target=ContinuousReminder(self.layer).parallelRun))
-        ### ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE ###
+        threads = [Thread(target=Reminder(self.layer).parallelRun), Thread(target=Casino(self.layer).parallelRun),
+                   Thread(target=Roulette(self.layer).parallelRun),
+                   Thread(target=ContinuousReminder(self.layer).parallelRun)]
+        # ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE
 
         for thread in threads:
             thread.setDaemon(True)
@@ -144,12 +164,14 @@ class PluginManager(object):
     """
     @:return a dictionary of the current plugin configuration
     """
-    def getPlugins(self):
+
+    def get_plugins(self):
         return self.plugins
 
     """
     Sets a new status of the plugins
     @:param the new plugin states as a dictionary
     """
-    def setPlugins(self, pluginDictionary):
-        self.plugins = pluginDictionary
+
+    def set_plugins(self, plugin_dictionary):
+        self.plugins = plugin_dictionary
