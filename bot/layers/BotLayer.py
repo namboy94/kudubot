@@ -22,35 +22,35 @@ This file is part of whatsapp-bot.
 """
 
 # imports
+import os
+import sys
+import time
+import traceback
+
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
+from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity, \
     RequestUploadIqProtocolEntity, AudioDownloadableMediaMessageProtocolEntity
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
-from startup.config.PluginConfigParser import PluginConfigParser
-from utils.encoding.Unicoder import Unicoder
-from utils.logging.LogWriter import LogWriter
-from utils.contacts.AddressBook import AddressBook
+
 from plugins.PluginManager import PluginManager
-import time
-import logging
-import sys
-import os
-import traceback
-
-logger = logging.getLogger(__name__)
+from startup.config.PluginConfigParser import PluginConfigParser
+from utils.contacts.AddressBook import AddressBook
+from utils.logging.LogWriter import LogWriter
+from yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
+from yowsupwrapper.entities.EntityAdapter import EntityAdapter
 
 
-class BotLayer(YowInterfaceLayer):
+class BotLayer(WrappedYowInterfaceLayer):
     """
     The BotLayer class
     The layer component of the bot. Used to send and receive messages
     """
 
     # class variables
-    DISCONNECT_ACTION_PROMPT = 0
+    disconnect_action_prompt = 0
     parallel_running = False
     plugin_manager = None
     muted = False
@@ -62,38 +62,34 @@ class BotLayer(YowInterfaceLayer):
         :param message_protocol_entity: the message received
         :return: void
         """
-
-        # Notify whatsapp that message was read
-        self.toLower(message_protocol_entity.ack())
-        self.toLower(message_protocol_entity.ack(True))
+        message_protocol_entity = EntityAdapter(message_protocol_entity)
+        self.send_receipt(message_protocol_entity)
 
         # Cases in which responses won't trigger
-        if not message_protocol_entity.getType() == 'text':
+        if not message_protocol_entity.get_type() == 'text':
             return
-        if message_protocol_entity.getTimestamp() < int(time.time()) - 200:
+        if message_protocol_entity.get_time_stamp() < int(time.time()) - 200:
             return
-        if AddressBook().isBlackListed(message_protocol_entity.getFrom(False)):
+        if AddressBook().is_black_listed(message_protocol_entity.get_from(False)):
             return
-        if AddressBook().isBlackListed(message_protocol_entity.getParticipant(False)):
+        if AddressBook().is_black_listed(message_protocol_entity.get_participant(False)):
             return
 
         try:
-            message_protocol_entity = Unicoder.fixIncominEntity(message_protocol_entity)
             LogWriter.writeEventLog("recv", message_protocol_entity)
-            response = self.plugin_manager.runPlugins(message_protocol_entity)
+            response = self.plugin_manager.run_plugins(message_protocol_entity)
 
             if response:
                 if not self.muted:
-                    LogWriter.writeEventLog("sent", response)
-                    response = Unicoder.fixOutgoingEntity(response)
-                    self.toLower(response)
+                    LogWriter.write_event_log("sent", response)
+                    self.to_lower(response)
                 else:
-                    LogWriter.writeEventLog("s(m)", response)
+                    LogWriter.write_event_log("s(m)", response)
 
         except Exception as e:
             trace = traceback.format_exc()
             exception = TextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n",
-                                                  to=message_protocol_entity.getFrom())
+                                                  to=message_protocol_entity.get_from())
             exception_image = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
             if not self.muted:
                 LogWriter.writeEventLog("exep", exception)
@@ -114,10 +110,10 @@ class BotLayer(YowInterfaceLayer):
         """
         if self.plugin_manager is None:
             self.plugin_manager = PluginManager(self)
-            self.plugin_manager.setPlugins(PluginConfigParser().readPlugins())
+            self.plugin_manager.set_plugins(PluginConfigParser().readPlugins())
             if not self.parallel_running:
                 print("Starting Parallel Threads")
-                PluginManager(self).startParallelRuns()
+                PluginManager(self).start_parallel_runs()
                 self.parallel_running = True
 
     # YOWSUP SPECIFIC METHODS
@@ -281,6 +277,15 @@ class BotLayer(YowInterfaceLayer):
             return "%s@g.us" % number
 
         return "%s@s.whatsapp.net" % number
+
+    def send_receipt(self, message_protocol_entity):
+        """
+        Sends the whatsapp servers that the message was received
+        :param message_protocol_entity: the message protocol entity that was received
+        :return: void
+        """
+        self.to_lower(message_protocol_entity.ack())
+        self.to_lower(message_protocol_entity.ack(True))
 
     def do_send_image(self, file_path, url, to, ip=None, caption=None):
         """
