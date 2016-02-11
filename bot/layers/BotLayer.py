@@ -41,6 +41,7 @@ from utils.contacts.AddressBook import AddressBook
 from utils.logging.LogWriter import LogWriter
 from yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
 from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class BotLayer(WrappedYowInterfaceLayer):
@@ -88,20 +89,21 @@ class BotLayer(WrappedYowInterfaceLayer):
 
         except Exception as e:
             trace = traceback.format_exc()
-            exception = TextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n",
-                                                  to=message_protocol_entity.get_from())
+            exception = WrappedTextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n",
+                                                         to=message_protocol_entity.get_from())
             exception_image = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
             if not self.muted:
                 LogWriter.writeEventLog("exep", exception)
-                LogWriter.writeEventLog("imgs",
-                                        TextMessageProtocolEntity(exception_image + " --- " + exception.getBody(),
-                                                                  to=message_protocol_entity.getFrom(False)))
-                self.send_image(message_protocol_entity.getFrom(False), exception_image, exception.getBody())
+                LogWriter.writeEventLog("imgs", WrappedTextMessageProtocolEntity(exception_image + " --- " +
+                                                                                 exception.get_body(),
+                                                                                 to=message_protocol_entity.
+                                                                                 get_from(False)))
+                self.send_image(message_protocol_entity.get_from(False), exception_image, exception.get_body())
             else:
                 LogWriter.writeEventLog("e(m)", exception)
                 LogWriter.writeEventLog("i(m)",
-                                        TextMessageProtocolEntity(exception_image + " --- " + exception.getBody(),
-                                                                  to=message_protocol_entity.getFrom()))
+                                        TextMessageProtocolEntity(exception_image + " --- " + exception.get_body(),
+                                                                  to=message_protocol_entity.get_from()))
 
     def plugin_manager_setup(self):
         """
@@ -110,7 +112,7 @@ class BotLayer(WrappedYowInterfaceLayer):
         """
         if self.plugin_manager is None:
             self.plugin_manager = PluginManager(self)
-            self.plugin_manager.set_plugins(PluginConfigParser().readPlugins())
+            self.plugin_manager.set_plugins(PluginConfigParser().read_plugins())
             if not self.parallel_running:
                 print("Starting Parallel Threads")
                 PluginManager(self).start_parallel_runs()
@@ -124,13 +126,14 @@ class BotLayer(WrappedYowInterfaceLayer):
         :return: void
         """
         # Required by Yowsup
+        # Some CamelCase formatting, please ignore
         super(BotLayer, self).__init__()
         YowInterfaceLayer.__init__(self)
         self.accountDelWarnings = 0
         self.connected = False
         self.username = None
         self.sendReceipts = True
-        self.disconnectAction = self.__class__.DISCONNECT_ACTION_PROMPT
+        self.disconnectAction = self.__class__.disconnect_action_prompt
         self.credentials = None
         self.jidAliases = {}
 
@@ -146,7 +149,7 @@ class BotLayer(WrappedYowInterfaceLayer):
         :param entity: The receipt entity
         :return: void
         """
-        self.toLower(entity.ack())
+        self.to_lower(entity.ack())
 
     # Todo get rid of the lambdas
     def send_image(self, number, path, caption=None):
@@ -225,7 +228,7 @@ class BotLayer(WrappedYowInterfaceLayer):
         :return: void
         """
         if error_request_upload_iq_protocol_entity and request_upload_iq_protocol_entity:
-            logger.error("Request upload for file %s for %s failed" % (path, jid))
+            print("Request upload for file %s for %s failed" % (path, jid))
 
     @staticmethod
     def on_upload_error(file_path, jid, url):
@@ -236,7 +239,7 @@ class BotLayer(WrappedYowInterfaceLayer):
         :param url: the upload url
         :return: void
         """
-        logger.error("Upload file %s to %s for %s failed!" % (file_path, url, jid))
+        print("Upload file %s to %s for %s failed!" % (file_path, url, jid))
 
     @staticmethod
     def on_upload_progress(file_path, jid, url, progress):

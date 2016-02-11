@@ -65,7 +65,7 @@ def main():
     args = parser.parse_args()
 
     # Check if installed
-    installed = Installer.isInstalled()
+    installed = Installer.is_installed()
 
     if args.install:
         if installed:
@@ -83,7 +83,7 @@ def main():
         sys.exit(0)
 
     try:
-        credentials = ConfigParser.configParse()
+        credentials = ConfigParser.configParse()  # Sadly, CamelCase.
     except EOFError:
         print("No valid login credentials provided in config file")
         sys.exit(1)
@@ -128,6 +128,7 @@ def main():
         YowNetworkLayer
         )
 
+    # Forgive the CamelCase, it's yowsup's fault!
     stack = YowStack(layers)
     stack.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, credentials)  # setting credentials
     stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])      # whatsapp server address
@@ -136,7 +137,6 @@ def main():
     stack.broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT))     # sending the connect signal
     # this is the program mainloop
     stack.loop()
-    print("Bot Dead")
 
 if __name__ == '__main__':
     main()
