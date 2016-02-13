@@ -22,28 +22,23 @@ This file is part of whatsapp-bot.
 """
 
 # imports
-from yowsup.layers.interface import YowInterfaceLayer
+from yowsup.layers.protocol_media.protocolentities import AudioDownloadableMediaMessageProtocolEntity
+from yowsupwrapper.entities.EntityAdapter import EntityAdapter
 
 
-class WrappedYowInterfaceLayer(YowInterfaceLayer):
-    """
-    A class that adapts the YowInterfaceLayer to offer normally styled python
-    methods and variables
+class WrappedAudioDownloadableMediaMessageProtocolEntity(EntityAdapter):
     """
 
-    def to_lower(self, entity):
-        """
-        Processes a yowsup entity
-        :param entity: the entity to be processed
-        :return: void
-        """
-        try:
-            self.toLower(entity.get_entity())
-        except:
-            self.toLower(entity)
+    """
 
-    def send_iq(self, entity, success_fn, error_fn):
-        return self._sendIq(entity, success_fn, error_fn)
+    @staticmethod
+    def from_file_path(file_path, url, ip, to):
+        """
 
-    def get_own_jid(self):
-        return self.getOwnJid()
+        :param file_path:
+        :param url:
+        :param ip:
+        :param to:
+        :return:
+        """
+        super().__init__(AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to))

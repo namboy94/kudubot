@@ -108,3 +108,31 @@ class EntityAdapter(object):
         :return:
         """
         return self.entity.getBody()
+
+    def is_duplicate(self):
+        """
+
+        :return:
+        """
+        return self.entity.isDuplicate()
+
+    def get_url(self):
+        """
+
+        :return:
+        """
+        return self.entity.getUrl()
+
+    def get_ip(self):
+        """
+
+        :return:
+        """
+        return self.entity.getIp()
+
+    def get_resume_offset(self):
+        """
+
+        :return:
+        """
+        return self.entity.getResumeOffset()

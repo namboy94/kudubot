@@ -22,28 +22,28 @@ This file is part of whatsapp-bot.
 """
 
 # imports
-from yowsup.layers.interface import YowInterfaceLayer
+from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
+from yowsupwrapper.entities.EntityAdapter import EntityAdapter
 
 
-class WrappedYowInterfaceLayer(YowInterfaceLayer):
-    """
-    A class that adapts the YowInterfaceLayer to offer normally styled python
-    methods and variables
+class WrappedImageDownloadableMediaMessageProtocolEntity(EntityAdapter):
     """
 
-    def to_lower(self, entity):
-        """
-        Processes a yowsup entity
-        :param entity: the entity to be processed
-        :return: void
-        """
-        try:
-            self.toLower(entity.get_entity())
-        except:
-            self.toLower(entity)
+    """
 
-    def send_iq(self, entity, success_fn, error_fn):
-        return self._sendIq(entity, success_fn, error_fn)
+    @staticmethod
+    def from_file_path(file_path, url, ip, to, caption=None):
+        """
 
-    def get_own_jid(self):
-        return self.getOwnJid()
+        :param caption:
+        :param file_path:
+        :param url:
+        :param ip:
+        :param to:
+        :return:
+        """
+        if caption is None:
+            super().__init__(ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to))
+        else:
+            super().__init__(ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to,
+                                                                                      caption=caption))

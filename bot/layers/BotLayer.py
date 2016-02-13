@@ -29,8 +29,7 @@ import traceback
 
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
-from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity, \
-    RequestUploadIqProtocolEntity, AudioDownloadableMediaMessageProtocolEntity
+from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
@@ -40,7 +39,11 @@ from startup.config.PluginConfigParser import PluginConfigParser
 from utils.contacts.AddressBook import AddressBook
 from utils.logging.LogWriter import LogWriter
 from yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
+from yowsupwrapper.entities.WrappedImageDownloadableMediaMessageProtocolEntity import \
+    WrappedImageDownloadableMediaMessageProtocolEntity
 from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+from yowsupwrapper.entities.WrappedAudioDownloadableMediaMessageProtocolEntity import \
+    WrappedAudioDownloadableMediaMessageProtocolEntity
 from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
@@ -93,17 +96,15 @@ class BotLayer(WrappedYowInterfaceLayer):
                                                          to=message_protocol_entity.get_from())
             exception_image = os.getenv("HOME") + "/.whatsapp-bot/images/exception.jpg"
             if not self.muted:
-                LogWriter.writeEventLog("exep", exception)
-                LogWriter.writeEventLog("imgs", WrappedTextMessageProtocolEntity(exception_image + " --- " +
-                                                                                 exception.get_body(),
-                                                                                 to=message_protocol_entity.
-                                                                                 get_from(False)))
+                LogWriter.write_event_log("exep", exception)
+                LogWriter.write_event_log("imgs", WrappedTextMessageProtocolEntity(
+                    exception_image + " --- " + exception.get_body(), to=message_protocol_entity.get_from(False)))
                 self.send_image(message_protocol_entity.get_from(False), exception_image, exception.get_body())
             else:
-                LogWriter.writeEventLog("e(m)", exception)
-                LogWriter.writeEventLog("i(m)",
-                                        TextMessageProtocolEntity(exception_image + " --- " + exception.get_body(),
-                                                                  to=message_protocol_entity.get_from()))
+                LogWriter.write_event_log("e(m)", exception)
+                LogWriter.write_event_log("i(m)",
+                                          TextMessageProtocolEntity(exception_image + " --- " + exception.get_body(),
+                                                                    to=message_protocol_entity.get_from()))
 
     def plugin_manager_setup(self):
         """
@@ -135,7 +136,7 @@ class BotLayer(WrappedYowInterfaceLayer):
         self.sendReceipts = True
         self.disconnectAction = self.__class__.disconnect_action_prompt
         self.credentials = None
-        self.jidAliases = {}
+        self.jid_aliases = {}
 
         # Methods to run on start
         self.plugin_manager_setup()
@@ -151,7 +152,6 @@ class BotLayer(WrappedYowInterfaceLayer):
         """
         self.to_lower(entity.ack())
 
-    # Todo get rid of the lambdas
     def send_image(self, number, path, caption=None):
         """
         Sends an image
@@ -162,11 +162,26 @@ class BotLayer(WrappedYowInterfaceLayer):
         """
         jid = self.alias_to_jid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
-        success_fn = lambda success_entity, original_entity:\
+
+        def success_fn(success_entity, original_entity):
+            """
+            Function called on successful media upload
+            :param success_entity: the success entity
+            :param original_entity: the original entity
+            :return: void
+            """
             self.on_request_upload_result(jid, path, success_entity, original_entity, caption)
-        error_fn = lambda error_entity, original_entity:\
+
+        def error_fn(error_entity, original_entity):
+            """
+            Function called on failed media upload
+            :param error_entity: the error entity
+            :param original_entity: the original entity
+            :return: void
+            """
             BotLayer.on_request_upload_error(jid, path, error_entity, original_entity)
-        self._sendIq(entity, success_fn, error_fn)
+
+        self.send_iq(entity, success_fn, error_fn)
 
     # Todo get rid of the lambdas
     def send_audio(self, number, path):
@@ -178,11 +193,26 @@ class BotLayer(WrappedYowInterfaceLayer):
         """
         jid = self.alias_to_jid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO, filePath=path)
-        success_fn = lambda success_entity, original_entity:\
+
+        def success_fn(success_entity, original_entity):
+            """
+            Function called on successful media upload
+            :param success_entity: the success entity
+            :param original_entity: the original entity
+            :return: void
+            """
             self.on_request_upload_result(jid, path, success_entity, original_entity)
-        error_fn = lambda error_entity, original_entity:\
+
+        def error_fn(error_entity, original_entity):
+            """
+            Function called on failed media upload
+            :param error_entity: the error entity
+            :param original_entity: the original entity
+            :return: void
+            """
             BotLayer.on_request_upload_error(jid, path, error_entity, original_entity)
-        self._sendIq(entity, success_fn, error_fn)
+
+        self.send_iq(entity, success_fn, error_fn)
 
     # TODO get rid of the lambdas
     def on_request_upload_result(self, jid, file_path, result_request_upload_iq_protocol_entity,
@@ -196,23 +226,30 @@ class BotLayer(WrappedYowInterfaceLayer):
         :param caption: the media caption, if applicable
         :return: void
         """
+        result_request_upload_iq_protocol_entity = EntityAdapter(result_request_upload_iq_protocol_entity)
 
         if request_upload_iq_protocol_entity.mediaType == RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO:
             do_send_fn = self.do_send_audio
         else:
             do_send_fn = self.do_send_image
 
-        if result_request_upload_iq_protocol_entity.isDuplicate():
-            do_send_fn(file_path, result_request_upload_iq_protocol_entity.getUrl(), jid,
-                       result_request_upload_iq_protocol_entity.getIp(), caption)
+        if result_request_upload_iq_protocol_entity.is_duplicate():
+            do_send_fn(file_path, result_request_upload_iq_protocol_entity.get_url(), jid,
+                       result_request_upload_iq_protocol_entity.get_ip(), caption)
         else:
-            # TODO Fix the shadowing problems
-            success_fn = lambda file_path, jid, url: do_send_fn(file_path, url, jid,
-                                                                result_request_upload_iq_protocol_entity.getIp(),
-                                                                caption)
-            media_uploader = MediaUploader(jid, self.getOwnJid(), file_path,
-                                           result_request_upload_iq_protocol_entity.getUrl(),
-                                           result_request_upload_iq_protocol_entity.getResumeOffset(), success_fn,
+            def success_fn(inner_file_path, inner_jid, url):
+                """
+                Function called when upload was successful
+                :param inner_file_path: path to the media file
+                :param inner_jid: the receiver's jid
+                :param url: the whatsapp media url
+                :return: void
+                """
+                do_send_fn(inner_file_path, url, inner_jid, result_request_upload_iq_protocol_entity.get_ip(), caption)
+
+            media_uploader = MediaUploader(jid, self.get_own_jid(), file_path,
+                                           result_request_upload_iq_protocol_entity.get_url(),
+                                           result_request_upload_iq_protocol_entity.get_resume_offset(), success_fn,
                                            BotLayer.on_upload_error, BotLayer.on_upload_progress, async=False)
             media_uploader.start()
 
@@ -261,7 +298,7 @@ class BotLayer(WrappedYowInterfaceLayer):
         :param c_alias: the current alias
         :return: the jid
         """
-        for alias, a_jid in self.jidAliases.items():
+        for alias, a_jid in self.jid_aliases.items():
             if c_alias.lower() == alias.lower():
                 return BotLayer.normalize_jid(a_jid)
 
@@ -300,8 +337,9 @@ class BotLayer(WrappedYowInterfaceLayer):
         :param caption: the caption to be displayed together with the image
         :return: void
         """
-        entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
-        self.toLower(entity)
+        entity = WrappedImageDownloadableMediaMessageProtocolEntity.from_file_path(file_path, url, ip, to,
+                                                                                   caption=caption)
+        self.to_lower(entity)
 
     def do_send_audio(self, file_path, url, to, ip=None):
         """
@@ -312,8 +350,8 @@ class BotLayer(WrappedYowInterfaceLayer):
         :param ip: the ip of the receiver
         :return: void
         """
-        entity = AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to)
-        self.toLower(entity)
+        entity = WrappedAudioDownloadableMediaMessageProtocolEntity.from_file_path(file_path, url, ip, to)
+        self.to_lower(entity)
 
     def set_presence_name(self, name):
         """
@@ -322,7 +360,7 @@ class BotLayer(WrappedYowInterfaceLayer):
         :return: void
         """
         entity = PresenceProtocolEntity(name=name)
-        self.toLower(entity)
+        self.to_lower(entity)
 
     def profile_set_status(self, text):
         """
@@ -348,7 +386,7 @@ class BotLayer(WrappedYowInterfaceLayer):
             :return: void
             """
             if error_iq_entity and original_iq_entity:
-                logger.error("Error updating status")
+                print("Error updating status")
 
         entity = SetStatusIqProtocolEntity(text)
-        self._sendIq(entity, on_success, on_error)
+        self.send_iq(entity, on_success, on_error)
