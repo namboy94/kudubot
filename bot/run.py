@@ -83,7 +83,7 @@ def main():
         sys.exit(0)
 
     try:
-        credentials = ConfigParser.configParse()  # Sadly, CamelCase.
+        credentials = ConfigParser.config_parse()  # Sadly, CamelCase.
     except EOFError:
         print("No valid login credentials provided in config file")
         sys.exit(1)

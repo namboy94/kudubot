@@ -80,7 +80,7 @@ class BotLayer(WrappedYowInterfaceLayer):
             return
 
         try:
-            LogWriter.writeEventLog("recv", message_protocol_entity)
+            LogWriter.write_event_log("recv", message_protocol_entity)
             response = self.plugin_manager.run_plugins(message_protocol_entity)
 
             if response:

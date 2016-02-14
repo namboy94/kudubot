@@ -41,7 +41,7 @@ class BotLayerWithGUI(BotLayer):
         """
         if self.plugin_manager is None:
             self.plugin_manager = PluginManager(self)
-            self.plugin_manager.set_plugins(PluginConfigParser().readPlugins())
+            self.plugin_manager.set_plugins(PluginConfigParser().read_plugins())
             PluginManagerGUI(self.plugin_manager)
             if not self.parallel_running:
                 print("Starting Parallel Threads")

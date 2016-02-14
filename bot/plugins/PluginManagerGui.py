@@ -60,7 +60,7 @@ class PluginManagerGUI(object):
         Button(self.gui, text="Confirm", command=self.gui.destroy).pack()
 
         self.gui.mainloop()
-        PluginConfigParser().writePlugins(self.plugin_dictionary)
+        PluginConfigParser().write_plugins(self.plugin_dictionary)
         self.plugin_manager.setPlugins(self.plugin_dictionary)
 
     def __toggleValue__(self, key):

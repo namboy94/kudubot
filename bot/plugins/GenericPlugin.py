@@ -23,7 +23,6 @@ This file is part of whatsapp-bot.
 
 # imports
 from utils.logging.LogWriter import LogWriter
-from utils.encoding.Unicoder import Unicoder
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 
 
@@ -45,8 +44,8 @@ class GenericPlugin(object):
             return
         self.layer = layer
         self.entity = message_protocol_entity
-        self.message = self.entity.getBody()
-        self.sender = self.entity.getFrom()
+        self.message = self.entity.get_body()
+        self.sender = self.entity.get_from()
 
     def regex_check(self):
         """
@@ -94,11 +93,10 @@ class GenericPlugin(object):
         :return: void
         """
         if self.layer.muted:
-            LogWriter.writeEventLog("s(m)", entity)
+            LogWriter.write_event_log("s(m)", entity)
         else:
-            LogWriter.writeEventLog("sent", entity)
-            fixed_entity = Unicoder.fixOutgoingEntity(entity)
-            self.layer.toLower(fixed_entity)
+            LogWriter.write_event_log("sent", entity)
+            self.layer.to_lower(entity)
 
     def send_image(self, recipient, image_path, caption):
         """
