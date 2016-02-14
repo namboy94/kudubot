@@ -23,16 +23,18 @@ This file is part of whatsapp-bot.
 
 import random
 
-"""
-The Randomizer Class
-"""
-class Randomizer(object):
 
+class Randomizer(object):
     """
-    Returns a random element of a list
-    @:return the random element
+    The Randomizer Class
     """
+
     @staticmethod
-    def getRandomElement(set):
-        randNumber = random.randint(0, len(set) - 1)
-        return set[randNumber]
+    def get_random_element(element_set):
+        """
+        Returns a random element of a list
+        :param element_set: the set from which to get the random element
+        :return: the random element
+        """
+        rand_number = random.randint(0, len(element_set) - 1)
+        return element_set[rand_number]
