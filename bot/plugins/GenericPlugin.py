@@ -44,7 +44,8 @@ class GenericPlugin(object):
             return
         self.layer = layer
         self.entity = message_protocol_entity
-        self.message = self.entity.get_body()
+        self.message = self.entity.get_body().lower()
+        self.cap_message = self.entity.get_body()
         self.sender = self.entity.get_from()
 
     def regex_check(self):
