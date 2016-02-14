@@ -71,8 +71,10 @@ class AddressBook(object):
         :param number: the number to be checked
         :return: true if the number is blacklisted, false otherwise
         """
-        if number in self.blacklist: return True
-        else: return False
+        if number in self.blacklist:
+            return True
+        else:
+            return False
 
     def is_authenticated(self, number):
         """

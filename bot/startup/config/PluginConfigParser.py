@@ -23,34 +23,46 @@ This file is part of whatsapp-bot.
 
 import os
 
-"""
-The PluginConfigParser Class
-"""
-class PluginConfigParser(object):
 
+class PluginConfigParser(object):
     """
-    Constructor
+    The PluginConfigParser Class
     """
+
     def __init__(self):
+        """
+        Constructor
+        :return void
+        """
         self.configFile = os.getenv("HOME") + "/.whatsapp-bot/plugins"
 
-    def readPlugins(self):
-        pluginDictionary = {}
+    def read_plugins(self):
+        """
+        Reads the plugins from the config file
+        :return: a dictionary with the plugins as keys and True/False as parameters
+        """
+        plugin_dictionary = {}
         file = open(self.configFile, 'r')
         for line in file:
-            pluginName = line.rsplit("=", 1)[0]
-            pluginState = line.rsplit("=", 1)[1]
-            if "1" in pluginState:
-                pluginDictionary[pluginName] = True
+            plugin_name = line.rsplit("=", 1)[0]
+            plugin_state = line.rsplit("=", 1)[1]
+            if "1" in plugin_state:
+                plugin_dictionary[plugin_name] = True
             else:
-                pluginDictionary[pluginName] = False
+                plugin_dictionary[plugin_name] = False
         file.close()
-        return pluginDictionary
+        return plugin_dictionary
 
-    def writePlugins(self, pluginDictionary):
+    def write_plugins(self, plugin_dictionary):
+        """
+        Writes the plugins to the config file
+        :param plugin_dictionary: the plugin dictionary to write
+        :return: void
+        """
         file = open(self.configFile, "w")
-        for name in pluginDictionary:
+        for name in plugin_dictionary:
             state = "0"
-            if pluginDictionary[name]: state = "1"
+            if plugin_dictionary[name]:
+                state = "1"
             file.write(name + "=" + state + "\n")
         file.close()
