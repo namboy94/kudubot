@@ -26,45 +26,54 @@ import time
 import re
 from utils.contacts.AddressBook import AddressBook
 
-"""
-The LogWriter class
-"""
+
 class LogWriter(object):
+    """
+    The LogWriter class
+    """
 
-    """
-    writes an event (Sent, received, etc.) to the standard log file
-    """
     @staticmethod
-    def writeEventLog(event, entity):
+    def write_event_log(event, entity):
+        """
+        writes an event (Sent, received, etc.) to the standard log file
+        :param entity: the entity to log
+        :param event: the event type to be logged
+        """
 
-        logFile = os.getenv("HOME") + "/.whatsapp-bot/logs/"
+        log_file = os.getenv("HOME") + "/.whatsapp-bot/logs/"
         if event in ["recv", "sent", "s(m)", "i(m)", "imgs", "a(m)", "audi"]:
             if event == "recv":
-                userName = entity.getFrom(False)
+                user_name = entity.get_from(False)
             else:
-                userName = entity.getTo(False)
+                user_name = entity.get_to(False)
 
-            if re.search(r"^[0-9]+-[0-9]+$", userName):
-                logFile += "groups/"
+            if re.search(r"^[0-9]+-[0-9]+$", user_name):
+                log_file += "groups/"
             else:
-                logFile += "users/"
-            logFile += userName + "---" + time.strftime("%Y-%m-%d")
+                log_file += "users/"
+            log_file += user_name + "---" + time.strftime("%Y-%m-%d")
         elif event == "exep" or event == "e(m)":
-            logFile += "exceptions/" + time.strftime("%Y-%m-%d")
+            log_file += "exceptions/" + time.strftime("%Y-%m-%d")
         elif event == "bugs" or event == "b(m)":
-            logFile += "bugs/" + time.strftime("%Y-%m-%d")
+            log_file += "bugs/" + time.strftime("%Y-%m-%d")
 
-        log = open(logFile, "a")
+        log = open(log_file, "a")
 
         contact = ""
-        if event == "recv": contact = AddressBook().getContactName(entity, True)
-        elif event == "sent" or event == "s(m)": contact = AddressBook().getContactName(entity, False)
-        elif event == "imgs" or event == "i(m)": contact = AddressBook().getContactName(entity, False)
-        elif event == "audi" or event == "a(m)": contact = AddressBook().getContactName(entity, False)
-        elif event == "exep" or event == "e(m)": contact = "Exception"
-        elif event == "bugs" or event == "b(m)": contact = "Bug"
+        if event == "recv":
+            contact = AddressBook().get_contact_name(entity, True)
+        elif event == "sent" or event == "s(m)":
+            contact = AddressBook().get_contact_name(entity, False)
+        elif event == "imgs" or event == "i(m)":
+            contact = AddressBook().get_contact_name(entity, False)
+        elif event == "audi" or event == "a(m)":
+            contact = AddressBook().get_contact_name(entity, False)
+        elif event == "exep" or event == "e(m)":
+            contact = "Exception"
+        elif event == "bugs" or event == "b(m)":
+            contact = "Bug"
 
-        string = event + ": " + contact + ": " + entity.getBody()
+        string = event + ": " + contact + ": " + entity.get_body()
         print(string)
         log.write((string + "\n"))
         log.close()
