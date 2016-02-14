@@ -23,7 +23,10 @@ This file is part of whatsapp-bot.
 
 # imports
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+from utils.encoding.Unicoder import Unicoder
 from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+
+import re
 
 
 class WrappedTextMessageProtocolEntity(EntityAdapter):
@@ -31,11 +34,26 @@ class WrappedTextMessageProtocolEntity(EntityAdapter):
 
     """
 
-    def __init__(self, body, to):
+    def __init__(self, body, to=None, _from=None):
         """
 
         :param body:
         :param to:
         :return:
         """
-        super().__init__(TextMessageProtocolEntity(body, to=to))
+        if _from is not None:
+            if re.compile("[0-9]+-[0-9]+").match(_from.split("@")[0]):
+                body = Unicoder.fix_incoming_unicode(body)
+        super().__init__(TextMessageProtocolEntity(body, to=to, _from=_from))
+
+    def get_entity(self):
+        """
+
+        :return:
+        """
+        body = self.entity.getBody()
+        if re.compile("[0-9]+-[0-9]+").match(self.entity.getTo(True).split("@")[0]):
+            body = Unicoder.fix_outgoing_unicode(body)
+            return TextMessageProtocolEntity(body, to=self.entity.getTo(True))
+        else:
+            return self.entity

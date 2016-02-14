@@ -21,105 +21,79 @@ This file is part of whatsapp-bot.
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from utils.encoding.DummyTextMessageProtocolEntity import DummyTextMessageProtocolEntity
 
-"""
-The Unicoder class
-"""
 class Unicoder(object):
+    """
+    The Unicoder class
+    """
 
-    """
-    Checks an incoming TextMessageProtocolEntity for valid Unicode encoding and repairs it if necessary.
-    @:return the fixed TextMessageProtocolEntity as a DummyTextMessageProtocolEntity
-    """
     @staticmethod
-    def fixIncominEntity(entity):
-        fixedEntity = entity
-        if re.compile("[0-9]+-[0-9]+").match(entity.getFrom(True).split("@")[0]):
-            fixedMessage = Unicoder.__fixIncomingUnicode__(entity.getBody())
-            fixedEntity = DummyTextMessageProtocolEntity(fixedMessage, entity.getFrom(),
-                                                         entity.getFrom(False), entity.getParticipant(),
-                                                         entity.getNotify())
-        return fixedEntity
+    def fix_incoming_unicode(broken_emoji):
+        """
+        Fixes a broken incoming Unicode string
+        :param broken_emoji: The broken unicode string
+        :return: the fixed string
+        """
 
-    """
-    Checks an outgoing TextMessageProtocolEntity for valid Unicode encoding and repairs it if necessary
-    @:return the fixed TextMessageProtocolEntity as TextMessageProtocolEntity, ready to send
-    """
-    @staticmethod
-    def fixOutgoingEntity(entity):
-        brokenEntity = entity
-        if re.compile("[0-9]+-[0-9]+").match(entity.getTo(True).split("@")[0]):
-            fixedMessage = Unicoder.__fixOutgoingUnicode__(entity.getBody())
-            brokenEntity = TextMessageProtocolEntity(fixedMessage, to=entity.getTo())
-        return brokenEntity
-
-    """
-    Fixes a broken incoming Unicode string
-    @:return the fixed string
-    """
-    @staticmethod
-    def __fixIncomingUnicode__(brokenEmoji):
-
-        byteEmoji = bytes(brokenEmoji, 'utf-8')
-        goodByteEmoji = []
+        byte_emoji = bytes(broken_emoji, 'utf-8')
+        good_byte_emoji = []
         i = 0
 
-        while i < len(byteEmoji):
-            if not byteEmoji[i] == 194:
-                if byteEmoji[i] == 195:
+        while i < len(byte_emoji):
+            if not byte_emoji[i] == 194:
+                if byte_emoji[i] == 195:
                     i += 1
-                    goodByteEmoji.append(byteEmoji[i] + 64)
+                    good_byte_emoji.append(byte_emoji[i] + 64)
                 else:
-                    goodByteEmoji.append(byteEmoji[i])
+                    good_byte_emoji.append(byte_emoji[i])
             i += 1
 
-        goodByteEmoji = bytes(goodByteEmoji)
-        return goodByteEmoji.decode()
+        good_byte_emoji = bytes(good_byte_emoji)
+        return good_byte_emoji.decode()
 
-    """
-    Fixes a broken outgoing Unicode string
-    @:return the fixed string
-    """
     @staticmethod
-    def __fixOutgoingUnicode__(goodUnicode):
+    def fix_outgoing_unicode(good_unicode):
+        """
+        Fixes a broken outgoing Unicode string
+        :param good_unicode: the outgoing unicode string
+        :return: the fixed string
+        """
 
-        newWord = ""
+        new_word = ""
 
-        for char in goodUnicode:
+        for char in good_unicode:
 
-            byteUnicode = list(bytes(char, 'utf-8'))
-            if len(byteUnicode) == 1: newWord += char; continue
+            byte_unicode = list(bytes(char, 'utf-8'))
+            if len(byte_unicode) == 1:
+                new_word += char
+                continue
 
-            brokenByteUnicode = []
+            broken_byte_unicode = []
             i = 0
             has195 = False
-            lastIs194 = False
-            lastIs195 = False
+            last_is_194 = False
+            last_is_195 = False
 
-
-            while i < len(byteUnicode):
+            while i < len(byte_unicode):
 
                 if not has195:
-                    brokenByteUnicode.append(195)
+                    broken_byte_unicode.append(195)
                     has195 = True
-                    lastIs195 = True
+                    last_is_195 = True
 
                 else:
-                    if lastIs195:
-                        brokenByteUnicode.append(byteUnicode[i] - 64)
-                        lastIs195 = False
+                    if last_is_195:
+                        broken_byte_unicode.append(byte_unicode[i] - 64)
+                        last_is_195 = False
                         i += 1
-                    elif lastIs194:
-                        brokenByteUnicode.append(byteUnicode[i])
-                        lastIs194 = False
+                    elif last_is_194:
+                        broken_byte_unicode.append(byte_unicode[i])
+                        last_is_194 = False
                         i += 1
                     else:
-                        brokenByteUnicode.append(194)
-                        lastIs194 = True
+                        broken_byte_unicode.append(194)
+                        last_is_194 = True
 
-            newWord += bytes(brokenByteUnicode).decode()
+            new_word += bytes(broken_byte_unicode).decode()
 
-        return newWord
+        return new_word

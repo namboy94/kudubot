@@ -38,15 +38,16 @@ class EntityAdapter(object):
         :return: void
         """
         self.entity = original_entity
-        if self.get_from() == "text":
-            self.entity = Unicoder.fix_incoming_entity(self.entity)
+        if self.get_type() == "text":
+            
+            self.entity = Unicoder.fix_incoming_unicode(self.entity)
 
     def get_entity(self):
         """
 
         :return:
         """
-        if self.get_from() == "text":
+        if self.get_type() == "text":
             return Unicoder.fix_outgoing_entity(self.entity)
 
 
