@@ -126,21 +126,21 @@ class PluginManager(object):
             plugins.append(TextToSpeechConverter(self.layer, message_protocol_entity))
         # ADD NEW PLUGINS HERE
 
-        if message_protocol_entity.getBody().lower() in ["/help", "/hilfe"]:
+        if message_protocol_entity.get_body().lower() in ["/help", "/hilfe"]:
             help_string = "/help\tDisplays this help message"
             for plugin in plugins:
-                if not plugin.getDescription("en") == "":
+                if not plugin.get_description("en") == "":
                     help_string += "\n\n\n"
-                if message_protocol_entity.getBody().lower() == "/help":
-                    help_string += plugin.getDescription("en")
-                elif message_protocol_entity.getBody().lower() == "/hilfe":
-                    help_string += plugin.getDescription("de")
-            return TextMessageProtocolEntity(help_string, to=message_protocol_entity.getFrom())
+                if message_protocol_entity.get_body().lower() == "/help":
+                    help_string += plugin.get_description("en")
+                elif message_protocol_entity.get_body().lower() == "/hilfe":
+                    help_string += plugin.get_description("de")
+            return TextMessageProtocolEntity(help_string, to=message_protocol_entity.get_from(True))
 
         for plugin in plugins:
-            if plugin.regexCheck():
-                plugin.parseUserInput()
-                return plugin.getResponse()
+            if plugin.regex_check():
+                plugin.parse_user_input()
+                return plugin.get_response()
 
         return False
 

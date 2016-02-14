@@ -38,18 +38,13 @@ class EntityAdapter(object):
         :return: void
         """
         self.entity = original_entity
-        if self.get_type() == "text":
-            
-            self.entity = Unicoder.fix_incoming_unicode(self.entity)
 
     def get_entity(self):
         """
 
         :return:
         """
-        if self.get_type() == "text":
-            return Unicoder.fix_outgoing_entity(self.entity)
-
+        return self.entity
 
     def get_type(self):
         """
@@ -58,12 +53,12 @@ class EntityAdapter(object):
         """
         return self.entity.getType()
 
-    def ack(self):
+    def ack(self, send=False):
         """
 
         :return:
         """
-        return self.entity.ack()
+        return self.entity.ack(send)
 
     def get_time_stamp(self):
         """

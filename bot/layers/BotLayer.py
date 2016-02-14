@@ -66,7 +66,10 @@ class BotLayer(WrappedYowInterfaceLayer):
         :param message_protocol_entity: the message received
         :return: void
         """
-        message_protocol_entity = EntityAdapter(message_protocol_entity)
+        try:
+            message_protocol_entity = WrappedTextMessageProtocolEntity("", entity=message_protocol_entity)
+        except AttributeError:
+            message_protocol_entity = EntityAdapter(message_protocol_entity)
         self.send_receipt(message_protocol_entity)
 
         # Cases in which responses won't trigger
@@ -76,7 +79,7 @@ class BotLayer(WrappedYowInterfaceLayer):
             return
         if AddressBook().is_black_listed(message_protocol_entity.get_from(False)):
             return
-        if AddressBook().is_black_listed(message_protocol_entity.get_participant(False)):
+        if AddressBook().is_black_listed(message_protocol_entity.get_participant()):
             return
 
         try:
