@@ -23,7 +23,7 @@ This file is part of whatsapp-bot.
 
 # imports
 from utils.logging.LogWriter import LogWriter
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class GenericPlugin(object):
@@ -108,9 +108,11 @@ class GenericPlugin(object):
         :return: void
         """
         if self.layer.muted:
-            LogWriter.write_event_log("i(m)", TextMessageProtocolEntity(image_path + " --- " + caption, to=recipient))
+            LogWriter.write_event_log("i(m)", WrappedTextMessageProtocolEntity(image_path + " --- " + caption,
+                                                                               to=recipient))
         else:
-            LogWriter.write_event_log("imgs", TextMessageProtocolEntity(image_path + " --- " + caption, to=recipient))
+            LogWriter.write_event_log("imgs", WrappedTextMessageProtocolEntity(image_path + " --- " + caption,
+                                                                               to=recipient))
             self.layer.send_image(recipient.split("@")[0], image_path, caption)
 
     def send_audio(self, recipient, audio_path, audio_text="Audio"):
@@ -122,7 +124,7 @@ class GenericPlugin(object):
         :return: void
         """
         if self.layer.muted:
-            LogWriter.write_event_log("a(m)", TextMessageProtocolEntity(audio_text, to=recipient))
+            LogWriter.write_event_log("a(m)", WrappedTextMessageProtocolEntity(audio_text, to=recipient))
         else:
-            LogWriter.write_event_log("audi", TextMessageProtocolEntity(audio_text, to=recipient))
+            LogWriter.write_event_log("audi", WrappedTextMessageProtocolEntity(audio_text, to=recipient))
             self.layer.send_audio(recipient.split("@")[0], audio_path)

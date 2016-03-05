@@ -23,7 +23,6 @@ This file is part of whatsapp-bot.
 
 # imports
 from threading import Thread
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.internetServicePlugins.FootballScores import FootballScores
 from plugins.internetServicePlugins.ImageSender import ImageSender
 from plugins.internetServicePlugins.KVV import KVV
@@ -42,6 +41,7 @@ from plugins.localServicePlugins.casino.Roulette import Roulette
 from plugins.restrictedAccessplugins.Muter import Muter
 from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
 from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class PluginManager(object):
@@ -135,7 +135,7 @@ class PluginManager(object):
                     help_string += plugin.get_description("en")
                 elif message_protocol_entity.get_body().lower() == "/hilfe":
                     help_string += plugin.get_description("de")
-            return TextMessageProtocolEntity(help_string, to=message_protocol_entity.get_from(True))
+            return WrappedTextMessageProtocolEntity(help_string, to=message_protocol_entity.get_from(True))
 
         for plugin in plugins:
             if plugin.regex_check():

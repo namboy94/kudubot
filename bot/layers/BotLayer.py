@@ -30,7 +30,6 @@ import traceback
 from yowsup.layers.interface import YowInterfaceLayer, ProtocolEntityCallback
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 
@@ -106,8 +105,9 @@ class BotLayer(WrappedYowInterfaceLayer):
             else:
                 LogWriter.write_event_log("e(m)", exception)
                 LogWriter.write_event_log("i(m)",
-                                          TextMessageProtocolEntity(exception_image + " --- " + exception.get_body(),
-                                                                    to=message_protocol_entity.get_from()))
+                                          WrappedTextMessageProtocolEntity(exception_image + " --- " +
+                                                                           exception.get_body(),
+                                                                           to=message_protocol_entity.get_from()))
 
     def plugin_manager_setup(self):
         """
@@ -317,9 +317,9 @@ class BotLayer(WrappedYowInterfaceLayer):
         if '@' in number:
             return number
         elif "-" in number:
-            return "%s@g.us" % number
+            return number + "@g.us"
 
-        return "%s@s.whatsapp.net" % number
+        return number + "@s.whatsapp.net"
 
     def send_receipt(self, message_protocol_entity):
         """

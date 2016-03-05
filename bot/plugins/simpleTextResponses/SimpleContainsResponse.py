@@ -22,9 +22,9 @@ This file is part of whatsapp-bot.
 """
 
 import random
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from utils.math.Randomizer import Randomizer
 from plugins.GenericPlugin import GenericPlugin
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class SimpleContainsResponse(GenericPlugin):
@@ -109,7 +109,7 @@ class SimpleContainsResponse(GenericPlugin):
         Returns the response calculated by the plugin
         :return: the response as a MessageProtocolEntity
         """
-        return TextMessageProtocolEntity(self.response, to=self.sender)
+        return WrappedTextMessageProtocolEntity(self.response, to=self.sender)
 
     @staticmethod
     def get_description(language):
