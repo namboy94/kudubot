@@ -114,8 +114,8 @@ class SimpleContainsResponse(GenericPlugin):
     @staticmethod
     def get_description(language):
         """
-        Empty Description
+        Empty Description, since this plugin doesn't really provide any functionality
         :param language: the language to be returned
-        :return: the description as string
+        :return: an empty string
         """
         return ""

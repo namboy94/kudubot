@@ -21,80 +21,72 @@ This file is part of whatsapp-bot.
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from plugins.GenericPlugin import GenericPlugin
 from utils.math.Randomizer import Randomizer
+from plugins.GenericPlugin import GenericPlugin
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-The SimpleEqualsResponse Class
-"""
+
 class SimpleEqualsResponse(GenericPlugin):
+    """
+    The SimpleEqualsResponse Class
+    """
 
-    """
-    Constructor
-    Defines parameters for the plugin.
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
-    """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = self.entity.getBody()
-        self.minMessage = self.message.lower()
-        self.sender = self.entity.getFrom()
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        Defines parameters for the plugin.
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        """""
+        super().__init__(layer, message_protocol_entity)
 
-        self.caseInsensitiveOptions = [[["uptime"], ["Much too long, I'm tired"]]]
-        self.caseSensitiveOptions = [[["ping"], ["pong"]],
-                                     [["Ping"], ["Pong"]]]
+        self.response = ""
+        self.case_insensitive_options = [[["uptime"], ["Much too long, I'm tired"]]]
+        self.case_sensitive_options = [[["ping"], ["pong"]],
+                                       [["Ping"], ["Pong"]]]
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
-        for option in self.caseSensitiveOptions:
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return: True if input is valid, False otherwise
+        """
+        for option in self.case_sensitive_options:
             for opt in option[0]:
                 if self.message == opt:
                     return True
-        for option in self.caseInsensitiveOptions:
+        for option in self.case_insensitive_options:
             for opt in option[0]:
-                if self.minMessage == opt:
+                if self.message == opt:
                     return True
         return False
 
-    """
-    Parses the user's input
-    @:override
-    """
-    def parseUserInput(self):
-        for option in self.caseSensitiveOptions:
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        """
+        for option in self.case_sensitive_options:
             for opt in option[0]:
                 if self.message == opt:
-                    self.response = Randomizer.getRandomElement(option[1])
+                    self.response = Randomizer.get_random_element(option[1])
                     return
-        for option in self.caseInsensitiveOptions:
+        for option in self.case_insensitive_options:
             for opt in option[0]:
-                if self.minMessage == opt:
-                    self.response = Randomizer.getRandomElement(option[1])
+                if self.message == opt:
+                    self.response = Randomizer.get_random_element(option[1])
                     return
 
-    """
-    Returns the response calculated by the plugin
-    @:return the response as a MessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
-        return TextMessageProtocolEntity(self.response, to=self.sender)
+    def get_response(self):
+        """
+        Returns the response calculated by the plugin
+        :return: the response as a MessageProtocolEntity
+        """
+        return WrappedTextMessageProtocolEntity(self.response, to=self.sender)
 
-    """
-    Empty description
-    @:param language - the language to be returned
-    @:return the description as string
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Empty description, since this plugin doesn't really provide any functionality
+        :param language: the language to be returned
+        :return: an empty string
+        """
         return ""
