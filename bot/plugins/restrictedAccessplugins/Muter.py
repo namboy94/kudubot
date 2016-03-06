@@ -21,49 +21,44 @@ This file is part of whatsapp-bot.
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
-from utils.encoding.Unicoder import Unicoder
 from utils.contacts.AddressBook import AddressBook
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-The Muter Class
-"""
+
 class Muter(GenericPlugin):
-
     """
-    Constructor
-    Defines parameters for the plugin.
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
+    The Muter Class
     """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = self.entity.getBody().lower()
-        self.sender = self.entity.getFrom()
 
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        Defines parameters for the plugin.
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        super().__init__(layer, message_protocol_entity)
         self.authenticated = False
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return: True if input is valid, False otherwise
+        """
         if self.message in ["/unmute", "/mute"]:
             return True
-        else: return False
+        else:
+            return False
 
-    """
-    Parses the user's input
-    @:override
-    """
-    def parseUserInput(self):
-        self.authenticated = AddressBook().isAuthenticated(self.entity.getFrom(False)) \
-                             or AddressBook().isAuthenticated(self.entity.getParticipant())
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        :return: void
+        """
+        self.authenticated = AddressBook().is_authenticated(
+            self.entity.getFrom(False)) or AddressBook().is_authenticated(self.entity.getParticipant())
 
         if self.authenticated:
             if self.message == "/unmute":
@@ -71,29 +66,26 @@ class Muter(GenericPlugin):
             elif self.message == "/mute":
                 self.layer.muted = True
 
-    """
-    Returns the response calculated by the plugin
-    @:return the response as a MessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
+    def get_response(self):
+        """
+        Returns the response calculated by the plugin
+        :return: the response as a WrappedTextMessageProtocolEntity
+        """
         if self.layer.muted:
-            messageProtocolEntity = TextMessageProtocolEntity("🤐", to=self.sender)
-            messageProtocolEntity = Unicoder.fixOutgoingEntity(messageProtocolEntity)
-            self.sendMessage(messageProtocolEntity)
-            return messageProtocolEntity
+            message_protocol_entity = WrappedTextMessageProtocolEntity("🤐", to=self.sender)
+            self.send_message(message_protocol_entity)
+            return message_protocol_entity
 
         else:
-            return TextMessageProtocolEntity("😄", to=self.sender)
+            return WrappedTextMessageProtocolEntity("😄", to=self.sender)
 
-    """
-    Returns a helpful description of the plugin's syntax and functionality
-    @:param language - the language to be returned
-    @:return the description as string
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a helpful description of the plugin's syntax and functionality
+        :param language: the language to be returned
+        :return: the description as string
+        """
         if language == "en":
             return "/mute\tmutes the bot (admin)\n" \
                    "/unmute\tunmutes the bot (admin)\n"

@@ -26,78 +26,71 @@ import os
 import time
 import datetime
 import configparser
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-The Casino Class
-"""
+
 class Casino(GenericPlugin):
-
-    casinoDir = os.getenv("HOME") + "/.whatsapp-bot/casino/"
-    userDir = casinoDir + "users/"
-
     """
-    Constructor
-    Defines parameters for the plugin.
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
+    The Casino Class
     """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = self.entity.getBody().lower()
-        self.sender = self.entity.getFrom()
-        self.user = self.entity.getParticipant()
-        if not self.user: self.user = self.entity.getFrom()
-        self.userID = self.user.split("@")[0]
-        self.userNick = self.entity.getNotify()
+
+    casino_dir = os.getenv("HOME") + "/.whatsapp-bot/casino/"
+    user_dir = casino_dir + "users/"
+
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        Defines parameters for the plugin.
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        super().__init__(layer, message_protocol_entity)
+        
+        self.user = self.participant
+        self.user_id = self.user.split("@")[0]
+        self.user_nick = self.entity.getNotify()
         self.reply = None
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return: True if input is valid, False otherwise
+        """
         return re.search(r"^/casino (balance|beg)$", self.message)
 
-    """
-    Parses the user's input
-    @:override
-    """
-    def parseUserInput(self):
-        self.createUser(self.entity)
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        :return: void
+        """
+        self.create_user(self.entity)
         mode = self.message.split("/casino ")[1]
 
-        replyText = ""
+        reply_text = ""
         if mode == "balance":
-            balance = self.getBalance(self.userID)
-            replyText = "Your balance is: " + self.encodeMoneyString(balance[0], balance[1], True) + "€"
+            balance = self.get_balance(self.user_id)
+            reply_text = "Your balance is: " + self.encode_money_string(balance[0], balance[1], True) + "€"
         elif mode == "beg":
-            self.transferFunds(self.userID, 1, 0)
-            replyText = "You earn 1€ while begging for money"
+            self.transfer_funds(self.user_id, 1, 0)
+            reply_text = "You earn 1€ while begging for money"
+        self.reply = WrappedTextMessageProtocolEntity(reply_text, to=self.sender)
 
-        self.reply = TextMessageProtocolEntity(replyText, to=self.sender)
-
-    """
-    Returns the response calculated by the plugin
-    @:return the response as a MessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
+    def get_response(self):
+        """
+        Returns the response calculated by the plugin
+        :return: the response as a WrappedTextMessageProtocolEntity
+        """
         return self.reply
 
-    """
-    Returns a helpful description of the plugin's syntax and functionality
-    @:param language - the language to be returned
-    @:return the description as string
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a helpful description of the plugin's syntax and functionality
+        :param language: the language to be returned
+        :return: the description as string
+        """
         if language == "en":
             return "/casino\tprovides basic casino functions\n" \
                    "syntax:\n" \
@@ -109,217 +102,231 @@ class Casino(GenericPlugin):
         else:
             return "Help not available in this language"
 
-    """
-    Starts a parallel background activity if this class has one.
-    Defaults to False if not implemented
-    @:return False, if no parallel activity defined, should be implemented to return True if one is implmented.
-    @:override
-    """
-    def parallelRun(self):
+    def parallel_run(self):
+        """
+        Starts a parallel background activity if this class has one.
+        :return: void
+        """
         while True:
-            currentTime = datetime.datetime.now()
-            hours = int(currentTime.hour)
+            current_time = datetime.datetime.now()
+            hours = int(current_time.hour)
             if not hours < 23:
-                for user in os.listdir(self.userDir):
-                    self.transferFunds(user, 2000, 0)
+                for user in os.listdir(self.user_dir):
+                    self.transfer_funds(user, 2000, 0)
             time.sleep(3600)
+            
+    # Private methods
+    def create_user(self, message_entity):
+        """
+        Creates a new user file
+        :param message_entity: a messageEntity sent from the user
+        :return: void
+        """
+        user_id = message_entity.getParticipant()
+        if not user_id:
+            user_id = message_entity.getFrom(False)
+        user_id = user_id.split("@")[0]
+        user_nick = message_entity.getNotify()
+        user_file = self.user_dir + user_id
 
+        if not os.path.isfile(user_file):
+            self.generate_user(user_id, user_nick, "1000.00")
 
-    """
-    Creates a new user file
-    @:param messageEntity - a messageEntity sent from the user
-    """
-    def createUser(self, messageEntity):
-        userID = messageEntity.getParticipant()
-        if not userID: userID = messageEntity.getFrom(False)
-        userID = userID.split("@")[0]
-        userNick = messageEntity.getNotify()
-        userFile = self.userDir + userID
-
-        if not os.path.isfile(userFile):
-            self.generateUser(userID, userNick, "1000.00")
-
-    """
-    Generates a user account
-    @:param userID - the user's ID
-    @:param userNick - the user's (nick)name
-    @:param balance - the user's balance
-    """
-    def generateUser(self, userID, userNick, balance):
-        userFile = self.userDir + userID
-        file = open(userFile, "w")
+    def generate_user(self, user_id, user_nick, balance):
+        """
+        Generates a user account
+        :param user_id: the user's ID
+        :param user_nick: the user's (nick)name
+        :param balance: the user's balance
+        :return: void
+        """
+        user_file = self.user_dir + user_id
+        file = open(user_file, "w")
         file.write("[account]\n")
-        file.write("nick=" + userNick + "\n")
+        file.write("nick=" + user_nick + "\n")
         file.write("balance=" + balance)
 
-    """
-    Gets the user's (nick)name from his/her account
-    @:param userId - the user's ID
-    @:return the user's (nick)name
-    """
-    def getUserNick(self, userId):
-        userFile = self.userDir + userId
-        userDetails = configparser.ConfigParser()
-        userDetails.read(userFile)
-        nick = dict(userDetails.items("account"))["nick"]
+    def get_user_nick(self, user_id):
+        """
+        Gets the user's (nick)name from his/her account
+        :param user_id: the user's ID
+        :return: the user's (nick)name
+        """
+        user_file = self.user_dir + user_id
+        user_details = configparser.ConfigParser()
+        user_details.read(user_file)
+        nick = dict(user_details.items("account"))["nick"]
         return nick
 
+    def get_balance(self, user_id):
+        """
+        Gets the balance of a user
+        :param user_id: the user's ID
+        :return: the user's balance
+        """
+        user_file = self.user_dir + user_id
+        user_details = configparser.ConfigParser()
+        user_details.read(user_file)
+        balance = dict(user_details.items("account"))["balance"]
+        return self.decode_money_string(balance)
 
-    """
-    Gets the balance of a user
-    @:param userID - the user's ID
-    @:return the user's balance
-    """
-    def getBalance(self, userID):
-        userFile = self.userDir + userID
-        userDetails = configparser.ConfigParser()
-        userDetails.read(userFile)
-        balance = dict(userDetails.items("account"))["balance"]
-        return self.decodeMoneyString(balance)
+    def set_balance(self, user_id, dollars, cents):
+        """
+        Sets a user's balance to a specified value
+        :param user_id: the user's ID
+        :param dollars: the amount of dollars
+        :param cents: the amount of cents
+        :return: void
+        """
+        balance_string = self.encode_money_string(dollars, cents)
+        user_nick = self.get_user_nick(user_id)
+        self.generate_user(user_id, user_nick, balance_string)
 
-    """
-    Sets a user's balance to a specified value
-    @:param userID - the user's ID
-    @:param dollars - the amount of dollars
-    @:param cents - the amount of cents
-    """
-    def setBalance(self, userID, dollars, cents):
-        balanceString = self.encodeMoneyString(dollars, cents)
-        userNick = self.getUserNick(userID)
-        self.generateUser(userID, userNick, balanceString)
-
-    """
-    Decodes a money string
-    @:param moneyString - the String to be decoded
-    @:return the monetary value as a tuple of dollars and cents
-    """
-    def decodeMoneyString(self, moneyString):
-        dollars = int(moneyString.split(".")[0])
+    @staticmethod
+    def decode_money_string(money_string):
+        """
+        Decodes a money string
+        :param money_string: the String to be decoded
+        :return: the monetary value as a tuple of dollars and cents
+        """
+        dollars = int(money_string.split(".")[0])
         try:
-            cents = moneyString.split(".")[1]
-            if len(cents) < 2: cents += "0"
+            cents = money_string.split(".")[1]
+            if len(cents) < 2:
+                cents += "0"
             cents = int(cents)
-        except:
+        except ValueError:
             cents = 0
-        return (dollars, cents)
+        return dollars, cents
 
-    """
-    Encodes a tuple of dollars and cents to a moneyString
-    @:param dollars - the amount of dollars
-    @:param cents - the amount of cents
-    @:param delimiters - switch for enabling delimiters
-    @:return the encoded dollar string
-    """
-    def encodeMoneyString(self, dollars, cents, delimiters=False):
-        centString = str(cents)
-        if len(centString) < 2: centString = "0" + centString
-        if len(centString) < 2: centString = "0" + centString
+    @staticmethod
+    def encode_money_string(dollars, cents, delimiters=False):
+        """
+        Encodes a tuple of dollars and cents to a moneyString
+        :param dollars: the amount of dollars
+        :param cents: the amount of cents
+        :param delimiters: switch for enabling delimiters
+        :return: the encoded dollar string
+        """
+        cent_string = str(cents)
+        if len(cent_string) < 2:
+            cent_string = "0" + cent_string
+        if len(cent_string) < 2:
+            cent_string = "0" + cent_string
         if not delimiters:
-            return str(dollars) + "." + centString
+            return str(dollars) + "." + cent_string
         else:
-            dollarString = str(dollars)
-            dollarList = []
-            for char in dollarString: dollarList.insert(0, char)
-            print(dollarList)
-            formatedDollarString = ""
+            dollar_string = str(dollars)
+            dollar_list = []
+            for char in dollar_string:
+                dollar_list.insert(0, char)
+            print(dollar_list)
+            formated_dollar_string = ""
             i = 0
-            while i < len(dollarList):
+            while i < len(dollar_list):
                 if i > 0 and i % 3 == 0:
-                    formatedDollarString = " " + formatedDollarString
-                formatedDollarString = dollarList[i] + formatedDollarString
+                    formated_dollar_string = " " + formated_dollar_string
+                formated_dollar_string = dollar_list[i] + formated_dollar_string
                 i += 1
-            return formatedDollarString + "." + centString
+            return formated_dollar_string + "." + cent_string
 
-    """
-    Multiplies a monetary value by a given factor
-    @:param factor - the actor with which to multiply
-    @:param dollars - the initial amount of dollars
-    @:param cents - the initial amount of cents
-    @:return the multiplied monetary value as a tuple of dollars and cents
-    """
-    def multiplyMoney(self, factor, dollars, cents):
-        multipliedDollars = factor * dollars
-        multipliedCents = factor * cents
-        while multipliedCents >= 100: multipliedCents -= 100; multipliedDollars += 1
-        return (multipliedDollars, multipliedCents)
+    @staticmethod
+    def multiply_money(factor, dollars, cents):
+        """
+        Multiplies a monetary value by a given factor
+        :param factor: the actor with which to multiply
+        :param dollars: the initial amount of dollars
+        :param cents: the initial amount of cents
+        :return: the multiplied monetary value as a tuple of dollars and cents
+        """
+        multiplied_dollars = factor * dollars
+        multiplied_cents = factor * cents
+        while multiplied_cents >= 100:
+            multiplied_cents -= 100
+            multiplied_dollars += 1
+        return multiplied_dollars, multiplied_cents
 
+    def transfer_funds(self, user_id, dollars, cents):
+        """
+        Adds or subtracts an amount from the balance of a player
+        :param user_id: the user's ID
+        :param dollars: the amount of dollars to be transferred
+        :param cents: the amount of cents to be transferred
+        :return: void
+        """
+        current_dollars, current_cents = self.get_balance(user_id)
+        new_cents = current_cents + cents
+        while new_cents >= 100:
+            current_dollars += 1
+            new_cents -= 100
+        while new_cents < 0:
+            current_dollars -= 1
+            new_cents += 100
+        new_dollars = current_dollars + dollars
+        self.set_balance(user_id, new_dollars, new_cents)
 
-    """
-    Adds or subtracts an amount from the balance of a player
-    @:param userID - the user's ID
-    @:param dollars - the amount of dollars to be transferred
-    @:param cents - the amount of cents to be transferred
-    """
-    def transferFunds(self, userID, dollars, cents):
-        currentDollars, currentCents = self.getBalance(userID)
-        newCents = currentCents + cents
-        while newCents >= 100: currentDollars += 1; newCents -= 100
-        while newCents < 0: currentDollars -= 1; newCents += 100
-        newDollars = currentDollars + dollars
-        self.setBalance(userID, newDollars, newCents)
+    def has_sufficient_funds(self, user_id, dollars, cents):
+        """
+        Checks if a user has enough funds for a specified bet
+        :param user_id: the user's ID
+        :param dollars: the amount of dollars to be bet
+        :param cents: the amount of cents to be bet
+        :return: True if the user has enough funds, False otherwise
+        """
+        current_dollars, current_cents = self.get_balance(user_id)
+        current_money = (current_dollars * 100) + current_cents
+        query_value = (dollars * 100) + cents
+        return query_value <= current_money
 
-    """
-    Checks if a user has enough funds for a specified bet
-    @:param userID - the user's ID
-    @:param dollars - the amount of dollars to be bet
-    @:param cents - the amount of cents to be bet
-    @:return True if the user has enough funds, False otherwise
-    """
-    def hasSufficientFunds(self, userID, dollars, cents):
-        currentDollars, currentCents = self.getBalance(userID)
-        currentMoney = (currentDollars * 100) + currentCents
-        queryValue = (dollars * 100) + cents
-        return queryValue <= currentMoney
+    def store_bet(self, game, user_id, sender, dollars, cents, bet_type):
+        """
+        Stores a bet to a user's bet file
+        :param game: the game played
+        :param user_id: the user's ID
+        :param sender: the sender of the bet
+        :param dollars: the bet mount (dollars)
+        :param cents: the bet amount (cents)
+        :param bet_type: the bet type identifier
+        """
+        bet_string = sender + ";" + self.encode_money_string(dollars, cents) + ";" + bet_type + "\n"
+        user_bets = open(self.casino_dir + game + "/" + user_id, "a")
+        user_bets.write(bet_string)
+        user_bets.close()
 
-    """
-    Stores a bet to a user's bet file
-    @:param game - the game played
-    @:param userID - the user's ID
-    @:param sender - the sender of the bet
-    @:param dollars - the bet mount (dollars)
-    @:param cents - the bet amount (cents)
-    @:param betType - the bet type identifier
-    """
-    def storeBet(self, game, userID, sender, dollars, cents, betType):
-        betString = sender + ";" + self.encodeMoneyString(dollars, cents) + ";" + betType + "\n"
-        userBets = open(self.casinoDir + game + "/" + userID, "a")
-        userBets.write(betString)
-        userBets.close()
-
-    """
-    Gets the bets from a user's bet file
-    @:param game - the game played
-    @:param userID - the user's ID
-    @:return the bets as a list of strings
-    """
-    def getBets(self, game, userID):
-        betFile = open(self.casinoDir + game + "/" + userID, "r")
-        rawBets = betFile.read().split("\n")
-        rawBets.pop()
-        betFile.close()
+    def get_bets(self, game, user_id):
+        """
+        Gets the bets from a user's bet file
+        :param game: the game played
+        :param user_id: the user's ID
+        :return: the bets as a list of strings
+        """
+        bet_file = open(self.casino_dir + game + "/" + user_id, "r")
+        raw_bets = bet_file.read().split("\n")
+        raw_bets.pop()
+        bet_file.close()
         bets = []
 
-        for bet in rawBets:
-            betParts = bet.split(";")
-            betDict = {"sender" : betParts[0], "value" : betParts[1], "bet" : betParts[2]}
-            bets.append(betDict)
+        for bet in raw_bets:
+            bet_parts = bet.split(";")
+            bet_dict = {"sender": bet_parts[0], "value": bet_parts[1], "bet": bet_parts[2]}
+            bets.append(bet_dict)
 
         return bets
 
-    """
-    Gets the bets of a user as strings
-    @:param game - the game played
-    @:param userID - the user's ID
-    return the bets as a string
-    """
-    def getBetStrings(self, game, userID):
-        betString = "You have bet on the following:"
+    def get_bet_strings(self, game, user_id):
+        """
+        Gets the bets of a user as strings
+        :param game: the game played
+        :param user_id: the user's ID
+        :return: the bets as a string
+        """
+        bet_string = "You have bet on the following:"
         try:
-            bets = self.getBets(game, userID)
+            bets = self.get_bets(game, user_id)
             for bet in bets:
-                dollars, cents = self.decodeMoneyString(bet["value"])
-                betVal = self.encodeMoneyString(dollars, cents, True)
-                betString += "\nBet: " + bet["bet"] + "     Amount: " + betVal + "€"
-        except:
-            print()
-        return betString
+                dollars, cents = self.decode_money_string(bet["value"])
+                bet_val = self.encode_money_string(dollars, cents, True)
+                bet_string += "\nBet: " + bet["bet"] + "     Amount: " + bet_val + "€"
+        except Exception as e:
+            print(str(e))
+        return bet_string
