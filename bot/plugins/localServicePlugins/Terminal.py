@@ -23,67 +23,61 @@ This file is part of whatsapp-bot.
 
 import re
 import subprocess
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from plugins.GenericPlugin import GenericPlugin
 
-"""
-The Terminal Class
-"""
+from plugins.GenericPlugin import GenericPlugin
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Terminal(GenericPlugin):
-
     """
-    Constructor
-    Defines parameters for the plugin.
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
+    The Terminal Class
     """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = self.entity.getBody()
-        self.sender = self.entity.getFrom()
 
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        Defines parameters for the plugin.
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        super().__init__(layer, message_protocol_entity)
         self.command = ""
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return: True if input is valid, False otherwise
+        """
         if re.search(r"^/term uptime$", self.message):
             return True
-        else: return False
+        else:
+            return False
 
-    """
-    Parses the user's input
-    @:override
-    """
-    def parseUserInput(self):
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        :return: void
+        """
         self.command = self.message.split("/term ")[1]
 
-    """
-    Returns the response calculated by the plugin
-    @:return the response as a MessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
+    def get_response(self):
+        """
+        Returns the response calculated by the plugin
+        :return: the response as a WrappedTextMessageProtocolEntity
+        """
         if self.command == "uptime":
-            return TextMessageProtocolEntity(self.__executeCommand__(self.command), to=self.sender)
-        else: return None
+            return WrappedTextMessageProtocolEntity(self.__execute_command__(self.command), to=self.sender)
+        else:
+            return None
 
-    """
-    Returns a helpful description of the plugin's syntax and functionality
-    @:param language - the language to be returned
-    @:return the description as string
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a helpful description of the plugin's syntax and functionality
+        :param language: the language to be returned
+        :return: the description as string
+        """
         if language == "en":
             return "/term\tAllows limited access to the server's terminal\n" \
                    "syntax:\n" \
@@ -95,9 +89,10 @@ class Terminal(GenericPlugin):
         else:
             return "Help not available in this language"
 
-    """
-    Executes a command and returns its output.
-    @:return stdout of the command
-    """
-    def __executeCommand__(self, command):
+    @staticmethod
+    def __execute_command__(command):
+        """
+        Executes a command and returns its output.
+        :return: stdout of the command
+        """
         return subprocess.check_output(command, shell=True).decode()
