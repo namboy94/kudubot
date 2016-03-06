@@ -38,6 +38,7 @@ class FootballScores(GenericPlugin):
         Constructor
         :param layer: the overlying yowsup layer
         :param message_protocol_entity: the received message information
+        :return: void
         """
         super().__init__(layer, message_protocol_entity)
         self.bundesliga = False
@@ -49,8 +50,7 @@ class FootballScores(GenericPlugin):
     def regex_check(self):
         """
         Checks if the user input matches the regex needed for the plugin to function correctly
-        @:return True if the regex matches, False otherwise
-        @:override
+        :return: True if the regex matches, False otherwise
         """
         regex = r"^/(table|tabelle|spieltag|matchday)( [^ ]+, [^ ]+)?$"
         if re.search(regex, self.message):
@@ -61,6 +61,7 @@ class FootballScores(GenericPlugin):
     def parse_user_input(self):
         """
         Parses the user input
+        :return: void
         """
         if not len(self.message.split(" ")) == 1 and "bundesliga" not in self.message:
             country_league = self.message.split(" ", 1)[1]
@@ -77,8 +78,8 @@ class FootballScores(GenericPlugin):
 
     def get_response(self):
         """
-        Returns the result of the user defined search
-        :return: the result of the user defined search
+        Returns the result of the plugin calculation
+        :return: the result of the pluin calculation
         """
         response = ""
         if self.bundesliga:

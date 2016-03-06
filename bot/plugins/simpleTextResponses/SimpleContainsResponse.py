@@ -91,7 +91,7 @@ class SimpleContainsResponse(GenericPlugin):
     def parse_user_input(self):
         """
         Parses the user's input
-        :return void
+        :return: void
         """
         for option in self.case_sensitive_options:
             for opt in option[0]:

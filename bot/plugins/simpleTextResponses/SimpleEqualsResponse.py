@@ -37,7 +37,8 @@ class SimpleEqualsResponse(GenericPlugin):
         Defines parameters for the plugin.
         :param layer: the overlying yowsup layer
         :param message_protocol_entity: the received message information
-        """""
+        :return: void
+        """
         super().__init__(layer, message_protocol_entity)
 
         self.response = ""
@@ -63,6 +64,7 @@ class SimpleEqualsResponse(GenericPlugin):
     def parse_user_input(self):
         """
         Parses the user's input
+        :return: void
         """
         for option in self.case_sensitive_options:
             for opt in option[0]:
