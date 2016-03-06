@@ -47,11 +47,12 @@ class Casino(GenericPlugin):
         :return: void
         """
         super().__init__(layer, message_protocol_entity)
-        
-        self.user = self.participant
-        self.user_id = self.user.split("@")[0]
-        self.user_nick = self.entity.getNotify()
-        self.reply = None
+
+        if self.entity is not None:
+            self.user = self.participant
+            self.user_id = self.user.split("@")[0]
+            self.user_nick = self.entity.getNotify()
+            self.reply = None
 
     def regex_check(self):
         """

@@ -41,6 +41,7 @@ class GenericPlugin(object):
         """
         if message_protocol_entity is None:
             self.layer = layer
+            self.entity = None
             return
         self.layer = layer
         self.entity = message_protocol_entity

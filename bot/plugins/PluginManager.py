@@ -151,9 +151,9 @@ class PluginManager(object):
         :return: void
         """
 
-        threads = [Thread(target=Reminder(self.layer).parallelRun), Thread(target=Casino(self.layer).parallelRun),
-                   Thread(target=Roulette(self.layer).parallelRun),
-                   Thread(target=ContinuousReminder(self.layer).parallelRun)]
+        threads = [Thread(target=Reminder(self.layer).parallel_run), Thread(target=Casino(self.layer).parallel_run),
+                   Thread(target=Roulette(self.layer).parallel_run),
+                   Thread(target=ContinuousReminder(self.layer).parallel_run)]
         # ADD NEW PLUGINS REQUIRING A PARALLEL THREAD HERE
 
         for thread in threads:
