@@ -27,7 +27,7 @@ import re
 import time
 
 from plugins.GenericPlugin import GenericPlugin
-from  yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class ContinuousReminder(GenericPlugin):
@@ -163,12 +163,12 @@ class ContinuousReminder(GenericPlugin):
 
         file.close()
 
-    def __find_continuous_reminders__(self):
+    @staticmethod
+    def __find_continuous_reminders__():
         """
         Searches all continuous reminders
         :return: the due TextMessageProtocolEntitiies found
         """
-
         weekday = datetime.date.today().strftime("%A").lower()
         current_time = datetime.datetime.now()
         current_hour = int(current_time.hour)
@@ -179,7 +179,8 @@ class ContinuousReminder(GenericPlugin):
         reminder_entities = []
         receiver_paths = []
         for receiver in recipients:
-            if os.path.isdir(os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + receiver): continue
+            if os.path.isdir(os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + receiver):
+                continue
             receiver_paths.append(os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + receiver)
         for receiver in receiver_paths:
             receiver_name = receiver.rsplit("/", 1)[1]
@@ -188,31 +189,36 @@ class ContinuousReminder(GenericPlugin):
             file.close()
 
             reminders = file_content.split("\n")
-            if not reminders[len(reminders) - 1]: reminders.pop()
+            if not reminders[len(reminders) - 1]: 
+                reminders.pop()
             refreshed_reminders = []
             for reminder in reminders:
-                reminderDay = reminder.split("---endofmessage---")[1].split("@")[1]
+                reminder_day = reminder.split("---endofmessage---")[1].split("@")[1]
 
-                if not "@@@DONE@@@" in reminder:
+                if "@@@DONE@@@" not in reminder:
                     message = reminder.split("---endofmessage---")[0].split("message=")[1]
-                    reminderTime = reminder.split("---endofmessage---")[1].split("@")[0].split("time=")[1]
-                    hour = int(reminderTime.split("-")[0])
-                    min = int(reminderTime.split("-")[1])
-                    sec = int(reminderTime.split("-")[2])
+                    reminder_time = reminder.split("---endofmessage---")[1].split("@")[0].split("time=")[1]
+                    hour = int(reminder_time.split("-")[0])
+                    minute = int(reminder_time.split("-")[1])
+                    second = int(reminder_time.split("-")[2])
 
-                    outgoingEntity = TextMessageProtocolEntity(message, to=receiver_name)
+                    outgoing_entity = WrappedTextMessageProtocolEntity(message, to=receiver_name)
 
-                    if not reminderDay == weekday: refreshed_reminders.append(reminder)
+                    if not reminder_day == weekday:
+                        refreshed_reminders.append(reminder)
                     else:
-                        if current_hour < hour: refreshed_reminders.append(reminder);
-                        elif current_minute < min: refreshed_reminders.append(reminder);
-                        elif current_second < sec: refreshed_reminders.append(reminder);
+                        if current_hour < hour:
+                            refreshed_reminders.append(reminder)
+                        elif current_minute < minute:
+                            refreshed_reminders.append(reminder)
+                        elif current_second < second:
+                            refreshed_reminders.append(reminder)
                         else:
                             refreshed_reminders.append(reminder + "@@@DONE@@@")
-                            reminder_entities.append(outgoingEntity)
+                            reminder_entities.append(outgoing_entity)
 
                 else:
-                    if not weekday == reminderDay:
+                    if not weekday == reminder_day:
                         reminder = reminder.replace("@@@DONE@@@", "")
                         refreshed_reminders.append(reminder)
                     else:
@@ -225,39 +231,53 @@ class ContinuousReminder(GenericPlugin):
 
         return reminder_entities
 
-    def __getStored__(self):
+    def __get_stored__(self):
+        """
+        Reads the stored reminders from file and turns them into a string
+        :return: the stored reminders
+        """
         path = os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + self.sender
-        if not os.path.isfile(path): return "None"
+        if not os.path.isfile(path):
+            return "None"
         file = open(path, 'r')
         file_content = file.read()
         file.close()
         file_content = file_content.split("\n")
-        if not file_content[len(file_content) - 1]: file_content.pop()
+        if not file_content[len(file_content) - 1]:
+            file_content.pop()
 
-        storedString = ""
+        stored_string = ""
 
         i = 0
         for reminder in file_content:
             message = reminder.split("---endofmessage---")[0].split("message=")[1]
-            reminderTime = reminder.split("---endofmessage---")[1].split("@")[0].split("time=")[1]
-            reminderDay = reminder.split("---endofmessage---")[1].split("@")[1]
+            reminder_time = reminder.split("---endofmessage---")[1].split("@")[0].split("time=")[1]
+            reminder_day = reminder.split("---endofmessage---")[1].split("@")[1]
 
-            storedString += str(i) + " \"" + message + "\" on " + reminderDay + "@" + reminderTime + "\n"
+            stored_string += str(i) + " \"" + message + "\" on " + reminder_day + "@" + reminder_time + "\n"
 
             i += 1
 
-        return storedString
+        return stored_string
 
-    def __deleteReminder__(self, index):
+    def __delete_reminder__(self, index):
+        """
+        Deletes a reminder
+        :param index: the index of the reminder to be deleted
+        :return: A string that states which reminder was deleted
+        """
         path = os.getenv("HOME") + "/.whatsapp-bot/reminders/continuous/" + self.sender
-        if not os.path.isfile(path): return "Nothing to delete"
+        if not os.path.isfile(path):
+            return "Nothing to delete"
         file = open(path, 'r')
         file_content = file.read()
         file.close()
         file_content = file_content.split("\n")
-        if not file_content[len(file_content) - 1]: file_content.pop()
+        if not file_content[len(file_content) - 1]:
+            file_content.pop()
         deleted = file_content.pop(index)
         file = open(path, 'w')
-        for line in file_content: file.write(line + "\n")
+        for line in file_content:
+            file.write(line + "\n")
         file.close()
         return "Deleted:\n" + deleted

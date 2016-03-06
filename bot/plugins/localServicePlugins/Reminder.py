@@ -26,34 +26,27 @@ import os
 import re
 import time
 
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
-from utils.encoding.Unicoder import Unicoder
-from utils.logging.LogWriter import LogWriter
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-The Reminder Class
-"""
+
 class Reminder(GenericPlugin):
+    """
+    The Reminder Class
+    """
 
-    """
-    Constructor
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
-    """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        super().__init__(layer, message_protocol_entity)
+
         self.leapyear = False
-        if datetime.datetime.now().year % 4 == 0: self.leapyear = True
-
-        self.layer = layer
-        self.entity = messageProtocolEntity
-
-        self.capitalUserInput = self.entity.getBody()
-        self.userInput = self.capitalUserInput.lower()
-        self.sender = self.entity.getFrom()
-        self.participant = self.entity.getParticipant()
+        if datetime.datetime.now().year % 4 == 0:
+            self.leapyear = True
 
         self.year = 0
         self.month = 0
@@ -61,88 +54,97 @@ class Reminder(GenericPlugin):
         self.hour = 0
         self.minute = 0
         self.second = 0
-        self.reminderMessage = ""
+        self.reminder_message = ""
 
-    """
-    Checks if the user input matches the regex needed for the plugin to function correctly
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+    def regex_check(self):
+        """
+        Checks if the user input matches the regex needed for the plugin to function correctly
+        :return: True if input is valid, False otherwise
+        """
         regex = r"^/remind \"[^\"]+\" (tomorrow|morgen|" \
                 r"[0-9]+ (years|yahre|months|monate|days|tage|hours|stunden|minutes|minuten|seconds|sekunden)|" \
                 r"[0-9]{4}-[0-9]{2}-[0-9]{2}(-[0-9]{2}-[0-9]{2}-[0-9]{2})?)$"
-        if re.search(regex, self.userInput): return True
-        else: return False
+        if re.search(regex, self.message):
+            return True
+        else:
+            return False
 
-    """
-    Parses the user input
-    @:override
-    """
-    def parseUserInput(self):
-        self.reminderMessage = self.capitalUserInput.split("\"", 1)[1].rsplit("\"", 1)[0]
+    def parse_user_input(self):
+        """
+        Parses the user input
+        :return: void
+        """
+        self.reminder_message = self.cap_message.split("\"", 1)[1].rsplit("\"", 1)[0]
 
-        currentTime = datetime.datetime.now()
-        cYear = int(currentTime.year)
-        cMonth = int(currentTime.month)
-        cDay = int(currentTime.day)
-        cHour = int(currentTime.hour)
-        cMin = int(currentTime.minute)
-        cSec = int(currentTime.second)
-        params = self.userInput.split("\" ", 1)[1]
+        current_time = datetime.datetime.now()
+        current_year = int(current_time.year)
+        current_month = int(current_time.month)
+        current_day = int(current_time.day)
+        current_hour = int(current_time.hour)
+        current_minute = int(current_time.minute)
+        current_second = int(current_time.second)
+        params = self.message.split("\" ", 1)[1]
         if params in ["morgen", "tomorrow"]:
-            self.__setRemindertime__(cYear, cMonth, cDay + 1, cHour, cMin, cSec)
+            self.__set_reminder_time__(current_year, current_month, current_day + 1,
+                                       current_hour, current_minute, current_second)
         if re.search(r"^[0-9]+ (years|jahre)$", params):
-            self.__setRemindertime__(cYear + int(params.split(" ")[0]), cMonth, cDay, cHour, cMin, cSec)
+            self.__set_reminder_time__(current_year + int(params.split(" ")[0]), current_month, current_day,
+                                       current_hour, current_minute, current_second)
         if re.search(r"^[0-9]+ (months|monate)$", params):
-            self.__setRemindertime__(cYear, cMonth + int(params.split(" ")[0]), cDay, cHour, cMin, cSec)
+            self.__set_reminder_time__(current_year, current_month + int(params.split(" ")[0]), current_day,
+                                       current_hour, current_minute, current_second)
         if re.search(r"^[0-9]+ (days|tage)$", params):
-            self.__setRemindertime__(cYear, cMonth, cDay + int(params.split(" ")[0]), cHour, cMin, cSec)
+            self.__set_reminder_time__(current_year, current_month, current_day + int(params.split(" ")[0]),
+                                       current_hour, current_minute, current_second)
         if re.search(r"^[0-9]+ (hours|stunden)$", params):
-            self.__setRemindertime__(cYear, cMonth, cDay, cHour + int(params.split(" ")[0]), cMin, cSec)
+            self.__set_reminder_time__(current_year, current_month, current_day,
+                                       current_hour + int(params.split(" ")[0]), current_minute, current_second)
         if re.search(r"^[0-9]+ (minutes|minuten)$", params):
-            self.__setRemindertime__(cYear, cMonth, cDay, cHour, cMin + int(params.split(" ")[0]), cSec)
+            self.__set_reminder_time__(current_year, current_month, current_day,
+                                       current_hour, current_minute + int(params.split(" ")[0]), current_second)
         if re.search(r"^[0-9]+ (sekunden|seconds)$", params):
-            self.__setRemindertime__(cYear, cMonth, cDay, cHour, cMin, cSec + int(params.split(" ")[0]))
+            self.__set_reminder_time__(current_year, current_month, current_day,
+                                       current_hour, current_minute, current_second + int(params.split(" ")[0]))
         if re.search(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$", params):
-            self.__setRemindertime__(int(params.split("-")[0]), int(params.split("-")[1]), int(params.split("-")[2]), 0, 0, 0)
+            self.__set_reminder_time__(int(params.split("-")[0]), int(params.split("-")[1]),
+                                       int(params.split("-")[2]), 0, 0, 0)
         if re.search(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}$", params):
-            self.__setRemindertime__(int(params.split("-")[0]), int(params.split("-")[1]), int(params.split("-")[2]), int(params.split("-")[3]), int(params.split("-")[4]), int(params.split("-")[5]))
-        self.__calendarizeTime__()
+            self.__set_reminder_time__(int(params.split("-")[0]), int(params.split("-")[1]),
+                                       int(params.split("-")[2]), int(params.split("-")[3]),
+                                       int(params.split("-")[4]), int(params.split("-")[5]))
+        self.__calendarize_time__()
 
-    """
-    Sends a confirmation back to the sender that the message was stored
-    @:return the confirmation as a TextMessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
+    def get_response(self):
+        """
+        Sends a confirmation back to the sender that the message was stored
+        :return: the confirmation as a TextMessageProtocolEntity
+        """
         file = open(os.getenv("HOME") + "/.whatsapp-bot/reminders/" + str(int(time.time())), 'w')
         file.write("sender=" + self.sender)
-        file.write("\nmessage=" + self.reminderMessage)
-        file.write("\ntime=" + self.__createReminderTimeString__())
+        file.write("\nmessage=" + self.reminder_message)
+        file.write("\ntime=" + self.__create_reminder_time_string__())
         file.close()
-        return TextMessageProtocolEntity("Reminder Stored", to=self.sender)
+        return WrappedTextMessageProtocolEntity("Reminder Stored", to=self.sender)
 
-    """
-    Continuously checks if reminders are due and sends them to the intended recipient if needed.
-    @:override
-    """
-    def parallelRun(self):
+    def parallel_run(self):
+        """
+        Continuously checks if reminders are due and sends them to the intended recipient if needed.
+        :return: void
+        """
         while True:
-            reminders = self.__findReminders__()
+            reminders = self.__find_reminders__()
             for reminder in reminders:
-                self.sendMessage(reminder)
+                self.send_message(reminder)
                 time.sleep(1)
             time.sleep(1)
 
-    """
-    Returns a description about this plugin
-    @:param language - the language in which to display the description
-    @:return the description in the specified language
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a description about this plugin
+        :param language: the language in which to display the description
+        :return the description in the specified language
+        """
         if language == "en":
             return "/remind\tSaves a reminder and sends it back at the specified time\n" \
                    "syntax: /remind \"<message>\" <time>\n" \
@@ -156,18 +158,13 @@ class Reminder(GenericPlugin):
         else:
             return "Help not available in this language"
 
-### Private Methods ###
+    # Private Methods
 
-    """
-    Sets the local reminder time to a specified date and time
-    @:param year - the year
-    @:param month - the month
-    @:param day - the day
-    @:param hour - the hour
-    @:param minute - the minute
-    @:param second - the second
-    """
-    def __setRemindertime__(self, year, month, day, hour, minute, second):
+    def __set_reminder_time__(self, year, month, day, hour, minute, second):
+        """
+        Sets the reminder time
+        :return: void
+        """
         self.year = year
         self.month = month
         self.day = day
@@ -175,101 +172,116 @@ class Reminder(GenericPlugin):
         self.minute = minute
         self.second = second
 
-    """
-    Makes sure that only values valid in the Gregorian Calendar and metric time measurement systems
-    """
-    def __calendarizeTime__(self):
-        secondsLeft = self.second - self.second % 60
-        self.second = self.second % 60
-        self.minute += int(secondsLeft / 60)
-        minutesLeft = self.minute - self.minute % 60
-        self.minute = self.minute % 60
-        self.hour += int(minutesLeft / 60)
-        hoursLeft = self.hour - self.hour % 24
-        self.hour = self.hour % 24
+    def __calendarize_time__(self):
+        """
+        Makes sure that only values valid in the Gregorian Calendar and metric time measurement systems
+        :return: void
+        """
+        seconds_left = self.second - self.second % 60
+        self.second %= 60
+        self.minute += int(seconds_left / 60)
+        minutes_left = self.minute - self.minute % 60
+        self.minute %= 60
+        self.hour += int(minutes_left / 60)
+        self.hour %= 24
         self.day += int(self.hour / 24)
-        monthLength = self.__getMonthLength__()
-        while self.day > monthLength:
-            self.day -= monthLength
-            self.__incrementMonth__()
+        month_length = self.__get_month_length__()
+        while self.day > month_length:
+            self.day -= month_length
+            self.__increment_month__()
 
-    """
-    calculates the lenth of the current month in days
-    @:return the amount of days in the current month
-    """
-    def __getMonthLength__(self):
-        if self.month in [1,3,5,7,8,10,12]: monthLength = 31
-        elif self.month in [4,6,9,11]: monthLength = 30
-        elif self.month == 2 and self.leapyear: monthLength = 29
-        else: monthLength = 28
-        return monthLength
+    def __get_month_length__(self):
+        """
+        Calculates the lenth of the current month in days
+        :return: the amount of days in the current month
+        """
+        if self.month in [1, 3, 5, 7, 8, 10, 12]:
+            month_length = 31
+        elif self.month in [4, 6, 9, 11]:
+            month_length = 30
+        elif self.month == 2 and self.leapyear:
+            month_length = 29
+        else:
+            month_length = 28
+        return month_length
 
-    """
-    increments the month by one
-    """
-    def __incrementMonth__(self):
-        if self.month < 12: self.month += 1
-        elif self.month == 12: self.month = 1; self.year += 1
+    def __increment_month__(self):
+        """
+        Increments the month by one
+        :return: void
+        """
+        if self.month < 12:
+            self.month += 1
+        elif self.month == 12:
+            self.month = 1
+            self.year += 1
 
-    """
-    Turns the current reminder time into a string
-    @:return the reminder time string
-    """
-    def __createReminderTimeString__(self):
-        return str(self.year) + "-" + str(self.month) + "-" + str(self.day) + "-" \
-               + str(self.hour) + "-" + str(self.minute) + "-" + str(self.second)
+    def __create_reminder_time_string__(self):
+        """
+        Turns the current reminder time into a string
+        :return: the reminder time string
+        """
+        return str(self.year) + "-" + str(self.month) + "-" + str(self.day) + "-" + str(self.hour) + "-" + str(
+            self.minute) + "-" + str(self.second)
 
-
-
-    """
-    Searches all currently saved reminders and checks if they are due. If they are, they are returned
-    @:return a list of due reminders as TextMessageProtocolEntities
-    """
-    def __findReminders__(self):
+    def __find_reminders__(self):
+        """
+        Searches all currently saved reminders and checks if they are due. If they are, they are returned
+        :return: a list of due reminders as TextMessageProtocolEntities
+        """
         reminders = os.listdir(os.getenv("HOME") + "/.whatsapp-bot/reminders")
-        reminderEntities = []
-        reminderPaths = []
+        reminder_entities = []
+        reminder_paths = []
         for reminder in reminders:
             path = os.getenv("HOME") + "/.whatsapp-bot/reminders/" + reminder
             if not os.path.isdir(path):
-                reminderPaths.append(path)
-        for reminder in reminderPaths:
+                reminder_paths.append(path)
+        for reminder in reminder_paths:
             file = open(reminder, "r")
-            fileContent = file.read()
+            file_content = file.read()
             file.close()
-            sender = fileContent.split("\n")[0].split("sender=")[1]
-            message = fileContent.split("\n")[1].split("message=")[1]
-            timeString = fileContent.split("\n")[2].split("time=")[1]
-            if self.__remindDue__(timeString):
+            sender = file_content.split("\n")[0].split("sender=")[1]
+            message = file_content.split("\n")[1].split("message=")[1]
+            time_string = file_content.split("\n")[2].split("time=")[1]
+            if self.__remind_due__(time_string):
                 os.system("rm " + reminder)
-                outgoingEntity = TextMessageProtocolEntity(message, to=sender)
-                reminderEntities.append(outgoingEntity)
-        return reminderEntities
+                outgoing_entity = WrappedTextMessageProtocolEntity(message, to=sender)
+                reminder_entities.append(outgoing_entity)
+        return reminder_entities
 
-    """
-    Checks if a timestring is due
-    @:return True if it is due, False if not.
-    """
-    def __remindDue__(self, timeString):
-        currentTime = datetime.datetime.now()
-        cYear = int(currentTime.year)
-        cMonth = int(currentTime.month)
-        cDay = int(currentTime.day)
-        cHour = int(currentTime.hour)
-        cMin = int(currentTime.minute)
-        cSec = int(currentTime.second)
-        remindTime = timeString.split("-")
-        remindYear = int(remindTime[0])
-        remindMonth = int(remindTime[1])
-        remindDay = int(remindTime[2])
-        remindHour = int(remindTime[3])
-        remindMinute = int(remindTime[4])
-        remindSecond = int(remindTime[5])
+    @staticmethod
+    def __remind_due__(time_string):
+        """
+        Checks if a timestring is due
+        :param time_string: the time string to be checked
+        :return: True if it is due, False if not.
+        """
+        current_time = datetime.datetime.now()
+        current_year = int(current_time.year)
+        current_month = int(current_time.month)
+        current_day = int(current_time.day)
+        current_hour = int(current_time.hour)
+        current_minute = int(current_time.minute)
+        current_second = int(current_time.second)
+        remind_time = time_string.split("-")
+        remind_year = int(remind_time[0])
+        remind_month = int(remind_time[1])
+        remind_day = int(remind_time[2])
+        remind_hour = int(remind_time[3])
+        remind_minute = int(remind_time[4])
+        remind_second = int(remind_time[5])
 
-        if cYear < remindYear: return False
-        elif cMonth < remindMonth: return False
-        elif cDay < remindDay: return False
-        elif cHour < remindHour: return False
-        elif cMin < remindMinute: return False
-        elif cSec < remindSecond: return False
-        else: return True
+        if current_year < remind_year:
+            return False
+        elif current_month < remind_month:
+            return False
+        elif current_day < remind_day:
+            return False
+        elif current_hour < remind_hour:
+            return False
+        elif current_minute < remind_minute:
+            return False
+        elif current_second < remind_second:
+            return False
+        else:
+            return True
