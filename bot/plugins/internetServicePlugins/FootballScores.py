@@ -24,85 +24,82 @@ This file is part of whatsapp-bot.
 import re
 import requests
 from bs4 import BeautifulSoup
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-FootballScores class
-"""
+
 class FootballScores(GenericPlugin):
+    """
+    The FootballScores class
+    """
 
-    """
-    Constructor
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
-    """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if not messageProtocolEntity: self.layer = layer; return
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        """
+        super().__init__(layer, message_protocol_entity)
         self.bundesliga = False
         self.lang = "en"
-
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = self.entity.getBody()
-        self.sender = self.entity.getFrom()
-
         self.country = ""
         self.league = ""
+        self.mode = None
 
-    """
-    Checks if the user input matches the regex needed for the plugin to function correctly
-    @:return True if the regex matches, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+    def regex_check(self):
+        """
+        Checks if the user input matches the regex needed for the plugin to function correctly
+        @:return True if the regex matches, False otherwise
+        @:override
+        """
         regex = r"^/(table|tabelle|spieltag|matchday)( [^ ]+, [^ ]+)?$"
-        if re.search(regex, self.message): return True
-        else: return False
+        if re.search(regex, self.message):
+            return True
+        else:
+            return False
 
-    """
-    Parses the user input
-    @:override
-    """
-    def parseUserInput(self):
-        if not len(self.message.split(" ")) == 1 and not "bundesliga" in self.message:
-            countryLeague = self.message.split(" ", 1)[1]
-            self.country = countryLeague.split(", ")[0]
-            self.league = countryLeague.split(", ")[1]
+    def parse_user_input(self):
+        """
+        Parses the user input
+        """
+        if not len(self.message.split(" ")) == 1 and "bundesliga" not in self.message:
+            country_league = self.message.split(" ", 1)[1]
+            self.country = country_league.split(", ")[0]
+            self.league = country_league.split(", ")[1]
         else:
             self.bundesliga = True
+            self.country = "germany"
+            self.league = "bundesliga"
 
         self.mode = self.message.split(" ")[0].split("/")[1].lower()
-        if self.mode in ["tabelle", "spieltag"]: self.lang = "de"
+        if self.mode in ["tabelle", "spieltag"]:
+            self.lang = "de"
 
-    """
-    Returns the result of the user defined search
-    @:return the result of the user defined search
-    A:override
-    """
-    def getResponse(self):
+    def get_response(self):
+        """
+        Returns the result of the user defined search
+        :return: the result of the user defined search
+        """
         response = ""
         if self.bundesliga:
             if self.mode in ["tabelle", "table"]:
-                response = self.__getBundesLigaTable__()
+                response = self.__get_bundesliga_table__()
             if self.mode in ["spieltag", "matchday"]:
-                response = self.__getBundesligaMatchDay__()
+                response = self.__get_bundesliga_match_day__()
         else:
             if self.mode in ["table", "tabelle"]:
-                response = self.__getGenericTable__()
+                response = self.__get_generic_table__()
             if self.mode in ["matchday", "spieltag"]:
-                response = self.__getGenericMatchDay__()
-        return TextMessageProtocolEntity(response, to=self.sender)
+                response = self.__get_generic_match_day__()
+        return WrappedTextMessageProtocolEntity(response, to=self.sender)
 
-    """
-    Returns a description about this plugin
-    @:param language - the language in which to display the description
-    @:return the description in the specified language
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a description about this plugin
+        :param language: the language in which to display the description
+        :return: the description in the specified language
+        """
         if language == "en":
             return "/table\tSends football table information\n" \
                    "syntax: /table [<country>][, <league>]\n\n" \
@@ -116,108 +113,101 @@ class FootballScores(GenericPlugin):
         else:
             return "Help not available in this language"
 
-    ### Private Methods ###
+    # Private Methods
+    def __get_bundesliga_table__(self):
+        """
+        Fetches the current bundesliga table
+        :return: a formatted string containing the bundesliga table
+        """
+        return_string = ""
+        teamres = self.__get_web_resource__('.team')
+        ptsres = self.__get_web_resource__('.pts')
 
-    """
-    Fetches the current bundesliga table
-    @return: a formatted string containing the bundesliga table
-    """
-    def __getBundesLigaTable__(self):
-
-        returnString = ""
-
-        url = "http://www.livescore.com/soccer/germany/bundesliga/"
-
-        html = requests.get(url).text
-        soup = BeautifulSoup(html, "html.parser")
-        teamres = soup.select('.team')
-        ptsres = soup.select('.pts')
-
-        i = 1 #teamnames
-        j = 15 #points
-        k = 12 #goals for
-        l = 13 #goals against
-        while i < 19:
-            place = str(i) + ".\t"
-            team = self.__makeBundesligaReadable__(teamres[i].text)
-            points = ptsres[j].text
-            goalsFor = ptsres[k].text
-            goalsAgainst = ptsres[l].text
+        team_name_index = 1
+        point_index = 15
+        goals_for_index = 12  # goals for
+        goals_against_index = 13  # goals against
+        while team_name_index < 19:
+            place = str(team_name_index) + ".\t"
+            team = self.__make_bundesliga_readable__(teamres[team_name_index].text)
+            points = ptsres[point_index].text
+            goals_for = ptsres[goals_for_index].text
+            goals_against = ptsres[goals_against_index].text
             spacer = "\t"
-            if len(goalsAgainst + goalsFor) < 4: spacer += "\t"
-            returnString += place + goalsFor + ":" + goalsAgainst + spacer + points + "\t" + team + "\n"
-            i += 1; j += 8; k += 8; l += 8
+            if len(goals_against + goals_for) < 4:
+                spacer += "\t"
+            return_string += place + goals_for + ":" + goals_against + spacer + points + "\t" + team + "\n"
+            team_name_index += 1
+            point_index += 8
+            goals_for_index += 8
+            goals_against_index += 8
 
-        return self.__makeBundesligaReadable__(returnString)
+        return return_string
 
-    """
-    Fetches data for the current Bundesliga match day and returns it
-    @:return the bundesliga matchday scores
-    """
-    def __getBundesligaMatchDay__(self):
-
-        returnString = ""
-
-        url = "http://www.livescore.com/soccer/germany/bundesliga/"
-        html = requests.get(url).text
-        soup = BeautifulSoup(html, "html.parser")
-        res = soup.select('.row-gray')
+    def __get_bundesliga_match_day__(self):
+        """
+        Fetches data for the current Bundesliga match day and returns it
+        :return: the bundesliga matchday scores
+        """
+        return_string = ""
+        res = self.__get_web_resource__('.row-gray')
 
         i = 0
         for r in res:
             if i < 9:
-                returnString += r.text + "\n"
+                return_string += r.text + "\n"
                 i += 1
 
-        return self.__makeBundesligaReadable__(returnString)
+        return self.__make_bundesliga_readable__(return_string)
 
-    """
-    Replaces Names of clubs that are simply too long, or English
-    @:return the replaced name
-    """
-    def __makeBundesligaReadable__(self, string):
+    @staticmethod
+    def __make_bundesliga_readable__(string):
+        """
+        Replaces Names of clubs that are simply too long, or English
+        :return: the replaced name
+        """
+        return_string = string
+        return_string = return_string.replace("Borussia Moenchengladbach", "Gladbach")
+        return_string = return_string.replace("Bayern Munich", "FC Bayern München")
+        return_string = return_string.replace("FC Cologne", "1.FC Köln")
+        return return_string
 
-        returnString = string
-        returnString = returnString.replace("Borussia Moenchengladbach", "Gladbach")
-        returnString = returnString.replace("Bayern Munich", "F\0C\0 B\0a\0y\0e\0r\0n M\0ü\0n\0c\0hen") #Overliste Johannes' Bot.
-        returnString = returnString.replace("FC Cologne", "1.FC Köln")
-        return returnString
-
-    """
-    Fetches information about a generic country/league matchday
-    @:return the matchday as string
-    """
-    def __getGenericMatchDay__(self):
-
-        returnString = ""
-
-        url = "http://www.livescore.com/soccer/" + self.country + "/" + self.league + "/"
-        html = requests.get(url).text
-        soup = BeautifulSoup(html, "html.parser")
-        res = soup.select('.row-gray')
+    def __get_generic_match_day__(self):
+        """
+        Fetches information about a generic country/league matchday
+        :return: the matchday as string
+        """
+        return_string = ""
+        res = self.__get_web_resource__('.row-gray')
 
         for r in res:
-            returnString += r.text + "\n"
+            return_string += r.text + "\n"
 
-        return returnString
+        return return_string
 
-    """
-    Fetches the information about a generic country/league table
-    @:return the league table as string
-    """
-    def __getGenericTable__(self):
-
-        returnString = ""
-
-        url = "http://www.livescore.com/soccer/" + self.country + "/" + self.league + "/"
-
-        html = requests.get(url).text
-        soup = BeautifulSoup(html, "html.parser")
-        teamres = soup.select('.team')
+    def __get_generic_table__(self):
+        """
+        Fetches the information about a generic country/league table
+        :return: the league table as string
+        """
+        return_string = ""
+        teamres = self.__get_web_resource__('.team')
 
         i = 1
         while i < len(teamres):
-            returnString += str(i) + ".\t" + teamres[i].text + "\n"
+            return_string += str(i) + ".\t" + teamres[i].text + "\n"
             i += 1
 
-        return returnString
+        return return_string
+
+    def __get_web_resource__(self, html_element):
+        """
+        Gets the web resource for a specific HTML element from livescore.com
+        This will be applied to whatever the currently selected country and league are.
+        :param html_element: the html element to look for
+        :return: the resource found
+        """
+        url = "http://www.livescore.com/soccer/" + self.country + "/" + self.league + "/"
+        html = requests.get(url).text
+        soup = BeautifulSoup(html, "html.parser")
+        return soup.select(html_element)
