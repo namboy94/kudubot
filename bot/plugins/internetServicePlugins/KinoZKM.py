@@ -24,66 +24,60 @@ This file is part of whatsapp-bot.
 import re
 import requests
 from bs4 import BeautifulSoup
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
-from utils.encoding.Unicoder import Unicoder
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-The KinoZKM Class
-"""
+
 class KinoZKM(GenericPlugin):
-
     """
-    Constructor
-    Defines parameters for the plugin.
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
+    The KinoZKM Class
     """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = self.entity.getBody().lower()
-        self.sender = self.entity.getFrom()
 
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        Defines parameters for the plugin.
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        super().__init__(layer, message_protocol_entity)
         self.mode = ""
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return: True if input is valid, False otherwise
+        """
         if re.search(r"^/kinozkm summaries$", self.message):
             return True
-        else: return False
+        else:
+            return False
 
-    """
-    Parses the user's input
-    @:override
-    """
-    def parseUserInput(self):
-        if self.message == "/kinozkm summaries": self.mode="summary"
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        :return: void
+        """
+        if self.message == "/kinozkm summaries":
+            self.mode = "summary"
 
-    """
-    Returns the response calculated by the plugin
-    @:return the response as a MessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
+    def get_response(self):
+        """
+        Returns the response calculated by the plugin
+        :return: the response as a WrappedTextMessageProtocolEntity
+        """
         if self.mode == "summary":
-            return TextMessageProtocolEntity(self.__getAllSummaries__(), to=self.sender)
+            return WrappedTextMessageProtocolEntity(self.__get_all_summaries__(), to=self.sender)
         raise NotImplementedError()
 
-    """
-    Returns a helpful description of the plugin's syntax and functionality
-    @:param language - the language to be returned
-    @:return the description as string
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a helpful description of the plugin's syntax and functionality
+        :param language: the language to be returned
+        :return the description as string
+        """
         if language == "en":
             return "/kinozkm\tFetches current information regarding the cinema at the ZKM in Karlsruhe\n" \
                    "syntax: /kinozkm [summaries]"
@@ -93,89 +87,35 @@ class KinoZKM(GenericPlugin):
         else:
             return "Help not available in this language"
 
-    ### Local Methods ###
-
-    """
-    Returns all currently running movies and movie descriptions.
-    @:return the movie titles and descriptions as formatted string.
-    """
-    def __getAllSummaries__(self):
+    # Local Methods
+    @staticmethod
+    def __get_all_summaries__():
+        """
+        Returns all currently running movies and movie descriptions.
+        :return: the movie titles and descriptions as formatted string.
+        """
 
         html = requests.get("http://www.filmpalast.net/programm.html").text
         soup = BeautifulSoup(html, "html.parser")
-        allMovieDescriptions = soup.select('.gwfilmdb-film-description')
-        allMovieTitles = soup.select('.gwfilmdb-film-title')
+        all_movie_descriptions = soup.select('.gwfilmdb-film-description')
+        all_movie_titles = soup.select('.gwfilmdb-film-title')
 
-        movieTitles = []
+        movie_titles = []
 
         skip = False
-        for title in allMovieTitles:
+        for title in all_movie_titles:
             if not skip:
-                movieTitles.append(title)
+                movie_titles.append(title)
                 skip = True
             else:
                 skip = False
 
-        allDescriptions = "Zusammenfassungen Aktuelle Filme:\n\n"
+        all_descriptions = "Zusammenfassungen Aktuelle Filme:\n\n"
 
         i = 0
-        while i < len(movieTitles):
-            allDescriptions += movieTitles[i].text + "\n"
-            allDescriptions += allMovieDescriptions[i].text + "\n\n"
+        while i < len(movie_titles):
+            all_descriptions += movie_titles[i].text + "\n"
+            all_descriptions += all_movie_descriptions[i].text + "\n\n"
             i += 1
 
-        return allDescriptions
-
-    """
-    def __getTimes__(self):
-        html = requests.get("http://www.filmpalast.net/programm.html").text
-        soup = BeautifulSoup(html, "html.parser")
-        allMovies = soup.select('.row')
-        allMovieTitles = soup.select('.gwfilmdb-film-title')
-        movieTitles = []
-
-        for title in allMovieTitles:
-            movieTitles.append(title.text)
-
-        i = 0
-        for movies in allMovies:
-            if i == 0: i += 1; continue
-            if i >= len(movieTitles): break
-
-            movieDetails = []
-            title = allMovieTitles[i * 2 - 1].text
-            times = allMovies[i].text.split("Spielzeiten")[1]
-
-            print(title)
-            print(times)
-
-            i += 1
-        return ""
-    """
-    """
-
-    def __getSummaries__(self):
-        html = requests.get("http://www.filmpalast.net/programm.html").text
-        soup = BeautifulSoup(html, "html.parser")
-        allMovies = soup.select('.row')
-        allMovieTitles = soup.select('.gwfilmdb-film-title')
-        movieTitles = []
-
-        for title in allMovieTitles:
-            movieTitles.append(title.text)
-
-        i = 0
-        for movies in allMovies:
-            if i == 0: i += 1; continue
-            if (i * 2 - 1) >= len(movieTitles): break
-
-            movieDetails = []
-            title = allMovieTitles[i * 2 - 1].text
-            times = allMovies[i].text.split("Spielzeiten       ")[1]
-            #print(title)
-            print(times)
-
-            i += 1
-        return ""
-
-    """
+        return all_descriptions

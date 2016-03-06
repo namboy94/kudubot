@@ -23,110 +23,112 @@ This file is part of whatsapp-bot.
 
 import re
 import pywapi
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-Class that stores relevant information, parses user input and gets weather data
-"""
+
 class Weather(GenericPlugin):
+    """
+    Class that stores relevant information, parses user input and gets weather data
+    """
 
-    """
-    Constructor
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
-    """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        super().__init__(layer, message_protocol_entity)
+        
         self.emojis = True
         self.verbose = False
         self.lang = "en"
-
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = messageProtocolEntity.getBody().lower()
-        self.sender = messageProtocolEntity.getFrom()
 
         self.city = ""
         self.province = ""
         self.country = ""
 
-    """
-    Checks if the user input matches the regex needed for the plugin to function correctly
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+        self.location = ""
+        self.location_code = ""
+        self.weather = ""
+
+    def regex_check(self):
+        """
+        Checks if the user input matches the regex needed for the plugin to function correctly
+        :return: True if input is valid, False otherwise
+        """
         regex = r"^/(weather|wetter)(:(text;|verbose;)+)?( ([^ ]+| )+(, ([^ ]+| )+)?(, ([^ ]+| )+)?)?$"
-        if re.search(regex, self.message): return True
-        else: return False
+        if re.search(regex, self.message):
+            return True
+        else:
+            return False
 
-
-    """
-    Parses the user input
-    @:param userInput - the user input
-    @:override
-    """
-    def parseUserInput(self):
-
-        trimmedInput = self.message.split(":")
+    def parse_user_input(self):
+        """
+        Parses the user input
+        :return: void
+        """
+        trimmed_input = self.message.split(":")
         args = []
-        if len(trimmedInput) > 1:
-            args = trimmedInput[1].split(";")
+        if len(trimmed_input) > 1:
+            args = trimmed_input[1].split(";")
             if not args[len(args) - 1] in ["verbose", args]:
                 args.pop()
-            if trimmedInput[0] == "wetter": self.lang = "de"
+            if trimmed_input[0] == "wetter":
+                self.lang = "de"
         else:
-            if self.message.split(" ")[0] == "wetter": self.lang = "de"
+            if self.message.split(" ")[0] == "wetter": 
+                self.lang = "de"
         for arg in args:
-            if arg == "verbose": self.verbose = True
-            if arg == "text": self.emojis = False
+            if arg == "verbose": 
+                self.verbose = True
+            if arg == "text":
+                self.emojis = False
 
-        cityString = ""
-        try: cityString = self.message.split(" ", 1)[1]
-        except: cityString = "karlsruhe"
+        try:
+            city_string = self.message.split(" ", 1)[1]
+        except NameError:
+            city_string = "karlsruhe"
 
-        splitCity = cityString.split(", ")
+        split_city = city_string.split(", ")
 
-        self.city = splitCity[0]
-        if len(splitCity) == 2:
+        self.city = split_city[0]
+        if len(split_city) == 2:
             self.province = False
-            self.country = splitCity[1]
-        elif len(splitCity) == 3:
-            self.province = splitCity[1]
-            self.country = splitCity[2]
+            self.country = split_city[1]
+        elif len(split_city) == 3:
+            self.province = split_city[1]
+            self.country = split_city[2]
         else:
             self.province = False
             self.country = False
 
-    """
-    Gets the weather data for the location specified by the user input
-    @returns the weather data as a TextMessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
-
+    def get_response(self):
+        """
+        Gets the weather data for the location specified by the user input
+        :return: the weather data as a WrappedTextMessageProtocolEntity
+        """
         try:
-            self.location = self.__specialPlaces__(self.city)
+            self.location = self.__special_places__(self.city)
             if not self.location:
-                self.location = self.__getLocation__()
-            self.locationCode = self.location[0]
-            self.location = self.__repairAmericanLocation__()
-            self.weather = pywapi.get_weather_from_weather_com(self.locationCode)
-        except:
-            return TextMessageProtocolEntity("City not Found", to=self.sender)
+                self.location = self.__get_location__()
+            self.location_code = self.location[0]
+            self.location = self.__repair_american_location__()
+            self.weather = pywapi.get_weather_from_weather_com(self.location_code)
+        except Exception as e:
+            str(e)
+            return WrappedTextMessageProtocolEntity("City not Found", to=self.sender)
 
-        return TextMessageProtocolEntity(self.__messageGenerator__(), to=self.sender)
+        return WrappedTextMessageProtocolEntity(self.__messageGenerator__(), to=self.sender)
 
-    """
-    Returns a description about this plugin
-    @:param language - the language in which to display the description
-    @:return the description in the specified language
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a description about this plugin
+        :param language: the language in which to display the description
+        :return: the description in the specified language
+        """
         if language == "en":
             return "/weather\tSends weather information\n" \
                    "syntax:\t/weather[:][options;] <cityname>[, <region>][, <country>]\n" \
@@ -137,27 +139,29 @@ class Weather(GenericPlugin):
                    "options: text,verbose"
         else:
             return "Help not available in this language"
+        
+    # private methods
+    @staticmethod
+    def __special_places__(city):
+        """
+        Helper method for getWeather(), which catches special, predefined cities.
+        For example, the default search result for Windhoek is Windhoek in South Africa, but with the help of
+        this method, the search is overriden and Windhoek in Namibia is displayed
+        :return: the city info
+        """
 
+        if city == "windhoek":
+            return 'WAXX0004', 'Windhoek, KH, Namibia'
+        if city == "???":
+            raise NameError("Invalid City")
+        if city == "johannesburg":
+            return "SFXX0023", 'Johannesburg, GT, South Africa'
 
-
-### private methods ###
-
-
-    """
-    Helper method for getWeather(), which catches special, predefined cities.
-    For example, the default search result for Windhoek is Windhoek in South Africa, but with the help of
-    this method, the search is overriden and Windhoek in Namibia is displayed
-    """
-    def __specialPlaces__(self, city):
-
-        if city == "windhoek": return ('WAXX0004', 'Windhoek, KH, Namibia')
-        if city == "???": raise NameError("Invalid City")
-        if city =="johannesburg": return ("SFXX0023", 'Johannesburg, GT, South Africa')
-
-    """
-    Gets the location code of a city
-    """
-    def __getLocation__(self):
+    def __get_location__(self):
+        """
+        Gets the location code of a city
+        :return: the location code for the user's input
+        """
         if not self.country and not self.province:
             return pywapi.get_loc_id_from_weather_com(self.city)[0]
         elif self.country and not self.province:
@@ -169,62 +173,85 @@ class Weather(GenericPlugin):
         elif self.country and self.province:
             search = pywapi.get_loc_id_from_weather_com(self.city)
             for result in search:
-                if result == "count": break
-                if search[result][1].split(", ")[1].lower() == self.province \
-                        and (search[result][1].split(", ")[2].lower() == self.country
-                        or self.country == "usa"):
+                if result == "count":
+                    break
+                if search[result][1].split(", ")[1].lower() == self.province and \
+                        (search[result][1].split(", ")[2].lower() == self.country or self.country == "usa"):
                     return search[result]
             raise NameError("City not Found")
 
-    """
-    Repairs American Locations (since they only store the state, not the country)
-    @returns the repaired location data
-    """
-    def __repairAmericanLocation__(self):
+    def __repair_american_location__(self):
+        """
+        Repairs American Locations (since they only store the state, not the country)
+        :return: the repaired location data
+        """
         if len(self.location[1].split(", ")) == 2:
             return [self.location[0], self.location[1] + ', USA']
-        else: return self.location
+        else:
+            return self.location
 
-    """
-    Determines the weather emoji for all weather types
-    @returns the weatherEmoji to the corresponding weatherType
-    """
-    def __getWeatherEmoji__(self, weatherType):
+    @staticmethod
+    def __get_weather_emoji__(weather_type):
+        """
+        Determines the weather emoji for all weather types
+        :return: the weatherEmoji to the corresponding weather_type
+        """
+        if weather_type in ["sunny", "clear", "sunny / windy", "clear / windy"]:
+            return "☀"
+        elif weather_type in ["fair"]:
+            return "🌤"
+        elif weather_type in ["partly cloudy"]:
+            return "⛅"
+        elif weather_type in ["mostly cloudy"]:
+            return "🌥"
+        elif weather_type in ["not definded"]:
+            return "🌦"
+        elif weather_type in ["light rain", "light rain shower"]:
+            return "🌧"
+        elif weather_type in ["cloudy"]:
+            return"☁"
+        elif weather_type in ["thunderstorms", "t-storm"]:
+            return "⛈"
+        elif weather_type in ["rain shower"]:
+            return "☔"
+        elif weather_type in ["thunderclouds"]:
+            return "🌩"
+        elif weather_type in ["snow"]:
+            return "🌨"
+        elif weather_type in ["windy"]:
+            return "🌬"
+        elif weather_type in ["tornado"]:
+            return "🌪"
+        elif weather_type in ["haze", "fog", "mist"]:
+            return "🌫"
+        else:
+            return "???"
 
-        if weatherType in ["sunny", "clear", "sunny / windy", "clear / windy"]: return "☀"
-        elif weatherType in ["fair"]: return "🌤"
-        elif weatherType in ["partly cloudy"]: return "⛅"
-        elif weatherType in ["mostly cloudy"]: return "🌥"
-        elif weatherType in ["not definded"]: return "🌦"
-        elif weatherType in ["light rain", "light rain shower"]: return "🌧"
-        elif weatherType in ["cloudy"]: return"☁"
-        elif weatherType in ["thunderstorms", "t-storm"]: return "⛈"
-        elif weatherType in ["rain shower"]: return "☔"
-        elif weatherType in ["thunderclouds"]: return "🌩"
-        elif weatherType in ["snow"]: return "🌨"
-        elif weatherType in ["windy"]: return "🌬"
-        elif weatherType in ["tornado"]: return "🌪"
-        elif weatherType in ["haze", "fog", "mist"]: return "🌫"
-        else: return "???"
-
-    """
-    Generates a message string to send back
-    """
+    # noinspection PyTypeChecker
     def __messageGenerator__(self):
-
+        """
+        Generates a message string to send back
+        :return: the message string
+        """
         try:
-            weatherType = self.weather['current_conditions']['text'].lower()
+            weather_type = self.weather['current_conditions']['text'].lower()
             temp = self.weather['current_conditions']['temperature'].lower()
-        except: return "Weather data currently unavailable"
+        except Exception as e:
+            str(e)
+            return "Weather data currently unavailable"
 
-        cityString = self.location[1].split(", ")[0] + ", " + self.location[1].split(", ")[2]
-        weatherMessage = weatherType
+        city_string = self.location[1].split(", ")[0] + ", " + self.location[1].split(", ")[2]
+        weather_message = weather_type
 
-        if self.emojis: weatherMessage = self.__getWeatherEmoji__(weatherType)
-        if self.verbose: cityString = self.location[1].split(", ")[0] + ", " + self.location[1].split(", ")[1] + ", " + self.location[1].split(", ")[2]
+        if self.emojis:
+            weather_message = self.__get_weather_emoji__(weather_type)
+        if self.verbose:
+            city_string = self.location[1].split(", ")[0] + ", " + self.location[1].split(", ")[1] + ", " +\
+                          self.location[1].split(", ")[2]
 
         if self.lang == "en":
-            return "It is " + weatherMessage + " and " + temp + "°C now in " + cityString
+            return "It is " + weather_message + " and " + temp + "°C now in " + city_string
         elif self.lang == "de":
-            return "Es ist " + weatherMessage + " und " + temp + "°C in " + cityString
-        else: return "Unknown language error"
+            return "Es ist " + weather_message + " und " + temp + "°C in " + city_string
+        else:
+            return "Unknown language error"

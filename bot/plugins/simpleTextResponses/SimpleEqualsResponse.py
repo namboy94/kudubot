@@ -53,7 +53,7 @@ class SimpleEqualsResponse(GenericPlugin):
         """
         for option in self.case_sensitive_options:
             for opt in option[0]:
-                if self.message == opt:
+                if self.cap_message == opt:
                     return True
         for option in self.case_insensitive_options:
             for opt in option[0]:

@@ -22,60 +22,54 @@ This file is part of whatsapp-bot.
 """
 
 import re
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-The XKCD Class
-"""
+
 class XKCD(GenericPlugin):
+    """
+    The XKCD Class
+    """
 
-    """
-    Constructor
-    Defines parameters for the plugin.
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    @:override
-    """
-    def __init__(self, layer, messageProtocolEntity=None):
-        if messageProtocolEntity is None: self.layer = layer; return
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = self.entity.getBody()
-        self.sender = self.entity.getFrom()
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        Defines parameters for the plugin.
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        super().__init__(layer, message_protocol_entity)
         self.comic = 0
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return: True if input is valid, False otherwise
+        """
         return re.search(r"^/xkcd [0-9]+$", self.message)
 
-    """
-    Parses the user's input
-    @:override
-    """
-    def parseUserInput(self):
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        :return: void
+        """
         self.comic = int(self.message.split("/xkcd ")[1])
 
-    """
-    Returns the response calculated by the plugin
-    @:return the response as a MessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
-        return TextMessageProtocolEntity("!xkcd " + str(self.comic), to=self.sender)
+    def get_response(self):
+        """
+        Returns the response calculated by the plugin
+        :return: the response as a MessageProtocolEntity
+        """
+        return WrappedTextMessageProtocolEntity("!xkcd " + str(self.comic), to=self.sender)
 
-    """
-    Returns a helpful description of the plugin's syntax and functionality
-    @:param language - the language to be returned
-    @:return the description as string
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a helpful description of the plugin's syntax and functionality
+        :param language: the language to be returned
+        :return: the description as string
+        """
         if language == "en":
             return "/kvv\tUses Johannes bucher's bot to display XKCD comics\n" \
                    "syntax: /xkcd <comic_number>"
@@ -84,12 +78,3 @@ class XKCD(GenericPlugin):
                    "syntax: /xkcd <comic_number>"
         else:
             return "Help not available in this language"
-
-    """
-    Starts a parallel background activity if this class has one.
-    Defaults to False if not implemented
-    @:return False, if no parallel activity defined, should be implemented to return True if one is implmented.
-    @:override
-    """
-    def parallelRun(self):
-        return False

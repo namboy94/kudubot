@@ -22,60 +22,54 @@ This file is part of whatsapp-bot.
 """
 
 import re
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from plugins.GenericPlugin import GenericPlugin
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-The KVV Class
-"""
+
 class KVV(GenericPlugin):
+    """
+    The KVV Class
+    """
 
-    """
-    Constructor
-    Defines parameters for the plugin.
-    @:param layer - the overlying yowsup layer
-    @:param messageProtocolEntity - the received message information
-    """
-    def __init__(self, layer, messageProtocolEntity=None):
-        #add this to the top:
-        if messageProtocolEntity is None: self.layer = layer; return
-        self.layer = layer
-        self.entity = messageProtocolEntity
-        self.message = self.entity.getBody()
-        self.sender = self.entity.getFrom()
+    def __init__(self, layer, message_protocol_entity=None):
+        """
+        Constructor
+        Defines parameters for the plugin.
+        :param layer: the overlying yowsup layer
+        :param message_protocol_entity: the received message information
+        :return: void
+        """
+        super().__init__(layer, message_protocol_entity)
+        self.station = ""
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return: True if input is valid, False otherwise
+        """
         return re.search(r"^/kvv [^ ]+", self.message)
 
-    """
-    Parses the user's input
-    @:override
-    """
-    def parseUserInput(self):
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        :return: void
+        """
         self.station = self.message.split("/kvv ", 1)[1]
 
+    def get_response(self):
+        """
+        Returns the station input by the user, and adds "!kvv " to it
+        :return: the response as a MessageProtocolEntity
+        """
+        return WrappedTextMessageProtocolEntity("!kvv " + self.station, to=self.sender)
 
-    """
-    Returns the station input by the user, and adds "!kvv " to it
-    @:return the response as a MessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
-        return TextMessageProtocolEntity("!kvv " + self.station, to=self.sender)
-
-    """
-    Returns a helpful description of the plugin's syntax and functionality
-    @:param language - the language to be returned
-    @:return the description as string
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a helpful description of the plugin's syntax and functionality
+        :param language: the language to be returned
+        :return: the description as string
+        """
         if language == "en":
             return "/kvv\tUses Johannes bucher's bot to display kvv times\n" \
                    "syntax: /kvv <station>"
