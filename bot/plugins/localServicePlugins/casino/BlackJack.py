@@ -24,72 +24,72 @@ This file is part of whatsapp-bot.
 import re
 import os
 import random
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+import datetime
+
 from plugins.localServicePlugins.Casino import Casino
+from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
-"""
-The BlackJack Class
-"""
+
 class BlackJack(Casino):
+    """
+    The BlackJack Class
+    """
 
-    inGame = False
+    in_game = False
     mode = ""
-    insufficientFunds = False
+    outcome = ""
+    insufficient_funds = False
 
-    """
-    Checks if the user input is valid for this plugin to continue
-    @:return True if input is valid, False otherwise
-    @:override
-    """
-    def regexCheck(self):
-
+    def regex_check(self):
+        """
+        Checks if the user input is valid for this plugin to continue
+        :return: True if input is valid, False otherwise
+        """
         if re.search(r"^/blackjack (start ([0-9]+(\.[0-9]{2})?)|hit|stay)$", self.message):
             return True
 
-    """
-    Parses the user's input
-    @:override
-    """
-    def parseUserInput(self):
-        self.createUser(self.entity)
+    def parse_user_input(self):
+        """
+        Parses the user's input
+        :return: void
+        """
+        self.create_user(self.entity)
         self.mode = self.message.split(" ")[1]
         if self.mode == "start":
-            if os.path.isdir(self.casinoDir + "blackjack/" + self.userID):
-                self.inGame = True
+            if os.path.isdir(self.casino_dir + "blackjack/" + self.user_id):
+                self.in_game = True
             else:
-                dollars, cents = self.decodeMoneyString(self.message.split(" ")[2])
-                self.storeBet("blackjack", self.userID, self.sender, dollars, cents, "start")
+                dollars, cents = self.decode_money_string(self.message.split(" ")[2])
+                self.store_bet("blackjack", self.user_id, self.sender, dollars, cents, "start")
 
-
-    """
-    Returns the response calculated by the plugin
-    @:return the response as a MessageProtocolEntity
-    @:override
-    """
-    def getResponse(self):
+    def get_response(self):
+        """
+        Returns the response calculated by the plugin
+        :return: the response as a WrappedTextMessageProtocolEntity
+        """
         if self.mode == "newBet":
-            if self.insufficientFunds:
-                return TextMessageProtocolEntity("Insufficient Funds", to=self.sender)
+            if self.insufficient_funds:
+                return WrappedTextMessageProtocolEntity("Insufficient Funds", to=self.sender)
             else:
-                return TextMessageProtocolEntity("Bet Saved", to=self.sender)
+                return WrappedTextMessageProtocolEntity("Bet Saved", to=self.sender)
         elif self.mode == "bets":
-            return TextMessageProtocolEntity(self.getBetStrings("roulette", self.userID), to=self.sender)
+            return WrappedTextMessageProtocolEntity(self.get_bet_strings("roulette", self.user_id), to=self.sender)
         elif self.mode == "time":
-            currentTime = datetime.datetime.now()
-            cMin = int(currentTime.minute)
-            cSec = int(currentTime.second)
-            timeLeft = 120 - cSec - 5
-            if cMin % 2 == 1: timeLeft -= 60
-            self.layer.toLower(TextMessageProtocolEntity(str(timeLeft) + "s to turn.", to=self.sender))
+            current_time = datetime.datetime.now()
+            current_minute = int(current_time.minute)
+            current_second = int(current_time.second)
+            time_left = 120 - current_second - 5
+            if current_minute % 2 == 1:
+                time_left -= 60
+            self.layer.toLower(WrappedTextMessageProtocolEntity(str(time_left) + "s to turn.", to=self.sender))
 
-    """
-    Returns a helpful description of the plugin's syntax and functionality
-    @:param language - the language to be returned
-    @:return the description as string
-    @:override
-    """
     @staticmethod
-    def getDescription(language):
+    def get_description(language):
+        """
+        Returns a helpful description of the plugin's syntax and functionality
+        :param language: the language to be returned
+        :return: the description as string
+        """
         if language == "en":
             return "/roulette\tAllows the sender to play roulette\n" \
                    "syntax: /roulette <amount> <bet>\n" \
@@ -107,35 +107,19 @@ class BlackJack(Casino):
         else:
             return "Help not available in this language"
 
-    """
-    Evaluates a bet
-    @:return the amount won by the player
-    """
-    def evaluateBet(self, bet):
-        betType = bet["bet"]
-        betDollars, betCents = self.decodeMoneyString(bet["value"])
-        try:
-            intbet = int(betType)
-            if self.outcome == intbet:
-                return self.multiplyMoney(35, betDollars, betCents)
-            else:
-                return (0, 0)
-        except:
-            if betType == "red":
-                if self.outcome in self.red:
-                    return self.multiplyMoney(2, betDollars, betCents)
-            elif betType == "black":
-                if self.outcome in self.black:
-                    return self.multiplyMoney(2, betDollars, betCents)
-            elif betType == "even":
-                if self.outcome % 2 == 0:
-                    return self.multiplyMoney(2, betDollars, betCents)
-            elif betType == "odd":
-                if self.outcome % 2 == 1:
-                    return self.multiplyMoney(2, betDollars, betCents)
-        return (0, 0)
+    def evaluate_bet(self, bet):
+        """
+        Evaluates a bet
+        :return: the amount won by the player
+        """
+        str(bet)
+        str(self)
+        return 0, 0
 
-    """
-    """
-    def drawCard(self):
+    @staticmethod
+    def draw_card():
+        """
+        Draws a random card
+        :return: the random card number
+        """
         return random.randint(2, 11)
