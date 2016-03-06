@@ -42,8 +42,10 @@ from layers.BotLayer import BotLayer
 from layers.BotLayerWithGUI import BotLayerWithGUI
 from startup.config.ConfigParser import ConfigParser
 from startup.installation.Installer import Installer
+from subprocess import Popen
 import argparse
 import sys
+import os
 
 # Sets the encoding to UTF-8 when running this program in python2
 if sys.version_info[0] == 2:
@@ -60,36 +62,32 @@ def main():
 
     # Argument Parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--install", help="installs the program",
-                        action="store_true")
-    parser.add_argument("-u", "--update", help="updates the program",
-                        action="store_true")
     parser.add_argument("-g", "--gui", help="starts the whatsbot with a gui to disable certain plugins",
                         action="store_true")
+    parser.add_argument("-r", "--register", help="Registers a new number")
+    parser.add_argument("-a", "--activate", help="Activates a new number")
     args = parser.parse_args()
 
     # Check if installed
     installed = Installer.is_installed()
 
-    if args.install:
-        if installed:
-            print("Program already installed. Use --update to update to the newest version")
-            sys.exit(1)
-        Installer.install()
-        sys.exit(0)
-
     if not installed:
-        print("Program not installed correctly, please use the --install option")
-        sys.exit(1)
-
-    if args.update:
-        Installer.update()
+        Installer.install()
+        print("Program was installed. Now use --register to register your phone number")
         sys.exit(0)
+
+    if args.register:
+        number_file = open(os.getenv("HOME") + "/.whatsbot/creds", 'w')
+        number_file.write("number=" + args.register + "\n")
+        number_file.write("password=")
+        os.system("yowsup-cli registration --requestcode sms --phone 49XXXXXXXX --cc 49 --mcc 123 --mnc 456")
+
 
     try:
-        credentials = ConfigParser.config_parse()  # Sadly, CamelCase.
+        credentials = ConfigParser.config_parse()
     except EOFError:
         print("No valid login credentials provided in config file")
+        print("Use --register to register a new number or --activate to activate a previously registered number")
         sys.exit(1)
 
     if args.gui:

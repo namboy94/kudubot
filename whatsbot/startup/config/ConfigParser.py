@@ -67,7 +67,7 @@ class ConfigParser(object):
         Opens the config file under Linux
         :return: the opened config file
         """
-        return open(os.getenv("HOME") + "/.whatsbot/config", 'r')
+        return open(os.getenv("HOME") + "/.whatsbot/creds", 'r')
 
     @staticmethod
     def open_windows_conf():
