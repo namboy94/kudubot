@@ -118,6 +118,7 @@ class ImageSender(GenericPlugin):
     def __wget_image__(self):
         """
         Wgets the image from the link
+        :return: void
         """
         try:
             spider_process_command = ['wget', '--spider', self.link]
