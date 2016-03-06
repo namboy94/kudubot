@@ -85,7 +85,7 @@ class Terminal(GenericPlugin):
     @staticmethod
     def getDescription(language):
         if language == "en":
-            return "/term\tAllows limit access to the server's terminal\n" \
+            return "/term\tAllows limited access to the server's terminal\n" \
                    "syntax:\n" \
                    "/term uptime\tShow's the server's uptime"
         elif language == "de":
