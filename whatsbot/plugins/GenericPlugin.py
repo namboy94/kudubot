@@ -48,6 +48,7 @@ class GenericPlugin(object):
         self.message = self.entity.get_body().lower()
         self.cap_message = self.entity.get_body()
         self.sender = self.entity.get_from()
+        self.notify = self.entity.get_notify()
         self.participant = self.entity.get_participant()
         if not self.participant:
             self.participant = self.sender

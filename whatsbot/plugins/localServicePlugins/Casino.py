@@ -51,7 +51,7 @@ class Casino(GenericPlugin):
         if self.entity is not None:
             self.user = self.participant
             self.user_id = self.user.split("@")[0]
-            self.user_nick = self.entity.getNotify()
+            self.user_nick = self.notify
             self.reply = None
 
     def regex_check(self):

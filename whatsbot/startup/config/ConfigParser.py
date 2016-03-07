@@ -32,9 +32,9 @@ class ConfigParser(object):
     """
 
     @staticmethod
-    def config_parse():
+    def parse_credentials():
         """
-        Parses a config file and extracts its password and number
+        Parses a credential file and extracts its password and number
         :return: the number and password as tuple of strings
         """
 

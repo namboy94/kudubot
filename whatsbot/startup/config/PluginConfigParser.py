@@ -34,7 +34,7 @@ class PluginConfigParser(object):
         Constructor
         :return void
         """
-        self.configFile = os.getenv("HOME") + "/.whatsbot/plugins"
+        self.configFile = os.getenv("HOME") + "/.whatsbot/config"
 
     def read_plugins(self):
         """
