@@ -21,6 +21,8 @@ This file is part of whatsbot.
     along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
+
 
 class AddressBook(object):
     """
@@ -31,11 +33,18 @@ class AddressBook(object):
         """
         Constructor containing all contacts in an array of arrays.
         """
-        self.contacts = [["4915779781557-1418747022", "Land of the very Brave"],
-                         ["4917628727937-1448730289", "Bottesting"],
-                         ["4917628727937", "Hermann"]]
-        self.blacklist = ["4915733871694", "4915202589244", "4915202589168"]
-        self.authenticated = ["4917628727937"]
+        contact_file = open(os.getenv("HOME") + "/.whatsbot/contacts", 'r')
+        contact_file_content = contact_file.read()
+
+        self.blacklisted = contact_file_content.split("<blacklisted>")[1].split("</blacklisted>")[0].split("\n")
+        self.authenticated = contact_file_content.split("<authenticated>")[1].split("</authenticated>")[0].split("\n")
+
+        self.contacts = []
+        contacts = contact_file_content.split("<contacts>")[1].split("</contacts>")[0].split("\n")
+
+        for contact in contacts:
+            if contact:
+                self.contacts.append([contact.split("=")[0], contact.split("=")[1]])
 
     def get_contact_name(self, entity, received):
         """
@@ -71,7 +80,7 @@ class AddressBook(object):
         :param number: the number to be checked
         :return: true if the number is blacklisted, false otherwise
         """
-        if number in self.blacklist:
+        if number in self.blacklisted:
             return True
         else:
             return False

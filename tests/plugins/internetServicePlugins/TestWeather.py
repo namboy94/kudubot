@@ -38,6 +38,7 @@ class TestWeather(object):
         """
         self.message = None
         self.layer = None
+        self.sender = "test@test.com"
 
     @classmethod
     def setup_class(cls):
@@ -66,10 +67,23 @@ class TestWeather(object):
         self.message = None
 
     @with_setup(setup, teardown)
-    def test(self):
+    def test_karlsruhe(self):
         """
-        basic test
+        Tests the weather for karlsruhe
         """
-        self.message = WrappedTextMessageProtocolEntity(_from="23323232@2121212.com", body="/wetter karlsruhe")
-        plugin = Weather(self.layer, self.message)
-        assert_equal(plugin.regex_check(), True)
+        karlsruhe = [WrappedTextMessageProtocolEntity(_from=self.sender, body="/wetter"),
+                     WrappedTextMessageProtocolEntity(_from=self.sender, body="/wetter karlsruhe"),
+                     WrappedTextMessageProtocolEntity(_from=self.sender, body="/wetter karlsruhe, de"),
+                     WrappedTextMessageProtocolEntity(_from=self.sender, body="/wetter karlsruhe, bw, de")]
+        karlsruhe_results = []
+
+        for message in karlsruhe:
+            plugin = Weather(self.layer, message)
+            assert_equal(plugin.regex_check(), True)
+            plugin.parse_user_input()
+            karlsruhe_results.append(plugin.get_response().get_body())
+
+        sample_message = karlsruhe_results[0]
+
+        for result in karlsruhe_results:
+            assert_equal(result, sample_message)
