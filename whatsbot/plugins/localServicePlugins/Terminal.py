@@ -24,8 +24,12 @@ This file is part of whatsbot.
 import re
 import subprocess
 
-from plugins.GenericPlugin import GenericPlugin
-from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+try:
+    from plugins.GenericPlugin import GenericPlugin
+    from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+except ImportError:
+    from whatsbot.plugins.GenericPlugin import GenericPlugin
+    from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Terminal(GenericPlugin):

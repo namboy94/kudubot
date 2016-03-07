@@ -23,8 +23,13 @@ This file is part of whatsbot.
 
 from nose.tools import with_setup
 from nose.tools import assert_equal
-from plugins.internetServicePlugins.Weather import Weather
-from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+
+try:
+    from plugins.internetServicePlugins.Weather import Weather
+    from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+except ImportError:
+    from whatsbot.plugins.internetServicePlugins.Weather import Weather
+    from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class TestWeather(object):

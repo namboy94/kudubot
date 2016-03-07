@@ -22,12 +22,15 @@ This file is part of whatsbot.
 """
 
 # imports
-from startup.config.PluginConfigParser import PluginConfigParser
 import sys
 if sys.version_info[0] == 2:
     from Tkinter import *
 else:
     from tkinter import *
+try:
+    from startup.config.PluginConfigParser import PluginConfigParser
+except ImportError:
+    from whatsbot.startup.config.PluginConfigParser import PluginConfigParser
 
 
 class PluginManagerGUI(object):

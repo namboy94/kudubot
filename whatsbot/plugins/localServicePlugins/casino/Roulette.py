@@ -26,11 +26,16 @@ import re
 import time
 import datetime
 import random
-
 from subprocess import Popen
-from plugins.localServicePlugins.Casino import Casino
-from utils.contacts.AddressBook import AddressBook
-from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+
+try:
+    from plugins.localServicePlugins.Casino import Casino
+    from utils.contacts.AddressBook import AddressBook
+    from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+except ImportError:
+    from whatsbot.plugins.localServicePlugins.Casino import Casino
+    from whatsbot.utils.contacts.AddressBook import AddressBook
+    from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Roulette(Casino):

@@ -22,8 +22,13 @@ This file is part of whatsbot.
 """
 
 # imports
-from utils.logging.LogWriter import LogWriter
-from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+
+try:
+    from utils.logging.LogWriter import LogWriter
+    from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+except ImportError:
+    from whatsbot.utils.logging.LogWriter import LogWriter
+    from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class GenericPlugin(object):

@@ -23,7 +23,11 @@ This file is part of whatsbot.
 
 # imports
 from yowsup.layers.protocol_media.protocolentities import AudioDownloadableMediaMessageProtocolEntity
-from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+
+try:
+    from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+except ImportError:
+    from whatsbot.yowsupwrapper.entities.EntityAdapter import EntityAdapter
 
 
 class WrappedAudioDownloadableMediaMessageProtocolEntity(EntityAdapter):

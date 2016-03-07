@@ -23,18 +23,21 @@ This file is part of whatsbot.
 
 # imports
 from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
-from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+
+try:
+    from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+except ImportError:
+    from whatsbot.yowsupwrapper.entities.EntityAdapter import EntityAdapter
 
 
 class WrappedImageDownloadableMediaMessageProtocolEntity(EntityAdapter):
     """
-
+    A wrapper around the ImageDownloadableMediaMessageProtocolEntity
     """
 
     @staticmethod
     def from_file_path(file_path, url, ip, to, caption=None):
         """
-
         :param caption:
         :param file_path:
         :param url:

@@ -22,7 +22,6 @@ This file is part of whatsbot.
 """
 
 # imports
-from utils.encoding.Unicoder import Unicoder
 
 
 class EntityAdapter(object):

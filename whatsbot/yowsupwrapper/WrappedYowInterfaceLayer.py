@@ -39,11 +39,23 @@ class WrappedYowInterfaceLayer(YowInterfaceLayer):
         """
         try:
             self.toLower(entity.get_entity())
-        except:
+        except Exception as e:
+            str(e)
             self.toLower(entity)
 
     def send_iq(self, entity, success_fn, error_fn):
+        """
+
+        :param entity:
+        :param success_fn:
+        :param error_fn:
+        :return:
+        """
         return self._sendIq(entity, success_fn, error_fn)
 
     def get_own_jid(self):
+        """
+
+        :return:
+        """
         return self.getOwnJid()

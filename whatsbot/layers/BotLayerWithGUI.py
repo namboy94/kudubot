@@ -22,10 +22,16 @@ This file is part of whatsbot.
 """
 
 # imports
-from layers.BotLayer import BotLayer
-from plugins.PluginManager import PluginManager
-from plugins.PluginManagerGui import PluginManagerGUI
-from startup.config.PluginConfigParser import PluginConfigParser
+try:
+    from layers.BotLayer import BotLayer
+    from plugins.PluginManager import PluginManager
+    from plugins.PluginManagerGui import PluginManagerGUI
+    from startup.config.PluginConfigParser import PluginConfigParser
+except ImportError:
+    from whatsbot.layers.BotLayer import BotLayer
+    from whatsbot.plugins.PluginManager import PluginManager
+    from whatsbot.plugins.PluginManagerGui import PluginManagerGUI
+    from whatsbot.startup.config.PluginConfigParser import PluginConfigParser
 
 
 class BotLayerWithGUI(BotLayer):

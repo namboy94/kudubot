@@ -22,6 +22,8 @@ This file is part of whatsbot.
 """
 
 # imports
+import argparse
+import sys
 from yowsup import env
 from yowsup.common import YowConstants
 from yowsup.layers import YowLayerEvent
@@ -38,12 +40,17 @@ from yowsup.layers.protocol_messages import YowMessagesProtocolLayer
 from yowsup.layers.protocol_receipts import YowReceiptProtocolLayer
 from yowsup.layers.stanzaregulator import YowStanzaRegulator
 from yowsup.stacks import YowStack
-from layers.BotLayer import BotLayer
-from layers.BotLayerWithGUI import BotLayerWithGUI
-from startup.config.ConfigParser import ConfigParser
-from startup.installation.Installer import Installer
-import argparse
-import sys
+
+try:
+    from layers.BotLayer import BotLayer
+    from layers.BotLayerWithGUI import BotLayerWithGUI
+    from startup.config.ConfigParser import ConfigParser
+    from startup.installation.Installer import Installer
+except ImportError:
+    from whatsbot.layers.BotLayer import BotLayer
+    from whatsbot.layers.BotLayerWithGUI import BotLayerWithGUI
+    from whatsbot.startup.config.ConfigParser import ConfigParser
+    from whatsbot.startup.installation.Installer import Installer
 
 # Sets the encoding to UTF-8 when running this program in python2
 if sys.version_info[0] == 2:
@@ -80,7 +87,7 @@ def main():
             number = input("Enter your number including the country code")
             cc = input("Enter your country code")
             print(number + cc)
-            # TODO Implement Registration
+            sys.exit(1)
         else:
             print("No valid login credentials provided in config file")
             print("Use --register to register a new number or --activate to activate a previously registered number")

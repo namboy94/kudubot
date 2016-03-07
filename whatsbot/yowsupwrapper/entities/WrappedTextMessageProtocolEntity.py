@@ -22,11 +22,15 @@ This file is part of whatsbot.
 """
 
 # imports
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from utils.encoding.Unicoder import Unicoder
-from yowsupwrapper.entities.EntityAdapter import EntityAdapter
-
 import re
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+
+try:
+    from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+    from utils.encoding.Unicoder import Unicoder
+except ImportError:
+    from whatsbot.yowsupwrapper.entities.EntityAdapter import EntityAdapter
+    from whatsbot.utils.encoding.Unicoder import Unicoder
 
 
 class WrappedTextMessageProtocolEntity(EntityAdapter):

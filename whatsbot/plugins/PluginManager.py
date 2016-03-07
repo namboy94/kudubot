@@ -23,25 +23,46 @@ This file is part of whatsbot.
 
 # imports
 from threading import Thread
-from plugins.internetServicePlugins.FootballScores import FootballScores
-from plugins.internetServicePlugins.ImageSender import ImageSender
-from plugins.internetServicePlugins.KVV import KVV
-from plugins.internetServicePlugins.KickTipp import KickTipp
-from plugins.internetServicePlugins.KinoZKM import KinoZKM
-from plugins.internetServicePlugins.Mensa import Mensa
-from plugins.internetServicePlugins.TheTVDB import TheTVDB
-from plugins.internetServicePlugins.Weather import Weather
-from plugins.internetServicePlugins.XKCD import XKCD
-from plugins.localServicePlugins.Casino import Casino
-from plugins.localServicePlugins.ContinuousReminder import ContinuousReminder
-from plugins.localServicePlugins.Reminder import Reminder
-from plugins.localServicePlugins.TextToSpeechConverter import TextToSpeechConverter
-from plugins.localServicePlugins.Terminal import Terminal
-from plugins.localServicePlugins.casino.Roulette import Roulette
-from plugins.restrictedAccessplugins.Muter import Muter
-from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
-from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
-from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+try:
+    from plugins.internetServicePlugins.FootballScores import FootballScores
+    from plugins.internetServicePlugins.ImageSender import ImageSender
+    from plugins.internetServicePlugins.KVV import KVV
+    from plugins.internetServicePlugins.KickTipp import KickTipp
+    from plugins.internetServicePlugins.KinoZKM import KinoZKM
+    from plugins.internetServicePlugins.Mensa import Mensa
+    from plugins.internetServicePlugins.TheTVDB import TheTVDB
+    from plugins.internetServicePlugins.Weather import Weather
+    from plugins.internetServicePlugins.XKCD import XKCD
+    from plugins.localServicePlugins.Casino import Casino
+    from plugins.localServicePlugins.ContinuousReminder import ContinuousReminder
+    from plugins.localServicePlugins.Reminder import Reminder
+    from plugins.localServicePlugins.TextToSpeechConverter import TextToSpeechConverter
+    from plugins.localServicePlugins.Terminal import Terminal
+    from plugins.localServicePlugins.casino.Roulette import Roulette
+    from plugins.restrictedAccessPlugins.Muter import Muter
+    from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
+    from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
+    from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+except ImportError:
+    from whatsbot.plugins.internetServicePlugins.FootballScores import FootballScores
+    from whatsbot.plugins.internetServicePlugins.ImageSender import ImageSender
+    from whatsbot.plugins.internetServicePlugins.KVV import KVV
+    from whatsbot.plugins.internetServicePlugins.KickTipp import KickTipp
+    from whatsbot.plugins.internetServicePlugins.KinoZKM import KinoZKM
+    from whatsbot.plugins.internetServicePlugins.Mensa import Mensa
+    from whatsbot.plugins.internetServicePlugins.TheTVDB import TheTVDB
+    from whatsbot.plugins.internetServicePlugins.Weather import Weather
+    from whatsbot.plugins.internetServicePlugins.XKCD import XKCD
+    from whatsbot.plugins.localServicePlugins.Casino import Casino
+    from whatsbot.plugins.localServicePlugins.ContinuousReminder import ContinuousReminder
+    from whatsbot.plugins.localServicePlugins.Reminder import Reminder
+    from whatsbot.plugins.localServicePlugins.TextToSpeechConverter import TextToSpeechConverter
+    from whatsbot.plugins.localServicePlugins.Terminal import Terminal
+    from whatsbot.plugins.localServicePlugins.casino.Roulette import Roulette
+    from whatsbot.plugins.restrictedAccessPlugins.Muter import Muter
+    from whatsbot.plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
+    from whatsbot.plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
+    from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class PluginManager(object):

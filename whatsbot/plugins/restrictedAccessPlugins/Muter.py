@@ -21,9 +21,14 @@ This file is part of whatsbot.
     along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from plugins.GenericPlugin import GenericPlugin
-from utils.contacts.AddressBook import AddressBook
-from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+try:
+    from plugins.GenericPlugin import GenericPlugin
+    from utils.contacts.AddressBook import AddressBook
+    from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+except ImportError:
+    from whatsbot.plugins.GenericPlugin import GenericPlugin
+    from whatsbot.utils.contacts.AddressBook import AddressBook
+    from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Muter(GenericPlugin):

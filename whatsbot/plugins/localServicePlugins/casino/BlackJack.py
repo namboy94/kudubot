@@ -26,8 +26,12 @@ import os
 import random
 import datetime
 
-from plugins.localServicePlugins.Casino import Casino
-from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+try:
+    from plugins.localServicePlugins.Casino import Casino
+    from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+except ImportError:
+    from whatsbot.plugins.localServicePlugins.Casino import Casino
+    from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class BlackJack(Casino):

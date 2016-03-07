@@ -23,7 +23,11 @@ This file is part of whatsbot.
 
 import os
 import re
-from plugins.GenericPlugin import GenericPlugin
+
+try:
+    from plugins.GenericPlugin import GenericPlugin
+except ImportError:
+    from whatsbot.plugins.GenericPlugin import GenericPlugin
 
 
 class TextToSpeechConverter(GenericPlugin):

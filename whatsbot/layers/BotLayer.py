@@ -33,17 +33,30 @@ from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtoco
 from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 
-from plugins.PluginManager import PluginManager
-from startup.config.PluginConfigParser import PluginConfigParser
-from utils.contacts.AddressBook import AddressBook
-from utils.logging.LogWriter import LogWriter
-from yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
-from yowsupwrapper.entities.WrappedImageDownloadableMediaMessageProtocolEntity import \
-    WrappedImageDownloadableMediaMessageProtocolEntity
-from yowsupwrapper.entities.EntityAdapter import EntityAdapter
-from yowsupwrapper.entities.WrappedAudioDownloadableMediaMessageProtocolEntity import \
-    WrappedAudioDownloadableMediaMessageProtocolEntity
-from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+try:
+    from plugins.PluginManager import PluginManager
+    from startup.config.PluginConfigParser import PluginConfigParser
+    from utils.contacts.AddressBook import AddressBook
+    from utils.logging.LogWriter import LogWriter
+    from yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
+    from yowsupwrapper.entities.WrappedImageDownloadableMediaMessageProtocolEntity import \
+        WrappedImageDownloadableMediaMessageProtocolEntity
+    from yowsupwrapper.entities.EntityAdapter import EntityAdapter
+    from yowsupwrapper.entities.WrappedAudioDownloadableMediaMessageProtocolEntity import \
+        WrappedAudioDownloadableMediaMessageProtocolEntity
+    from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+except ImportError:
+    from whatsbot.plugins.PluginManager import PluginManager
+    from whatsbot.startup.config.PluginConfigParser import PluginConfigParser
+    from whatsbot.utils.contacts.AddressBook import AddressBook
+    from whatsbot.utils.logging.LogWriter import LogWriter
+    from whatsbot.yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
+    from whatsbot.yowsupwrapper.entities.WrappedImageDownloadableMediaMessageProtocolEntity import \
+        WrappedImageDownloadableMediaMessageProtocolEntity
+    from whatsbot.yowsupwrapper.entities.EntityAdapter import EntityAdapter
+    from whatsbot.yowsupwrapper.entities.WrappedAudioDownloadableMediaMessageProtocolEntity import \
+        WrappedAudioDownloadableMediaMessageProtocolEntity
+    from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class BotLayer(WrappedYowInterfaceLayer):

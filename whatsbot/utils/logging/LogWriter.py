@@ -24,7 +24,11 @@ This file is part of whatsbot.
 import os
 import time
 import re
-from utils.contacts.AddressBook import AddressBook
+
+try:
+    from utils.contacts.AddressBook import AddressBook
+except ImportError:
+    from whatsbot.utils.contacts.AddressBook import AddressBook
 
 
 class LogWriter(object):
