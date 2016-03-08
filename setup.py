@@ -35,7 +35,7 @@ def readme():
 
 
 setup(name='whatsbot',
-      version='0.2.1',
+      version='0.2.2',
       description='An automated Whatsapp bot',
       long_description=readme(),
       classifiers=['Development Status :: 2 - Pre-Alpha',
@@ -71,7 +71,8 @@ setup(name='whatsbot',
       install_requires=['tvdb_api',
                         'yowsup2',
                         'beautifulsoup4',
-                        'pillow', 'pywapi'],
+                        'pillow',
+                        'pywapi'],
       test_suite='nose.collector',
       tests_require=['nose'],
       scripts=['bin/whatsbot',

@@ -109,18 +109,11 @@ class BotLayer(WrappedYowInterfaceLayer):
             trace = traceback.format_exc()
             exception = WrappedTextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n",
                                                          to=message_protocol_entity.get_from())
-            exception_image = os.getenv("HOME") + "/.whatsbot/images/exception.jpg"
             if not self.muted:
                 LogWriter.write_event_log("exep", exception)
-                LogWriter.write_event_log("imgs", WrappedTextMessageProtocolEntity(
-                    exception_image + " --- " + exception.get_body(), to=message_protocol_entity.get_from(False)))
-                self.send_image(message_protocol_entity.get_from(False), exception_image, exception.get_body())
+                self.to_lower(exception)
             else:
                 LogWriter.write_event_log("e(m)", exception)
-                LogWriter.write_event_log("i(m)",
-                                          WrappedTextMessageProtocolEntity(exception_image + " --- " +
-                                                                           exception.get_body(),
-                                                                           to=message_protocol_entity.get_from()))
 
     def plugin_manager_setup(self):
         """
