@@ -74,6 +74,7 @@ class Weather(GenericPlugin):
         Parses the user input
         :return: void
         """
+        self.message = self.message.split("/", 1)[1]
         trimmed_input = self.message.split(":")
         args = []
         if len(trimmed_input) > 1:
@@ -93,6 +94,8 @@ class Weather(GenericPlugin):
 
         try:
             city_string = self.message.split(" ", 1)[1]
+        except IndexError:
+            city_string = "karlsruhe"
         except NameError:
             city_string = "karlsruhe"
 
@@ -172,7 +175,7 @@ class Weather(GenericPlugin):
         elif self.country and not self.province:
             search = pywapi.get_loc_id_from_weather_com(self.city)
             for result in search:
-                if search[result][1].split(", ")[2].lower() == self.country:
+                if self.country == "usa" or search[result][1].split(", ")[2].lower() == self.country:
                     return search[result]
             raise NameError("City not Found")
         elif self.country and self.province:
@@ -181,7 +184,7 @@ class Weather(GenericPlugin):
                 if result == "count":
                     break
                 if search[result][1].split(", ")[1].lower() == self.province and \
-                        (search[result][1].split(", ")[2].lower() == self.country or self.country == "usa"):
+                        (self.country == "usa" or search[result][1].split(", ")[2].lower() == self.country):
                     return search[result]
             raise NameError("City not Found")
 
