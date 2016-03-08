@@ -24,7 +24,7 @@ clone:
     - cd
     - git clone http://gitlab.namibsun.net/namboy94/whatsapp-bot.git
 
-upload_to_pypi
+upload_to_pypi:
   stage: upload
   script:
     - cd
@@ -32,7 +32,7 @@ upload_to_pypi
     - python setup.py register sdist upload
     - sleep 60
 
-upgrade_from_pypi
+upgrade_from_pypi:
   stage: upgrade
   script:
     - sudo pip3.5 install whatsbot --upgrade
