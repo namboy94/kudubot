@@ -54,6 +54,8 @@ class Installer(object):
                 return False
             if not os.path.isdir(homedir + "/.whatsbot/casino/roulette"):
                 return False
+            if not os.path.isdir(homedir + "/.whatsbot/plugins"):
+                return False
             if not os.path.isfile(homedir + "/.whatsbot/config"):
                 return False
             if not os.path.isfile(homedir + "/.whatsbot/creds"):
@@ -77,6 +79,8 @@ class Installer(object):
             whatsapp_bot_dir = homedir + "/.whatsbot"
             if not os.path.isdir(whatsapp_bot_dir):
                 Popen(["mkdir", whatsapp_bot_dir]).wait()
+            if not os.path.isdir(whatsapp_bot_dir + "/plugins"):
+                Popen(["mkdir", whatsapp_bot_dir + "/plugins"]).wait()
             if not os.path.isdir(whatsapp_bot_dir + "/logs"):
                 Popen(["mkdir", "-p", whatsapp_bot_dir + "/logs/exceptions"]).wait()
                 Popen(["mkdir", "-p", whatsapp_bot_dir + "/logs/users"]).wait()

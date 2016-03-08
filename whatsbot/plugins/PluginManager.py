@@ -23,6 +23,7 @@ This file is part of whatsbot.
 
 # imports
 from threading import Thread
+
 try:
     from plugins.internetServicePlugins.FootballScores import FootballScores
     from plugins.internetServicePlugins.ImageSender import ImageSender
@@ -40,9 +41,11 @@ try:
     from plugins.localServicePlugins.Terminal import Terminal
     from plugins.localServicePlugins.casino.Roulette import Roulette
     from plugins.restrictedAccessPlugins.Muter import Muter
+    from plugins.restrictedAccessPlugins.PluginSelector import PluginSelector
     from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
     from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
     from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+    from startup.config.PluginConfigParser import PluginConfigParser
 except ImportError:
     from whatsbot.plugins.internetServicePlugins.FootballScores import FootballScores
     from whatsbot.plugins.internetServicePlugins.ImageSender import ImageSender
@@ -60,9 +63,11 @@ except ImportError:
     from whatsbot.plugins.localServicePlugins.Terminal import Terminal
     from whatsbot.plugins.localServicePlugins.casino.Roulette import Roulette
     from whatsbot.plugins.restrictedAccessPlugins.Muter import Muter
+    from whatsbot.plugins.restrictedAccessPlugins.PluginSelector import PluginSelector
     from whatsbot.plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
     from whatsbot.plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
+    from whatsbot.startup.config.PluginConfigParser import PluginConfigParser
 
 
 class PluginManager(object):
@@ -78,25 +83,27 @@ class PluginManager(object):
         :return: void
         """
         self.layer = layer
-        self.plugins = {"Weather Plugin": True,
-                        "TVDB Plugin": True,
-                        "Reminder Plugin": True,
-                        "Mensa Plugin": True,
-                        "Football Scores Plugin": True,
-                        "KVV Plugin": True,
-                        "Simple Contains Plugin": True,
-                        "Simple Equals Plugin": True,
-                        "Muter Plugin": True,
-                        "KinoZKM Plugin": True,
-                        "Terminal Plugin": True,
-                        "Kicktipp Plugin": True,
-                        "XKCD Plugin": True,
-                        "ImageSender Plugin": True,
-                        "Casino Plugin": True,
-                        "Continuous Reminder Plugin": True,
-                        "Text To Speech Plugin": True,
-                        "Roulette Plugin": True}
+        expected_plugins = ["Weather Plugin",
+                            "TVDB Plugin",
+                            "Reminder Plugin",
+                            "Mensa Plugin",
+                            "Football Scores Plugin",
+                            "KVV Plugin",
+                            "Simple Contains Plugin",
+                            "Simple Equals Plugin",
+                            "Muter Plugin",
+                            "KinoZKM Plugin",
+                            "Terminal Plugin",
+                            "Kicktipp Plugin",
+                            "XKCD Plugin",
+                            "ImageSender Plugin",
+                            "Casino Plugin",
+                            "Continuous Reminder Plugin",
+                            "Text To Speech Plugin",
+                            "Roulette Plugin",
+                            "Plugin Selector Plugin"]
         # ADD NEW PLUGINS HERE
+        self.plugins = PluginConfigParser().read_all_plugin_configs(expected_plugins)
 
     def run_plugins(self, message_protocol_entity):
         """
@@ -104,46 +111,53 @@ class PluginManager(object):
         :param message_protocol_entity: the incoming message protocol entity
         :return: void
         """
-
         if message_protocol_entity is None:
             raise Exception("Wrong initialization")
 
+        sender = message_protocol_entity.get_from(False)
+        try:
+            plugin_dict = self.plugins[sender]
+        except KeyError:
+            plugin_dict = self.plugins["global"]
+
         plugins = []
-        if self.plugins["Weather Plugin"]:
+        if plugin_dict["Weather Plugin"]:
             plugins.append(Weather(self.layer, message_protocol_entity))
-        if self.plugins["TVDB Plugin"]:
+        if plugin_dict["TVDB Plugin"]:
             plugins.append(TheTVDB(self.layer, message_protocol_entity))
-        if self.plugins["Reminder Plugin"]:
+        if plugin_dict["Reminder Plugin"]:
             plugins.append(Reminder(self.layer, message_protocol_entity))
-        if self.plugins["Mensa Plugin"]:
+        if plugin_dict["Mensa Plugin"]:
             plugins.append(Mensa(self.layer, message_protocol_entity))
-        if self.plugins["Football Scores Plugin"]:
+        if plugin_dict["Football Scores Plugin"]:
             plugins.append(FootballScores(self.layer, message_protocol_entity))
-        if self.plugins["KVV Plugin"]:
+        if plugin_dict["KVV Plugin"]:
             plugins.append(KVV(self.layer, message_protocol_entity))
-        if self.plugins["Simple Contains Plugin"]:
+        if plugin_dict["Simple Contains Plugin"]:
             plugins.append(SimpleContainsResponse(self.layer, message_protocol_entity))
-        if self.plugins["Simple Equals Plugin"]:
+        if plugin_dict["Simple Equals Plugin"]:
             plugins.append(SimpleEqualsResponse(self.layer, message_protocol_entity))
-        if self.plugins["Muter Plugin"]:
+        if plugin_dict["Muter Plugin"]:
             plugins.append(Muter(self.layer, message_protocol_entity))
-        if self.plugins["KinoZKM Plugin"]:
+        if plugin_dict["Plugin Selector Plugin"]:
+            plugins.append(PluginSelector(self.layer, message_protocol_entity))
+        if plugin_dict["KinoZKM Plugin"]:
             plugins.append(KinoZKM(self.layer, message_protocol_entity))
-        if self.plugins["Terminal Plugin"]:
+        if plugin_dict["Terminal Plugin"]:
             plugins.append(Terminal(self.layer, message_protocol_entity))
-        if self.plugins["Kicktipp Plugin"]:
+        if plugin_dict["Kicktipp Plugin"]:
             plugins.append(KickTipp(self.layer, message_protocol_entity))
-        if self.plugins["XKCD Plugin"]:
+        if plugin_dict["XKCD Plugin"]:
             plugins.append(XKCD(self.layer, message_protocol_entity))
-        if self.plugins["ImageSender Plugin"]:
+        if plugin_dict["ImageSender Plugin"]:
             plugins.append(ImageSender(self.layer, message_protocol_entity))
-        if self.plugins["Casino Plugin"]:
+        if plugin_dict["Casino Plugin"]:
             plugins.append(Casino(self.layer, message_protocol_entity))
-        if self.plugins["Roulette Plugin"]:
+        if plugin_dict["Roulette Plugin"]:
             plugins.append(Roulette(self.layer, message_protocol_entity))
-        if self.plugins["Continuous Reminder Plugin"]:
+        if plugin_dict["Continuous Reminder Plugin"]:
             plugins.append(ContinuousReminder(self.layer, message_protocol_entity))
-        if self.plugins["Text To Speech Plugin"]:
+        if plugin_dict["Text To Speech Plugin"]:
             plugins.append(TextToSpeechConverter(self.layer, message_protocol_entity))
         # ADD NEW PLUGINS HERE
 
@@ -197,3 +211,25 @@ class PluginManager(object):
         :return: void
         """
         self.plugins = plugin_dictionary
+
+    def set_plugin_state(self, sender, plugin, state):
+        """
+        Activates a plugin
+        :param sender: the group/user for which to activate the plugin
+        :param plugin: the plugin to be activated
+        :param state: The state in which the plugin should be put
+        :return: True, if all went well, False if plugin could not be found
+        """
+        try:
+            plugin_dict = self.plugins[sender]
+        except KeyError:
+            self.plugins[sender] = self.plugins["global"]
+            plugin_dict = self.plugins[sender]
+
+        try:
+            str(plugin_dict[plugin])
+            plugin_dict[plugin] = state
+            PluginConfigParser().write_plugins(plugin_dict, sender)
+            return True
+        except KeyError:
+            return False

@@ -53,10 +53,14 @@ class GenericPlugin(object):
         self.message = self.entity.get_body().lower()
         self.cap_message = self.entity.get_body()
         self.sender = self.entity.get_from()
+        self.sender_plain = self.entity.get_from(False)
         self.notify = self.entity.get_notify()
         self.participant = self.entity.get_participant()
         if not self.participant:
             self.participant = self.sender
+            self.participant_plain = self.sender_plain
+        else:
+            self.participant_plain = self.entity.get_participant(False)
 
     def regex_check(self):
         """

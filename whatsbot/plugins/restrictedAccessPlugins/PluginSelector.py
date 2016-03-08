@@ -21,6 +21,8 @@ This file is part of whatsbot.
     along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import re
+
 try:
     from plugins.GenericPlugin import GenericPlugin
     from utils.contacts.AddressBook import AddressBook
@@ -31,9 +33,9 @@ except ImportError:
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
-class Muter(GenericPlugin):
+class PluginSelector(GenericPlugin):
     """
-    The Muter Class
+    The PluginSelector Class
     """
 
     def __init__(self, layer, message_protocol_entity=None):
@@ -46,16 +48,14 @@ class Muter(GenericPlugin):
         """
         super().__init__(layer, message_protocol_entity)
         self.authenticated = False
+        self.response = ""
 
     def regex_check(self):
         """
         Checks if the user input is valid for this plugin to continue
         :return: True if input is valid, False otherwise
         """
-        if self.message in ["/unmute", "/mute"]:
-            return True
-        else:
-            return False
+        return re.search(r"^/plugin (activate|deactivate) ([0-9]+|[a-zA-Z]+)$", self.message)
 
     def parse_user_input(self):
         """
@@ -66,23 +66,30 @@ class Muter(GenericPlugin):
             self.sender_plain) or AddressBook().is_authenticated(self.participant_plain)
 
         if self.authenticated:
-            if self.message == "/unmute":
-                self.layer.muted = False
-            elif self.message == "/mute":
-                self.layer.muted = True
+            if self.message.startswith("/plugin activate"):
+                success = self.layer.plugin_manager.set_plugin_state(self.sender,
+                                                                     self.message.split("/plugin activate ")[1],
+                                                                     True)
+                if success:
+                    self.response = "Plugin " + self.message.split("/plugin activate ")[1] + " activated"
+                else:
+                    self.response = "Plugin " + self.message.split("/plugin activate ")[1] + " does not exist"
+
+            elif self.message.startswith("/plugin deactivate"):
+                success = self.layer.plugin_manager.set_plugin_state(self.sender,
+                                                                     self.message.split("/plugin deactivate ")[1],
+                                                                     False)
+                if success:
+                    self.response = "Plugin " + self.message.split("/plugin deactivate ")[1] + " deactivated"
+                else:
+                    self.response = "Plugin " + self.message.split("/plugin deactivate ")[1] + " does not exist"
 
     def get_response(self):
         """
         Returns the response calculated by the plugin
         :return: the response as a WrappedTextMessageProtocolEntity
         """
-        if self.layer.muted:
-            message_protocol_entity = WrappedTextMessageProtocolEntity("🤐", to=self.sender)
-            self.send_message(message_protocol_entity)
-            return message_protocol_entity
-
-        else:
-            return WrappedTextMessageProtocolEntity("😄", to=self.sender)
+        return WrappedTextMessageProtocolEntity(body=self.response, to=self.sender)
 
     @staticmethod
     def get_description(language):
@@ -92,10 +99,12 @@ class Muter(GenericPlugin):
         :return: the description as string
         """
         if language == "en":
-            return "/mute\tmutes the whatsbot (admin)\n" \
-                   "/unmute\tunmutes the whatsbot (admin)\n"
+            return "/plugin\tallows activation/deactivation of plugins (admin)\n" \
+                   "/plugin activate <plugin|plugin-index>\tactivates a plugin\n" \
+                   "/plugin deactivate <plugin|plugin-index>\tdeactivates a plugin\n"
         elif language == "de":
-            return "/mute\tStellt den Bot auf lautlos (admin)\n" \
-                   "/unmute\tHolt den Bot wieder aus dem Lautlosmodus aus (admin)\n"
+            return "/plugin\tErmöglicht das Aktivieren/Deaktivieren von plugins (admin)\n" \
+                   "/plugin activate <plugin|plugin-index>\tAktiviert ein plugin\n" \
+                   "/plugin deactivate <plugin|plugin-index>\tDeaktiviert ein plugin\n"
         else:
             return "Help not available in this language"

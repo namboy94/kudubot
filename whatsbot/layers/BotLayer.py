@@ -129,10 +129,9 @@ class BotLayer(WrappedYowInterfaceLayer):
         """
         if self.plugin_manager is None:
             self.plugin_manager = PluginManager(self)
-            self.plugin_manager.set_plugins(PluginConfigParser().read_plugins())
             if not self.parallel_running:
                 print("Starting Parallel Threads")
-                PluginManager(self).start_parallel_runs()
+                self.plugin_manager.start_parallel_runs()
                 self.parallel_running = True
 
     # YOWSUP SPECIFIC METHODS
