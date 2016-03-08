@@ -1,23 +1,18 @@
 stages:
-  - build
+  - clean
   - get
-  - beforedeploy
+  - upload
+  - upgrade
   - deploy
 
 kill_whatsbot:
-  stage: build
+  stage: clean
   script:
     - killall whatsbot
   allow_failure: true
 
-kill_python:
-  stage: build
-  script:
-    - killall python
-  allow_failure: true
-
 delete_old:
-  stage: build
+  stage: clean
   script:
     - cd
     - rm -rf whatsapp-bot
@@ -28,21 +23,24 @@ clone:
   script:
     - cd
     - git clone http://gitlab.namibsun.net/namboy94/whatsapp-bot.git
-    - python whatsapp-bot/whatsbot/main.py -i
 
-write_script:
-  stage: beforedeploy
+upload_to_pypi
+  stage: upload
   script:
     - cd
-    - touch runner
-    - echo "while true" >> runner
-    - echo "do" >> runner
-    - echo "python $HOME/whatsapp-bot/whatsbot/main.py" >> runner
-    - echo "done" >> runner
+    - cd whatsapp-bot
+    - python setup.py register sdist upload
+    - sleep 60
+
+upgrade_from_pypi
+  stage: upgrade
+  script:
+    - sudo pip3.5 install whatsbot --upgrade
+    - sleep 5
 
 startbot:
   stage: deploy
   script:
     - cd
-    - bash runner&
+    - whatsbot&
     - exit 0
