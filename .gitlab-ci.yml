@@ -11,6 +11,12 @@ kill_whatsbot:
     - killall whatsbot
   allow_failure: true
 
+kill_whatsbot_instance:
+  stage: clean
+  script:
+    - killall whatsbot-instance
+  allow_failure: true
+
 delete_old:
   stage: clean
   script:
@@ -42,5 +48,6 @@ upgrade_from_pypi:
 startbot:
   stage: deploy
   script:
-    - whatsbot&
+    - whatsbot &
+    - disown
     - exit 0
