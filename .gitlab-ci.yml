@@ -48,6 +48,5 @@ upgrade_from_pypi:
 startbot:
   stage: deploy
   script:
-    - whatsbot &
-    - disown
+    - nohup whatsbot &
     - exit 0
