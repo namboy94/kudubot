@@ -82,7 +82,7 @@ class Installer(object):
             if not os.path.isdir(whatsapp_bot_dir):
                 Popen(["mkdir", whatsapp_bot_dir]).wait()
             if not os.path.isdir(whatsapp_bot_dir + "/resources/images"):
-                Popen(["mkdir", whatsapp_bot_dir + "/resources/images"]).wait()
+                Popen(["mkdir", "-p", whatsapp_bot_dir + "/resources/images"]).wait()
                 Popen(["wget",
                        "http://gitlab.namibsun.net/namboy94/whatsapp-bot/raw/master/res/images/divby0.jpg",
                        "-O", whatsapp_bot_dir + "/resources/images/divby0.jpg"]).wait()
