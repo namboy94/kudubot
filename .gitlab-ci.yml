@@ -19,18 +19,21 @@ kill_python:
 delete_old:
   stage: build
   script:
+    - cd
     - rm -rf whatsapp-bot
   allow_failure: true
 
 clone:
   stage: get
   script:
+    - cd
     - git clone http://gitlab.namibsun.net/namboy94/whatsapp-bot.git
     - python whatsapp-bot/whatsbot/main.py -i
 
 write_script:
   stage: deploy
   script:
+    - cd
     - touch runner
     - echo "while true" >> runner
     - echo "do" >> runner
@@ -40,4 +43,5 @@ write_script:
 startbot:
   stage: run
   script:
+    - cd
     - bash runner&
