@@ -1,5 +1,6 @@
 stages:
   - build
+  - get
   - deploy
   - run
 
@@ -22,7 +23,7 @@ delete_old:
   allow_failure: true
 
 clone:
-  stage: deploy
+  stage: get
   script:
     - git clone http://gitlab.namibsun.net/namboy94/whatsapp-bot.git
     - python whatsapp-bot/whatsbot/main.py -i
