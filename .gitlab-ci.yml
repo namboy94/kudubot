@@ -34,10 +34,10 @@ write_script:
     - touch runner
     - echo "while true" >> runner
     - echo "do" >> runner
-    - echo "$HOME/whatsapp-bot/whatsbot/main.py" >> runner
+    - echo "python $HOME/whatsapp-bot/whatsbot/main.py" >> runner
     - echo "done" >> runner
 
 startbot:
   stage: run
   script:
-    - runner&
+    - bash runner&
