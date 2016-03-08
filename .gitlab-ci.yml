@@ -31,13 +31,13 @@ clone:
 write_script:
   stage: deploy
   script:
-    - touch whatsapp-bot/runner
-    - echo "while true" >> whatsapp-bot/runner
-    - echo "do" >> whatsapp-bot/runner
-    - echo "$HOME/whatsapp-bot/whatsbot/main.py" >> whatsapp-bot/runner
-    - echo "done" >> whatsapp-bot/runner
+    - touch runner
+    - echo "while true" >> runner
+    - echo "do" >> runner
+    - echo "$HOME/whatsapp-bot/whatsbot/main.py" >> runner
+    - echo "done" >> runner
 
 startbot:
   stage: run
   script:
-    - whatsapp-bot/runner&
+    - runner&

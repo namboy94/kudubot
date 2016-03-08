@@ -80,7 +80,7 @@ def main():
         Installer.install()
         print("Program was installed. Now use --register to register your phone number")
         sys.exit(0)
-    if not args.install:
+    if args.install:
         print("Program already installed")
         sys.exit(0)
 
