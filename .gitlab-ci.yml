@@ -3,18 +3,29 @@ stages:
   - test
   - deploy
 
-cleanup:
+kill_whatsbot:
   stage: build
   script:
     - killall whatsbot
+  allow_failure: true
+
+kill_python:
+  stage: build
+  script:
     - killall python
+  allow_failure: true
+
+delete_old:
+  stage: build
+  script:
+    - rm -rf whatsapp-bot
+  allow_failure: true
 
 clone:
   stage: test
   script:
-    - rm -rf whatsapp-bot
     - git clone git@gitlab.namibsun.net:namboy94/whatsapp-bot.git
-    - python whatsapp-bot/bin/whatsbot-instance
+    - python whatsapp-bot/bin/whatsbot-instance -i
 
 startbot:
   stage: deploy
