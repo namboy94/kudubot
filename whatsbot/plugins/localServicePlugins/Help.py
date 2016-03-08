@@ -98,7 +98,7 @@ class Help(GenericPlugin):
                     if plugin.get_plugin_name() == identifier:
                         self.response = plugin.get_description(self.lang)
                         return
-            self.response = ""
+            self.response = "Sorry, not plugin " + identifier + " found"
 
     def get_response(self):
         """

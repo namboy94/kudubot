@@ -91,8 +91,11 @@ class BotLayer(WrappedYowInterfaceLayer):
             return
         if AddressBook().is_black_listed(message_protocol_entity.get_from(False)):
             return
-        if AddressBook().is_black_listed(message_protocol_entity.get_participant()):
-            return
+        try:
+            if AddressBook().is_black_listed(message_protocol_entity.get_participant(False)):
+                return
+        except Exception as e:
+            str(e)
 
         try:
             LogWriter.write_event_log("recv", message_protocol_entity)
