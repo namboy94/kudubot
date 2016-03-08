@@ -163,7 +163,7 @@ class Roulette(Casino):
             else:
                 return WrappedTextMessageProtocolEntity("Sorry.", to=self.sender)
         elif self.mode == "board":
-            roulette_image = os.getenv("HOME") + "/.whatsbot/images/roulette/table.jpg"
+            roulette_image = "../res/images/roulette/table.jpg"
             self.send_image(self.sender, roulette_image, "")
             return None
         elif self.mode == "cancel":

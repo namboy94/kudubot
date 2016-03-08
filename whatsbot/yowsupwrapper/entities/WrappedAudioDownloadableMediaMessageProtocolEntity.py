@@ -32,7 +32,7 @@ except ImportError:
 
 class WrappedAudioDownloadableMediaMessageProtocolEntity(EntityAdapter):
     """
-
+    Wrapper around the Audio Entity
     """
 
     @staticmethod
@@ -45,4 +45,4 @@ class WrappedAudioDownloadableMediaMessageProtocolEntity(EntityAdapter):
         :param to:
         :return:
         """
-        super().__init__(AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to))
+        return EntityAdapter(AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to))

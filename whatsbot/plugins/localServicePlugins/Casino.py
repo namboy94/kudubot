@@ -136,11 +136,11 @@ class Casino(GenericPlugin):
         :param message_entity: a messageEntity sent from the user
         :return: void
         """
-        user_id = message_entity.getParticipant()
+        user_id = message_entity.get_participant()
         if not user_id:
-            user_id = message_entity.getFrom(False)
+            user_id = message_entity.get_from(False)
         user_id = user_id.split("@")[0]
-        user_nick = message_entity.getNotify()
+        user_nick = message_entity.get_notify()
         user_file = self.user_dir + user_id
 
         if not os.path.isfile(user_file):

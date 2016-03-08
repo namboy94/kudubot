@@ -107,7 +107,10 @@ class BotLayer(WrappedYowInterfaceLayer):
 
         except Exception as e:
             trace = traceback.format_exc()
-            exception = WrappedTextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n",
+            message = "Please consider opening an issue detailing how this exception came to be at " \
+                      "gitlab.namibsun.net/namboy94/whatsapp-bot." \
+                      " If you could also copy and past the stackrace, that would be great."
+            exception = WrappedTextMessageProtocolEntity("Exception: " + str(e) + "\n" + trace + "\n\n" + message,
                                                          to=message_protocol_entity.get_from())
             if not self.muted:
                 LogWriter.write_event_log("exep", exception)

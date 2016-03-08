@@ -46,7 +46,7 @@ class WrappedImageDownloadableMediaMessageProtocolEntity(EntityAdapter):
         :return:
         """
         if caption is None:
-            super().__init__(ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to))
+            return EntityAdapter(ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to))
         else:
-            super().__init__(ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to,
-                                                                                      caption=caption))
+            return EntityAdapter(ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to,
+                                                                                          caption=caption))
