@@ -83,6 +83,8 @@ class PluginSelector(GenericPlugin):
                     self.response = "Plugin " + self.cap_message.split("/plugin deactivate ")[1] + " deactivated"
                 else:
                     self.response = "Plugin " + self.cap_message.split("/plugin deactivate ")[1] + " does not exist"
+        else:
+            self.response = "Sorry, I can't let you do that."
 
     def get_response(self):
         """
