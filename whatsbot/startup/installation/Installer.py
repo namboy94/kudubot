@@ -62,6 +62,8 @@ class Installer(object):
                 return False
             if not os.path.isfile(homedir + "/.whatsbot/creds"):
                 return False
+            if not os.path.isfile(homedir + "/.whatsbot/emailcreds"):
+                return False
             if not os.path.isfile(homedir + "/.whatsbot/contacts"):
                 return False
             return True
@@ -102,6 +104,10 @@ class Installer(object):
             if not os.path.isfile(whatsapp_bot_dir + "/creds"):
                 file = open(whatsapp_bot_dir + "/creds", "w")
                 file.write("number=\npassword=")
+                file.close()
+            if not os.path.isfile(whatsapp_bot_dir + "/emailcreds"):
+                file = open(whatsapp_bot_dir + "/emailcreds", "w")
+                file.write("server=\nport=\nadress=\npassword=")
                 file.close()
             if not os.path.isfile(whatsapp_bot_dir + "/contacts"):
                 file = open(whatsapp_bot_dir + "/contacts", "w")

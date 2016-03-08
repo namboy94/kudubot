@@ -82,7 +82,8 @@ def main():
 
     try:
         credentials = ConfigParser.parse_credentials()
-    except EOFError:
+    except EOFError or Exception as e:
+        str(e)
         if args.register:
             number = input("Enter your number including the country code")
             cc = input("Enter your country code")

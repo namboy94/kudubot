@@ -35,10 +35,10 @@ def readme():
 
 
 setup(name='whatsbot',
-      version='0.2.7',
+      version='0.3',
       description='An automated Whatsapp bot',
       long_description=readme(),
-      classifiers=['Development Status :: 2 - Pre-Alpha',
+      classifiers=['Development Status :: 3 - Alpha',
                    'Intended Audience :: End Users/Desktop',
                    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
                    'Programming Language :: Python :: 3',

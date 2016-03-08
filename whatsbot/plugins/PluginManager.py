@@ -34,6 +34,7 @@ try:
     from plugins.internetServicePlugins.TheTVDB import TheTVDB
     from plugins.internetServicePlugins.Weather import Weather
     from plugins.internetServicePlugins.XKCD import XKCD
+    from plugins.internetServicePlugins.EmailSender import EmailSender
     from plugins.localServicePlugins.Casino import Casino
     from plugins.localServicePlugins.ContinuousReminder import ContinuousReminder
     from plugins.localServicePlugins.Reminder import Reminder
@@ -57,6 +58,7 @@ except ImportError:
     from whatsbot.plugins.internetServicePlugins.TheTVDB import TheTVDB
     from whatsbot.plugins.internetServicePlugins.Weather import Weather
     from whatsbot.plugins.internetServicePlugins.XKCD import XKCD
+    from whatsbot.plugins.internetServicePlugins.EmailSender import EmailSender
     from whatsbot.plugins.localServicePlugins.Casino import Casino
     from whatsbot.plugins.localServicePlugins.ContinuousReminder import ContinuousReminder
     from whatsbot.plugins.localServicePlugins.Reminder import Reminder
@@ -103,7 +105,8 @@ class PluginManager(object):
                             ContinuousReminder.get_plugin_name(),
                             TextToSpeechConverter.get_plugin_name(),
                             Roulette.get_plugin_name(),
-                            PluginSelector.get_plugin_name()]
+                            PluginSelector.get_plugin_name(),
+                            EmailSender.get_plugin_name()]
         # ADD NEW PLUGINS HERE
         self.plugins = PluginConfigParser().read_all_plugin_configs(expected_plugins)
 
@@ -161,6 +164,8 @@ class PluginManager(object):
             plugins.append(ContinuousReminder(self.layer, message_protocol_entity))
         if plugin_dict["Text To Speech Plugin"]:
             plugins.append(TextToSpeechConverter(self.layer, message_protocol_entity))
+        if plugin_dict["Email Sender Plugin"]:
+            plugins.append(EmailSender(self.layer, message_protocol_entity))
         # ADD NEW PLUGINS HERE
 
         help_plugin = Help(self.layer, plugins, message_protocol_entity)
