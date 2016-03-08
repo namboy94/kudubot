@@ -70,6 +70,7 @@ def main():
     parser.add_argument("-g", "--gui", help="starts the whatsbot with a gui to disable certain plugins",
                         action="store_true")
     parser.add_argument("-r", "--register", help="Registers a new number", action="store_true")
+    parser.add_argument("-i", "--install", help="Installs/updates the program", action="store_true")
     args = parser.parse_args()
 
     # Check if installed
@@ -78,6 +79,9 @@ def main():
     if not installed:
         Installer.install()
         print("Program was installed. Now use --register to register your phone number")
+        sys.exit(0)
+    if not args.install:
+        print("Program already installed")
         sys.exit(0)
 
     try:

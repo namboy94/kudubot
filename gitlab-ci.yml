@@ -1,0 +1,22 @@
+stages:
+  - build
+  - test
+  - deploy
+
+cleanup:
+  stage: build
+  script:
+    - killall whatsbot
+    - killall python
+
+clone:
+  stage: test
+  script:
+    - rm -rf whatsapp-bot
+    - git clone git@gitlab.namibsun.net:namboy94/whatsapp-bot.git
+    - python whatsapp-bot/bin/whatsbot-instance
+
+startbot:
+  stage: deploy
+  script:
+    - python whatsapp-bot/bin/whatsbot&
