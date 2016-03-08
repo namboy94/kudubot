@@ -1,7 +1,7 @@
 stages:
   - build
-  - test
   - deploy
+  - run
 
 kill_whatsbot:
   stage: build
@@ -22,12 +22,21 @@ delete_old:
   allow_failure: true
 
 clone:
-  stage: test
-  script:
-    - git clone git@gitlab.namibsun.net:namboy94/whatsapp-bot.git
-    - python whatsapp-bot/bin/whatsbot-instance -i
-
-startbot:
   stage: deploy
   script:
-    - python whatsapp-bot/bin/whatsbot&
+    - git clone http://gitlab.namibsun.net/namboy94/whatsapp-bot.git
+    - python whatsapp-bot/whatsbot/main.py -i
+
+write_script:
+  stage: deploy
+  script:
+    - touch whatsapp-bot/runner
+    - echo "while true" >> whatsapp-bot/runner
+    - echo "do" >> whatsapp-bot/runner
+    - echo "$HOME/whatsapp-bot/whatsbot/main.py" >> whatsapp-bot/runner
+    - echo "done" >> whatsapp-bot/runner
+
+startbot:
+  stage: run
+  script:
+    - whatsapp-bot/runner&
