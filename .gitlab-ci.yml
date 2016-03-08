@@ -1,5 +1,6 @@
 stages:
   - setup
+  - test
   - upload
   - cleanup
   - upgrade
@@ -9,6 +10,13 @@ clone:
   script:
     - cd
     - git clone http://gitlab.namibsun.net/namboy94/whatsapp-bot.git
+
+run_unit_tests:
+  stage: test
+  script:
+    - cd
+    - cd whatsapp-bot
+    - python setup.py test
 
 upload_to_pypi:
   stage: upload
