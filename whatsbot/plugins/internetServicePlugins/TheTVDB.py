@@ -103,3 +103,11 @@ class TheTVDB(GenericPlugin):
                    "syntax: /tvdb <show> s<staffel> e<episode>"
         else:
             return "Help not available in this language"
+
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "TVDB Plugin"

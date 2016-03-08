@@ -92,6 +92,14 @@ class GenericPlugin(object):
         """
         raise NotImplementedError()
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        raise NotImplementedError()
+
     def parallel_run(self):
         """
         Starts a parallel background activity if this class has one.

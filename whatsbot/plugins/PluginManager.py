@@ -44,6 +44,7 @@ try:
     from plugins.restrictedAccessPlugins.PluginSelector import PluginSelector
     from plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
     from plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
+    from plugins.localServicePlugins.Help import Help
     from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
     from startup.config.PluginConfigParser import PluginConfigParser
 except ImportError:
@@ -66,6 +67,7 @@ except ImportError:
     from whatsbot.plugins.restrictedAccessPlugins.PluginSelector import PluginSelector
     from whatsbot.plugins.simpleTextResponses.SimpleContainsResponse import SimpleContainsResponse
     from whatsbot.plugins.simpleTextResponses.SimpleEqualsResponse import SimpleEqualsResponse
+    from whatsbot.plugins.localServicePlugins.Help import Help
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
     from whatsbot.startup.config.PluginConfigParser import PluginConfigParser
 
@@ -83,25 +85,25 @@ class PluginManager(object):
         :return: void
         """
         self.layer = layer
-        expected_plugins = ["Weather Plugin",
-                            "TVDB Plugin",
-                            "Reminder Plugin",
-                            "Mensa Plugin",
-                            "Football Scores Plugin",
-                            "KVV Plugin",
-                            "Simple Contains Plugin",
-                            "Simple Equals Plugin",
-                            "Muter Plugin",
-                            "KinoZKM Plugin",
-                            "Terminal Plugin",
-                            "Kicktipp Plugin",
-                            "XKCD Plugin",
-                            "ImageSender Plugin",
-                            "Casino Plugin",
-                            "Continuous Reminder Plugin",
-                            "Text To Speech Plugin",
-                            "Roulette Plugin",
-                            "Plugin Selector Plugin"]
+        expected_plugins = [Weather.get_plugin_name(),
+                            TheTVDB.get_plugin_name(),
+                            Reminder.get_plugin_name(),
+                            Mensa.get_plugin_name(),
+                            FootballScores.get_plugin_name(),
+                            KVV.get_plugin_name(),
+                            SimpleContainsResponse.get_plugin_name(),
+                            SimpleEqualsResponse.get_plugin_name(),
+                            Muter.get_plugin_name(),
+                            KinoZKM.get_plugin_name(),
+                            Terminal.get_plugin_name(),
+                            KickTipp.get_plugin_name(),
+                            XKCD.get_plugin_name(),
+                            ImageSender.get_plugin_name(),
+                            Casino.get_plugin_name(),
+                            ContinuousReminder.get_plugin_name(),
+                            TextToSpeechConverter.get_plugin_name(),
+                            Roulette.get_plugin_name(),
+                            PluginSelector.get_plugin_name()]
         # ADD NEW PLUGINS HERE
         self.plugins = PluginConfigParser().read_all_plugin_configs(expected_plugins)
 
@@ -161,16 +163,10 @@ class PluginManager(object):
             plugins.append(TextToSpeechConverter(self.layer, message_protocol_entity))
         # ADD NEW PLUGINS HERE
 
-        if message_protocol_entity.get_body().lower() in ["/help", "/hilfe"]:
-            help_string = "/help\tDisplays this help message"
-            for plugin in plugins:
-                if not plugin.get_description("en") == "":
-                    help_string += "\n\n\n"
-                if message_protocol_entity.get_body().lower() == "/help":
-                    help_string += plugin.get_description("en")
-                elif message_protocol_entity.get_body().lower() == "/hilfe":
-                    help_string += plugin.get_description("de")
-            return WrappedTextMessageProtocolEntity(help_string, to=message_protocol_entity.get_from(True))
+        help_plugin = Help(self.layer, plugins, message_protocol_entity)
+        if help_plugin.regex_check():
+            help_plugin.parse_user_input()
+            return help_plugin.get_response()
 
         for plugin in plugins:
             if plugin.regex_check():

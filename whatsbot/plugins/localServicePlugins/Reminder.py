@@ -162,6 +162,14 @@ class Reminder(GenericPlugin):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Reminder Plugin"
+
     # Private Methods
 
     def __set_reminder_time__(self, year, month, day, hour, minute, second):

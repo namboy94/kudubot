@@ -111,6 +111,14 @@ class BlackJack(Casino):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Blackjack Plugin"
+
     def evaluate_bet(self, bet):
         """
         Evaluates a bet

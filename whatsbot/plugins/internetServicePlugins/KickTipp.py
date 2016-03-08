@@ -89,6 +89,14 @@ class KickTipp(GenericPlugin):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Kicktipp Plugin"
+
     # Local Methods
     def __get_table__(self):
         """

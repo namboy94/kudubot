@@ -207,6 +207,14 @@ class Roulette(Casino):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Roulette Plugin"
+
     def parallel_run(self, once=False):
         """
         Starts a parallel background activity if this class has one.

@@ -92,6 +92,14 @@ class KinoZKM(GenericPlugin):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "KinoZKM Plugin"
+
     # Local Methods
     @staticmethod
     def __get_all_summaries__():

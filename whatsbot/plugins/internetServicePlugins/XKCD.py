@@ -76,10 +76,18 @@ class XKCD(GenericPlugin):
         :return: the description as string
         """
         if language == "en":
-            return "/kvv\tUses Johannes bucher's whatsbot to display XKCD comics\n" \
+            return "/xkcd\tUses Johannes bucher's whatsbot to display XKCD comics\n" \
                    "syntax: /xkcd <comic_number>"
         elif language == "de":
-            return "/kvv\tBenutzt Johannes Buchers whatsbot um XKCD Comics anzuzeigen\n" \
+            return "/xkcd\tBenutzt Johannes Buchers whatsbot um XKCD Comics anzuzeigen\n" \
                    "syntax: /xkcd <comic_number>"
         else:
             return "Help not available in this language"
+
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "XKCD Plugin"

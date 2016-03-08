@@ -23,85 +23,100 @@ This file is part of whatsbot.
 
 try:
     from plugins.GenericPlugin import GenericPlugin
-    from utils.math.Randomizer import Randomizer
     from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 except ImportError:
     from whatsbot.plugins.GenericPlugin import GenericPlugin
-    from whatsbot.utils.math.Randomizer import Randomizer
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
-class SimpleEqualsResponse(GenericPlugin):
+class Help(GenericPlugin):
     """
-    The SimpleEqualsResponse Class
+    The Help Class
     """
 
-    def __init__(self, layer, message_protocol_entity=None):
+    def __init__(self, layer, plugins, message_protocol_entity=None):
         """
         Constructor
         Defines parameters for the plugin.
         :param layer: the overlying yowsup layer
+        :param plugins: The active plugins for which help messages should be shown
         :param message_protocol_entity: the received message information
         :return: void
         """
         super().__init__(layer, message_protocol_entity)
-
+        self.plugins = plugins
         self.response = ""
-        self.case_insensitive_options = [[["uptime"], ["Much too long, I'm tired"]]]
-        self.case_sensitive_options = [[["ping"], ["pong"]],
-                                       [["Ping"], ["Pong"]]]
+        self.mode = ""
+        self.lang = "en"
 
     def regex_check(self):
         """
         Checks if the user input is valid for this plugin to continue
         :return: True if input is valid, False otherwise
         """
-        for option in self.case_sensitive_options:
-            for opt in option[0]:
-                if self.cap_message == opt:
-                    return True
-        for option in self.case_insensitive_options:
-            for opt in option[0]:
-                if self.message == opt:
-                    return True
-        return False
+        if not self.message.startswith("/help") and not self.message.startswith("/hilfe"):
+            return False
+        if self.message in ["/help", "/hilfe"]:
+            self.mode = "all"
+        else:
+            try:
+                self.mode = self.cap_message.split("/help ")[1]
+            except IndexError:
+                self.mode = self.cap_message.split("/hilfe ")[1]
+                self.lang = "de"
+        return True
 
     def parse_user_input(self):
         """
         Parses the user's input
         :return: void
         """
-        for option in self.case_sensitive_options:
-            for opt in option[0]:
-                if self.message == opt:
-                    self.response = Randomizer.get_random_element(option[1])
-                    return
-        for option in self.case_insensitive_options:
-            for opt in option[0]:
-                if self.message == opt:
-                    self.response = Randomizer.get_random_element(option[1])
-                    return
+        self.response = "Plugins\n\n"
+        indexed_plugins = {}
+        counter = 0
+        for plugin in self.plugins:
+            self.response += str(counter) + ": " + plugin.get_plugin_name() + "\n"
+            indexed_plugins[counter] = plugin
+            counter += 1
+
+        if self.lang == "en":
+            self.response += "\nFor detailed instructions, enter \n/help <plugin-name> \nor \n/help <plugin-index>"
+        elif self.lang == "de":
+            self.response += "\nFür detailierte Anweisungen, geb \n/hilfe <plugin-name> \noder" \
+                                 " \n/hilfe <plugin-index> ein"
+
+        if self.mode != "all":
+            identifier = ""
+            if self.lang == "en":
+                identifier = self.cap_message.split("/help ")[1]
+            elif self.lang == "de":
+                identifier = self.cap_message.split("/hilfe ")[1]
+            try:
+                self.response = indexed_plugins[int(identifier)].get_description(self.lang)
+            except ValueError or KeyError:
+                for plugin in self.plugins:
+                    if plugin.get_plugin_name() == identifier:
+                        self.response = plugin.get_description(self.lang)
+                        return
+            self.response = ""
 
     def get_response(self):
         """
         Returns the response calculated by the plugin
-        :return: the response as a MessageProtocolEntity
+        :return: the response as a WrappedTextMessageProtocolEntity
         """
         return WrappedTextMessageProtocolEntity(self.response, to=self.sender)
 
     @staticmethod
     def get_description(language):
         """
-        Empty description, since this plugin doesn't really provide any functionality
-        :param language: the language to be returned
-        :return: an empty string
+        No Description Needed
         """
         return ""
 
     @staticmethod
     def get_plugin_name():
         """
-        Returns the plugin name
-        :return: the plugin name
+        No Description Needed
         """
-        return "Simple Equals Plugin"
+        return ""

@@ -120,6 +120,14 @@ class ImageSender(GenericPlugin):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "ImageSender Plugin"
+
     def __wget_image__(self):
         """
         Wgets the image from the link

@@ -161,6 +161,14 @@ class Mensa(GenericPlugin):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Mensa Plugin"
+
     # Private Methods
     def __get_todays_plan__(self):
         """

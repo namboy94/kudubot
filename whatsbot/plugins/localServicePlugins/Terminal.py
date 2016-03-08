@@ -94,6 +94,14 @@ class Terminal(GenericPlugin):
             return "Help not available in this language"
 
     @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Terminal Plugin"
+
+    @staticmethod
     def __execute_command__(command):
         """
         Executes a command and returns its output.

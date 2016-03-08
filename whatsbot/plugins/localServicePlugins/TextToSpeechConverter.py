@@ -92,6 +92,14 @@ class TextToSpeechConverter(GenericPlugin):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Text To Speech Plugin"
+
     def __generate_audio__(self):
         """
         Generates an audio file

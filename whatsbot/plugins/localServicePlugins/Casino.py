@@ -108,6 +108,14 @@ class Casino(GenericPlugin):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Casino Plugin"
+
     def parallel_run(self):
         """
         Starts a parallel background activity if this class has one.

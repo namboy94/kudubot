@@ -147,6 +147,14 @@ class Weather(GenericPlugin):
                    "options: text,verbose"
         else:
             return "Help not available in this language"
+
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Weather Plugin"
         
     # private methods
     @staticmethod

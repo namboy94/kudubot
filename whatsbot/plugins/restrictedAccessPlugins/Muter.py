@@ -99,3 +99,11 @@ class Muter(GenericPlugin):
                    "/unmute\tHolt den Bot wieder aus dem Lautlosmodus aus (admin)\n"
         else:
             return "Help not available in this language"
+
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Muter Plugin"

@@ -125,3 +125,11 @@ class SimpleContainsResponse(GenericPlugin):
         :return: an empty string
         """
         return ""
+
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Simple Contains Plugin"

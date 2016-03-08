@@ -108,3 +108,11 @@ class PluginSelector(GenericPlugin):
                    "/plugin deactivate <plugin|plugin-index>\tDeaktiviert ein plugin\n"
         else:
             return "Help not available in this language"
+
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Plugin Selector Plugin"

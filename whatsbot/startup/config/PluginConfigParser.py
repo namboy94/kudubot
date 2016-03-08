@@ -101,7 +101,6 @@ class PluginConfigParser(object):
                     needs_to_write = True
                     plugin_dict[config][plugin] = True
             if needs_to_write:
-                print("writing")
                 if config != "global":
                     self.write_plugins(plugin_dict[config], config)
                 else:

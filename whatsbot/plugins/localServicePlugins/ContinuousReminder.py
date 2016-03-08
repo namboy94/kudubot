@@ -135,6 +135,14 @@ class ContinuousReminder(GenericPlugin):
         else:
             return "Help not available in this language"
 
+    @staticmethod
+    def get_plugin_name():
+        """
+        Returns the plugin name
+        :return: the plugin name
+        """
+        return "Continuous Reminder Plugin"
+
     # Private Methods
     def __set_continuous_reminder__(self, params):
         """
