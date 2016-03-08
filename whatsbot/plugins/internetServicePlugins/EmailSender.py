@@ -90,27 +90,27 @@ class EmailSender(GenericPlugin):
         Returns the response calculated by the plugin
         :return: the response as a MessageProtocolEntity
         """
-        # Set up message
-        msg = MIMEMultipart()
-        msg['From'] = self.email_creds["adress"]
-        msg['To'] = self.email_recipient
-        msg['Subject'] = self.email_title
-        body = MIMEText(self.email_message, 'plain')
-        msg.attach(body)
-
-        # Initialize Connection
-        print(self.email_creds)
-        smtp = smtplib.SMTP_SSL(self.email_creds["server"], int(self.email_creds["port"]))
-        smtp.set_debuglevel(1)
-        smtp.login(self.email_creds["adress"], self.email_creds["password"])
-
-        # Send Email
-        smtp.sendmail(self.email_creds["adress"], self.email_recipient, msg.as_string())
-        smtp.quit()
-
         if not self.email_creds:
             return WrappedTextMessageProtocolEntity("No valid email credentials stored", to=self.sender)
         else:
+            # Set up message
+            msg = MIMEMultipart()
+            msg['From'] = self.email_creds["adress"]
+            msg['To'] = self.email_recipient
+            msg['Subject'] = self.email_title
+            body = MIMEText(self.email_message, 'plain')
+            msg.attach(body)
+
+            # Initialize Connection
+            print(self.email_creds)
+            smtp = smtplib.SMTP_SSL(self.email_creds["server"], int(self.email_creds["port"]))
+            smtp.set_debuglevel(1)
+            smtp.login(self.email_creds["adress"], self.email_creds["password"])
+
+            # Send Email
+            smtp.sendmail(self.email_creds["adress"], self.email_recipient, msg.as_string())
+            smtp.quit()
+
             return WrappedTextMessageProtocolEntity("Email sent", to=self.sender)
 
     @staticmethod
@@ -165,6 +165,13 @@ class EmailSender(GenericPlugin):
                 count += 1
 
         if count == 4:
+            complete = True
+            for key in info:
+                if not info[key]:
+                    complete = False
+                    break
+            if not complete:
+                return False
             return info
         else:
             return False
