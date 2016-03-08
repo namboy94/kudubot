@@ -35,7 +35,7 @@ except ImportError:
 
 class WrappedTextMessageProtocolEntity(EntityAdapter):
     """
-
+    A wrapper around the TextMessageProtocol Entity
     """
 
     def __init__(self, body, to=None, _from=None, entity=None):
@@ -52,7 +52,12 @@ class WrappedTextMessageProtocolEntity(EntityAdapter):
         if _from is not None:
             if re.compile("[0-9]+-[0-9]+").match(_from.split("@")[0]):
                 body = Unicoder.fix_incoming_unicode(body)
-        super().__init__(TextMessageProtocolEntity(body, to=to, _from=_from))
+
+        if entity is not None:
+            entity.body = body
+            super().__init__(entity)
+        else:
+            super().__init__(TextMessageProtocolEntity(body, to=to, _from=_from))
 
     def get_entity(self):
         """

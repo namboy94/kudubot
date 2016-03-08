@@ -55,7 +55,7 @@ class PluginSelector(GenericPlugin):
         Checks if the user input is valid for this plugin to continue
         :return: True if input is valid, False otherwise
         """
-        return re.search(r"^/plugin (activate|deactivate) ([0-9]+|[a-zA-Z]+)$", self.message)
+        return re.search(r"^/plugin (activate|deactivate) ([0-9]+|[a-zA-Z]+(( [a-zA-Z]+)+)?)$", self.message)
 
     def parse_user_input(self):
         """
@@ -67,22 +67,22 @@ class PluginSelector(GenericPlugin):
 
         if self.authenticated:
             if self.message.startswith("/plugin activate"):
-                success = self.layer.plugin_manager.set_plugin_state(self.sender,
-                                                                     self.message.split("/plugin activate ")[1],
+                success = self.layer.plugin_manager.set_plugin_state(self.sender_plain,
+                                                                     self.cap_message.split("/plugin activate ")[1],
                                                                      True)
                 if success:
-                    self.response = "Plugin " + self.message.split("/plugin activate ")[1] + " activated"
+                    self.response = "Plugin " + self.cap_message.split("/plugin activate ")[1] + " activated"
                 else:
-                    self.response = "Plugin " + self.message.split("/plugin activate ")[1] + " does not exist"
+                    self.response = "Plugin " + self.cap_message.split("/plugin activate ")[1] + " does not exist"
 
             elif self.message.startswith("/plugin deactivate"):
-                success = self.layer.plugin_manager.set_plugin_state(self.sender,
-                                                                     self.message.split("/plugin deactivate ")[1],
+                success = self.layer.plugin_manager.set_plugin_state(self.sender_plain,
+                                                                     self.cap_message.split("/plugin deactivate ")[1],
                                                                      False)
                 if success:
-                    self.response = "Plugin " + self.message.split("/plugin deactivate ")[1] + " deactivated"
+                    self.response = "Plugin " + self.cap_message.split("/plugin deactivate ")[1] + " deactivated"
                 else:
-                    self.response = "Plugin " + self.message.split("/plugin deactivate ")[1] + " does not exist"
+                    self.response = "Plugin " + self.cap_message.split("/plugin deactivate ")[1] + " does not exist"
 
     def get_response(self):
         """
