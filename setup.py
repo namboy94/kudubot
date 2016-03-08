@@ -22,7 +22,7 @@ This file is part of whatsapp-whatsbot.
 """
 
 # imports
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def readme():
@@ -35,7 +35,7 @@ def readme():
 
 
 setup(name='whatsbot',
-      version='0.2.2',
+      version='0.2.3',
       description='An automated Whatsapp bot',
       long_description=readme(),
       classifiers=['Development Status :: 2 - Pre-Alpha',
@@ -50,24 +50,7 @@ setup(name='whatsbot',
       author='Hermann Krumrey',
       author_email='hermann@krumreyh.com',
       license='GNU GPL3',
-      packages=['whatsbot',
-                'whatsbot.layers',
-                'whatsbot.plugins',
-                'whatsbot.plugins.internetServicePlugins',
-                'whatsbot.plugins.localServicePlugins',
-                'whatsbot.plugins.localServicePlugins.casino',
-                'whatsbot.plugins.restrictedAccessPlugins',
-                'whatsbot.plugins.simpleTextResponses',
-                'whatsbot.startup',
-                'whatsbot.startup.config',
-                'whatsbot.startup.installation',
-                'whatsbot.utils',
-                'whatsbot.utils.contacts',
-                'whatsbot.utils.encoding',
-                'whatsbot.utils.logging',
-                'whatsbot.utils.math',
-                'whatsbot.yowsupwrapper',
-                'whatsbot.yowsupwrapper.entities'],
+      packages=find_packages(),
       install_requires=['tvdb_api',
                         'yowsup2',
                         'beautifulsoup4',

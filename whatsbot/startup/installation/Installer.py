@@ -40,6 +40,8 @@ class Installer(object):
 
         if platform.system() == "Linux":
             homedir = os.getenv("HOME")
+            if not os.path.isdir(homedir + "/.whatsbot/resources/images"):
+                return False
             if not os.path.isdir(homedir + "/.whatsbot/logs/exceptions"):
                 return False
             if not os.path.isdir(homedir + "/.whatsbot/logs/users"):
@@ -79,6 +81,17 @@ class Installer(object):
             whatsapp_bot_dir = homedir + "/.whatsbot"
             if not os.path.isdir(whatsapp_bot_dir):
                 Popen(["mkdir", whatsapp_bot_dir]).wait()
+            if not os.path.isdir(whatsapp_bot_dir + "/resources/images"):
+                Popen(["mkdir", whatsapp_bot_dir + "/resources/images"]).wait()
+                Popen(["wget",
+                       "http://gitlab.namibsun.net/namboy94/whatsapp-bot/raw/master/res/images/divby0.jpg",
+                       "-O", whatsapp_bot_dir + "/resources/images/divby0.jpg"]).wait()
+                Popen(["wget",
+                       "http://gitlab.namibsun.net/namboy94/whatsapp-bot/raw/master/res/images/exception.jpg",
+                       "-O", whatsapp_bot_dir + "/resources/images/exception.jpg"]).wait()
+                Popen(["wget",
+                       "http://gitlab.namibsun.net/namboy94/whatsapp-bot/raw/master/res/images/rouletteboard.jpg",
+                       "-O", whatsapp_bot_dir + "/resources/images/rouletteboard.jpg"]).wait()
             if not os.path.isdir(whatsapp_bot_dir + "/plugins"):
                 Popen(["mkdir", whatsapp_bot_dir + "/plugins"]).wait()
             if not os.path.isdir(whatsapp_bot_dir + "/logs"):
