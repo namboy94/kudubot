@@ -1,6 +1,6 @@
 #!/bin/bash
 
-/*
+:'
 Copyright 2015,2016 Hermann Krumrey
 
 This file is part of whatsapp-bot.
@@ -20,7 +20,7 @@ This file is part of whatsapp-bot.
 
     You should have received a copy of the GNU General Public License
     along with whatsapp-bot.  If not, see <http://www.gnu.org/licenses/>.
-*/
+'
 
 
 #Script to combat yowsup's problem with disconnecting
