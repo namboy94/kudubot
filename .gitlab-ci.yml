@@ -1,7 +1,7 @@
 stages:
   - build
   - get
-  - deploy
+  - predeploy
   - run
 
 kill_whatsbot:
@@ -31,7 +31,7 @@ clone:
     - python whatsapp-bot/whatsbot/main.py -i
 
 write_script:
-  stage: deploy
+  stage: predeploy
   script:
     - cd
     - touch runner
@@ -41,7 +41,8 @@ write_script:
     - echo "done" >> runner
 
 startbot:
-  stage: run
+  stage: deploy
   script:
     - cd
     - bash runner&
+    - exit 0
