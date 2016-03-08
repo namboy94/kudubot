@@ -31,6 +31,7 @@ upload_to_pypi:
     - cd whatsapp-bot
     - python setup.py register sdist upload
     - sleep 60
+  allow_failure: true
 
 upgrade_from_pypi:
   stage: upgrade
@@ -41,6 +42,5 @@ upgrade_from_pypi:
 startbot:
   stage: deploy
   script:
-    - cd
     - whatsbot&
     - exit 0
