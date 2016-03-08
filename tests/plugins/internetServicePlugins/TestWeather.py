@@ -111,7 +111,6 @@ class TestWeather(object):
         assert_true(self.__city_results_equal__(karlsruhe_text))
         assert_true(self.__city_results_equal__(karlsruhe_verbose_text))
 
-
     @with_setup(setup, teardown)
     def test_windhoek(self):
         """

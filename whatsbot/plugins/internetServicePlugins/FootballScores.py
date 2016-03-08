@@ -196,6 +196,7 @@ class FootballScores(GenericPlugin):
 
         for r in res:
             return_string += r.text + "\n"
+        return_string = return_string.split(" #")[0]
 
         return return_string
 
