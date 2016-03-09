@@ -22,7 +22,7 @@ This file is part of whatsbot.
 """
 
 from nose.tools import with_setup
-from nose.tools import assert_equal
+from nose.tools import assert_false
 from nose.tools import assert_true
 
 try:
@@ -35,7 +35,7 @@ except ImportError:
 
 class TestEmailSender(object):
     """
-    Unit Test Class that tests XXX
+    Unit Test Class that tests the Email Sender Plugin
     """
 
     def __init__(self):
@@ -75,10 +75,23 @@ class TestEmailSender(object):
     @with_setup(setup, teardown)
     def test_regex(self):
         """
+        Tests the regex
         """
-
-        messages = [WrappedTextMessageProtocolEntity(_from=self.sender, body="/email \"Test\" hermann@krumreyh.com")]
+        messages = [WrappedTextMessageProtocolEntity(_from=self.sender,
+                                                     body="/email \"Test\" hermann@krumreyh.com"),
+                    WrappedTextMessageProtocolEntity(_from=self.sender,
+                                                     body="/email \"Test\" \"Test\" hermann@krumreyh.com")]
+        wrong_messages = [WrappedTextMessageProtocolEntity(_from=self.sender,
+                                                           body="/email Test\" hermann@krumreyh.com"),
+                          WrappedTextMessageProtocolEntity(_from=self.sender,
+                                                           body="/email \"Test hermann@krumreyh.com"),
+                          WrappedTextMessageProtocolEntity(_from=self.sender,
+                                                           body="/email \"Test\" herm ann@krumreyh.com")]
 
         for message in messages:
             plugin = EmailSender(self.layer, message)
             assert_true(plugin.regex_check())
+
+        for message in wrong_messages:
+            plugin = EmailSender(self.layer, message)
+            assert_false(plugin.regex_check())
