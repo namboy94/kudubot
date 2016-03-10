@@ -64,34 +64,29 @@ class TestEmailSender(object):
         """
         Sets up a test
         """
-        self.message = None
+        str(self)
 
     def teardown(self):
         """
         Tears down a test
         """
-        self.message = None
+        str(self)
 
     @with_setup(setup, teardown)
     def test_regex(self):
         """
-        Tests the regex
+        Tests the regex check for this plugin
         """
-        messages = [WrappedTextMessageProtocolEntity(_from=self.sender,
-                                                     body="/email \"Test\" hermann@krumreyh.com"),
-                    WrappedTextMessageProtocolEntity(_from=self.sender,
-                                                     body="/email \"Test\" \"Test\" hermann@krumreyh.com")]
-        wrong_messages = [WrappedTextMessageProtocolEntity(_from=self.sender,
-                                                           body="/email Test\" hermann@krumreyh.com"),
-                          WrappedTextMessageProtocolEntity(_from=self.sender,
-                                                           body="/email \"Test hermann@krumreyh.com"),
-                          WrappedTextMessageProtocolEntity(_from=self.sender,
-                                                           body="/email \"Test\" herm ann@krumreyh.com")]
+        messages = ["/email \"Test\" hermann@krumreyh.com",
+                    "/email \"Test\" \"Test\" hermann@krumreyh.com"]
+        wrong_messages = ["/email Test\" hermann@krumreyh.com",
+                          "/email \"Test hermann@krumreyh.com",
+                          "/email \"Test\" herm ann@krumreyh.com"]
 
         for message in messages:
-            plugin = EmailSender(self.layer, message)
+            plugin = EmailSender(self.layer, WrappedTextMessageProtocolEntity(body=message, _from=self.sender))
             assert_true(plugin.regex_check())
 
         for message in wrong_messages:
-            plugin = EmailSender(self.layer, message)
+            plugin = EmailSender(self.layer, WrappedTextMessageProtocolEntity(body=message, _from=self.sender))
             assert_false(plugin.regex_check())

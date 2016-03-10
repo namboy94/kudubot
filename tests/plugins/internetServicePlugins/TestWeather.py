@@ -64,13 +64,13 @@ class TestWeather(object):
         """
         Sets up a test
         """
-        self.message = None
+        str(self)
 
     def teardown(self):
         """
         Tears down a test
         """
-        self.message = None
+        str(self)
 
     @with_setup(setup, teardown)
     def test_karlsruhe_with_modes(self):

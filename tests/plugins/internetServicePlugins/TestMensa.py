@@ -22,20 +22,19 @@ This file is part of whatsbot.
 """
 
 from nose.tools import with_setup
-from nose.tools import assert_equal
 from nose.tools import assert_true
 
 try:
-    from plugins.internetServicePlugins. import
+    from plugins.internetServicePlugins.Mensa import Mensa
     from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 except ImportError:
-    from whatsbot.plugins.internetServicePlugins. import
+    from whatsbot.plugins.internetServicePlugins.Mensa import Mensa
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Test(object):
     """
-    Unit Test Class that tests XXX
+    Unit Test Class that tests the Mensa plugin
     """
 
     def __init__(self):
@@ -64,17 +63,18 @@ class Test(object):
         """
         Sets up a test
         """
-        self.message = None
+        str(self)
 
     def teardown(self):
         """
         Tears down a test
         """
-        self.message = None
+        str(self)
 
     @with_setup(setup, teardown)
-    def test_(self):
+    def test_mensa_today(self):
         """
-
+        Tests the current day's mensa output
         """
-        print()
+        plugin = Mensa(self.layer, WrappedTextMessageProtocolEntity(body="/mensa", _from=self.sender))
+        assert_true(plugin.regex_check())

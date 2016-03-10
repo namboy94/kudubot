@@ -64,13 +64,13 @@ class TestFootballScores(object):
         """
         Sets up a test
         """
-        self.message = None
+        str(self)
 
     def teardown(self):
         """
         Tears down a test
         """
-        self.message = None
+        str(self)
 
     @with_setup(setup, teardown)
     def test_bundesliga(self):
@@ -105,7 +105,7 @@ class TestFootballScores(object):
     @with_setup(setup, teardown)
     def test_england_premier_league(self):
         """
-        Tests the results for the bundesliga
+        Tests the results for the english premier league
         """
         table_plugin = FootballScores(self.layer,
                                       WrappedTextMessageProtocolEntity(
@@ -125,7 +125,7 @@ class TestFootballScores(object):
     @with_setup(setup, teardown)
     def test_namibia_premier_league(self):
         """
-        Tests the results for the bundesliga
+        Tests the results for the namibian premier league
         """
         table_plugin = FootballScores(self.layer,
                                       WrappedTextMessageProtocolEntity(
@@ -145,7 +145,7 @@ class TestFootballScores(object):
     @with_setup(setup, teardown)
     def test_spanish_primera_league(self):
         """
-        Tests the results for the bundesliga
+        Tests the results for the spanish primera division
         """
         table_plugin = FootballScores(self.layer,
                                       WrappedTextMessageProtocolEntity(

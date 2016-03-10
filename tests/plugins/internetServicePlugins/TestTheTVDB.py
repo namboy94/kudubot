@@ -26,16 +26,16 @@ from nose.tools import assert_equal
 from nose.tools import assert_true
 
 try:
-    from plugins.internetServicePlugins. import
+    from plugins.internetServicePlugins.TheTVDB import TheTVDB
     from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 except ImportError:
-    from whatsbot.plugins.internetServicePlugins. import
+    from whatsbot.plugins.internetServicePlugins.TheTVDB import TheTVDB
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Test(object):
     """
-    Unit Test Class that tests XXX
+    Unit Test Class that tests the TVDB Plugin
     """
 
     def __init__(self):
@@ -64,17 +64,24 @@ class Test(object):
         """
         Sets up a test
         """
-        self.message = None
+        str(self)
 
     def teardown(self):
         """
         Tears down a test
         """
-        self.message = None
+        str(self)
 
     @with_setup(setup, teardown)
-    def test_(self):
+    def test_episodes(self):
         """
+        Tests some specific episode names
+        """
+        episodes = {"/tvdb game of thrones s01 e01": "Winter Is Coming",
+                    "/tvdb friends s10 e11": "The One Where The Stripper Cries"}
 
-        """
-        print()
+        for key in episodes:
+            plugin = TheTVDB(self.layer, WrappedTextMessageProtocolEntity(body=key, _from=self.sender))
+            assert_true(plugin.regex_check())
+            plugin.parse_user_input()
+            assert_equal(plugin.get_response().get_body(), episodes[key])

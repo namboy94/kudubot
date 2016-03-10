@@ -22,20 +22,19 @@ This file is part of whatsbot.
 """
 
 from nose.tools import with_setup
-from nose.tools import assert_equal
 from nose.tools import assert_true
 
 try:
-    from plugins.internetServicePlugins. import
+    from plugins.internetServicePlugins.KickTipp import KickTipp
     from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 except ImportError:
-    from whatsbot.plugins.internetServicePlugins. import
+    from whatsbot.plugins.internetServicePlugins.KickTipp import KickTipp
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Test(object):
     """
-    Unit Test Class that tests XXX
+    Unit Test Class that tests the Kicktipp plugin
     """
 
     def __init__(self):
@@ -64,17 +63,24 @@ class Test(object):
         """
         Sets up a test
         """
-        self.message = None
+        str(self)
 
     def teardown(self):
         """
         Tears down a test
         """
-        self.message = None
+        str(self)
 
     @with_setup(setup, teardown)
-    def test_(self):
+    def test_stellies(self):
         """
+        Tests the results for the Kicktipp community "Stellies"
+        """
+        plugin = KickTipp(self.layer, WrappedTextMessageProtocolEntity(body="/kicktipp stellies", _from=self.sender))
+        assert_true(plugin.regex_check())
+        plugin.parse_user_input()
+        reply = plugin.get_response().get_body()
 
-        """
-        print()
+        users = ["MisterD", "SirSimon", "Frederick", "hermann", "E.I"]
+        for user in users:
+            assert_true(user in reply)

@@ -26,16 +26,16 @@ from nose.tools import assert_equal
 from nose.tools import assert_true
 
 try:
-    from plugins.internetServicePlugins. import
+    from plugins.internetServicePlugins.XKCD import XKCD
     from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 except ImportError:
-    from whatsbot.plugins.internetServicePlugins. import
+    from whatsbot.plugins.internetServicePlugins.XKCD import XKCD
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Test(object):
     """
-    Unit Test Class that tests XXX
+    Unit Test Class that tests XKCD plugin
     """
 
     def __init__(self):
@@ -64,17 +64,20 @@ class Test(object):
         """
         Sets up a test
         """
-        self.message = None
+        str(self)
 
     def teardown(self):
         """
         Tears down a test
         """
-        self.message = None
+        str(self)
 
     @with_setup(setup, teardown)
     def test_(self):
         """
-
+        Tests if the XKCD plugin correctly forwards messages
         """
-        print()
+        plugin = XKCD(self.layer, WrappedTextMessageProtocolEntity(body="/xkcd 123", _from=self.sender))
+        assert_true(plugin.regex_check())
+        plugin.parse_user_input()
+        assert_equal(plugin.get_response().get_body(), "!xkcd 123")

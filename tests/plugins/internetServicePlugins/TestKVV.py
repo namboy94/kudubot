@@ -26,16 +26,16 @@ from nose.tools import assert_equal
 from nose.tools import assert_true
 
 try:
-    from plugins.internetServicePlugins. import
+    from plugins.internetServicePlugins.KVV import KVV
     from yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 except ImportError:
-    from whatsbot.plugins.internetServicePlugins. import
+    from whatsbot.plugins.internetServicePlugins.KVV import KVV
     from whatsbot.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import WrappedTextMessageProtocolEntity
 
 
 class Test(object):
     """
-    Unit Test Class that tests XXX
+    Unit Test Class that tests the KVV plugin
     """
 
     def __init__(self):
@@ -64,17 +64,20 @@ class Test(object):
         """
         Sets up a test
         """
-        self.message = None
+        str(self)
 
     def teardown(self):
         """
         Tears down a test
         """
-        self.message = None
+        str(self)
 
     @with_setup(setup, teardown)
-    def test_(self):
+    def test_parasite(self):
         """
-
+        Tests if the KVV plugin correctly forwards the command
         """
-        print()
+        plugin = KVV(self.layer, WrappedTextMessageProtocolEntity(body="/kvv arbitrary", _from=self.sender))
+        assert_true(plugin.regex_check())
+        plugin.parse_user_input()
+        assert_equal(plugin.get_response().get_body(), "!kvv arbitrary")

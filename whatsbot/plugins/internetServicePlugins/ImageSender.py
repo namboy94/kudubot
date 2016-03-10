@@ -63,7 +63,7 @@ class ImageSender(GenericPlugin):
         """
         if re.search(r"^/img (http(s)?://|www.)[^;>\| ]+(.png|.jpg)$", self.message):
             if "&&" in self.message:
-                self.send_message(WrappedTextMessageProtocolEntity("Nice try.", to=self.sender))
+                # self.send_message(WrappedTextMessageProtocolEntity("Nice try.", to=self.sender))
                 return False
             else:
                 return True
