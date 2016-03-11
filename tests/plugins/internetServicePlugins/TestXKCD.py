@@ -73,7 +73,7 @@ class Test(object):
         str(self)
 
     @with_setup(setup, teardown)
-    def test_(self):
+    def test_parasite(self):
         """
         Tests if the XKCD plugin correctly forwards messages
         """
