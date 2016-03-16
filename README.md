@@ -34,3 +34,6 @@ where an instance of his bot is registered.
 Registering a number can be either accomplished via using yowsup-cli (consult the project's Github page for 
 further information) or via using a rooted Android smartphone. It is currently planned to implement a registration
 feature, this has however not been implemented yet.
+
+
+[Git Statistics](http://krumreyh.com/git_stats_pages/whatsapp-bot/general.html)

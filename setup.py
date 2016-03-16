@@ -35,7 +35,7 @@ def readme():
 
 
 setup(name='whatsbot',
-      version='0.3.3',
+      version='0.3.4',
       description='An automated Whatsapp bot',
       long_description=readme(),
       classifiers=['Development Status :: 3 - Alpha',
