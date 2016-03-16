@@ -18,6 +18,13 @@ run_unit_tests:
     - cd whatsapp-bot
     - python setup.py test
 
+generate_statistics:
+  stage: test
+  script:
+    - cd
+    - cd whatsapp-bot
+    - git_stats generate
+
 upload_to_pypi:
   stage: upload
   script:
@@ -26,6 +33,14 @@ upload_to_pypi:
     - python setup.py register sdist upload
     - sleep 60
   allow_failure: true
+
+upload_statistics:
+  stage: upload
+  script:
+    - cd
+    - cd whatsapp-bot
+    - rsync -avP --delete-after git_stats/ www.krumreyh.de@ssh.strato.de:~/git_stats_pages/whatsapp-bot
+    - ssh www.krumreyh.de@ssh.strato.de 'rsync -av --delete-after git_stats_pages Homepage/'
 
 delete_clone:
   stage: cleanup
@@ -38,3 +53,4 @@ upgrade_from_pypi:
   script:
     - sudo pip3.5 install whatsbot --upgrade
     - sleep 5
+    - killall whatsbot-instance
