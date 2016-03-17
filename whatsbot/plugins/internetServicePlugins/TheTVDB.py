@@ -86,7 +86,7 @@ class TheTVDB(GenericPlugin):
                 return WrappedTextMessageProtocolEntity("Episode not found", to=self.sender)
             if "Could not find season" in str(e):
                 return WrappedTextMessageProtocolEntity("Season not found", to=self.sender)
-            print(str(e))
+            str(e)
 
     @staticmethod
     def get_description(language):

@@ -78,6 +78,11 @@ class LogWriter(object):
             contact = "Bug"
 
         string = event + ": " + contact + ": " + entity.get_body()
-        print(string)
+
+        try:
+            print(string)
+        except IOError:  # Prevents Exceptions being thrown in case the Terminal is gone.
+            str(string)
+
         log.write((string + "\n"))
         log.close()

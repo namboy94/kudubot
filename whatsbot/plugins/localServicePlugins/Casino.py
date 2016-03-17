@@ -234,7 +234,6 @@ class Casino(GenericPlugin):
             dollar_list = []
             for char in dollar_string:
                 dollar_list.insert(0, char)
-            print(dollar_list)
             formated_dollar_string = ""
             i = 0
             while i < len(dollar_list):
@@ -342,5 +341,5 @@ class Casino(GenericPlugin):
                 bet_val = self.encode_money_string(dollars, cents, True)
                 bet_string += "\nBet: " + bet["bet"] + "     Amount: " + bet_val + "€"
         except Exception as e:
-            print(str(e))
+            str(e)
         return bet_string

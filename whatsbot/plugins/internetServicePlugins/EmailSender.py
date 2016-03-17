@@ -102,7 +102,6 @@ class EmailSender(GenericPlugin):
             msg.attach(body)
 
             # Initialize Connection
-            print(self.email_creds)
             smtp = smtplib.SMTP_SSL(self.email_creds["server"], int(self.email_creds["port"]))
             smtp.set_debuglevel(1)
             smtp.login(self.email_creds["adress"], self.email_creds["password"])

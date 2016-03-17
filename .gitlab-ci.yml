@@ -53,4 +53,5 @@ upgrade_from_pypi:
   script:
     - sudo pip3.5 install whatsbot --upgrade
     - sleep 5
-    - killall whatsbot-instance
+    - sudo killall whatsbot-instance
+  allow_failure: true
