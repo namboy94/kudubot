@@ -24,33 +24,20 @@ This file is part of whatsbot.
 # imports
 import argparse
 import sys
-from yowsup import env
-from yowsup.common import YowConstants
-from yowsup.layers import YowLayerEvent
-from yowsup.layers.axolotl import YowAxolotlLayer
-from yowsup.layers.auth import YowCryptLayer, YowAuthenticationProtocolLayer
-from yowsup.layers.coder import YowCoderLayer
-from yowsup.layers.logger import YowLoggerLayer
-from yowsup.layers.network import YowNetworkLayer
-from yowsup.layers.protocol_acks import YowAckProtocolLayer
-from yowsup.layers.protocol_calls import YowCallsProtocolLayer
-from yowsup.layers.protocol_iq import YowIqProtocolLayer
-from yowsup.layers.protocol_media import YowMediaProtocolLayer
-from yowsup.layers.protocol_messages import YowMessagesProtocolLayer
-from yowsup.layers.protocol_receipts import YowReceiptProtocolLayer
-from yowsup.layers.stanzaregulator import YowStanzaRegulator
-from yowsup.stacks import YowStack
 
 try:
     from layers.BotLayer import BotLayer
     from layers.BotLayerWithGUI import BotLayerWithGUI
     from startup.config.ConfigParser import ConfigParser
     from startup.installation.Installer import Installer
+    from YowsupEchoStack import YowsupEchoStack
+
 except ImportError:
     from whatsbot.layers.BotLayer import BotLayer
     from whatsbot.layers.BotLayerWithGUI import BotLayerWithGUI
     from whatsbot.startup.config.ConfigParser import ConfigParser
     from whatsbot.startup.installation.Installer import Installer
+    from whatsbot.YowsupEchoStack import YowsupEchoStack
 
 # Sets the encoding to UTF-8 when running this program in python2
 if sys.version_info[0] == 2:
@@ -103,50 +90,8 @@ def main():
     else:
         selected_layer = BotLayer
 
-    # This may have to be implemented some day if passing layers as tuples will be
-    # deprecated, as being warned by yowsup currently. Sadly, this will also change
-    # how the layer classes are built up, and I honestly would rather not do that now.
-    """
-    stack_builder = YowStackBuilder()
-    stack = stack_builder.pushDefaultLayers(True).push(selected_layer).build()
-    stack.setCredentials(credentials)
-    stack.broadcastEvent(YowLayerEvent(selected_layer.EVENT_START))
-
-    try:
-        stack.loop(timeout=0.5, discrete=0.5)
-    except AuthError as e:
-        print("Auth Error, reason %s" % e)
-    except KeyboardInterrupt:
-        print("\nBot Dead")
-        sys.exit(0)
-    """
-
-    layers = (
-        selected_layer,
-        (YowAuthenticationProtocolLayer,
-         YowMessagesProtocolLayer,
-         YowReceiptProtocolLayer,
-         YowAckProtocolLayer,
-         YowMediaProtocolLayer,
-         YowIqProtocolLayer,
-         YowCallsProtocolLayer),
-        YowAxolotlLayer,
-        YowLoggerLayer,
-        YowCoderLayer,
-        YowCryptLayer,
-        YowStanzaRegulator,
-        YowNetworkLayer
-        )
-
-    # Forgive the CamelCase, it's yowsup's fault!
-    stack = YowStack(layers)
-    stack.setProp(YowAuthenticationProtocolLayer.PROP_CREDENTIALS, credentials)  # setting credentials
-    stack.setProp(YowNetworkLayer.PROP_ENDPOINT, YowConstants.ENDPOINTS[0])      # whatsapp server address
-    stack.setProp(YowCoderLayer.PROP_DOMAIN, YowConstants.DOMAIN)
-    stack.setProp(YowCoderLayer.PROP_RESOURCE, env.CURRENT_ENV.getResource())    # info about us as WhatsApp client
-    stack.broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT))     # sending the connect signal
-    # this is the program mainloop
-    stack.loop()
+    echo_stack = YowsupEchoStack(selected_layer, credentials)
+    echo_stack.start()
 
 if __name__ == '__main__':
     main()
