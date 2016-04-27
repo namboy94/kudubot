@@ -18,7 +18,7 @@ This file is part of messengerbot.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
+    along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 # imports
@@ -89,11 +89,10 @@ class Connection(object):
         self.service_manager.process_message(message)
 
     @staticmethod
-    def establish_connection(credentials: Tuple) -> None:
+    def establish_connection() -> None:
         """
         Establishes the connection to the specific service
 
-        :param credentials: Credentials used to establish the connection
         :return: None
         """
         raise NotImplementedError()

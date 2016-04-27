@@ -18,7 +18,7 @@ This file is part of messengerbot.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
+    along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 

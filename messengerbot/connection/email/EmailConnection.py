@@ -18,7 +18,7 @@ This file is part of messengerbot.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
+    along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 # imports
@@ -28,6 +28,7 @@ from messengerbot.connection.generic.Message import Message
 from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.email.senders.SmtpSender import SmtpSender
 from messengerbot.connection.email.listeners.ImapListener import ImapListener
+from messengerbot.connection.email.parsers.EmailConfigParser import EmailConfigParser
 
 
 class EmailConnection(Connection):
@@ -95,13 +96,12 @@ class EmailConnection(Connection):
         raise NotImplementedError()
 
     @staticmethod
-    def establish_connection(credentials: Tuple[str, str, str, str, str]) -> None:
+    def establish_connection() -> None:
         """
         Establishes the connection to the specific service
 
-        :param credentials: Credentials used to establish the connection
-                            (email address, password, server, imap port, smtp port)
         :return: None
         """
+        credentials = EmailConfigParser.parse_email_config(EmailConnection.identifier)
         email_connection = EmailConnection(credentials)
         ImapListener(credentials, email_connection.on_incoming_message).listen()
