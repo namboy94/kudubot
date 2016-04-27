@@ -18,7 +18,7 @@ This file is part of messengerbot.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
+    along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 # imports
@@ -283,7 +283,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
 
     def set_presence_name(self, name):
         """
-        Sets the presence name of the whatsbot
+        Sets the presence name of the messengerbot
         :param name: the presence name to set
         :return: void
         """
@@ -292,7 +292,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
 
     def profile_set_status(self, text: str) -> None:
         """
-        Sets the profile status of the whatsbot
+        Sets the profile status of the messengerbot
         :param text:
         :return: None
         """
