@@ -33,12 +33,11 @@ from messengerbot.connection.generic.Message import Message
 from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.whatsapp.layers.YowsupEchoLayer import YowsupEchoLayer
 from messengerbot.connection.whatsapp.stacks.YowsupEchoStack import YowsupEchoStack
-from messengerbot.connection.whatsapp.yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
 from messengerbot.connection.whatsapp.yowsupwrapper.entities.WrappedTextMessageProtocolEntity \
     import WrappedTextMessageProtocolEntity
 
 
-class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
+class WhatsappConnection(YowsupEchoLayer, Connection):
     """
     Class that implements the connection to the Whatsapp Messaging service
     """
@@ -52,6 +51,8 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         super().__init__()
         # noinspection PyCallByClass
         YowInterfaceLayer.__init__(self)
+
+        print("Starting")
 
     def send_text_message(self, message: Message) -> None:
         """
@@ -101,6 +102,7 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         :param message_protocol_entity: the message received
         :return: void
         """
+        print("Got message")
         # Wrap the message protocol entity in a PEP8-compliant Wrapper
         wrapped_entity = WrappedTextMessageProtocolEntity(entity=message_protocol_entity)
         message = self.convert_text_message_protocol_entity_to_message(wrapped_entity)
@@ -150,4 +152,5 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
 if __name__ == "__main__":
     number = "4915202589168"
     password = "co6rEWF2GrMpdaiTXpp8lxld/a4="
+    print("Got creds")
     WhatsappConnection.establish_connection((number, password))

@@ -23,7 +23,8 @@ This file is part of messengerbot.
 
 # imports
 
-from messengerbot.connection.generic.Connection import Connection
+# from messengerbot.connection.generic.Connection import Connection
+Connection = None
 from messengerbot.connection.generic.Message import Message
 
 

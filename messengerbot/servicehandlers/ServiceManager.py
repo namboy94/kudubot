@@ -24,7 +24,8 @@ This file is part of messengerbot.
 # imports
 from threading import Thread
 
-from messengerbot.connection.generic.Connection import Connection
+# from messengerbot.connection.generic.Connection import Connection
+Connection = None
 from messengerbot.connection.generic.Message import Message
 from messengerbot.servicehandlers.ServiceConfigParser import ServiceConfigParser
 
@@ -49,7 +50,7 @@ class ServiceManager(object):
     The connection used to communicate
     """
 
-    def __init__(self, connection: Connection) -> None:
+    def __init__(self, connection: 'Connection') -> None:
         """
         Constructor for the ServiceManager class. It stores the connection as a class variable and parses
         local config files to determine which services should be active.
