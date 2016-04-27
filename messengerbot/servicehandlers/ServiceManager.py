@@ -25,6 +25,7 @@ This file is part of messengerbot.
 from threading import Thread
 
 from messengerbot.connection.generic.Connection import Connection
+from messengerbot.servicehandlers.ServiceConfigParser import ServiceConfigParser
 
 
 class ServiceManager(object):
@@ -32,14 +33,14 @@ class ServiceManager(object):
     The ServiceManager class handles the implemented Services and processes incoming messages
     """
 
-    all_plugins = []
+    all_services = []
     """
-    A list of all implemented plugins
+    A list of all implemented services
     """
 
-    active_plugins = []
+    active_services = []
     """
-    A list of active plugins defined by the Service Config Parser
+    A list of active services defined by the Service Config Parser
     """
 
     connection = None
@@ -50,13 +51,13 @@ class ServiceManager(object):
     def __init__(self, connection: Connection) -> None:
         """
         Constructor for the ServiceManager class. It stores the connection as a class variable and parses
-        local config files to determine which plugins should be active.
+        local config files to determine which services should be active.
 
         :param connection: The connection that handles the communication for the services
         :return: None
         """
         self.connection = connection
-        self.active_plugins = ServiceConfigParser.read_plugin_config(self.all_plugins, connection.identifier)
+        self.active_services = ServiceConfigParser.read_config(self.all_services, connection.identifier)
         self.start_background_processes()
 
     def process_message(self, sender: str, message_body: str) -> None:
@@ -66,10 +67,11 @@ class ServiceManager(object):
         :param message_body: The text of the message, used to determine which service to use
         :return: None
         """
-        for plugin in self.active_plugins:
-            if plugin.regex_check(message_body):  # Check every plugin if the message matches the plugin-specific regex
-                concrete_plugin = plugin(self.connection)  # Create a plugin object
-                concrete_plugin.process_message(sender, message_body)  # Process the message using the selected plugin
+        # Check every service if the message matches the service-specific regex
+        for service in self.active_services:
+            if service.regex_check(message_body):
+                concrete_service = service.__init__(self.connection)  # Create a service object
+                concrete_service.process_message(sender, message_body)  # Process the message using the selected service
 
     def start_background_processes(self) -> None:
         """
@@ -78,9 +80,9 @@ class ServiceManager(object):
         """
         threads = []
 
-        for plugin in self.active_plugins:
-            if plugin.has_background_process:
-                threads.append(Thread(target=plugin(self.connection).background_process))
+        for service in self.active_services:
+            if service.has_background_process:
+                threads.append(Thread(target=service.__init__(self.connection).background_process))
 
         for thread in threads:
             thread.setDaemon(True)
