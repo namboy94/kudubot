@@ -22,25 +22,25 @@ This file is part of messengerbot.
 """
 
 # imports
-from typing import List
-from messengerbot.servicehandlers.Service import Service
+from yowsup.layers.protocol_media.protocolentities import AudioDownloadableMediaMessageProtocolEntity
+
+from messengerbot.connection.whatsapp.yowsupwrapper.entities.EntityAdapter import EntityAdapter
 
 
-class ServiceConfigParser(object):
+class WrappedAudioDownloadableMediaMessageProtocolEntity(object):
     """
-    Class that parses config files to determine which services to run.
+    Wrapper around the Audio Message Entity type
     """
 
-    # noinspection PyTypeChecker
     @staticmethod
-    def read_config(all_services: List[Service], connection_identifier: str) -> List[Service]:
+    def from_file_path(file_path: str, url: str, ip: str, to: str) -> EntityAdapter:
         """
-        Reads the config file for the specific connection type and returns a list of plugins that
-        are active according to the config file
+        Generates an Audio Entity from a file path
 
-        :param all_services: A list of all available services
-        :param connection_identifier: A string that identifies the type of connection used
-        :return: a list of the active plugins (according to the config file)
+        :param file_path: the path to the audio file
+        :param url: the whatsapp media URL
+        :param ip: the receiver's IP adress
+        :param to: the receiver's whatsapp address
+        :return: the Audio Entity wrapped with an EntityAdapter
         """
-        # TODO implement the parser
-        return all_services
+        return EntityAdapter(AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to=to))

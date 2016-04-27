@@ -22,24 +22,48 @@ This file is part of messengerbot.
 """
 
 # imports
-from messengerbot.servicehandlers.ServiceManager import ServiceManager
+from yowsup.layers.interface import YowInterfaceLayer
+
+from messengerbot.connection.generic.Connection import Connection
+from messengerbot.connection.whatsapp.yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
+from messengerbot.connection.whatsapp.layers.YowsupEchoLayer import YowsupEchoLayer
+from messengerbot.connection.whatsapp.stacks.YowsupEchoStack import YowsupEchoStack
 
 
-class Connection(object):
+class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
     """
-    Class that defines common interface elements to handle the connection to the various
-    messenger services
-    """
-
-    identifier = "generic"
-    """
-    A string identifier with which other parts of the program can identify the type of connection
+    Class that implements the connection to the Whatsapp Messaging service
     """
 
-    service_manager = None
-    """
-    An object that handles all active message services of the messenger bot
-    """
+    def __init__(self, static: bool = False) -> None:
+        """
+        Constructor for the WhatsappConnection class, with an option to only be initialized to
+        establish a new connection
+
+        :param static: Flag that defines if the created object is only used for 'static'
+                        methods (i.e. the connect() method)
+        :return: None
+        """
+        # Don't do anything if in static mode
+        if static:
+            return
+
+        super().__init__()
+        YowInterfaceLayer.__init__(self)
+        self.accountDelWarnings = 0
+        self.connected = False
+        self.username = None
+        self.sendReceipts = True
+        self.disconnectAction = self.__class__.disconnect_action_prompt
+        self.credentials = None
+        self.jid_aliases = {}
+
+        # Methods to run on start
+        self.plugin_manager_setup()
+        self.set_presence_name("Whatsapp-Bot")
+        self.profile_set_status("I am a whatsbot.")
+
+
 
     def send_text_message(self, receiver: str, message_body: str, message_title: str = "") -> None:
         """
@@ -91,4 +115,4 @@ class Connection(object):
 
         :return: None
         """
-        raise NotImplementedError()
+        x = WhatsappConnection()

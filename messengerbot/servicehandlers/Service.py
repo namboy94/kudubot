@@ -21,6 +21,7 @@ This file is part of messengerbot.
     along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# imports
 from messengerbot.connection.generic.Connection import Connection
 
 
