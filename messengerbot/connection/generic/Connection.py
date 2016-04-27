@@ -47,6 +47,7 @@ class Connection(object):
     def send_text_message(self, message: Message) -> None:
         """
         Sends a text message to the receiver.
+
         :param message: The message entity to be sent
         :return: None
         """
@@ -55,6 +56,7 @@ class Connection(object):
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
         Sends an image to the receiver, with an optional caption/title
+
         :param receiver: The receiver of the message
         :param message_image: The image to be sent
         :param caption: The caption/title to be displayed along with the image, defaults to an empty string
@@ -65,6 +67,7 @@ class Connection(object):
     def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
         """
         Sends an audio file to the receiver, with an optional caption/title
+
         :param receiver: The receiver of the message
         :param message_audio: The audio file to be sent
         :param caption: The caption/title to be displayed along with the audio, defaults to an empty string

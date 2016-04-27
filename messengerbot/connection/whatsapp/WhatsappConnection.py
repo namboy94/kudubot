@@ -42,6 +42,11 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
     Class that implements the connection to the Whatsapp Messaging service
     """
 
+    identifier = "whatsapp"
+    """
+    A string identifier with which other parts of the program can identify the type of connection
+    """
+
     def __init__(self) -> None:
         """
         Constructor for the WhatsappConnection class that initializes the Yowsup layer
@@ -58,6 +63,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         """
         Sends a text message to the receiver. Some services allow the use of titles, but some don't,
         so the message title is optional
+
         :param message: The message to be sent
         :return: None
         """
@@ -67,6 +73,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
         Sends an image to the receiver, with an optional caption/title
+
         :param receiver: The receiver of the message
         :param message_image: The image to be sent
         :param caption: The caption/title to be displayed along with the image, defaults to an empty string
@@ -77,6 +84,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
     def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
         """
         Sends an audio file to the receiver, with an optional caption/title
+
         :param receiver: The receiver of the message
         :param message_audio: The audio file to be sent
         :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
@@ -148,9 +156,3 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         body = message.message_body
 
         return WrappedTextMessageProtocolEntity(body, to=to)
-
-if __name__ == "__main__":
-    number = "4915202589168"
-    password = "co6rEWF2GrMpdaiTXpp8lxld/a4="
-    print("Got creds")
-    WhatsappConnection.establish_connection((number, password))

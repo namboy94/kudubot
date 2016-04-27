@@ -24,29 +24,41 @@ This file is part of messengerbot.
 # imports
 from typing import Tuple
 
-from messengerbot.servicehandlers.ServiceManager import ServiceManager
 from messengerbot.connection.generic.Message import Message
+from messengerbot.connection.generic.Connection import Connection
+from messengerbot.connection.email.listeners.ImapListener import ImapListener
 
 
-class Connection(object):
+class EmailConnection(Connection):
     """
-    Class that defines common interface elements to handle the connection to the various
-    messenger services
+    Class that implements an Email-based connection using imaplib and smtplib
     """
 
-    identifier = "generic"
+    identifier = "email"
     """
     A string identifier with which other parts of the program can identify the type of connection
     """
 
-    service_manager = None
+    credentials = ()
     """
-    An object that handles all active message services of the messenger bot
+    The credentials used to connect to the IMAP and SMTP servers
+    The are a tuple of the form (email address, password, server, port)
     """
+
+    def __init__(self, credentials: Tuple[str, str, str, str]) -> None:
+        """
+        Constructor for the EmailConnection class
+
+        :param credentials: The credentials used to connect to the email server:
+                                (email address, password, server, port)
+        :return: None
+        """
+        self.credentials = credentials
 
     def send_text_message(self, message: Message) -> None:
         """
         Sends a text message to the receiver.
+
         :param message: The message entity to be sent
         :return: None
         """
@@ -55,6 +67,7 @@ class Connection(object):
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
         Sends an image to the receiver, with an optional caption/title
+
         :param receiver: The receiver of the message
         :param message_image: The image to be sent
         :param caption: The caption/title to be displayed along with the image, defaults to an empty string
@@ -65,6 +78,7 @@ class Connection(object):
     def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
         """
         Sends an audio file to the receiver, with an optional caption/title
+
         :param receiver: The receiver of the message
         :param message_audio: The audio file to be sent
         :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
@@ -72,25 +86,15 @@ class Connection(object):
         """
         raise NotImplementedError()
 
-    def on_incoming_message(self, message: Message) -> None:
-        """
-        Message called whenever a message is received
-
-        :param message: The received message object
-        :return: None
-        """
-        # Create a ServiceManager object if there is None before this
-        if self.service_manager is None:
-            self.service_manager = ServiceManager(self)
-        # Process the message
-        self.service_manager.process_message(message)
-
     @staticmethod
-    def establish_connection(credentials: Tuple) -> None:
+    def establish_connection(credentials: Tuple[str, str, str, str]) -> None:
         """
         Establishes the connection to the specific service
 
         :param credentials: Credentials used to establish the connection
+                            (email address, password, server, port)
         :return: None
         """
-        raise NotImplementedError()
+        email_connection = EmailConnection(credentials)
+        ImapListener(credentials, email_connection.on_incoming_message).listen()
+

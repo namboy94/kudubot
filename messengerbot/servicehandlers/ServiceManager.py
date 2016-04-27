@@ -24,10 +24,10 @@ This file is part of messengerbot.
 # imports
 from threading import Thread
 
-# from messengerbot.connection.generic.Connection import Connection
-Connection = None
 from messengerbot.connection.generic.Message import Message
 from messengerbot.servicehandlers.ServiceConfigParser import ServiceConfigParser
+# from messengerbot.connection.generic.Connection import Connection
+Connection = object
 
 
 class ServiceManager(object):

@@ -23,9 +23,9 @@ This file is part of messengerbot.
 
 # imports
 
-# from messengerbot.connection.generic.Connection import Connection
-Connection = None
 from messengerbot.connection.generic.Message import Message
+# from messengerbot.connection.generic.Connection import Connection
+Connection = object
 
 
 class Service(object):
