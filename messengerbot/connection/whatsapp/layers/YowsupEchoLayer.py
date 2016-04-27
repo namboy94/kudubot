@@ -305,7 +305,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
             :return: None
             """
             if result_iq_entity and original_iq_entity:
-                print()
+                pass
 
         def on_error(error_iq_entity: MessageProtocolEntity, original_iq_entity: MessageProtocolEntity) -> None:
             """

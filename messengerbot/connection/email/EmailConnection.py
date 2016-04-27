@@ -26,6 +26,7 @@ from typing import Tuple
 
 from messengerbot.connection.generic.Message import Message
 from messengerbot.connection.generic.Connection import Connection
+from messengerbot.connection.email.senders.SmtpSender import SmtpSender
 from messengerbot.connection.email.listeners.ImapListener import ImapListener
 
 
@@ -42,18 +43,25 @@ class EmailConnection(Connection):
     credentials = ()
     """
     The credentials used to connect to the IMAP and SMTP servers
-    The are a tuple of the form (email address, password, server, port)
+    The are a tuple of the form (email address, password, server, imap port, smtp port)
     """
 
-    def __init__(self, credentials: Tuple[str, str, str, str]) -> None:
+    smtp_sender = None
+    """
+    An SMTP handler that can be used to send email messages
+    """
+
+    def __init__(self, credentials: Tuple[str, str, str, str, str]) -> None:
         """
-        Constructor for the EmailConnection class
+        Constructor for the EmailConnection class. It stores the credentials and generates
+        an SMTP connection handler
 
         :param credentials: The credentials used to connect to the email server:
-                                (email address, password, server, port)
+                                (email address, password, server, imap port, smtp port)
         :return: None
         """
         self.credentials = credentials
+        self.smtp_sender = SmtpSender(credentials)
 
     def send_text_message(self, message: Message) -> None:
         """
@@ -62,7 +70,7 @@ class EmailConnection(Connection):
         :param message: The message entity to be sent
         :return: None
         """
-        raise NotImplementedError()
+        self.smtp_sender.send_text_email(message)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
@@ -87,14 +95,13 @@ class EmailConnection(Connection):
         raise NotImplementedError()
 
     @staticmethod
-    def establish_connection(credentials: Tuple[str, str, str, str]) -> None:
+    def establish_connection(credentials: Tuple[str, str, str, str, str]) -> None:
         """
         Establishes the connection to the specific service
 
         :param credentials: Credentials used to establish the connection
-                            (email address, password, server, port)
+                            (email address, password, server, imap port, smtp port)
         :return: None
         """
         email_connection = EmailConnection(credentials)
         ImapListener(credentials, email_connection.on_incoming_message).listen()
-

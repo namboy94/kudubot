@@ -57,8 +57,6 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         # noinspection PyCallByClass
         YowInterfaceLayer.__init__(self)
 
-        print("Starting")
-
     def send_text_message(self, message: Message) -> None:
         """
         Sends a text message to the receiver. Some services allow the use of titles, but some don't,
@@ -110,7 +108,6 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         :param message_protocol_entity: the message received
         :return: void
         """
-        print("Got message")
         # Wrap the message protocol entity in a PEP8-compliant Wrapper
         wrapped_entity = WrappedTextMessageProtocolEntity(entity=message_protocol_entity)
         message = self.convert_text_message_protocol_entity_to_message(wrapped_entity)

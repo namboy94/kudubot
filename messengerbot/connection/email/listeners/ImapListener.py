@@ -45,7 +45,7 @@ class ImapListener(object):
     The method that gets called whenever a new message arrives
     """
 
-    def __init__(self, credentials: Tuple[str, str, str, str], callback_function: callable)\
+    def __init__(self, credentials: Tuple[str, str, str, str, str], callback_function: callable)\
             -> None:
         """
         Constructor for the ImapListener class that gets the necessary credentials for authenticating with the
@@ -53,18 +53,18 @@ class ImapListener(object):
         is received.
 
         :param credentials: Credentials to log on to the IMAP server:
-                                email-address, password, server, port
+                                email-address, password, server, imap port, smtp port
         :param callback_function: The on_incoming_message method of the EmailConnection
         :return: None
         """
         # unpack the credentials
-        username, password, server, port = credentials
+        username, password, server, imap_port, smtp_port = credentials
 
         # store the callback
         self.callback = callback_function
 
         # Connect to the server
-        self.imap = imaplib.IMAP4_SSL(server)
+        self.imap = imaplib.IMAP4_SSL("imap." + server, int(imap_port))
         self.imap.login(username, password)
 
     def listen(self) -> None:
@@ -91,10 +91,14 @@ class ImapListener(object):
                 sender_name = email_message['From'].split(" <")[0]
                 sender_address = email_message['From'].split("<", 1)[1].rsplit(">", 1)[0]
                 sender_identifier = sender_address
-                body = email_message.get_payload(decode=False)
                 title = email_message["Subject"]
+
+                try:
+                    body = email_message.get_payload(decode=False).split("\r\n")[0]
+                except AttributeError:  # When attachments etc are included
+                    body = email_message.get_payload(decode=False)[0].split("\r\n")[0]
 
                 self.callback(Message(body, title, sender_address, True, sender_identifier, sender_name))
 
-                # Sleep 5 seconds after every check
-                time.sleep(5)
+            # Sleep 5 seconds after every check
+            time.sleep(5)

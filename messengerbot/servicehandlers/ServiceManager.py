@@ -24,6 +24,9 @@ This file is part of messengerbot.
 # imports
 from threading import Thread
 
+#services
+from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
+
 from messengerbot.connection.generic.Message import Message
 from messengerbot.servicehandlers.ServiceConfigParser import ServiceConfigParser
 # from messengerbot.connection.generic.Connection import Connection
@@ -35,7 +38,7 @@ class ServiceManager(object):
     The ServiceManager class handles the implemented Services and processes incoming messages
     """
 
-    all_services = []
+    all_services = [SimpleEqualsResponseService]
     """
     A list of all implemented services
     """
@@ -71,7 +74,8 @@ class ServiceManager(object):
         # Check every service if the message matches the service-specific regex
         for service in self.active_services:
             if service.regex_check(message):
-                concrete_service = service.__init__(self.connection)  # Create a service object
+                # noinspection PyCallingNonCallable
+                concrete_service = service(self.connection)  # Create a service object
                 concrete_service.process_message(message)  # Process the message using the selected service
 
     def start_background_processes(self) -> None:
