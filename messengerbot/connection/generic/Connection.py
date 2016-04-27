@@ -25,6 +25,7 @@ This file is part of messengerbot.
 from typing import Tuple
 
 from messengerbot.servicehandlers.ServiceManager import ServiceManager
+from messengerbot.connection.generic.Message import Message
 
 
 class Connection(object):
@@ -74,18 +75,18 @@ class Connection(object):
         """
         raise NotImplementedError()
 
-    def on_incoming_message(self, sender: str, message_body: str) -> None:
+    def on_incoming_message(self, message: Message) -> None:
         """
         Message called whenever a message is received
-        :param sender: The sender of the received message
-        :param message_body: The message body of the message
+
+        :param message: The received message object
         :return: None
         """
         # Create a ServiceManager object if there is None before this
         if self.service_manager is None:
             self.service_manager = ServiceManager(self)
         # Process the message
-        self.service_manager.process_message(sender, message_body)
+        self.service_manager.process_message(message)
 
     def establish_connection(self, credentials: Tuple[str]) -> None:
         """

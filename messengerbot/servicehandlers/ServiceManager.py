@@ -25,6 +25,7 @@ This file is part of messengerbot.
 from threading import Thread
 
 from messengerbot.connection.generic.Connection import Connection
+from messengerbot.connection.generic.Message import Message
 from messengerbot.servicehandlers.ServiceConfigParser import ServiceConfigParser
 
 
@@ -60,18 +61,17 @@ class ServiceManager(object):
         self.active_services = ServiceConfigParser.read_config(self.all_services, connection.identifier)
         self.start_background_processes()
 
-    def process_message(self, sender: str, message_body: str) -> None:
+    def process_message(self, message: Message) -> None:
         """
         Processes an incoming message using the active services
-        :param sender: The sender of the message
-        :param message_body: The text of the message, used to determine which service to use
+        :param message: The received message to process
         :return: None
         """
         # Check every service if the message matches the service-specific regex
         for service in self.active_services:
-            if service.regex_check(message_body):
+            if service.regex_check(message):
                 concrete_service = service.__init__(self.connection)  # Create a service object
-                concrete_service.process_message(sender, message_body)  # Process the message using the selected service
+                concrete_service.process_message(message)  # Process the message using the selected service
 
     def start_background_processes(self) -> None:
         """

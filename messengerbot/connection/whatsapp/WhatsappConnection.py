@@ -22,15 +22,20 @@ This file is part of messengerbot.
 """
 
 # imports
+import re
 from typing import Tuple
 
 from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.interface import ProtocolEntityCallback
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 
+from messengerbot.connection.generic.Message import Message
 from messengerbot.connection.generic.Connection import Connection
-from messengerbot.connection.whatsapp.yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
 from messengerbot.connection.whatsapp.layers.YowsupEchoLayer import YowsupEchoLayer
 from messengerbot.connection.whatsapp.stacks.YowsupEchoStack import YowsupEchoStack
+from messengerbot.connection.whatsapp.yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
+from messengerbot.connection.whatsapp.yowsupwrapper.entities.WrappedTextMessageProtocolEntity \
+    import WrappedTextMessageProtocolEntity
 
 
 class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
@@ -38,32 +43,25 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
     Class that implements the connection to the Whatsapp Messaging service
     """
 
-    def __init__(self, static: bool = False) -> None:
+    def __init__(self) -> None:
         """
-        Constructor for the WhatsappConnection class, with an option to only be initialized to
-        establish a new connection
+        Constructor for the WhatsappConnection class that initializes the Yowsup layer
 
-        :param static: Flag that defines if the created object is only used for 'static'
-                        methods (i.e. the connect() method)
         :return: None
         """
-        # Don't do anything if in static mode
-        if static:
-            return
-        else:
-            super().__init__()
-            YowInterfaceLayer.__init__(self)
+        super().__init__()
+        # noinspection PyCallByClass
+        YowInterfaceLayer.__init__(self)
 
-    def send_text_message(self, receiver: str, message_body: str, message_title: str = "") -> None:
+    def send_text_message(self, message: Message) -> None:
         """
         Sends a text message to the receiver. Some services allow the use of titles, but some don't,
         so the message title is optional
-        :param receiver: The receiver of the message
-        :param message_body: The main message to be sent
-        :param message_title: The title of the message, defaults to an empty string
+        :param message: The message to be sent
         :return: None
         """
-        raise NotImplementedError()
+        message_protocol_entity = self.convert_message_to_text_message_protocol_entity(message)
+        self.to_lower(message_protocol_entity)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
@@ -73,7 +71,7 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         :param caption: The caption/title to be displayed along with the image, defaults to an empty string
         :return: None
         """
-        raise NotImplementedError()
+        self.send_image(receiver, message_image, caption)
 
     def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
         """
@@ -83,9 +81,11 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
         :return: None
         """
-        raise NotImplementedError()
+        str(caption)
+        self.send_audio(receiver, message_audio)
 
-    def establish_connection(self, credentials: Tuple[str]) -> None:
+    @staticmethod
+    def establish_connection(credentials: Tuple[str]) -> None:
         """
         Establishes the connection to the specific service
 
@@ -95,10 +95,54 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         echo_stack.start()
 
     @ProtocolEntityCallback("message")
-    def on_message(self, message_protocol_entity):
+    def on_message(self, message_protocol_entity: TextMessageProtocolEntity):
         """
         Method run when a message is received
         :param message_protocol_entity: the message received
         :return: void
         """
-        self.on_incoming_message()
+        # Wrap the message protocol entity in a PEP8-compliant Wrapper
+        wrapped_entity = WrappedTextMessageProtocolEntity(entity=message_protocol_entity)
+        message = self.convert_text_message_protocol_entity_to_message(wrapped_entity)
+        self.on_incoming_message(message)
+
+    @staticmethod
+    def convert_text_message_protocol_entity_to_message(message_protocol_entity: WrappedTextMessageProtocolEntity) \
+            -> Message:
+        """
+        Converts an incoming text message protocol entity into a Message object
+
+        :param message_protocol_entity: The entity to convert
+        :return: the converted message
+        """
+        body = message_protocol_entity.get_body()
+
+        sender_number = message_protocol_entity.get_from(True)
+        sender_identifier = message_protocol_entity.get_from(False)
+        sender_name = message_protocol_entity.get_notify()
+        group = False
+        individual_number = ""
+        individual_identifier = ""
+        individual_name = ""
+
+        if re.search(r"[0-9]+-[0-9]+", sender_identifier):
+            group = True
+            individual_number = message_protocol_entity.get_participant(True)
+            individual_identifier = message_protocol_entity.get_participant(False)
+            individual_name = message_protocol_entity.get_notify()
+
+        return Message(body, "", sender_number, sender_identifier, sender_name, True, group,
+                       individual_number, individual_identifier, individual_name)
+
+    @staticmethod
+    def convert_message_to_text_message_protocol_entity(message: Message) -> WrappedTextMessageProtocolEntity:
+        """
+        Converts an outgoing message object into a text message protocol entity
+
+        :param message: The message to be converted
+        :return: The converted text message protocol entity
+        """
+        to = message.address
+        body = message.message_body
+
+        return WrappedTextMessageProtocolEntity(body, to=to)

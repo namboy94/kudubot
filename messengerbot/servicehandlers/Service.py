@@ -23,6 +23,7 @@ This file is part of messengerbot.
 
 # imports
 from messengerbot.connection.generic.Connection import Connection
+from messengerbot.connection.generic.Message import Message
 
 
 class Service(object):
@@ -47,7 +48,7 @@ class Service(object):
         self.connection = connection
 
     @staticmethod
-    def regex_check(message: str) -> bool:
+    def regex_check(message: Message) -> bool:
         """
         Check if the received message is a valid command for this service
 
@@ -56,12 +57,11 @@ class Service(object):
         """
         raise NotImplementedError()
 
-    def process_message(self, sender: str, message: str) -> None:
+    def process_message(self, message: Message) -> None:
         """
         Process a message according to the service's functionality
 
-        :param sender: the sender of the message
-        :param message: the message itself
+        :param message: the message to process
         :return: None
         """
         raise NotImplementedError()
