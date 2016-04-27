@@ -21,7 +21,7 @@ This file is part of messengerbot.
     along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from messengerbot.interfaces.ServiceManager import ServiceManager
+from messengerbot.servicehandlers.ServiceManager import ServiceManager
 
 
 class Connection(object):
@@ -30,7 +30,12 @@ class Connection(object):
     messenger services
     """
 
-    service_manager = ServiceManager()
+    identifier = "generic"
+    """
+    A string identifier with which other parts of the program can identify the type of connection
+    """
+
+    service_manager = None
     """
     An object that handles all active message services of the messenger bot
     """
@@ -73,4 +78,8 @@ class Connection(object):
         :param message_body: The message body of the message
         :return: None
         """
+        # Create a ServiceManager object if there is None before this
+        if self.service_manager is None:
+            self.service_manager = ServiceManager(self)
+        # Process the message
         self.service_manager.process_message(sender, message_body)
