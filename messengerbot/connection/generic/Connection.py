@@ -44,13 +44,10 @@ class Connection(object):
     An object that handles all active message services of the messenger bot
     """
 
-    def send_text_message(self, receiver: str, message_body: str, message_title: str = "") -> None:
+    def send_text_message(self, message: Message) -> None:
         """
-        Sends a text message to the receiver. Some services allow the use of titles, but some don't,
-        so the message title is optional
-        :param receiver: The receiver of the message
-        :param message_body: The main message to be sent
-        :param message_title: The title of the message, defaults to an empty string
+        Sends a text message to the receiver.
+        :param message: The message entity to be sent
         :return: None
         """
         raise NotImplementedError()

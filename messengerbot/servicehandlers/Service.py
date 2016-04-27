@@ -73,3 +73,33 @@ class Service(object):
         :return: None
         """
         raise NotImplementedError()
+
+    def send_text_message(self, message: Message) -> None:
+        """
+        Sends a text message using the active connection and also logs it using the logging mechanism
+
+        :param message: the message to be sent
+        :return: None
+        """
+        # TODO Logging
+        self.connection.send_text_message(message)
+
+    def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
+        """
+        Sends an image to the receiver, with an optional caption/title
+        :param receiver: The receiver of the message
+        :param message_image: The image to be sent
+        :param caption: The caption/title to be displayed along with the image, defaults to an empty string
+        :return: None
+        """
+        self.connection.send_image_message(receiver, message_image, caption)
+
+    def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
+        """
+        Sends an audio file to the receiver, with an optional caption/title
+        :param receiver: The receiver of the message
+        :param message_audio: The audio file to be sent
+        :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
+        :return: None
+        """
+        self.connection.send_audio_message(receiver, message_audio, caption)

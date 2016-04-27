@@ -82,8 +82,9 @@ class Message(object):
     The title of the message
     """
 
-    def __init__(self, message_body: str, message_title: str, address: str, identifier: str, name: str, incoming: bool,
-                 group: bool = False, single_address: str = "", single_identifier: str = "", single_name: str = "") \
+    def __init__(self, message_body: str, message_title: str, address: str, incoming: bool,
+                 identifier: str = "", name: str = "",
+                 group: bool = False, single_address: str = "", single_identifier: str = "", single_name: str = "")\
             -> None:
         """
         Constructor for the Message class
@@ -91,9 +92,9 @@ class Message(object):
         :param message_body: The actual message text
         :param message_title: The title of the message
         :param address: the sender address
+        :param incoming: True is incoming message, False if outgoing
         :param identifier: the sender identifier
         :param name: the sender name
-        :param incoming: True is incoming message, False if outgoing
         :param group: True if this is a group. The following information must onl be entered when the message comes
                         from/is addressed at a group
         :param single_address: the address of the individual group participant

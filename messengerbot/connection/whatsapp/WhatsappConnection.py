@@ -131,7 +131,7 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
             individual_identifier = message_protocol_entity.get_participant(False)
             individual_name = message_protocol_entity.get_notify()
 
-        return Message(body, "", sender_number, sender_identifier, sender_name, True, group,
+        return Message(body, "", sender_number, True, sender_identifier, sender_name, group,
                        individual_number, individual_identifier, individual_name)
 
     @staticmethod
