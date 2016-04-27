@@ -43,6 +43,7 @@ class Service(object):
         :param connection: The connection to be used by the service
         :return: None
         """
+        self.connection = connection
 
     @staticmethod
     def regex_check(message: str) -> bool:
@@ -64,7 +65,7 @@ class Service(object):
         """
         raise NotImplementedError()
 
-    def background_thread(self) -> None:
+    def background_process(self) -> None:
         """
         A method that should be run in the background if has_background_process is True
 
