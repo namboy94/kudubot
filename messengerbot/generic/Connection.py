@@ -1,0 +1,76 @@
+# coding=utf-8
+"""
+Copyright 2015,2016 Hermann Krumrey
+
+This file is part of messengerbot.
+
+    messengerbot makes use of various third-party python modules to serve
+    information via online chat services.
+
+    messengerbot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    messengerbot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with whatsbot.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+from messengerbot.interfaces.ServiceManager import ServiceManager
+
+
+class Connection(object):
+    """
+    Class that defines common interface elements to handle the connection to the various
+    messenger services
+    """
+
+    service_manager = ServiceManager()
+    """
+    An object that handles all active message services of the messenger bot
+    """
+
+    def send_text_message(self, receiver: str, message_body: str, message_title: str = "") -> None:
+        """
+        Sends a text message to the receiver. Some services allow the use of titles, but some don't,
+        so the message title is optional
+        :param receiver: The receiver of the message
+        :param message_body: The main message to be sent
+        :param message_title: The title of the message, defaults to an empty string
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
+        """
+        Sends an image to the receiver, with an optional caption/title
+        :param receiver: The receiver of the message
+        :param message_image: The image to be sent
+        :param caption: The caption/title to be displayed along with the image, defaults to an empty string
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
+        """
+        Sends an audio file to the receiver, with an optional caption/title
+        :param receiver: The receiver of the message
+        :param message_audio: The audio file to be sent
+        :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def on_incoming_message(self, sender: str, message_body: str) -> None:
+        """
+        Message called whenever a message is received
+        :param sender: The sender of the received message
+        :param message_body: The message body of the message
+        :return: None
+        """
+        self.service_manager.process_message(sender, message_body)
