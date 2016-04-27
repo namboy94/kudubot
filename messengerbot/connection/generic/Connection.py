@@ -22,6 +22,8 @@ This file is part of messengerbot.
 """
 
 # imports
+from typing import Tuple
+
 from messengerbot.servicehandlers.ServiceManager import ServiceManager
 
 
@@ -85,10 +87,11 @@ class Connection(object):
         # Process the message
         self.service_manager.process_message(sender, message_body)
 
-    def connect(self) -> None:
+    def establish_connection(self, credentials: Tuple[str]) -> None:
         """
         Establishes the connection to the specific service
 
+        :param credentials: Credentials used to establish the connection
         :return: None
         """
         raise NotImplementedError()

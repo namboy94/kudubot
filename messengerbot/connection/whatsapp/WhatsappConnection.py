@@ -22,7 +22,10 @@ This file is part of messengerbot.
 """
 
 # imports
+from typing import Tuple
+
 from yowsup.layers.interface import YowInterfaceLayer
+from yowsup.layers.interface import ProtocolEntityCallback
 
 from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.whatsapp.yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
@@ -47,23 +50,9 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         # Don't do anything if in static mode
         if static:
             return
-
-        super().__init__()
-        YowInterfaceLayer.__init__(self)
-        self.accountDelWarnings = 0
-        self.connected = False
-        self.username = None
-        self.sendReceipts = True
-        self.disconnectAction = self.__class__.disconnect_action_prompt
-        self.credentials = None
-        self.jid_aliases = {}
-
-        # Methods to run on start
-        self.plugin_manager_setup()
-        self.set_presence_name("Whatsapp-Bot")
-        self.profile_set_status("I am a whatsbot.")
-
-
+        else:
+            super().__init__()
+            YowInterfaceLayer.__init__(self)
 
     def send_text_message(self, receiver: str, message_body: str, message_title: str = "") -> None:
         """
@@ -96,23 +85,20 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         """
         raise NotImplementedError()
 
-    def on_incoming_message(self, sender: str, message_body: str) -> None:
-        """
-        Message called whenever a message is received
-        :param sender: The sender of the received message
-        :param message_body: The message body of the message
-        :return: None
-        """
-        # Create a ServiceManager object if there is None before this
-        if self.service_manager is None:
-            self.service_manager = ServiceManager(self)
-        # Process the message
-        self.service_manager.process_message(sender, message_body)
-
-    def connect(self) -> None:
+    def establish_connection(self, credentials: Tuple[str]) -> None:
         """
         Establishes the connection to the specific service
 
         :return: None
         """
-        x = WhatsappConnection()
+        echo_stack = YowsupEchoStack(WhatsappConnection, credentials)
+        echo_stack.start()
+
+    @ProtocolEntityCallback("message")
+    def on_message(self, message_protocol_entity):
+        """
+        Method run when a message is received
+        :param message_protocol_entity: the message received
+        :return: void
+        """
+        self.on_incoming_message()

@@ -24,6 +24,8 @@ This file is part of messengerbot.
 # imports
 from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.protocol_messages.protocolentities import MessageProtocolEntity
+from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
+from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
 
 from messengerbot.connection.whatsapp.yowsupwrapper.entities.EntityAdapter import EntityAdapter
 
@@ -35,6 +37,7 @@ class WrappedYowInterfaceLayer(YowInterfaceLayer):
     """
 
     # Required local variables
+    disconnect_action_prompt = 0
     accountDelWarnings = 0
     connected = False
     username = None
@@ -55,7 +58,8 @@ class WrappedYowInterfaceLayer(YowInterfaceLayer):
         except AttributeError:
             self.toLower(entity)
 
-    def send_iq(self, entity: MessageProtocolEntity, success_fn: callable, error_fn: callable) -> None:
+    def send_iq(self, entity: RequestUploadIqProtocolEntity or SetStatusIqProtocolEntity,
+                success_fn: callable, error_fn: callable) -> None:
         """
         Used whenerver media files are sent
 

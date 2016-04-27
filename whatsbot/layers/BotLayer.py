@@ -66,7 +66,6 @@ class BotLayer(WrappedYowInterfaceLayer):
     """
 
     # class variables
-    disconnectAction = 0
     disconnect_action_prompt = 0
     parallel_running = False
     plugin_manager = None
@@ -136,13 +135,6 @@ class BotLayer(WrappedYowInterfaceLayer):
 
     # YOWSUP SPECIFIC METHODS
 
-    accountDelWarnings = 0
-    connected = False
-    username = None
-    sendReceipts = True
-    credentials = None
-    jid_aliases = {}
-
     def __init__(self):
         """
         Constructor, can be expanded for more functionality
@@ -152,9 +144,13 @@ class BotLayer(WrappedYowInterfaceLayer):
         # Some CamelCase formatting, please ignore
         super(BotLayer, self).__init__()
         YowInterfaceLayer.__init__(self)
-
-
-
+        self.accountDelWarnings = 0
+        self.connected = False
+        self.username = None
+        self.sendReceipts = True
+        self.disconnectAction = self.__class__.disconnect_action_prompt
+        self.credentials = None
+        self.jid_aliases = {}
 
         # Methods to run on start
         self.plugin_manager_setup()
