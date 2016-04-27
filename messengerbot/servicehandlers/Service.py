@@ -22,6 +22,7 @@ This file is part of messengerbot.
 """
 
 # imports
+
 from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.generic.Message import Message
 
@@ -37,6 +38,20 @@ class Service(object):
     """
 
     connection = None
+    """
+    The connection to use to send messages
+    """
+
+    help_description = {"en": "A Generic Service Interface",
+                        "de": "Eine Generische Dienstleistungsschnittstelle"}
+    """
+    A dictionary containing help messages in various languages on the use of the service
+    """
+
+    identifier = "Service"
+    """
+    A unique identifier assigned to the plugin.
+    """
 
     def __init__(self, connection: Connection) -> None:
         """
@@ -46,33 +61,6 @@ class Service(object):
         :return: None
         """
         self.connection = connection
-
-    @staticmethod
-    def regex_check(message: Message) -> bool:
-        """
-        Check if the received message is a valid command for this service
-
-        :param message: the message to be checked
-        :return: True if the message is a valid command, False otherwise
-        """
-        raise NotImplementedError()
-
-    def process_message(self, message: Message) -> None:
-        """
-        Process a message according to the service's functionality
-
-        :param message: the message to process
-        :return: None
-        """
-        raise NotImplementedError()
-
-    def background_process(self) -> None:
-        """
-        A method that should be run in the background if has_background_process is True
-
-        :return: None
-        """
-        raise NotImplementedError()
 
     def send_text_message(self, message: Message) -> None:
         """
@@ -92,6 +80,7 @@ class Service(object):
         :param caption: The caption/title to be displayed along with the image, defaults to an empty string
         :return: None
         """
+        # TODO Logging
         self.connection.send_image_message(receiver, message_image, caption)
 
     def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
@@ -102,4 +91,51 @@ class Service(object):
         :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
         :return: None
         """
+        # TODO Logging
         self.connection.send_audio_message(receiver, message_audio, caption)
+
+    def process_message(self, message: Message) -> None:
+        """
+        Process a message according to the service's functionality
+
+        :param message: the message to process
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def background_process(self) -> None:
+        """
+        A method that should be run in the background if has_background_process is True
+
+        :return: None
+        """
+        if not self.has_background_process:
+            return
+        else:
+            raise NotImplementedError()
+
+    @staticmethod
+    def regex_check(message: Message) -> bool:
+        """
+        Check if the received message is a valid command for this service
+
+        :param message: the message to be checked
+        :return: True if the message is a valid command, False otherwise
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_description(language):
+        """
+        Method that returns the help description of the plugin in a particular language.
+        If the selected language has no description, the string
+        "No help available for this language"
+        will be returned instead
+
+        :param language: the language to be returned
+        :return: the description in that language
+        """
+        try:
+            return Service.help_description[language.lower()]
+        except KeyError:
+            return "No help available for this language"

@@ -85,7 +85,7 @@ class Connection(object):
         # Process the message
         self.service_manager.process_message(message)
 
-    def establish_connection(self, credentials: Tuple[str]) -> None:
+    def establish_connection(self, credentials: Tuple) -> None:
         """
         Establishes the connection to the specific service
 

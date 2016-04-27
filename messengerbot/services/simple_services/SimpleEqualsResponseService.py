@@ -22,7 +22,6 @@ This file is part of whatsbot.
 """
 
 from messengerbot.servicehandlers.Service import Service
-from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.generic.Message import Message
 
 
@@ -30,6 +29,18 @@ class SimpleEqualsResponseService(Service):
     """
     The SimpleEqualsResponseService Class that extends the generic Service class.
     The service responds to strings that exactly match pre-defined options
+    """
+
+    identifier = "simple_equals_response"
+    """
+    The identifier for this service
+    """
+
+    help_description = {"en": "",
+                        "de": ""}
+    """
+    Help description for this service. It's empty, because this service does not act on actual commands
+    per say.
     """
 
     case_insensitive_options = {"uptime": "Much too long, I'm tired"}
@@ -42,31 +53,6 @@ class SimpleEqualsResponseService(Service):
     """
     Case-sensitive defined response conditions and responses
     """
-
-    def __init__(self, connection: Connection) -> None:
-        """
-        Constructor of the SimpleEqualsResponseService class.
-        It defines parameters for the plugin.
-
-        :param connection: The connection defined
-        :return: None
-        """
-        super().__init__(connection)
-
-    @staticmethod
-    def regex_check(message: Message) -> bool:
-        """
-        Checks if the user input is valid for this plugin to continue
-
-        :return: True if input is valid, False otherwise
-        """
-        for option in SimpleEqualsResponseService.case_sensitive_options:
-            if option == message.message_body:
-                return True
-        for option in SimpleEqualsResponseService.case_insensitive_options:
-            if option == message.message_body.lower():
-                return True
-        return False
 
     def process_message(self, message: Message) -> None:
         """
@@ -84,19 +70,16 @@ class SimpleEqualsResponseService(Service):
         self.send_text_message(reply_message)
 
     @staticmethod
-    def get_description(language):
+    def regex_check(message: Message) -> bool:
         """
-        Empty description, since this plugin doesn't really provide any functionality
+        Checks if the user input is valid for this plugin to continue
 
-        :param language: the language to be returned
-        :return: an empty string
+        :return: True if input is valid, False otherwise
         """
-        return ""
-
-    @staticmethod
-    def get_plugin_name():
-        """
-        Returns the plugin name
-        :return: the plugin name
-        """
-        return "Simple Equals Plugin"
+        for option in SimpleEqualsResponseService.case_sensitive_options:
+            if option == message.message_body:
+                return True
+        for option in SimpleEqualsResponseService.case_insensitive_options:
+            if option == message.message_body.lower():
+                return True
+        return False

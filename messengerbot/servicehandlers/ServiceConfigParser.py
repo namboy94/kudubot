@@ -23,6 +23,7 @@ This file is part of messengerbot.
 
 # imports
 from typing import List
+
 from messengerbot.servicehandlers.Service import Service
 
 
@@ -43,4 +44,5 @@ class ServiceConfigParser(object):
         :return: a list of the active plugins (according to the config file)
         """
         # TODO implement the parser
+        str(connection_identifier)
         return all_services

@@ -85,7 +85,7 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         self.send_audio(receiver, message_audio)
 
     @staticmethod
-    def establish_connection(credentials: Tuple[str]) -> None:
+    def establish_connection(credentials: Tuple[str, str]) -> None:
         """
         Establishes the connection to the specific service
 
@@ -146,3 +146,8 @@ class WhatsappConnection(WrappedYowInterfaceLayer, YowsupEchoLayer, Connection):
         body = message.message_body
 
         return WrappedTextMessageProtocolEntity(body, to=to)
+
+if __name__ == "__main__":
+    number = "4915202589168"
+    password = "co6rEWF2GrMpdaiTXpp8lxld/a4="
+    WhatsappConnection.establish_connection((number, password))

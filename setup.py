@@ -34,7 +34,7 @@ def readme():
         return f.read()
 
 
-setup(name='whatsbot',
+setup(name='messengerbot',
       version='0.3.5',
       description='An automated Whatsapp bot',
       long_description=readme(),
