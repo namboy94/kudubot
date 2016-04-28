@@ -2,6 +2,8 @@
 
 messengerbot is a bot framework that allows running a bot on a multitude of messaging services
 
+This project was formerly known as whatsbot and whatsapp-bot.
+
 Currently supported are:
 
 * Email
