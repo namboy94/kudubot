@@ -5,7 +5,7 @@ Copyright 2015,2016 Hermann Krumrey
 This file is part of messengerbot.
 
     messengerbot makes use of various third-party python modules to serve
-    information via the online chat service Whatsapp.
+    information via online chat services.
 
     messengerbot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,3 +20,10 @@ This file is part of messengerbot.
     You should have received a copy of the GNU General Public License
     along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
 """
+
+# imports
+from messengerbot.main import main
+from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
+
+if __name__ == '__main__':
+    main(WhatsappConnection.identifier)

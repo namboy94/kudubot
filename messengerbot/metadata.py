@@ -26,7 +26,7 @@ The metadata is stored here. It can be used by any other module in this project 
 notably by the setup.py file
 """
 
-project_name = "messengerbot"
+project_name = "messenger_bot"
 """
 The name of the project
 """
@@ -36,7 +36,7 @@ project_description = "A bot that interfaces with several different messenger se
 A short description of the project
 """
 
-version_number = "0.3.5"
+version_number = "0.3.7"
 """
 The current version of the program.
 """

@@ -35,40 +35,51 @@ A list of possible connections
 """
 
 
-def main() -> None:
+def main(override: str = "", verbosity: int = 0) -> None:
     """
     The main method of the program
 
+    :param override: Can be used to override the main method to force a specific connection to run
+    :param verbosity: Can be set to define how verbose the outpt will be. Defaults to 0, no or only basic output
     :return: None
     """
 
+    if verbosity > 0:
+        print("Starting program")
+
     try:
-        # Check for invalid amount of arguments
-        if len(sys.argv) == 1:
-            print("No connection type selected.")
-            sys.exit(1)
-        elif len(sys.argv) > 2:
-            print("Too many connection types defined")
-            sys.exit(1)
+        if not override:
+            # Check for invalid amount of arguments
+            if len(sys.argv) == 1:
+                print("No connection type selected.")
+                sys.exit(1)
+            elif len(sys.argv) > 2:
+                print("Too many connection types defined")
+                sys.exit(1)
 
         # Check if the local configs are OK and if necessary fix them
         LocalConfigChecker.check_and_fix_config(connections)
 
+        if override:
+            selected_connection = override
+        else:
+            selected_connection = sys.argv[1]
+
         # Generate the connection
         connected = False
         for connection in connections:
-            if connection.identifier == sys.argv[1]:
+            if connection.identifier == selected_connection:
                 connected = True
                 connection.establish_connection()
 
         if not connected:
             print("No valid connection type selected")
-            sys.argv(1)
+            sys.exit(1)
 
     except KeyboardInterrupt:
         pass
 
-    print("Thanks for using Messengerbot")
+    print("Thanks for using messengerbot")
 
 
 if __name__ == "__main__":

@@ -1,1 +1,5 @@
-Life's too short for changelogs
+V 0.3.7
+  -  Added scripts to be installed by setup.py
+  -  updated readme
+V 0.3.6
+  -  Changed from being a whatsapp-only bot to a multi-purpose bot
