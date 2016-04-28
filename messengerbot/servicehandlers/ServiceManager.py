@@ -24,8 +24,9 @@ This file is part of messengerbot.
 # imports
 from threading import Thread
 
-#services
+# services
 from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
+from messengerbot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
 
 from messengerbot.connection.generic.Message import Message
 from messengerbot.servicehandlers.ServiceConfigParser import ServiceConfigParser
@@ -38,7 +39,8 @@ class ServiceManager(object):
     The ServiceManager class handles the implemented Services and processes incoming messages
     """
 
-    all_services = [SimpleEqualsResponseService]
+    all_services = [SimpleEqualsResponseService,
+                    SimpleContainsResponseService]
     """
     A list of all implemented services
     """

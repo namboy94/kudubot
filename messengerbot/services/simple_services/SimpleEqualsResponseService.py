@@ -72,7 +72,7 @@ class SimpleEqualsResponseService(Service):
     @staticmethod
     def regex_check(message: Message) -> bool:
         """
-        Checks if the user input is valid for this plugin to continue
+        Checks if the user input is valid for this service to continue
 
         :return: True if input is valid, False otherwise
         """

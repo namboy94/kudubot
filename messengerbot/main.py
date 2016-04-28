@@ -24,6 +24,7 @@ This file is part of messengerbot.
 # imports
 import sys
 
+import messengerbot.metadata as metadata
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 from messengerbot.connection.email.EmailConnection import EmailConnection
 # from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
@@ -43,8 +44,9 @@ def main(override: str = "", verbosity: int = 0) -> None:
     :param verbosity: Can be set to define how verbose the outpt will be. Defaults to 0, no or only basic output
     :return: None
     """
+    metadata.verbosity = verbosity
 
-    if verbosity > 0:
+    if metadata.verbosity > 0:
         print("Starting program")
 
     try:

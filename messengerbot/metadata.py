@@ -72,12 +72,12 @@ license_type = "GNU GPL3"
 The project's license type
 """
 
-python3_requirements = ['tvdb_api', 'beautifulsoup4', 'typing']
+python3_requirements = ['tvdb_api', 'yowsup2', 'pywapi', 'pillow',  'beautifulsoup4', 'typing']
 """
 Python 3 Python Packaging Index requirements
 """
 
-python2_requirements = ['tvdb_api', 'beautifulsoup4', 'typing']
+python2_requirements = ['tvdb_api', 'yowsup2', 'pywapi', 'pillow',  'beautifulsoup4', 'typing']
 """
 Python 2 Python Packaging Index requirements
 """
@@ -85,4 +85,9 @@ Python 2 Python Packaging Index requirements
 scripts = ['bin/messengerbot']
 """
 List of script files to be installed during installation
+"""
+
+verbosity = 0
+"""
+Identifier for the selected verbosity
 """
