@@ -28,9 +28,11 @@ import messengerbot.metadata as metadata
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 from messengerbot.connection.email.EmailConnection import EmailConnection
 from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
+from messengerbot.connection.telegram.TelegramConnection import TelegramConnection
 
 connections = [EmailConnection,
-               WhatsappConnection]
+               WhatsappConnection,
+               TelegramConnection]
 """
 A list of possible connections
 """
@@ -85,4 +87,4 @@ def main(override: str = "", verbosity: int = 0) -> None:
 
 
 if __name__ == "__main__":
-    main(override='whatsapp', verbosity=2)
+    main(override='telegram', verbosity=2)

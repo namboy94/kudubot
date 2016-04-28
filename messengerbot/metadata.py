@@ -36,7 +36,7 @@ project_description = "A bot that interfaces with several different messenger se
 A short description of the project
 """
 
-version_number = "0.3.7"
+version_number = "0.3.8"
 """
 The current version of the program.
 """

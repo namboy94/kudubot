@@ -26,4 +26,4 @@ from messengerbot.main import main
 from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
 
 if __name__ == '__main__':
-    main(WhatsappConnection.identifier)
+    main(WhatsappConnection.identifier, verbosity=1)

@@ -26,4 +26,4 @@ from messengerbot.main import main
 from messengerbot.connection.email.EmailConnection import EmailConnection
 
 if __name__ == '__main__':
-    main(EmailConnection.identifier)
+    main(EmailConnection.identifier, verbosity=1)

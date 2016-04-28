@@ -21,6 +21,8 @@
           <option value="sys.setdefaultencoding" />
           <option value="run.reload" />
           <option value="plugins.PluginManagerGui.Tkinter" />
+          <option value="telegram.message.Message.update_id" />
+          <option value="telegram.message.Message.message" />
         </list>
       </option>
     </inspection_tool>
