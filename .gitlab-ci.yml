@@ -16,6 +16,7 @@ uninstall:
   stage: setup
   script:
     - sudo pip3.5 uninstall -y messengerbot
+  allow_failure: true
 
 run_unit_tests:
   stage: test

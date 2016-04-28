@@ -31,8 +31,12 @@ from messengerbot.services.simple_services.SimpleContainsResponseService import 
 
 from messengerbot.connection.generic.Message import Message
 from messengerbot.servicehandlers.ServiceConfigParser import ServiceConfigParser
-# from messengerbot.connection.generic.Connection import Connection
-Connection = object
+
+# Weird import strucutre due to cyclic imports
+try:
+    from messengerbot.connection.generic.Connection import Connection
+except ImportError:
+    Connection = object
 
 
 class ServiceManager(object):
@@ -66,7 +70,6 @@ class ServiceManager(object):
         :return: None
         """
         self.connection = connection
-        # noinspection PyUnresolvedReferences
         self.active_services = ServiceConfigParser.read_config(self.all_services, connection.identifier)
         self.start_background_processes()
 

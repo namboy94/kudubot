@@ -220,8 +220,7 @@ class FootballInfoService(Service):
         soup = BeautifulSoup(html, "html.parser")
         return soup.select(html_element)
 
-    @staticmethod
-    def format_league_table(league_table_dictionary: Dict[int, Dict[str, str]]) -> str:
+    def format_league_table(self, league_table_dictionary: Dict[int, Dict[str, str]]) -> str:
         """
         Formats a league table dictionary
 
@@ -230,28 +229,44 @@ class FootballInfoService(Service):
         """
         # Determine how long the longest team name is
         longest_team_name = 0
-        for position in range(1, len(league_table_dictionary)):
+        for position in range(1, len(league_table_dictionary) + 1):
             team_name_length = len(league_table_dictionary[position]["team_name"])
             if team_name_length > longest_team_name:
                 longest_team_name = team_name_length
 
-        formatted_string = "#    " + "Team Name".ljust(longest_team_name) + \
-                           "  P     W     D     L     GF    GA    GD    Pts\n"
-        divider = "  "
+        if self.connection.identifier in ["whatsapp", "telegram"]:  # For mobile messengers
 
-        for position in range(1, len(league_table_dictionary)):
-            line = "\n" + str(position).ljust(3) + divider
-            line += league_table_dictionary[position]["team_name"].ljust(longest_team_name) + divider
-            line += league_table_dictionary[position]["matches"].ljust(4) + divider
-            line += league_table_dictionary[position]["wins"].ljust(4) + divider
-            line += league_table_dictionary[position]["draws"].ljust(4) + divider
-            line += league_table_dictionary[position]["losses"].ljust(4) + divider
-            line += league_table_dictionary[position]["goals_for"].ljust(4) + divider
-            line += league_table_dictionary[position]["goals_against"].ljust(4) + divider
-            line += league_table_dictionary[position]["goal_difference"].rjust(4) + divider
-            line += league_table_dictionary[position]["points"].ljust(4)
+            formatted_string = "#   " + "Team Name".ljust(12) + " FOR:AG  Pts"
+            divider = " "
 
-            formatted_string += line
+            for position in range(1, len(league_table_dictionary) + 1):
+                line = "\n" + str(position).ljust(3) + divider
+                line += league_table_dictionary[position]["team_name"].ljust(longest_team_name)[0:15] + divider
+                line += league_table_dictionary[position]["goals_for"] + ":"
+                line += league_table_dictionary[position]["goals_against"] + divider
+                line += league_table_dictionary[position]["points"]
+
+                formatted_string += line
+
+        else:  # For normal messages like email
+
+            formatted_string = "#    " + "Team Name".ljust(longest_team_name) + \
+                               "  P     W     D     L     GF    GA    GD    Pts\n"
+            divider = "  "
+
+            for position in range(1, len(league_table_dictionary) + 1):
+                line = "\n" + str(position).ljust(3) + divider
+                line += league_table_dictionary[position]["team_name"].ljust(longest_team_name) + divider
+                line += league_table_dictionary[position]["matches"].ljust(4) + divider
+                line += league_table_dictionary[position]["wins"].ljust(4) + divider
+                line += league_table_dictionary[position]["draws"].ljust(4) + divider
+                line += league_table_dictionary[position]["losses"].ljust(4) + divider
+                line += league_table_dictionary[position]["goals_for"].ljust(4) + divider
+                line += league_table_dictionary[position]["goals_against"].ljust(4) + divider
+                line += league_table_dictionary[position]["goal_difference"].rjust(4) + divider
+                line += league_table_dictionary[position]["points"].ljust(4)
+
+                formatted_string += line
 
         return formatted_string
 

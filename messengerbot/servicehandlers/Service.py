@@ -24,8 +24,12 @@ This file is part of messengerbot.
 # imports
 
 from messengerbot.connection.generic.Message import Message
-# from messengerbot.connection.generic.Connection import Connection
-Connection = object
+
+# Weird import structure due to cyclic dependency
+try:
+    from messengerbot.connection.generic.Connection import Connection
+except ImportError:
+    Connection = object
 
 
 class Service(object):
