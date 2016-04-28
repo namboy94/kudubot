@@ -24,8 +24,8 @@ This file is part of messengerbot.
 # imports
 import time
 import telegram
-from telegram.error import NetworkError, Unauthorized
 from typing import List
+from telegram.error import NetworkError, Unauthorized
 
 from messengerbot.connection.generic.Message import Message
 from messengerbot.connection.generic.Connection import Connection
@@ -61,6 +61,8 @@ class TelegramConnection(telegram.Bot, Connection):
         :return: None
         """
         super().__init__(api_key)
+        self.initialize()
+
         self.api_key = api_key
 
         try:
@@ -110,11 +112,11 @@ class TelegramConnection(telegram.Bot, Connection):
 
         for update in self.getUpdates(offset=self.update_id, timeout=10):
 
-            chat_id = update.message.chat_id
             self.update_id = update.update_id + 1
+            chat_id = update.message.chat_id
             message = update.message.text
 
-            messages.append(Message(message, "", chat_id, True))
+            messages.append(Message(message, "", chat_id, True, chat_id, chat_id))
 
         return messages
 

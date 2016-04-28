@@ -5,7 +5,7 @@ Copyright 2015,2016 Hermann Krumrey
 This file is part of messengerbot.
 
     messengerbot makes use of various third-party python modules to serve
-    information via the online chat service Whatsapp.
+    information via the online chat services.
 
     messengerbot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

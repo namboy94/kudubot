@@ -125,5 +125,9 @@ class Message(object):
 
         :return: the message as a string
         """
-        # TODO do this right
-        return self.message_body + " from " + self.address
+        if self.incoming:
+            message_as_string = "RECV: From " + str(self.address) + ": " + str(self.message_body)
+        else:
+            message_as_string = "SENT: To " + str(self.address) + ": " + str(self.message_body)
+
+        return message_as_string

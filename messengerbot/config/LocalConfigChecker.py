@@ -5,7 +5,7 @@ Copyright 2015,2016 Hermann Krumrey
 This file is part of messengerbot.
 
     messengerbot makes use of various third-party python modules to serve
-    information via the online chat service Whatsapp.
+    information via the online chat services.
 
     messengerbot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,12 @@ This file is part of messengerbot.
 import os
 
 from typing import List
-from messengerbot.connection.generic.Connection import Connection
+
+# Import structure to combat cyclic imports
+try:
+    from messengerbot.connection.generic.Connection import Connection
+except ImportError:
+    Connection = None
 
 
 class LocalConfigChecker(object):
@@ -91,3 +96,14 @@ class LocalConfigChecker(object):
                 os.makedirs(connection_contacts)
             if not os.path.isfile(connection_config):
                 open(connection_config, 'w').close()
+
+            message_logs = os.path.join(connection_logs, "messages")
+            group_logs = os.path.join(message_logs, "groups")
+            user_logs = os.path.join(message_logs, "users")
+
+            if not os.path.isdir(message_logs):
+                os.makedirs(message_logs)
+            if not os.path.isdir(group_logs):
+                os.makedirs(group_logs)
+            if not os.path.isdir(user_logs):
+                os.makedirs(user_logs)

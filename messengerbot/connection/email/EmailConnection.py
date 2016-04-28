@@ -61,6 +61,7 @@ class EmailConnection(Connection):
                                 (email address, password, server, imap port, smtp port)
         :return: None
         """
+        self.initialize()
         self.credentials = credentials
         self.smtp_sender = SmtpSender(credentials)
 

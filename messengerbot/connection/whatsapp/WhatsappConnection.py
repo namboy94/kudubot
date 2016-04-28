@@ -57,6 +57,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         super().__init__()
         # noinspection PyCallByClass
         YowInterfaceLayer.__init__(self)
+        self.initialize()
 
     def send_text_message(self, message: Message) -> None:
         """

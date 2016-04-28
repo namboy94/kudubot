@@ -22,8 +22,10 @@ This file is part of messengerbot.
 """
 
 # imports
-from messengerbot.servicehandlers.ServiceManager import ServiceManager
+import messengerbot.metadata as metadata
 from messengerbot.connection.generic.Message import Message
+from messengerbot.logger.MessageLogger import MessageLogger
+from messengerbot.servicehandlers.ServiceManager import ServiceManager
 
 
 class Connection(object):
@@ -41,6 +43,19 @@ class Connection(object):
     """
     An object that handles all active message services of the messenger bot
     """
+
+    message_logger = None
+    """
+    A message logger, needs to be initialized by the initialize method
+    """
+
+    def initialize(self):
+        """
+        Common constructor for the individual connections to be called in the actual constructor
+
+        :return: None
+        """
+        self.message_logger = MessageLogger(self.identifier, metadata.verbosity)
 
     def send_text_message(self, message: Message) -> None:
         """
@@ -75,7 +90,7 @@ class Connection(object):
 
     def on_incoming_message(self, message: Message) -> None:
         """
-        Message called whenever a message is received
+        Method called whenever a message is received
 
         :param message: The received message object
         :return: None
@@ -83,7 +98,9 @@ class Connection(object):
         # Create a ServiceManager object if there is None before this
         if self.service_manager is None:
             self.service_manager = ServiceManager(self)
-        # Process the message
+
+        # Process and log the message
+        self.message_logger.log_message(message)
         self.service_manager.process_message(message)
 
     @staticmethod

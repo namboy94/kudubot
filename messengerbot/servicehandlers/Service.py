@@ -74,7 +74,7 @@ class Service(object):
         :param message: the message to be sent
         :return: None
         """
-        # TODO Logging
+        self.connection.message_logger.log_message(message)
         self.connection.send_text_message(message)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:

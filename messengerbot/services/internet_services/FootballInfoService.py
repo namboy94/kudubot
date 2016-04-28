@@ -5,7 +5,7 @@ Copyright 2015,2016 Hermann Krumrey
 This file is part of messengerbot.
 
     messengerbot makes use of various third-party python modules to serve
-    information via the online chat service Whatsapp.
+    information via the online chat services.
 
     messengerbot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class FootballInfoService(Service):
             else:
                 regex_term += ("|" + descriptor)
 
-        regex_term += ")( [^ ]+, [^ ]+)?$"
+        regex_term += ")( [^ ]+, [^ ]+)$"
 
         return re.search(re.compile(regex_term), message.message_body.lower())
 
