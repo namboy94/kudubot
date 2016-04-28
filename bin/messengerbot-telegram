@@ -24,7 +24,7 @@ This file is part of messengerbot.
 
 # imports
 from messengerbot.main import main
-from messengerbot.connection.email.EmailConnection import EmailConnection
+from messengerbot.connection.telegram.TelegramConnection import TelegramConnection
 
 if __name__ == '__main__':
-    main(EmailConnection.identifier, verbosity=1)
+    main(TelegramConnection.identifier, verbosity=1)

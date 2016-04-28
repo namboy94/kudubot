@@ -1,3 +1,7 @@
+V 0.3.9.1
+  - Added more scripts
+  - Added shebang to scripts
+  - Added python-telegram-bot to dependencies
 V 0.3.9
   - Added a message logger
 V 0.3.8

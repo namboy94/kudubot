@@ -24,7 +24,6 @@ This file is part of messengerbot.
 
 # imports
 from messengerbot.main import main
-from messengerbot.connection.email.EmailConnection import EmailConnection
 
 if __name__ == '__main__':
-    main(EmailConnection.identifier, verbosity=1)
+    main(verbosity=1)
