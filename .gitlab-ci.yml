@@ -23,6 +23,7 @@ run_unit_tests:
     - cd
     - cd messengerbot
     - python setup.py test
+  allow_failure: true
 
 generate_statistics:
   stage: test
