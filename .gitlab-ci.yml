@@ -79,5 +79,5 @@ upgrade_from_pypi:
   stage: upgrade
   when: always
   script:
-    - sudo pip3.5 install messengerbot --upgrade
+    - sudo pip3.5 install messenger_bot --upgrade
     - sleep 5
