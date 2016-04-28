@@ -118,3 +118,12 @@ class Message(object):
             self.single_address = single_address
             self.single_identifier = single_identifier
             self.single_name = single_name
+
+    def to_string(self) -> str:
+        """
+        Creates a string from the message's attributes
+
+        :return: the message as a string
+        """
+        # TODO do this right
+        return self.message_body + " from " + self.address

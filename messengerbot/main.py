@@ -27,10 +27,10 @@ import sys
 import messengerbot.metadata as metadata
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 from messengerbot.connection.email.EmailConnection import EmailConnection
-# from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
+from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
 
-connections = [EmailConnection]
-# WhatsappConnection]
+connections = [EmailConnection,
+               WhatsappConnection]
 """
 A list of possible connections
 """
@@ -85,4 +85,4 @@ def main(override: str = "", verbosity: int = 0) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(override='whatsapp', verbosity=2)

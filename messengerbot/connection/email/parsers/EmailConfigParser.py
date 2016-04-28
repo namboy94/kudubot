@@ -71,7 +71,7 @@ class EmailConfigParser(object):
         parsed_config = dict(config.items("credentials"))
 
         try:
-            # Get the valuse from the config file
+            # Get the values from the config file
             return_tuple = (parsed_config["address"], parsed_config["password"], parsed_config["server"],
                             parsed_config["imap_port"], parsed_config["smtp_port"])
 

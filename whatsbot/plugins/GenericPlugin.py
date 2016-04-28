@@ -142,7 +142,7 @@ class GenericPlugin(object):
         Sends an audio file outside of the normal yowsup loop
         :param recipient: the receiver of the audio
         :param audio_path: the audio file to be send
-        :param audio_text: text for logging purposes
+        :param audio_text: text for logger purposes
         :return: void
         """
         if self.layer.muted:

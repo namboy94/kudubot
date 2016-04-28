@@ -23,16 +23,17 @@ This file is part of messengerbot.
 
 # imports
 import re
-from typing import Tuple
 
 from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.interface import ProtocolEntityCallback
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 
+import messengerbot.metadata as metadata
 from messengerbot.connection.generic.Message import Message
 from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.whatsapp.layers.YowsupEchoLayer import YowsupEchoLayer
 from messengerbot.connection.whatsapp.stacks.YowsupEchoStack import YowsupEchoStack
+from messengerbot.connection.whatsapp.parsers.WhatsappConfigParser import WhatsappConfigParser
 from messengerbot.connection.whatsapp.yowsupwrapper.entities.WrappedTextMessageProtocolEntity \
     import WrappedTextMessageProtocolEntity
 
@@ -92,13 +93,18 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         self.send_audio(receiver, message_audio)
 
     @staticmethod
-    def establish_connection(credentials: Tuple[str, str]) -> None:
+    def establish_connection() -> None:
         """
         Establishes the connection to the specific service
 
         :return: None
         """
+        credentials = WhatsappConfigParser.parse_whatsapp_config(WhatsappConnection.identifier)
         echo_stack = YowsupEchoStack(WhatsappConnection, credentials)
+
+        if metadata.verbosity > 0:
+            print("Starting Whatsapp Connection")
+
         echo_stack.start()
 
     @ProtocolEntityCallback("message")
@@ -108,6 +114,9 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         :param message_protocol_entity: the message received
         :return: void
         """
+        if metadata.verbosity > 1:
+            print("Received Message")
+
         # Wrap the message protocol entity in a PEP8-compliant Wrapper
         wrapped_entity = WrappedTextMessageProtocolEntity(entity=message_protocol_entity)
         message = self.convert_text_message_protocol_entity_to_message(wrapped_entity)

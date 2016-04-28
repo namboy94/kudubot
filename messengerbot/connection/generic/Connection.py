@@ -22,8 +22,6 @@ This file is part of messengerbot.
 """
 
 # imports
-from typing import Tuple
-
 from messengerbot.servicehandlers.ServiceManager import ServiceManager
 from messengerbot.connection.generic.Message import Message
 

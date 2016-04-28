@@ -27,6 +27,7 @@ import time
 import email
 from typing import Tuple
 
+import messengerbot.metadata as metadata
 from messengerbot.connection.generic.Message import Message
 
 
@@ -63,6 +64,9 @@ class ImapListener(object):
         # store the callback
         self.callback = callback_function
 
+        if metadata.verbosity > 0:
+            print("Connecting to the IMAP server")
+
         # Connect to the server
         self.imap = imaplib.IMAP4_SSL("imap." + server, int(imap_port))
         self.imap.login(username, password)
@@ -74,7 +78,13 @@ class ImapListener(object):
 
         :return: None
         """
+        if metadata.verbosity > 0:
+            print("Starting listening for new Email messages")
+
         while True:
+            if metadata.verbosity > 2:
+                print("Looping Email Listener")
+
             # select the Inbox folder
             self.imap.select('INBOX')
 
@@ -98,7 +108,12 @@ class ImapListener(object):
                 except AttributeError:  # When attachments etc are included
                     body = email_message.get_payload(decode=False)[0].split("\r\n")[0]
 
-                self.callback(Message(body, title, sender_address, True, sender_identifier, sender_name))
+                message_object = Message(body, title, sender_address, True, sender_identifier, sender_name)
+
+                if metadata.verbosity > 1:
+                    print(message_object.to_string())
+
+                self.callback(message_object)
 
             # Sleep 5 seconds after every check
             time.sleep(5)
