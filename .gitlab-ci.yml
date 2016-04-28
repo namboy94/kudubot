@@ -10,7 +10,7 @@ clone:
   script:
     - cd
     - git clone http://gitlab.namibsun.net/namboy94/messengerbot.git
-    - git clone http://gitlab.namibsun.net/namboy94/messengerbot.wiki.git
+    - git clone git@gitlab.namibsun.net:namboy94/messengerbot.wiki.git
 
 uninstall:
   stage: setup
