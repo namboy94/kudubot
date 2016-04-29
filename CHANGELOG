@@ -1,3 +1,5 @@
+V 0.4.0.1
+  - Added script files to setup.py
 V 0.4
   - Added plugin config parses
   - Implemented Help framework

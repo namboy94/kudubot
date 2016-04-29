@@ -15,7 +15,7 @@ clone:
 uninstall:
   stage: setup
   script:
-    - sudo pip3.5 uninstall -y messengerbot
+    - sudo pip3.5 uninstall -y messenger_bot
   allow_failure: true
 
 run_unit_tests:

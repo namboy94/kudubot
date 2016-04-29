@@ -65,8 +65,10 @@ setup(name=metadata.project_name,
       install_requires=metadata.python3_requirements,
       test_suite='nose.collector',
       tests_require=['nose'],
-      scripts=['bin/messengerbot-email',
-               'bin/messengerbot-whatsapp'],
+      scripts=["bin/messengerbot",
+               'bin/messengerbot-email',
+               'bin/messengerbot-whatsapp',
+               'bin/messengerbot-telegram'],
       zip_safe=False)
 
 # How to upload to pypi:
