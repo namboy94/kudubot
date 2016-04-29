@@ -41,6 +41,11 @@ class Connection(object):
     A string identifier with which other parts of the program can identify the type of connection
     """
 
+    muted = False
+    """
+    Can be set to mute the bot
+    """
+
     service_manager = None
     """
     An object that handles all active message services of the messenger bot

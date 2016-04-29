@@ -38,8 +38,8 @@ class SimpleContainsResponseService(Service):
     The identifier for this service
     """
 
-    help_description = {"en": "",
-                        "de": ""}
+    help_description = {"en": "No Help Description Available",
+                        "de": "Keine Hilfsbeschreibung verfügbar"}
     """
     Help description for this service. It's empty, because this service does not act on actual commands
     per say.

@@ -26,6 +26,7 @@ from threading import Thread
 
 # required services
 from messengerbot.servicehandlers.required_services.HelpService import HelpService
+from messengerbot.servicehandlers.required_services.MuterService import MuterService
 from messengerbot.servicehandlers.required_services.ServiceSelectorService import ServiceSelectorService
 
 # other services
@@ -50,21 +51,21 @@ class ServiceManager(object):
     """
 
     all_services = [HelpService,
+                    MuterService,
                     ServiceSelectorService,
                     KickTippService,
                     FootballInfoService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]
-
-    all_services_backup = [HelpService,
-                    ServiceSelectorService,
-                    KickTippService,
-                    FootballInfoService,
-                    SimpleEqualsResponseService,
-                    SimpleContainsResponseService]
-
     """
     A list of all implemented services
+    """
+
+    protected_services = [HelpService,
+                          MuterService,
+                          ServiceSelectorService]
+    """
+    A list of services that may not be deactivated
     """
 
     active_services = []

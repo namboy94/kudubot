@@ -58,6 +58,11 @@ class Service(object):
     A unique identifier assigned to the plugin.
     """
 
+    protected = False
+    """
+    Can be set to true if the service requires admin privileges
+    """
+
     def __init__(self, connection: Connection) -> None:
         """
         Basic Constructor for a Service. It stores the connection as a class variable.
@@ -74,8 +79,9 @@ class Service(object):
         :param message: the message to be sent
         :return: None
         """
-        self.connection.message_logger.log_message(message)
-        self.connection.send_text_message(message)
+        if not self.connection.muted:
+            self.connection.message_logger.log_message(message)
+            self.connection.send_text_message(message)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """

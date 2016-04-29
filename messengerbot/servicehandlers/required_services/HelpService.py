@@ -37,8 +37,8 @@ class HelpService(Service):
     The identifier for this service
     """
 
-    help_description = {"en": "",
-                        "de": ""}
+    help_description = {"en": "No Help Description Available",
+                        "de": "Keine Hilfsbeschreibung verfügbar"}
     """
     Help description for this service. No description since this is the class generating the help\
     messages anyway.
@@ -49,6 +49,14 @@ class HelpService(Service):
     """
     Keywords that trigger the help service, which can also be used to determine the language
     """
+
+    instruction_message = {"en": "\nFor detailed instructions, enter \n/help <service-name> "
+                                 "\nor \n/help <service-index>",
+                           "de": "\nFür detailierte Anweisungen, geb \n/hilfe <service-name>"
+                                 "\noder \n/hilfe <service-index> ein"}
+
+    service_not_found_warning = {"en": ("Sorry, the service \"", "\" was not found"),
+                                 "de": ("Sorry, der Service \"", "\" wurde nicht gefunden")}
 
     def process_message(self, message: Message) -> None:
         """
@@ -65,31 +73,35 @@ class HelpService(Service):
             selected_service = None
 
         indexed_services = {}
-        for service_count in range(0, len(self.connection.service_manager.active_services)):
-            indexed_services[service_count] = self.connection.service_manager.active_services[service_count]
+        for service_count in range(0, len(self.connection.service_manager.all_services)):
+            indexed_services[service_count] = self.connection.service_manager.all_services[service_count]
 
         if selected_service is None:
             reply = "Services\n\n"
 
-            for service_count in range(0, len(self.connection.service_manager.active_services)):
-                reply += str(service_count + 1) + ": " + indexed_services[service_count].identifier + "\n"
+            for service_count in range(0, len(self.connection.service_manager.all_services)):
+                reply += str(service_count + 1) + ": " + indexed_services[service_count].identifier  # + "\n"
+                if indexed_services[service_count].protected:
+                    reply += " " + "🔐"  # Lock emoji
+                if indexed_services[service_count] in self.connection.service_manager.active_services:
+                    reply += " " + "👍🏻"  # thumbs up emoji
+                else:
+                    reply += " " + "👎🏻"  # thumbs down emoji
+                reply += "\n"
 
-            if language == "en":
-                reply += "\nFor detailed instructions, enter \n/help <service-name> \nor \n/help <service-index>"
-            elif language == "de":
-                reply += "\nFür detailierte Anweisungen, geb \n/hilfe <service-name> \noder" \
-                                 " \n/hilfe <service-index> ein"
+            reply += self.instruction_message[language]
 
         else:
             reply = ""
             try:
                 reply = self.get_service_description(indexed_services[int(selected_service) - 1], language)
             except (ValueError, KeyError):
-                for service in self.connection.service_manager.active_services:
+                for service in self.connection.service_manager.all_services:
                     if service.identifier == selected_service:
                         reply = self.get_service_description(service, language)
                 if not reply:
-                    reply = "Sorry, service \"" + selected_service + "\" not found"
+                    reply = self.service_not_found_warning[language][0] + selected_service \
+                            + self.service_not_found_warning[language][1]
 
         reply_message = self.generate_reply_message(message, "Help", reply)
         self.send_text_message(reply_message)
