@@ -36,7 +36,7 @@ project_description = "A bot that interfaces with several different messenger se
 A short description of the project
 """
 
-version_number = "0.4.0.1"
+version_number = "0.4.0.2"
 """
 The current version of the program.
 """
@@ -82,7 +82,10 @@ python2_requirements = ['tvdb_api', 'yowsup2', 'pywapi', 'pillow',  'beautifulso
 Python 2 Python Packaging Index requirements
 """
 
-scripts = ['bin/messengerbot']
+scripts = ["bin/messengerbot",
+           'bin/messengerbot-email',
+           'bin/messengerbot-whatsapp',
+           'bin/messengerbot-telegram']
 """
 List of script files to be installed during installation
 """

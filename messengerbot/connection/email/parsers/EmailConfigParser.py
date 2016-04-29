@@ -27,6 +27,7 @@ import sys
 import configparser
 from typing import Tuple
 
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 
@@ -62,8 +63,8 @@ class EmailConfigParser(object):
         if contents == "" or "[credentials]" not in contents:
             config_file = open(email_config_file, 'w')
             config_file.write(EmailConfigParser.blank_config_file_template)
-            print("Generated Email Config Template, please enter your credentials in the file.")
-            print("The file is located at " + email_config_file)
+            PrintLogger.print("Generated Email Config Template, please enter your credentials in the file.")
+            PrintLogger.print("The file is located at " + email_config_file)
             sys.exit(1)
 
         config = configparser.ConfigParser()
@@ -84,5 +85,5 @@ class EmailConfigParser(object):
             return return_tuple
 
         except (KeyError, ValueError):
-            print("Invalid Email config file loaded. Please correct this.")
+            PrintLogger.print("Invalid Email config file loaded. Please correct this.")
             sys.exit(1)

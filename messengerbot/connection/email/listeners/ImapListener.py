@@ -27,7 +27,7 @@ import time
 import email
 from typing import Tuple
 
-import messengerbot.metadata as metadata
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
 
 
@@ -64,8 +64,7 @@ class ImapListener(object):
         # store the callback
         self.callback = callback_function
 
-        if metadata.verbosity > 0:
-            print("Connecting to the IMAP server")
+        PrintLogger.print("Connecting to the IMAP server", 1)
 
         # Connect to the server
         self.imap = imaplib.IMAP4_SSL("imap." + server, int(imap_port))
@@ -78,12 +77,10 @@ class ImapListener(object):
 
         :return: None
         """
-        if metadata.verbosity > 0:
-            print("Starting listening for new Email messages")
+        PrintLogger.print("Starting listening for new Email messages", 1)
 
         while True:
-            if metadata.verbosity > 2:
-                print("Looping Email Listener")
+            PrintLogger.print("Looping Email Listener", 3)
 
             # select the Inbox folder
             self.imap.select('INBOX')
@@ -109,9 +106,6 @@ class ImapListener(object):
                     body = email_message.get_payload(decode=False)[0].split("\r\n")[0]
 
                 message_object = Message(body, title, sender_address, True, sender_identifier, sender_name)
-
-                if metadata.verbosity > 1:
-                    print(message_object.to_string())
 
                 self.callback(message_object)
 

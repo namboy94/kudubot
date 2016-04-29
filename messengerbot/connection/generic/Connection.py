@@ -23,6 +23,7 @@ This file is part of messengerbot.
 
 # imports
 import messengerbot.metadata as metadata
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
 from messengerbot.logger.MessageLogger import MessageLogger
 from messengerbot.servicehandlers.Authenticator import Authenticator
@@ -104,9 +105,7 @@ class Connection(object):
         :return: None
         """
         if self.authenticator.is_from_blacklisted_user(message):
-            if metadata.verbosity > 1:
-                print("blocked message from blacklisted user " + message.identifier)
-            return
+            PrintLogger.print("blocked message from blacklisted user " + message.identifier, 2)
 
         # Process and log the message
         self.message_logger.log_message(message)

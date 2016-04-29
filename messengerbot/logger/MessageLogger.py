@@ -25,6 +25,7 @@ This file is part of messengerbot.
 import os
 import time
 
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
@@ -64,8 +65,7 @@ class MessageLogger(object):
         :param message: the message to be logged
         :return: None
         """
-        if self.verbosity > 0:
-            print(message.to_string())
+        PrintLogger.print(message.to_string(), 1)
 
         log_dir = os.path.join(self.log_directory, "messages")
 

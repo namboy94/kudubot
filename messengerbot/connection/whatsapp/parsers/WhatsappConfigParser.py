@@ -27,6 +27,7 @@ import sys
 import configparser
 from typing import Tuple
 
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 
@@ -58,8 +59,8 @@ class WhatsappConfigParser(object):
         if contents == "" or "[credentials]" not in contents:
             config_file = open(whatsapp_config_file, 'w')
             config_file.write(WhatsappConfigParser.blank_config_file_template)
-            print("Generated Whatsapp Config Template, please enter your credentials in the file.")
-            print("The file is located at " + whatsapp_config_file)
+            PrintLogger.print("Generated Whatsapp Config Template, please enter your credentials in the file.")
+            PrintLogger.print("The file is located at " + whatsapp_config_file)
             sys.exit(1)
 
         config = configparser.ConfigParser()
@@ -79,5 +80,5 @@ class WhatsappConfigParser(object):
             return return_tuple
 
         except (KeyError, ValueError):
-            print("Invalid Whatsapp config file loaded. Please correct this.")
+            PrintLogger.print("Invalid Whatsapp config file loaded. Please correct this.")
             sys.exit(1)

@@ -32,6 +32,7 @@ from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEnt
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
 
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.whatsapp.yowsupwrapper.entities.EntityAdapter import EntityAdapter
 from messengerbot.connection.whatsapp.yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
 from messengerbot.connection.whatsapp.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import \
@@ -186,7 +187,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         :return: None
         """
         if error_request_upload_iq_protocol_entity and request_upload_iq_protocol_entity:
-            print("Request upload for file %s for %s failed" % (path, jid))
+            PrintLogger.print("Request upload for file %s for %s failed" % (path, jid))
 
     @staticmethod
     def on_upload_error(file_path: str, jid: str, url: str) -> None:
@@ -198,7 +199,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         :param url: the upload url
         :return: None
         """
-        print("Upload file %s to %s for %s failed!" % (file_path, url, jid))
+        PrintLogger.print("Upload file %s to %s for %s failed!" % (file_path, url, jid))
 
     @staticmethod
     def on_upload_progress(file_path: str, jid: str, url: str, progress: float) -> None:
@@ -316,7 +317,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
             :return: None
             """
             if error_iq_entity and original_iq_entity:
-                print("Error updating status")
+                PrintLogger.print("Error updating status")
 
         entity = SetStatusIqProtocolEntity(text)
         self.send_iq(entity, on_success, on_error)

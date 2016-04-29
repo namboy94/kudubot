@@ -39,6 +39,8 @@ from yowsup.layers.protocol_media import YowMediaProtocolLayer
 from yowsup.layers.protocol_messages import YowMessagesProtocolLayer
 from yowsup.layers.protocol_receipts import YowReceiptProtocolLayer
 
+from messengerbot.logger.PrintLogger import PrintLogger
+
 
 class YowsupEchoStack(object):
     """
@@ -101,4 +103,4 @@ class YowsupEchoStack(object):
         try:
             self.stack.loop()
         except Exception as e:
-            print("Authentication Error: %s" % str(e))
+            PrintLogger.print("Authentication Error: %s" % str(e))

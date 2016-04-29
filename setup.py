@@ -57,18 +57,15 @@ setup(name=metadata.project_name,
                    'Natural Language :: English',
                    'Operating System :: POSIX :: Linux'
                    ],
-      url='http://namibsun.net/namboy94/messengerbot',
-      author='Hermann Krumrey',
-      author_email='hermann@krumreyh.com',
-      license='GNU GPL3',
+      url=metadata.project_url,
+      author=metadata.author_name,
+      author_email=metadata.author_email,
+      license=metadata.license_type,
       packages=find_packages(),
       install_requires=metadata.python3_requirements,
       test_suite='nose.collector',
       tests_require=['nose'],
-      scripts=["bin/messengerbot",
-               'bin/messengerbot-email',
-               'bin/messengerbot-whatsapp',
-               'bin/messengerbot-telegram'],
+      scripts=[metadata.scripts],
       zip_safe=False)
 
 # How to upload to pypi:

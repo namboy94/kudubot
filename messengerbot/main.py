@@ -25,6 +25,7 @@ This file is part of messengerbot.
 import sys
 
 import messengerbot.metadata as metadata
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 from messengerbot.connection.email.EmailConnection import EmailConnection
 from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
@@ -48,17 +49,16 @@ def main(override: str = "", verbosity: int = 0) -> None:
     """
     metadata.verbosity = verbosity
 
-    if metadata.verbosity > 0:
-        print("Starting program")
+    PrintLogger.print("Starting program", 1)
 
     try:
         if not override:
             # Check for invalid amount of arguments
             if len(sys.argv) == 1:
-                print("No connection type selected.")
+                PrintLogger.print("No connection type selected.")
                 sys.exit(1)
             elif len(sys.argv) > 2:
-                print("Too many connection types defined")
+                PrintLogger.print("Too many connection types defined")
                 sys.exit(1)
 
         # Check if the local configs are OK and if necessary fix them
@@ -77,13 +77,13 @@ def main(override: str = "", verbosity: int = 0) -> None:
                 connection.establish_connection()
 
         if not connected:
-            print("No valid connection type selected")
+            PrintLogger.print("No valid connection type selected")
             sys.exit(1)
 
     except KeyboardInterrupt:
         pass
 
-    print("Thanks for using messengerbot")
+    PrintLogger.print("Thanks for using messengerbot")
 
 
 if __name__ == "__main__":

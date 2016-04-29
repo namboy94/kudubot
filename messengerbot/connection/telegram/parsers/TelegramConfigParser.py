@@ -26,6 +26,7 @@ import os
 import sys
 import configparser
 
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 
@@ -56,8 +57,8 @@ class TelegramConfigParser(object):
         if contents == "" or "[credentials]" not in contents:
             config_file = open(telegram_config_file, 'w')
             config_file.write(TelegramConfigParser.blank_config_file_template)
-            print("Generated Telegram Config Template, please enter your credentials in the file.")
-            print("The file is located at " + telegram_config_file)
+            PrintLogger.print("Generated Telegram Config Template, please enter your credentials in the file.")
+            PrintLogger.print("The file is located at " + telegram_config_file)
             sys.exit(1)
 
         config = configparser.ConfigParser()
@@ -76,5 +77,5 @@ class TelegramConfigParser(object):
             return api_key
 
         except (KeyError, ValueError):
-            print("Invalid Telegram config file loaded. Please correct this.")
+            PrintLogger.print("Invalid Telegram config file loaded. Please correct this.")
             sys.exit(1)

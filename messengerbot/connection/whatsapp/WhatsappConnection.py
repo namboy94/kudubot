@@ -103,8 +103,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         credentials = WhatsappConfigParser.parse_whatsapp_config(WhatsappConnection.identifier)
         echo_stack = YowsupEchoStack(WhatsappConnection, credentials)
 
-        if metadata.verbosity > 0:
-            print("Starting Whatsapp Connection")
+        PrintLogger.print("Starting Whatsapp Connection", 1)
 
         echo_stack.start()
 
@@ -115,8 +114,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         :param message_protocol_entity: the message received
         :return: void
         """
-        if metadata.verbosity > 1:
-            print("Received Message")
+        PrintLogger.print("Received Message", 2)
 
         # Wrap the message protocol entity in a PEP8-compliant Wrapper
         wrapped_entity = WrappedTextMessageProtocolEntity(entity=message_protocol_entity)
