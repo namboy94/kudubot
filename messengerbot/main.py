@@ -87,4 +87,4 @@ def main(override: str = "", verbosity: int = 0) -> None:
 
 
 if __name__ == "__main__":
-    main(override='telegram', verbosity=0)
+    main(override='telegram', verbosity=2)

@@ -87,7 +87,7 @@ class SimpleContainsResponseService(Service):
                 if ind_key in message.message_body.lower():
                     reply = random.choice(SimpleContainsResponseService.case_insensitive_options[key])
 
-        reply_message = Message(reply, "Simple Contains Response", message.address, False)
+        reply_message = self.generate_reply_message(message, "Simple Contains Response", reply)
         self.send_text_message(reply_message)
 
     @staticmethod

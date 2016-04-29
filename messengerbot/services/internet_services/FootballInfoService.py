@@ -104,7 +104,7 @@ class FootballInfoService(Service):
         elif self.matchday_mode:
             reply = self.get_matchday_info()
 
-        reply_message = Message(reply, "Football Info", message.address, False)
+        reply_message = self.generate_reply_message(message, "Football Info", reply)
         self.send_text_message(reply_message)
 
     @staticmethod

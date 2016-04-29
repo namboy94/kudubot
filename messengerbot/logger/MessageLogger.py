@@ -70,11 +70,20 @@ class MessageLogger(object):
         log_dir = os.path.join(self.log_directory, "messages")
 
         if message.group:
-            log_dir = os.path.join(log_dir, "groups", str(message.identifier))
-            log_file = os.path.join(log_dir, time.strftime("%Y-%m-%d"))
+            log_dir = os.path.join(log_dir, "groups")
+            identifier = str(message.identifier)
+            if not identifier:
+                identifier = str(message.address)
+
+            log_file = os.path.join(log_dir, identifier, time.strftime("%Y-%m-%d"))
+
         else:
-            log_dir = os.path.join(log_dir, "users", str(message.identifier))
-            log_file = os.path.join(log_dir, time.strftime("%Y-%m-%d"))
+            log_dir = os.path.join(log_dir, "users")
+            identifier = str(message.identifier)
+            if not identifier:
+                identifier = str(message.address)
+
+            log_file = os.path.join(log_dir, identifier, time.strftime("%Y-%m-%d"))
 
         if not os.path.isdir(log_dir):
             os.makedirs(log_dir)

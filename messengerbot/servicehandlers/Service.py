@@ -120,6 +120,20 @@ class Service(object):
             raise NotImplementedError()
 
     @staticmethod
+    def generate_reply_message(message: Message, title: str, body: str) -> Message:
+        """
+        Generates a reply message object while re-using the original message and just replacing
+        the title and body, while flipping the 'incoming' switch
+
+        :param message: the original message
+        :param title: the new title of the message
+        :param body: the new body of the message
+        :return: the new message object
+        """
+        return Message(body, title, message.address, False, message.identifier, message.name, message.group,
+                       message.single_address, message.single_identifier, message.single_name)
+
+    @staticmethod
     def regex_check(message: Message) -> bool:
         """
         Check if the received message is a valid command for this service

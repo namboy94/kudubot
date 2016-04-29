@@ -66,7 +66,7 @@ class SimpleEqualsResponseService(Service):
         except KeyError:
             reply = self.case_insensitive_options[message.message_body.lower()]
 
-        reply_message = Message(reply, "Simple Equals Response", message.address, False)
+        reply_message = self.generate_reply_message(message, "Simple Equals Response", reply)
         self.send_text_message(reply_message)
 
     @staticmethod
