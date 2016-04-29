@@ -58,6 +58,7 @@ class SimpleContainsResponseService(Service):
                                                         "https://play.google.com/store/apps/details?id=com.namibsun."
                                                         "android.dice"],
                                 ("beste bot", "bester bot"): ["😘"],
+                                ("doofer bot", "scheiß bot"): ["🖕🏻", "😡"],
                                 ("chicken", "nuggets", "huhn", "hühnchen"): ["🐤", "Die armen Kücken!\n🐤🐤🐤"],
                                 ("scheiße", "kacke"): ["💩"]}
     """

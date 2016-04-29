@@ -25,6 +25,7 @@ This file is part of messengerbot.
 import messengerbot.metadata as metadata
 from messengerbot.connection.generic.Message import Message
 from messengerbot.logger.MessageLogger import MessageLogger
+from messengerbot.servicehandlers.Authenticator import Authenticator
 from messengerbot.servicehandlers.ServiceManager import ServiceManager
 
 
@@ -49,6 +50,11 @@ class Connection(object):
     A message logger, needs to be initialized by the initialize method
     """
 
+    authenticator = None
+    """
+    Can be used to check for admin and blacklisted users
+    """
+
     def initialize(self):
         """
         Common constructor for the individual connections to be called in the actual constructor
@@ -56,6 +62,8 @@ class Connection(object):
         :return: None
         """
         self.message_logger = MessageLogger(self.identifier, metadata.verbosity)
+        self.service_manager = ServiceManager(self)
+        self.authenticator = Authenticator(self.identifier)
 
     def send_text_message(self, message: Message) -> None:
         """
@@ -95,9 +103,10 @@ class Connection(object):
         :param message: The received message object
         :return: None
         """
-        # Create a ServiceManager object if there is None before this
-        if self.service_manager is None:
-            self.service_manager = ServiceManager(self)
+        if self.authenticator.is_from_blacklisted_user(message):
+            if metadata.verbosity > 1:
+                print("blocked message from blacklisted user " + message.identifier)
+            return
 
         # Process and log the message
         self.message_logger.log_message(message)

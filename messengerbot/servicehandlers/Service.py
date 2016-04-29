@@ -142,19 +142,3 @@ class Service(object):
         :return: True if the message is a valid command, False otherwise
         """
         raise NotImplementedError()
-
-    @staticmethod
-    def get_description(language):
-        """
-        Method that returns the help description of the plugin in a particular language.
-        If the selected language has no description, the string
-        "No help available for this language"
-        will be returned instead
-
-        :param language: the language to be returned
-        :return: the description in that language
-        """
-        try:
-            return Service.help_description[language.lower()]
-        except KeyError:
-            return "No help available for this language"

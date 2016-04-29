@@ -7,6 +7,7 @@ This project was formerly known as whatsbot and whatsapp-bot.
 Currently supported are:
 
 * Email
+* Telegram
 * Whatsapp via Yowsup (currently broken)
 
 [Changelog](http://gitlab.namibsun.net/namboy94/messengerbot/raw/master/CHANGELOG)

@@ -1,3 +1,8 @@
+V 0.4
+  - Added plugin config parses
+  - Implemented Help framework
+  - Implemented authentication
+  - Implemented dynamice service activation
 V 0.3.9.2
   - Added Kicktipp plugin
   - Fixed file/directory not found errors in the logger

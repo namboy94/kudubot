@@ -21,8 +21,8 @@ This file is part of messengerbot.
     along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# imports
 import os
-
 from typing import List
 
 # Import structure to combat cyclic imports
@@ -88,12 +88,15 @@ class LocalConfigChecker(object):
         for connection in connection_types:
             connection_logs = os.path.join(LocalConfigChecker.log_directory, connection.identifier)
             connection_config = os.path.join(LocalConfigChecker.config_directory, connection.identifier)
+            connection_service_config = connection_config + "-services"
             connection_contacts = os.path.join(LocalConfigChecker.contacts_directory, connection.identifier)
 
             if not os.path.isdir(connection_logs):
                 os.makedirs(connection_logs)
             if not os.path.isdir(connection_contacts):
                 os.makedirs(connection_contacts)
+            if not os.path.isdir(connection_service_config):
+                open(connection_service_config, 'w').close()
             if not os.path.isfile(connection_config):
                 open(connection_config, 'w').close()
 
@@ -107,3 +110,11 @@ class LocalConfigChecker(object):
                 os.makedirs(group_logs)
             if not os.path.isdir(user_logs):
                 os.makedirs(user_logs)
+
+            admin_contacts = os.path.join(connection_contacts, "admin")
+            blacklist_contacts = os.path.join(connection_contacts, "blacklist")
+
+            if not os.path.isfile(admin_contacts):
+                open(admin_contacts, 'w').close()
+            if not os.path.isfile(blacklist_contacts):
+                open(blacklist_contacts, 'w').close()

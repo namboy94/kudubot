@@ -113,7 +113,7 @@ class TelegramConnection(telegram.Bot, Connection):
         for update in self.getUpdates(offset=self.update_id, timeout=10):
 
             self.update_id = update.update_id + 1
-            chat_id = update.message.chat_id
+            chat_id = str(update.message.chat_id)
             message = update.message.text
 
             messages.append(Message(message, "", chat_id, True, chat_id, chat_id))

@@ -24,7 +24,11 @@ This file is part of messengerbot.
 # imports
 from threading import Thread
 
-# services
+# required services
+from messengerbot.servicehandlers.required_services.HelpService import HelpService
+from messengerbot.servicehandlers.required_services.ServiceSelectorService import ServiceSelectorService
+
+# other services
 from messengerbot.services.internet_services.KickTippService import KickTippService
 from messengerbot.services.internet_services.FootballInfoService import FootballInfoService
 from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
@@ -45,10 +49,20 @@ class ServiceManager(object):
     The ServiceManager class handles the implemented Services and processes incoming messages
     """
 
-    all_services = [KickTippService,
+    all_services = [HelpService,
+                    ServiceSelectorService,
+                    KickTippService,
                     FootballInfoService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]
+
+    all_services_backup = [HelpService,
+                    ServiceSelectorService,
+                    KickTippService,
+                    FootballInfoService,
+                    SimpleEqualsResponseService,
+                    SimpleContainsResponseService]
+
     """
     A list of all implemented services
     """
@@ -63,7 +77,7 @@ class ServiceManager(object):
     The connection used to communicate
     """
 
-    def __init__(self, connection: 'Connection') -> None:
+    def __init__(self, connection: Connection) -> None:
         """
         Constructor for the ServiceManager class. It stores the connection as a class variable and parses
         local config files to determine which services should be active.

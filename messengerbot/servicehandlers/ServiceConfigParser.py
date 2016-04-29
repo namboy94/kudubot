@@ -22,9 +22,12 @@ This file is part of messengerbot.
 """
 
 # imports
+import os
+import configparser
 from typing import List
 
 from messengerbot.servicehandlers.Service import Service
+from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 
 class ServiceConfigParser(object):
@@ -43,6 +46,55 @@ class ServiceConfigParser(object):
         :param connection_identifier: A string that identifies the type of connection used
         :return: a list of the active plugins (according to the config file)
         """
-        # TODO implement the parser
-        str(connection_identifier)
-        return all_services
+        # Check config file
+        config_file = os.path.join(LocalConfigChecker.config_directory, connection_identifier + "-services")
+
+        # Sanity check
+        config = open(config_file, 'r')
+        config_contents = config.read()
+        config.close()
+
+        sane = True
+        if not config_contents:
+            sane = False
+        if "[services]" not in config_contents:
+            sane = False
+        for service in all_services:
+            if service.identifier not in config_contents:
+                sane = False
+
+        if not sane:
+            ServiceConfigParser.write_standard_config(all_services, config_file)
+            return list(all_services)
+        else:
+            config = configparser.ConfigParser()
+            config.read(config_file)
+            parsed_config = dict(config.items("services"))
+
+            active_services = []
+
+            try:
+                for service in all_services:
+                    if parsed_config[service.identifier] == "1":
+                        active_services.append(service)
+                return active_services
+            except KeyError:
+                ServiceConfigParser.write_standard_config(all_services, config_file)
+
+    # noinspection PyTypeChecker
+    @staticmethod
+    def write_standard_config(all_services: List[Service], config_file: str) -> None:
+        """
+        Writes a service config file with all services enabled
+
+        :param all_services: A list of all available services
+        :param config_file: The config file to write to
+        :return: None
+        """
+        config = open(config_file, "w")
+        config.write("[services]\n")
+
+        for service in all_services:
+            config.write(service.identifier + " = 1\n")
+
+        config.close()
