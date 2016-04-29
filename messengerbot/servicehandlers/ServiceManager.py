@@ -25,6 +25,7 @@ This file is part of messengerbot.
 from threading import Thread
 
 # services
+from messengerbot.services.internet_services.KickTippService import KickTippService
 from messengerbot.services.internet_services.FootballInfoService import FootballInfoService
 from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
 from messengerbot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
@@ -44,7 +45,8 @@ class ServiceManager(object):
     The ServiceManager class handles the implemented Services and processes incoming messages
     """
 
-    all_services = [FootballInfoService,
+    all_services = [KickTippService,
+                    FootballInfoService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]
     """

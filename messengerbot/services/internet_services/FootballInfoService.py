@@ -52,8 +52,7 @@ class FootballInfoService(Service):
                               "/spieltag\tSchickt Fußball Spieltaginformationen\n"
                               "syntax: /spieltag [<country>][, <liga>]"}
     """
-    Help description for this service. It's empty, because this service does not act on actual commands
-    per say.
+    Help description for this service.
     """
 
     league_mode = False

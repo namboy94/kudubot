@@ -74,16 +74,18 @@ class MessageLogger(object):
             identifier = str(message.identifier)
             if not identifier:
                 identifier = str(message.address)
+            log_dir = os.path.join(log_dir, identifier)
 
-            log_file = os.path.join(log_dir, identifier, time.strftime("%Y-%m-%d"))
+            log_file = os.path.join(log_dir, time.strftime("%Y-%m-%d"))
 
         else:
             log_dir = os.path.join(log_dir, "users")
             identifier = str(message.identifier)
             if not identifier:
                 identifier = str(message.address)
+            log_dir = os.path.join(log_dir, identifier)
 
-            log_file = os.path.join(log_dir, identifier, time.strftime("%Y-%m-%d"))
+            log_file = os.path.join(log_dir, time.strftime("%Y-%m-%d"))
 
         if not os.path.isdir(log_dir):
             os.makedirs(log_dir)
