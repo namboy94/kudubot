@@ -83,7 +83,7 @@ class EmailConnection(Connection):
         :param caption: The caption/title to be displayed along with the image, defaults to an empty string
         :return: None
         """
-        raise NotImplementedError()
+        self.smtp_sender.send_image_email(message_image, caption, receiver)
 
     def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
         """
@@ -94,7 +94,7 @@ class EmailConnection(Connection):
         :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
         :return: None
         """
-        raise NotImplementedError()
+        self.smtp_sender.send_audio_email(message_audio, caption, receiver)
 
     @staticmethod
     def establish_connection() -> None:

@@ -23,9 +23,12 @@ This file is part of messengerbot.
 
 # imports
 import smtplib
-from typing import Tuple
-from email.mime.multipart import MIMEMultipart
+from typing import Tuple, List
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.mime.audio import MIMEAudio
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 
 from messengerbot.connection.generic.Message import Message
 
@@ -55,15 +58,61 @@ class SmtpSender(object):
         :param message: The message to be send
         :return: None
         """
+        body = MIMEText(message.message_body, 'plain')
+        self.send_mime_part_email([body], message.message_title, message.address)
+
+    def send_image_email(self, image_path: str, title: str, recipient: str) -> None:
+        """
+        Sends an embedded image via email and a title for it as the email subject
+
+        :param image_path: the path to the image
+        :param title: the image title
+        :param recipient: the receiver of the email message
+        :return: None
+        """
+        image_file = open(image_path, 'rb')  # Open the file in read-bytes mode
+        image_data = image_file.read()
+        image_file.close()
+
+        image = MIMEImage(image_data)
+        self.send_mime_part_email([image], title, recipient)
+
+    def send_audio_email(self, audio_path: str, title: str, recipient: str) -> None:
+        """
+        Sends an audio file via email and a title for it as the email subject
+
+        :param audio_path: the path to the audio file
+        :param title: the audio title
+        :param recipient: the receiver of the email message
+        :return: None
+        """
+        audio_file = open(audio_path, 'rb')  # Open the file in read-bytes mode
+        audio_data = audio_file.read()
+        audio_file.close()
+
+        audio = MIMEAudio(audio_data)
+        self.send_mime_part_email([audio], title, recipient)
+
+    # noinspection PyTypeChecker
+    def send_mime_part_email(self, mime_objects: List[MIMEBase], title: str, recipient: str) -> None:
+        """
+        Sends an email containing MIME Parts (like MIMEText or MIMEImage) and a title to a receiving
+        email address
+
+        :param mime_objects: a list of MIME objects to be sent
+        :param title: the title of the email
+        :param recipient: the receiver of the email
+        :return: None
+        """
         email_address, password, server, imap_port, smtp_port = self.credentials
 
-        # Set up message as email
-        body = MIMEText(message.message_body, 'plain')
         email_message = MIMEMultipart()
         email_message['From'] = email_address
-        email_message['To'] = message.address
-        email_message['Subject'] = message.message_title
-        email_message.attach(body)
+        email_message['To'] = recipient
+        email_message['Subject'] = title
+
+        for part in mime_objects:
+            email_message.attach(part)
 
         # Initialize SMTP Connection
         smtp = smtplib.SMTP_SSL("smtp." + server, int(smtp_port))
@@ -71,5 +120,5 @@ class SmtpSender(object):
         smtp.login(email_address, password)
 
         # Send Email
-        smtp.sendmail(email_address, message.address, email_message.as_string())
+        smtp.sendmail(email_address, recipient, email_message.as_string())
         smtp.quit()
