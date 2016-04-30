@@ -64,6 +64,12 @@ class Connection(object):
     Can be used to check for admin and blacklisted users
     """
 
+    last_used_language = "en"
+    """
+    Identifier for the last used language of a service, in case another service doesn't have a way of determining
+    the language from a message
+    """
+
     def initialize(self):
         """
         Common constructor for the individual connections to be called in the actual constructor
@@ -119,6 +125,11 @@ class Connection(object):
         # Process and log the message
         self.message_logger.log_message(message)
         try:
+            self.service_manager.process_message(message)
+        except KeyError:
+            # If a non-English language is selected and a service has not yet implemented that language,
+            # revert back to English
+            self.last_used_language = "en"
             self.service_manager.process_message(message)
         except Exception as e:
             stack_trace = traceback.format_exc()

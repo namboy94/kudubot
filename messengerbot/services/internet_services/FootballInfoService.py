@@ -67,12 +67,12 @@ class FootballInfoService(Service):
     are requested
     """
 
-    league_descriptors = ["league", "liga"]
+    league_descriptors = {"league": "en", "liga": "de"}
     """
     Descriptors in different languages for the league mode (used for the command syntax)
     """
 
-    matchday_descriptors = ["matchday", "spieltag"]
+    matchday_descriptors = {"matchday": "en", "spieltag": "de"}
     """
     Descriptors in different languages for the matchday mode (used for the command syntax)
     """
@@ -117,7 +117,11 @@ class FootballInfoService(Service):
         # Generate the Regex
         regex_term = "^/("
 
-        all_descriptors = FootballInfoService.league_descriptors + FootballInfoService.matchday_descriptors
+        all_descriptors = []
+        for descriptor in FootballInfoService.league_descriptors:
+            all_descriptors.append(descriptor)
+        for descriptor in FootballInfoService.matchday_descriptors:
+            all_descriptors.append(descriptor)
 
         first = True
         for descriptor in all_descriptors:
@@ -141,8 +145,10 @@ class FootballInfoService(Service):
         # Check which mode to use
         mode = message_text.split(" ")[0].split("/")[1].lower()
         if mode in self.league_descriptors:
+            self.connection.last_used_language = self.league_descriptors[mode]
             self.league_mode = True
         elif mode in self.matchday_descriptors:
+            self.connection.last_used_language = self.matchday_descriptors[mode]
             self.matchday_mode = True
 
         # Determine league and country

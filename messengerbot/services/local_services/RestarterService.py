@@ -86,6 +86,7 @@ class RestarterService(Service):
         :return: None
         """
         language = self.restart_commands[message.message_body]
+        self.connection.last_used_language = language
 
         if self.connection.authenticator.is_from_admin(message):
 

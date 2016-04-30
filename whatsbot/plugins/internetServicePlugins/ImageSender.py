@@ -112,11 +112,7 @@ class ImageSender(GenericPlugin):
         :return: the description as string
         """
         if language == "en":
-            return "/img\tSends images from an URL\n" \
-                   "syntax: /img <url>"
-        elif language == "de":
-            return "/img\tVerschickt Bilder von URLs\n" \
-                   "syntax: /img <url>"
+            return
         else:
             return "Help not available in this language"
 

@@ -102,6 +102,8 @@ class WeatherService(Service):
         :return: None
         """
         language, city, country, region = self.parse_user_input(message)
+        self.connection.last_used_language = language
+
         location = self.get_location(city, country, region)
         if location is not None:
             weather = pywapi.get_weather_from_weather_com(location[0])

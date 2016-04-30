@@ -50,7 +50,8 @@ class TvdbService(Service):
     Help description for this service.
     """
 
-    episode_not_found_error = {"en": "Episode not found on the TV database (thetvdb.com)"}
+    episode_not_found_error = {"en": "Episode not found on the TV database (thetvdb.com)",
+                               "de": "Episode nicht auf der TV Database gefunden (thetvdb.com)"}
 
     def process_message(self, message: Message) -> None:
         """
@@ -77,8 +78,7 @@ class TvdbService(Service):
         """
         return re.search(r"^/(tvdb) ([^ ]+| )+ s[0-9]{1,2} e[0-9]{1,4}$", message.message_body.lower())
 
-    @staticmethod
-    def get_tvdb_info(show: str, season: int, episode: int) -> str:
+    def get_tvdb_info(self, show: str, season: int, episode: int) -> str:
         """
         Gets information for the given tv show parameters
 
@@ -92,4 +92,4 @@ class TvdbService(Service):
             episode_info = tvdb[show][season][episode]
             return episode_info['episodename']
         except (tvdb_episodenotfound, tvdb_seasonnotfound, tvdb_shownotfound, ConnectionError):
-            return TvdbService.episode_not_found_error["en"]
+            return TvdbService.episode_not_found_error[self.connection.last_used_language]

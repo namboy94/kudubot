@@ -1,3 +1,7 @@
+V 0.4.5
+  - Added extended language support
+  - Added ImageSender service
+  - Added image and audio sending capabilities to email and telegram connections
 V 0.4.4
   - Added ability to run all connections at once
 V 0.4.3.1
