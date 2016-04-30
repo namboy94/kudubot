@@ -88,7 +88,12 @@ class TelegramConnection(telegram.Bot, Connection):
         :param caption: The caption/title to be displayed along with the image, defaults to an empty string
         :return: None
         """
-        raise NotImplementedError()
+        image = open(message_image, 'rb')
+        if caption:
+            self.sendPhoto(chat_id=receiver, photo=image, caption=caption)
+        else:
+            self.sendPhoto(chat_id=receiver, photo=image)
+        image.close()
 
     def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
         """
@@ -99,7 +104,12 @@ class TelegramConnection(telegram.Bot, Connection):
         :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
         :return: None
         """
-        raise NotImplementedError()
+        audio = open(message_audio, 'rb')
+        if caption:
+            self.sendAudio(chat_id=receiver, audio=audio, title=caption)
+        else:
+            self.sendAudio(chat_id=receiver, audio=audio)
+        audio.close()
 
     # noinspection PyTypeChecker
     def get_messages(self) -> List[Message]:
