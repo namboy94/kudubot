@@ -30,6 +30,7 @@ from messengerbot.servicehandlers.required_services.MuterService import MuterSer
 from messengerbot.servicehandlers.required_services.ServiceSelectorService import ServiceSelectorService
 
 # other services
+from messengerbot.services.internet_services.WeatherService import WeatherService
 from messengerbot.services.internet_services.KickTippService import KickTippService
 from messengerbot.services.internet_services.FootballInfoService import FootballInfoService
 from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
@@ -55,6 +56,7 @@ class ServiceManager(object):
                     ServiceSelectorService,
                     KickTippService,
                     FootballInfoService,
+                    WeatherService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]
     """
