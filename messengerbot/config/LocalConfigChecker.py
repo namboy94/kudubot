@@ -58,6 +58,11 @@ class LocalConfigChecker(object):
     Directory containing program logs
     """
 
+    exception_logs_directory = os.path.join(log_directory, "exceptions")
+    """
+    Directory containing exception logs
+    """
+
     contacts_directory = os.path.join(program_directory, "contacts")
     """
     Directory containing contact files
@@ -84,6 +89,8 @@ class LocalConfigChecker(object):
             os.makedirs(LocalConfigChecker.log_directory)
         if not os.path.isdir(LocalConfigChecker.contacts_directory):
             os.makedirs(LocalConfigChecker.contacts_directory)
+        if not os.path.isdir(LocalConfigChecker.exception_logs_directory):
+            os.makedirs(LocalConfigChecker.exception_logs_directory)
 
         for connection in connection_types:
             connection_logs = os.path.join(LocalConfigChecker.log_directory, connection.identifier)

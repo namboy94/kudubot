@@ -22,10 +22,13 @@ This file is part of messengerbot.
 """
 
 # imports
+import traceback
+
 import messengerbot.metadata as metadata
 from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
 from messengerbot.logger.MessageLogger import MessageLogger
+from messengerbot.logger.ExceptionLogger import ExceptionLogger
 from messengerbot.servicehandlers.Authenticator import Authenticator
 from messengerbot.servicehandlers.ServiceManager import ServiceManager
 
@@ -111,10 +114,15 @@ class Connection(object):
         """
         if self.authenticator.is_from_blacklisted_user(message):
             PrintLogger.print("blocked message from blacklisted user " + message.identifier, 2)
+            return
 
         # Process and log the message
         self.message_logger.log_message(message)
-        self.service_manager.process_message(message)
+        try:
+            self.service_manager.process_message(message)
+        except Exception as e:
+            stack_trace = traceback.format_exc()
+            ExceptionLogger.log_exception(e, stack_trace, self.identifier, message)
 
     @staticmethod
     def establish_connection() -> None:

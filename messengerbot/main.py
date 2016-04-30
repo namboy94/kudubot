@@ -23,9 +23,11 @@ This file is part of messengerbot.
 
 # imports
 import sys
+import traceback
 
 import messengerbot.metadata as metadata
 from messengerbot.logger.PrintLogger import PrintLogger
+from messengerbot.logger.ExceptionLogger import ExceptionLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 from messengerbot.connection.email.EmailConnection import EmailConnection
 from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
@@ -52,33 +54,37 @@ def main(override: str = "", verbosity: int = 0) -> None:
     PrintLogger.print("Starting program", 1)
 
     try:
-        if not override:
-            # Check for invalid amount of arguments
-            if len(sys.argv) == 1:
-                PrintLogger.print("No connection type selected.")
+        try:
+            if not override:
+                # Check for invalid amount of arguments
+                if len(sys.argv) == 1:
+                    PrintLogger.print("No connection type selected.")
+                    sys.exit(1)
+                elif len(sys.argv) > 2:
+                    PrintLogger.print("Too many connection types defined")
+                    sys.exit(1)
+
+            # Check if the local configs are OK and if necessary fix them
+            LocalConfigChecker.check_and_fix_config(connections)
+
+            if override:
+                selected_connection = override
+            else:
+                selected_connection = sys.argv[1]
+
+            # Generate the connection
+            connected = False
+            for connection in connections:
+                if connection.identifier == selected_connection:
+                    connected = True
+                    connection.establish_connection()
+
+            if not connected:
+                PrintLogger.print("No valid connection type selected")
                 sys.exit(1)
-            elif len(sys.argv) > 2:
-                PrintLogger.print("Too many connection types defined")
-                sys.exit(1)
-
-        # Check if the local configs are OK and if necessary fix them
-        LocalConfigChecker.check_and_fix_config(connections)
-
-        if override:
-            selected_connection = override
-        else:
-            selected_connection = sys.argv[1]
-
-        # Generate the connection
-        connected = False
-        for connection in connections:
-            if connection.identifier == selected_connection:
-                connected = True
-                connection.establish_connection()
-
-        if not connected:
-            PrintLogger.print("No valid connection type selected")
-            sys.exit(1)
+        except Exception as e:
+            stack_trace = traceback.format_exc()
+            ExceptionLogger.log_exception(e, stack_trace, "main")
 
     except KeyboardInterrupt:
         pass
