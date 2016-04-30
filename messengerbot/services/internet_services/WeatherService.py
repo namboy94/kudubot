@@ -57,6 +57,9 @@ class WeatherService(Service):
     Keywords that map to the language to be used
     """
 
+    options = {"text": False,
+               "verbose": False}
+
     weather_identifiers = {"sunny": {"em":  "☀", "de": "sonnig"},
                            "clear": {"em":  "☀", "de": "klar"},
                            "sunny / windy": {"em":  "☀", "de": "sonnig / windig"},
@@ -88,6 +91,9 @@ class WeatherService(Service):
     Defines the weather message for multiple languages
     """
 
+    city_not_found_message = {"en": "City not found",
+                              "de": "Stadt nicht gefunden"}
+
     def process_message(self, message: Message) -> None:
         """
         Process a message according to the service's functionality
@@ -95,11 +101,13 @@ class WeatherService(Service):
         :param message: the message to process
         :return: None
         """
-        language, verbose, text_mode, city, country, region = self.parse_user_input(message)
+        language, city, country, region = self.parse_user_input(message)
         location = self.get_location(city, country, region)
-        weather = pywapi.get_weather_from_weather_com(location[0])
-
-        reply = self.generate_weather_string(language, verbose, text_mode, location, weather)
+        if location is not None:
+            weather = pywapi.get_weather_from_weather_com(location[0])
+            reply = self.generate_weather_string(language, location, weather)
+        else:
+            reply = self.city_not_found_message[language]
 
         reply_message = self.generate_reply_message(message, "Kicktipp", reply)
         self.send_text_message(reply_message)
@@ -120,19 +128,18 @@ class WeatherService(Service):
                 first = False
             else:
                 regex += "|" + key
-        regex += ")(:(text;|verbose;)+)?( ([^ ,]+| )(, ([^ ,]+| )+)?(, ([^ ,]+| )+)?)?$"
+        regex += ")(:(text;|verbose;)+)?( (([^ ,]+| )+)(, ([^ ,]+| )+)?(, ([^ ,]+| )+)?)?$"
 
         return re.search(re.compile(regex), message.message_body)
 
-    def parse_user_input(self, message: Message) -> Tuple[str, bool, bool, str, str, str]:
+    def parse_user_input(self, message: Message) -> Tuple[str, str, str, str]:
         """
         Parses the user input. It determines the used language, if text mode or verbose mode should
         be used and the city, country and region to check
+        The options are stored in the options dictionary
 
         :return: a tuple of the parsed information in the order:
                     -language
-                    -verbose mode
-                    -text mode
                     -city
                     -country
                     -region
@@ -152,6 +159,9 @@ class WeatherService(Service):
                 verbose = True
             if "text" in options:
                 text_mode = True
+
+        self.options["text"] = text_mode
+        self.options["verbose"] = verbose
 
         city = ""
         country = ""
@@ -176,7 +186,7 @@ class WeatherService(Service):
         country = country.replace(",", "").strip()
         region = region.replace(",", "").strip()
 
-        return language, verbose, text_mode, city, country, region
+        return language, city, country, region
 
     @staticmethod
     def get_location(city: str, country: str, region: str) -> Tuple[str, str]:
@@ -186,7 +196,7 @@ class WeatherService(Service):
         :param city: The city to be searched
         :param country: The country to be searched
         :param region: The region to be searched
-        :return: the pywapi location ID Tuple
+        :return: the pywapi location ID Tuple, or None if no location was found
         """
         search_term = city
         if country:
@@ -194,24 +204,25 @@ class WeatherService(Service):
         if region:
             search_term += (", " + region)
 
-        location = pywapi.get_loc_id_from_weather_com(search_term)[0]
+        try:
+            location = pywapi.get_loc_id_from_weather_com(search_term)[0]
+        except KeyError:
+            return None
 
         # Add 'USA' to US-american location strings
         if len(location[1].split(", ")) < 3:
-            location[1] += ", USA"
+            location_string = location[1]
+            location_string += ", USA"
+            location = (location[0], location_string)
 
         return location
 
-    @staticmethod
-    def generate_weather_string(language: str, verbose: bool, text_mode: bool, location: Tuple[str, str],
-                                weather: Dict) -> str:
+    def generate_weather_string(self, language: str, location: Tuple[str, str], weather: Dict) -> str:
         """
         Generates a message string to send back for the selected location's weather using the
         specified options
 
         :param language: the language to use
-        :param verbose: flag to enable verbose mode
-        :param text_mode: flag to enable text mode
         :param location: the loaction tuple of the location to check
         :param weather: the weather dictionary of that location
         :return: the message string
@@ -220,10 +231,10 @@ class WeatherService(Service):
         temperature = weather['current_conditions']['temperature']
         location_string = location[1]
 
-        if not verbose:
+        if not self.options['verbose']:
             location_string = location_string.split(", ")[0] + ", " + location_string.split(", ")[2]
 
-        if not text_mode:
+        if not self.options['text']:
             try:
                 weather_type = WeatherService.weather_identifiers[weather_type.lower()]["em"]
             except KeyError:
