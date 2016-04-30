@@ -109,7 +109,7 @@ class WeatherService(Service):
         else:
             reply = self.city_not_found_message[language]
 
-        reply_message = self.generate_reply_message(message, "Kicktipp", reply)
+        reply_message = self.generate_reply_message(message, "Weather", reply)
         self.send_text_message(reply_message)
 
     @staticmethod

@@ -21,6 +21,9 @@ This file is part of messengerbot.
     along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# imports
+import time
+
 
 class Message(object):
     """
@@ -82,9 +85,15 @@ class Message(object):
     The title of the message
     """
 
+    timestamp = ""
+    """
+    The timestamp of the message's creation
+    """
+
     def __init__(self, message_body: str, message_title: str, address: str, incoming: bool,
                  identifier: str = "", name: str = "",
-                 group: bool = False, single_address: str = "", single_identifier: str = "", single_name: str = "")\
+                 group: bool = False, single_address: str = "", single_identifier: str = "", single_name: str = "",
+                 timestamp: float = -1.0)\
             -> None:
         """
         Constructor for the Message class
@@ -100,6 +109,7 @@ class Message(object):
         :param single_address: the address of the individual group participant
         :param single_identifier: the identifier of the individual group participant
         :param single_name: the name of the individual group participant
+        :param timestamp: The time stamp of the message creation
         """
         self.message_body = message_body
         self.message_title = message_title
@@ -118,6 +128,11 @@ class Message(object):
             self.single_address = single_address
             self.single_identifier = single_identifier
             self.single_name = single_name
+
+        if timestamp < 0.0:
+            self.timestamp = time.time()
+        else:
+            self.timestamp = timestamp
 
     def to_string(self) -> str:
         """

@@ -115,8 +115,9 @@ class TelegramConnection(telegram.Bot, Connection):
             self.update_id = update.update_id + 1
             chat_id = str(update.message.chat_id)
             message = update.message.text
+            timestamp = update.message.date.timestamp()
 
-            messages.append(Message(message, "", chat_id, True, chat_id, chat_id))
+            messages.append(Message(message, "", chat_id, True, chat_id, chat_id, timestamp=timestamp))
 
         return messages
 

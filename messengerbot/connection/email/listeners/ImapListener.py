@@ -22,9 +22,9 @@ This file is part of messengerbot.
 """
 
 # imports
-import imaplib
 import time
 import email
+import imaplib
 from typing import Tuple
 
 from messengerbot.logger.PrintLogger import PrintLogger
@@ -99,13 +99,15 @@ class ImapListener(object):
                 sender_address = email_message['From'].split("<", 1)[1].rsplit(">", 1)[0]
                 sender_identifier = sender_address
                 title = email_message["Subject"]
+                timestamp = time.mktime(email.utils.parsedate(email_message['Date']))
 
                 try:
                     body = email_message.get_payload(decode=False).split("\r\n")[0]
                 except AttributeError:  # When attachments etc are included
                     body = email_message.get_payload(decode=False)[0].split("\r\n")[0]
 
-                message_object = Message(body, title, sender_address, True, sender_identifier, sender_name)
+                message_object = Message(body, title, sender_address, True, sender_identifier, sender_name,
+                                         timestamp=timestamp)
 
                 self.callback(message_object)
 

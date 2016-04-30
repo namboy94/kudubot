@@ -1,3 +1,6 @@
+V 0.4.3
+  - Implemented restarter service
+  - Added timestamp metadata to message objects
 V 0.4.2
   - Implemented an Exception Logger
 V 0.4.1.2

@@ -28,7 +28,7 @@ from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.interface import ProtocolEntityCallback
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 
-import messengerbot.metadata as metadata
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
 from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.whatsapp.layers.YowsupEchoLayer import YowsupEchoLayer
@@ -139,6 +139,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         individual_number = ""
         individual_identifier = ""
         individual_name = ""
+        timestamp = float(message_protocol_entity.get_time_stamp())
 
         if re.search(r"[0-9]+-[0-9]+", sender_identifier):
             group = True
@@ -147,7 +148,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
             individual_name = message_protocol_entity.get_notify()
 
         return Message(body, "", sender_number, True, sender_identifier, sender_name, group,
-                       individual_number, individual_identifier, individual_name)
+                       individual_number, individual_identifier, individual_name, timestamp)
 
     @staticmethod
     def convert_message_to_text_message_protocol_entity(message: Message) -> WrappedTextMessageProtocolEntity:

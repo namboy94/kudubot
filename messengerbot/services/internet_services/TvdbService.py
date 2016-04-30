@@ -65,7 +65,7 @@ class TvdbService(Service):
 
         reply = self.get_tvdb_info(tv_show, season, episode)
 
-        reply_message = self.generate_reply_message(message, "Kicktipp", reply)
+        reply_message = self.generate_reply_message(message, "Tvdb", reply)
         self.send_text_message(reply_message)
 
     @staticmethod
