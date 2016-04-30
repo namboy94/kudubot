@@ -70,6 +70,12 @@ class RestarterService(Service):
     time_out_message = {"en": "You need to wait 30 seconds before restarting the bot again.",
                         "de": "Du musst 30 Sekunden warten bevor der Bot abermals neugestartet werden soll."}
 
+    unauthorized_warning = {"en": "Sorry, I can't let you do that.",
+                            "de": "Sorry, das darfst du nicht."}
+    """
+    Reply for non-admins
+    """
+
     protected = True
 
     def process_message(self, message: Message) -> None:
@@ -81,33 +87,40 @@ class RestarterService(Service):
         """
         language = self.restart_commands[message.message_body]
 
-        # Do not restart if the bot was restarted in the last 30 seconds
-        if os.path.isfile(self.restarting_file):
-            restart_file = open(self.restarting_file, 'r')
-            last_restart = float(restart_file.read())
+        if self.connection.authenticator.is_from_admin(message):
+
+            # Do not restart if the bot was restarted in the last 30 seconds
+            if os.path.isfile(self.restarting_file):
+                restart_file = open(self.restarting_file, 'r')
+                last_restart = float(restart_file.read())
+                restart_file.close()
+
+                if message.timestamp < last_restart + 30.0:
+                    reply = self.time_out_message[language]
+                    reply_message = self.generate_reply_message(message, "Restarter", reply)
+                    self.send_text_message(reply_message)
+                    return
+                else:
+                    os.remove(self.restarting_file)
+
+            reply = self.restarting_message[language]
+            reply_message = self.generate_reply_message(message, "Restarter", reply)
+            self.send_text_message(reply_message)
+
+            # Create a temporary file to avoid infinite restarting loops
+            restart_file = open(self.restarting_file, 'w')
+            restart_file.write(str(message.timestamp))
             restart_file.close()
 
-            if message.timestamp < last_restart + 30.0:
-                reply = self.time_out_message[language]
-                reply_message = self.generate_reply_message(message, "Restarter", reply)
-                self.send_text_message(reply_message)
-                return
-            else:
-                os.remove(self.restarting_file)
+            PrintLogger.print("Restarting Bot")
+            time.sleep(2)
 
-        reply = self.restarting_message[language]
-        reply_message = self.generate_reply_message(message, "Restarter", reply)
-        self.send_text_message(reply_message)
+            os.execl(sys.executable, sys.executable, *sys.argv)  # Restart program
 
-        # Create a temporary file to avoid infinite restarting loops
-        restart_file = open(self.restarting_file, 'w')
-        restart_file.write(str(message.timestamp))
-        restart_file.close()
-
-        PrintLogger.print("Restarting Bot")
-        time.sleep(2)
-
-        os.execl(sys.executable, sys.executable, *sys.argv)  # Restart program
+        else:
+            reply = self.unauthorized_warning[language]
+            reply_message = self.generate_reply_message(message, "Restarter", reply)
+            self.send_text_message(reply_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:

@@ -1,3 +1,5 @@
+V 0.4.3.1
+  - Fixed Restarter permissions
 V 0.4.3
   - Implemented restarter service
   - Added timestamp metadata to message objects
