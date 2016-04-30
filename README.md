@@ -22,6 +22,19 @@ Currently supported connection types are:
 * Telegram
 * Whatsapp via Yowsup (currently broken)
 
+They can be used using the commands:
+
+    messengerbot-email     # For the email connectio
+    messengerbot-telegram  # For the Telegram Connection
+    messengerbot-whatsapp  # For the Whatsapp Connection  (Doesn't work right now)
+    messengerbot-all       # For all connections
+    
+Yo can also specify custom verbosity levels using
+
+    messengerbot
+    
+directly
+
 Currently implemented bot services are:
 
 * Help Service

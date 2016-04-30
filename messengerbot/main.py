@@ -24,17 +24,18 @@ This file is part of messengerbot.
 # imports
 import sys
 import traceback
+from threading import Thread
 
 import messengerbot.metadata as metadata
 from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.logger.ExceptionLogger import ExceptionLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 from messengerbot.connection.email.EmailConnection import EmailConnection
-from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
+# from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
 from messengerbot.connection.telegram.TelegramConnection import TelegramConnection
 
 connections = [EmailConnection,
-               WhatsappConnection,
+               # WhatsappConnection,
                TelegramConnection]
 """
 A list of possible connections
@@ -67,21 +68,42 @@ def main(override: str = "", verbosity: int = 0) -> None:
             # Check if the local configs are OK and if necessary fix them
             LocalConfigChecker.check_and_fix_config(connections)
 
-            if override:
-                selected_connection = override
+            if override == "all" or (len(sys.argv) > 1 and sys.argv[1] == "all"):
+                for connection in connections:
+
+                    def connect():
+                        """
+                        Connects to a service
+
+                        :return: None
+                        """
+                        try:
+                            connection.establish_connection()
+                        except Exception as ex:
+                            stack_t = traceback.format_exc()
+                            ExceptionLogger.log_exception(ex, stack_t, connection.identifier)
+
+                    connection_thread = Thread(target=connect)
+                    connection_thread.daemon = True
+                    connection_thread.start()
+                while True:
+                    pass
             else:
-                selected_connection = sys.argv[1]
+                if override:
+                    selected_connection = override
+                else:
+                    selected_connection = sys.argv[1]
 
-            # Generate the connection
-            connected = False
-            for connection in connections:
-                if connection.identifier == selected_connection:
-                    connected = True
-                    connection.establish_connection()
+                # Generate the connection
+                connected = False
+                for connection in connections:
+                    if connection.identifier == selected_connection:
+                        connected = True
+                        connection.establish_connection()
 
-            if not connected:
-                PrintLogger.print("No valid connection type selected")
-                sys.exit(1)
+                if not connected:
+                    PrintLogger.print("No valid connection type selected")
+                    sys.exit(1)
         except Exception as e:
             stack_trace = traceback.format_exc()
             ExceptionLogger.log_exception(e, stack_trace, "main")
@@ -90,7 +112,3 @@ def main(override: str = "", verbosity: int = 0) -> None:
         pass
 
     PrintLogger.print("Thanks for using messengerbot")
-
-
-if __name__ == "__main__":
-    main(override='telegram', verbosity=2)
