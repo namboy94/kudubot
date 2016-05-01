@@ -33,6 +33,7 @@ from messengerbot.servicehandlers.required_services.ServiceSelectorService impor
 from messengerbot.services.local_services.RestarterService import RestarterService
 from messengerbot.services.internet_services.TvdbService import TvdbService
 from messengerbot.services.internet_services.WeatherService import WeatherService
+from messengerbot.services.internet_services.KitMensaService import KitMensaService
 from messengerbot.services.internet_services.KickTippService import KickTippService
 from messengerbot.services.internet_services.ImageSenderService import ImageSenderService
 from messengerbot.services.internet_services.FootballInfoService import FootballInfoService
@@ -62,6 +63,7 @@ class ServiceManager(object):
                     FootballInfoService,
                     WeatherService,
                     TvdbService,
+                    KitMensaService,
                     ImageSenderService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]

@@ -73,6 +73,7 @@ class ImageSenderService(Service):
             local_file = os.path.join(LocalConfigChecker.program_directory, image_name)
             urllib.request.urlretrieve(link, local_file)
             self.send_image_message(message.address, local_file, image_name)
+            os.remove(local_file)
 
         except (urllib.error.HTTPError, urllib.error.URLError):
             reply = self.image_download_error[self.connection.last_used_language]
