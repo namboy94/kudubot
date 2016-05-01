@@ -121,16 +121,8 @@ class WeatherService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        regex = "^/("
-
-        first = True
-        for key in WeatherService.weather_keywords:
-            if first:
-                regex += key
-                first = False
-            else:
-                regex += "|" + key
-        regex += ")(:(text;|verbose;)+)?( (([^ ,]+| )+)(, ([^ ,]+| )+)?(, ([^ ,]+| )+)?)?$"
+        regex = "^/" + Service.regex_string_from_dictionary_keys([WeatherService.weather_keywords])
+        regex += "(:(text;|verbose;)+)?( (([^ ,]+| )+)(, ([^ ,]+| )+)?(, ([^ ,]+| )+)?)?$"
 
         return re.search(re.compile(regex), message.message_body)
 

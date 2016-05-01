@@ -115,23 +115,9 @@ class FootballInfoService(Service):
         """
 
         # Generate the Regex
-        regex_term = "^/("
-
-        all_descriptors = []
-        for descriptor in FootballInfoService.league_descriptors:
-            all_descriptors.append(descriptor)
-        for descriptor in FootballInfoService.matchday_descriptors:
-            all_descriptors.append(descriptor)
-
-        first = True
-        for descriptor in all_descriptors:
-            if first:
-                regex_term += descriptor
-                first = False
-            else:
-                regex_term += ("|" + descriptor)
-
-        regex_term += ")( [^ ]+, [^ ]+)$"
+        regex_term = "^/" + Service.regex_string_from_dictionary_keys([FootballInfoService.league_descriptors,
+                                                                       FootballInfoService.matchday_descriptors]) \
+                     + "( [^ ]+, [^ ]+)$"
 
         return re.search(re.compile(regex_term), message.message_body.lower())
 

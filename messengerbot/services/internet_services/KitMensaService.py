@@ -138,27 +138,10 @@ class KitMensaService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        regex = "^/(mensa)( )?(("
-
-        first = False
-        for key in KitMensaService.line_key:
-            if first:
-                regex += key
-                first = False
-            else:
-                regex += "|" + key
-        first = False
-
-        regex += ") (1|2|3|4|5|6)|schnitzelbar|curry queen|abend|cafeteria vormittag|cafeteria nachmittag)?( ("
-
-        for key in KitMensaService.tomorrow_key:
-            if first:
-                regex += key
-                first = False
-            else:
-                regex += "|" + key
-
-        regex += "))?$"
+        regex = "^/(mensa)( )?(" + Service.regex_string_from_dictionary_keys([KitMensaService.line_key])
+        regex += " (1|2|3|4|5|6)|schnitzelbar|curry queen|abend|cafeteria vormittag|cafeteria nachmittag)?( "
+        regex += Service.regex_string_from_dictionary_keys([KitMensaService.tomorrow_key])
+        regex += ")?$"
 
         return re.search(re.compile(regex), message.message_body.lower())
 

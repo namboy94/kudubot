@@ -36,7 +36,7 @@ project_description = "A bot that interfaces with several different messenger se
 A short description of the project
 """
 
-version_number = "0.4.6"
+version_number = "0.5"
 """
 The current version of the program.
 """
@@ -72,12 +72,19 @@ license_type = "GNU GPL3"
 The project's license type
 """
 
-python3_requirements = ['tvdb_api', 'yowsup2', 'pywapi', 'pillow',  'beautifulsoup4', 'typing', 'python-telegram-bot']
+python3_requirements = ['tvdb_api',
+                        'yowsup2',
+                        'pywapi',
+                        'pillow',
+                        'beautifulsoup4',
+                        'typing',
+                        'python-telegram-bot',
+                        'gTTS']
 """
 Python 3 Python Packaging Index requirements
 """
 
-python2_requirements = ['tvdb_api', 'yowsup2', 'pywapi', 'pillow',  'beautifulsoup4', 'typing', 'python-telegram-bot']
+python2_requirements = python3_requirements
 """
 Python 2 Python Packaging Index requirements
 """

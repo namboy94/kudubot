@@ -22,6 +22,7 @@ This file is part of messengerbot.
 """
 
 # imports
+from typing import Dict, List
 
 from messengerbot.connection.generic.Message import Message
 
@@ -148,3 +149,30 @@ class Service(object):
         :return: True if the message is a valid command, False otherwise
         """
         raise NotImplementedError()
+
+    @staticmethod
+    def regex_string_from_dictionary_keys(dictionaries: List[Dict[str, str]]) -> str:
+        """
+        Generates a regex string of form (item1|item2|...|item_n) from dictionary keys
+        Multiple dictionaries can be used
+
+        :param dictionaries: the dictionaries containing the keys to be used
+        :return: the regex string
+        """
+        dictionary_keys = []
+
+        for dictionary in dictionaries:
+            for key in dictionary:
+                dictionary_keys.append(key)
+
+        regex_string = "("
+        first = False
+        for key in dictionary_keys:
+            if first:
+                regex_string += key
+                first = False
+            else:
+                regex_string += "|" + key
+        regex_string += ")"
+
+        return regex_string

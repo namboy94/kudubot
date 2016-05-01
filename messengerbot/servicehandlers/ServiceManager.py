@@ -35,6 +35,8 @@ from messengerbot.services.internet_services.TvdbService import TvdbService
 from messengerbot.services.internet_services.WeatherService import WeatherService
 from messengerbot.services.internet_services.KitMensaService import KitMensaService
 from messengerbot.services.internet_services.KickTippService import KickTippService
+from messengerbot.services.internet_services.GoogleTtsService import GoogleTtsService
+from messengerbot.services.internet_services.EmailSenderService import EmailSenderService
 from messengerbot.services.internet_services.ImageSenderService import ImageSenderService
 from messengerbot.services.internet_services.FootballInfoService import FootballInfoService
 from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
@@ -62,8 +64,10 @@ class ServiceManager(object):
                     KickTippService,
                     FootballInfoService,
                     WeatherService,
+                    GoogleTtsService,
                     TvdbService,
                     KitMensaService,
+                    EmailSenderService,
                     ImageSenderService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]
