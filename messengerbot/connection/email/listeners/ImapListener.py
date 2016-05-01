@@ -102,14 +102,20 @@ class ImapListener(object):
                 timestamp = time.mktime(email.utils.parsedate(email_message['Date']))
 
                 try:
-                    body = email_message.get_payload(decode=False).split("\r\n")[0]
+                    body_parts = email_message.get_payload(decode=False).split("\r\n")
                 except AttributeError:  # When attachments etc are included
-                    body = email_message.get_payload(decode=False)[0].split("\r\n")[0]
+                    body_parts = email_message.get_payload(decode=False)[0].split("\r\n")
+
+                body = ""
+                for body_part in body_parts:
+                    if body_part:
+                        body += body_part
+                body = body.rstrip()
 
                 message_object = Message(body, title, sender_address, True, sender_identifier, sender_name,
                                          timestamp=timestamp)
 
                 self.callback(message_object)
 
-            # Sleep 5 seconds after every check
-            time.sleep(5)
+            # Sleep 2 seconds after every check
+            time.sleep(2)

@@ -23,6 +23,7 @@ This file is part of messengerbot.
 
 # imports
 import smtplib
+import mimetypes
 from typing import Tuple, List
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
@@ -70,11 +71,13 @@ class SmtpSender(object):
         :param recipient: the receiver of the email message
         :return: None
         """
+        sub_type = self.guess_file_type(image_path)
+
         image_file = open(image_path, 'rb')  # Open the file in read-bytes mode
         image_data = image_file.read()
         image_file.close()
 
-        image = MIMEImage(image_data)
+        image = MIMEImage(image_data, _subtype=sub_type)
         self.send_mime_part_email([image], title, recipient)
 
     def send_audio_email(self, audio_path: str, title: str, recipient: str) -> None:
@@ -86,11 +89,13 @@ class SmtpSender(object):
         :param recipient: the receiver of the email message
         :return: None
         """
+        sub_type = self.guess_file_type(audio_path)
+
         audio_file = open(audio_path, 'rb')  # Open the file in read-bytes mode
         audio_data = audio_file.read()
         audio_file.close()
 
-        audio = MIMEAudio(audio_data)
+        audio = MIMEAudio(audio_data, _subtype=sub_type)
         self.send_mime_part_email([audio], title, recipient)
 
     # noinspection PyTypeChecker
@@ -122,3 +127,16 @@ class SmtpSender(object):
         # Send Email
         smtp.sendmail(email_address, recipient, email_message.as_string())
         smtp.quit()
+
+    @staticmethod
+    def guess_file_type(file_path: str) -> str:
+        """
+        Guesses the file tpye of a media file according to its file type extension
+
+        :param file_path: the file to be checked
+        :return: the media (sub)type
+        """
+        content_type, encoding = mimetypes.guess_type(file_path)
+        if content_type is None or encoding is not None:
+            content_type = 'application/octet-stream'
+        return content_type.split('/', 1)[1]

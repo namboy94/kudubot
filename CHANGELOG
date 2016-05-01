@@ -1,3 +1,6 @@
+V 0.5.0.1
+  - Fixed email media sending
+  - Fixed email receiving issues
 V 0.5
   - Added Google TTS service
   - Added Email sender service
