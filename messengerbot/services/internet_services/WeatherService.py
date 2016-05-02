@@ -221,27 +221,30 @@ class WeatherService(Service):
         :param weather: the weather dictionary of that location
         :return: the message string
         """
-        weather_type = weather['current_conditions']['text']
-        temperature = weather['current_conditions']['temperature']
-        location_string = location[1]
+        try:
+            weather_type = weather['current_conditions']['text']
+            temperature = weather['current_conditions']['temperature']
+            location_string = location[1]
 
-        if not self.options['verbose']:
-            location_string = location_string.split(", ")[0] + ", " + location_string.split(", ")[2]
+            if not self.options['verbose']:
+                location_string = location_string.split(", ")[0] + ", " + location_string.split(", ")[2]
 
-        if not self.options['text']:
-            try:
-                weather_type = WeatherService.weather_identifiers[weather_type.lower()]["em"]
-            except KeyError:
-                weather_type = WeatherService.weather_identifiers["not defined"]["em"]
-        else:
-            if language != "en":
+            if not self.options['text']:
                 try:
-                    weather_type = WeatherService.weather_identifiers[weather_type.lower()]["de"]
+                    weather_type = WeatherService.weather_identifiers[weather_type.lower()]["em"]
                 except KeyError:
-                    weather_type = WeatherService.weather_identifiers["not defined"]["de"]
+                    weather_type = WeatherService.weather_identifiers["not defined"]["em"]
+            else:
+                if language != "en":
+                    try:
+                        weather_type = WeatherService.weather_identifiers[weather_type.lower()]["de"]
+                    except KeyError:
+                        weather_type = WeatherService.weather_identifiers["not defined"]["de"]
 
-        language_message = WeatherService.weather_message_dictionary[language]
-        message_string = language_message[0] + weather_type + language_message[1]
-        message_string += temperature + "°C" + language_message[2] + location_string
+            language_message = WeatherService.weather_message_dictionary[language]
+            message_string = language_message[0] + weather_type + language_message[1]
+            message_string += temperature + "°C" + language_message[2] + location_string
 
-        return message_string
+            return message_string
+        except KeyError:
+            return "Weather data currently unavailable"

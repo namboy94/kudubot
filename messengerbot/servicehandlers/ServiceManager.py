@@ -30,6 +30,7 @@ from messengerbot.servicehandlers.required_services.MuterService import MuterSer
 from messengerbot.servicehandlers.required_services.ServiceSelectorService import ServiceSelectorService
 
 # other services
+from messengerbot.services.local_services.ReminderService import ReminderService
 from messengerbot.services.local_services.RestarterService import RestarterService
 from messengerbot.services.internet_services.TvdbService import TvdbService
 from messengerbot.services.internet_services.WeatherService import WeatherService
@@ -61,6 +62,7 @@ class ServiceManager(object):
                     MuterService,
                     ServiceSelectorService,
                     RestarterService,
+                    ReminderService,
                     KickTippService,
                     FootballInfoService,
                     WeatherService,
@@ -126,7 +128,8 @@ class ServiceManager(object):
 
         for service in self.active_services:
             if service.has_background_process:
-                threads.append(Thread(target=service.__init__(self.connection).background_process))
+                # noinspection PyCallingNonCallable
+                threads.append(Thread(target=service(self.connection).background_process))
 
         for thread in threads:
             thread.setDaemon(True)

@@ -72,6 +72,14 @@ class Service(object):
         :return: None
         """
         self.connection = connection
+        self.initialize()
+
+    def initialize(self) -> None:
+        """
+        Can be used to extend the constructor for extra functionality
+        :return:
+        """
+        pass
 
     def send_text_message(self, message: Message) -> None:
         """

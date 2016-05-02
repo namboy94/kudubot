@@ -46,6 +46,9 @@ Currently implemented bot services are:
 * Football Info Service
 * Weather Service
 
+If you have any questions, please don't hesitate to contact me at krumreyh@namibsun.net.
+I know that documentation is currently lacking somewhat.
+
 ##Links
 
 [Changelog](http://gitlab.namibsun.net/namboy94/messengerbot/raw/master/CHANGELOG)

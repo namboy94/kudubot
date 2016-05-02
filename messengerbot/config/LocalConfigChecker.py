@@ -68,6 +68,11 @@ class LocalConfigChecker(object):
     Directory containing contact files
     """
 
+    services_directory = os.path.join(program_directory, "services")
+    """
+    Directory reserved for service files
+    """
+
     # noinspection PyTypeChecker
     @staticmethod
     def check_and_fix_config(connection_types: List[Connection]) -> None:
@@ -79,49 +84,57 @@ class LocalConfigChecker(object):
         :return: None
         """
 
-        if not os.path.isdir(LocalConfigChecker.program_directory):
-            os.makedirs(LocalConfigChecker.program_directory)
-        if not os.path.isdir(LocalConfigChecker.resource_directory):
-            os.makedirs(LocalConfigChecker.resource_directory)
-        if not os.path.isdir(LocalConfigChecker.config_directory):
-            os.makedirs(LocalConfigChecker.config_directory)
-        if not os.path.isdir(LocalConfigChecker.log_directory):
-            os.makedirs(LocalConfigChecker.log_directory)
-        if not os.path.isdir(LocalConfigChecker.contacts_directory):
-            os.makedirs(LocalConfigChecker.contacts_directory)
-        if not os.path.isdir(LocalConfigChecker.exception_logs_directory):
-            os.makedirs(LocalConfigChecker.exception_logs_directory)
+        LocalConfigChecker.validate_directory(LocalConfigChecker.program_directory)
+        LocalConfigChecker.validate_directory(LocalConfigChecker.resource_directory)
+        LocalConfigChecker.validate_directory(LocalConfigChecker.config_directory)
+        LocalConfigChecker.validate_directory(LocalConfigChecker.log_directory)
+        LocalConfigChecker.validate_directory(LocalConfigChecker.contacts_directory)
+        LocalConfigChecker.validate_directory(LocalConfigChecker.exception_logs_directory)
+        LocalConfigChecker.validate_directory(LocalConfigChecker.services_directory)
 
         for connection in connection_types:
             connection_logs = os.path.join(LocalConfigChecker.log_directory, connection.identifier)
             connection_config = os.path.join(LocalConfigChecker.config_directory, connection.identifier)
             connection_service_config = connection_config + "-services"
             connection_contacts = os.path.join(LocalConfigChecker.contacts_directory, connection.identifier)
+            connection_service_directory = os.path.join(LocalConfigChecker.services_directory, connection.identifier)
 
-            if not os.path.isdir(connection_logs):
-                os.makedirs(connection_logs)
-            if not os.path.isdir(connection_contacts):
-                os.makedirs(connection_contacts)
-            if not os.path.isdir(connection_service_config):
-                open(connection_service_config, 'w').close()
-            if not os.path.isfile(connection_config):
-                open(connection_config, 'w').close()
+            LocalConfigChecker.validate_directory(connection_logs)
+            LocalConfigChecker.validate_directory(connection_contacts)
+            LocalConfigChecker.validate_directory(connection_service_directory)
+            LocalConfigChecker.validate_text_file(connection_service_config)
+            LocalConfigChecker.validate_text_file(connection_config)
 
             message_logs = os.path.join(connection_logs, "messages")
             group_logs = os.path.join(message_logs, "groups")
             user_logs = os.path.join(message_logs, "users")
 
-            if not os.path.isdir(message_logs):
-                os.makedirs(message_logs)
-            if not os.path.isdir(group_logs):
-                os.makedirs(group_logs)
-            if not os.path.isdir(user_logs):
-                os.makedirs(user_logs)
+            LocalConfigChecker.validate_directory(message_logs)
+            LocalConfigChecker.validate_directory(group_logs)
+            LocalConfigChecker.validate_directory(user_logs)
 
             admin_contacts = os.path.join(connection_contacts, "admin")
             blacklist_contacts = os.path.join(connection_contacts, "blacklist")
 
-            if not os.path.isfile(admin_contacts):
-                open(admin_contacts, 'w').close()
-            if not os.path.isfile(blacklist_contacts):
-                open(blacklist_contacts, 'w').close()
+            LocalConfigChecker.validate_text_file(admin_contacts)
+            LocalConfigChecker.validate_text_file(blacklist_contacts)
+              
+    @staticmethod  
+    def validate_directory(directory: str) -> None:
+        """
+        Checks if a directory exists, and if not, creates it
+        
+        :return: None
+        """
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+
+    @staticmethod
+    def validate_text_file(text_file: str) -> None:
+        """
+        Checks if a text file exists, and if not, creates it
+
+        :return: None
+        """
+        if not os.path.isfile(text_file):
+            open(text_file, 'w').close()
