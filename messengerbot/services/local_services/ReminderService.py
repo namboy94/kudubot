@@ -104,16 +104,39 @@ class ReminderService(Service):
                     "hours": 0,
                     "minutes": 0,
                     "seconds": 0}
-    "The time when the reminder shoul be activated"
+    """
+    The time when the reminder shoul be activated
+    """
+
+    list_keywords = {"list": "en",
+                     "liste": "de"}
+    """
+    Keywords for the list command
+    """
+
+    no_reminders_stored = {"en": "No reminders stored",
+                           "de": "Keine Erinnerungen gespeichert"}
+    """
+    Message sent if the user requests a list of his reminders, but there are none
+    """
 
     reminder_delete_out_of_bounds = {"en": "No reminder with that index stored",
                                      "de": "Keine Erinnerung mit diesem Index."}
+    """
+    Message sent when the delete command's index is out of bounds
+    """
 
     delete_file_success = {"en": "Successfully deleted reminder",
                            "de": "Erinnerung erfolgreich gelöscht"}
+    """
+    Success message when deleting an reminder
+    """
 
     delete_keywords = {"delete": "en",
                        "löschen": "de"}
+    """
+    Keywords for the delete command
+    """
 
     def initialize(self) -> None:
         """
@@ -137,12 +160,20 @@ class ReminderService(Service):
         for key in self.delete_keywords:
             if key in user_input:
                 delete_key = key
+        list_key = None
+        for key in self.list_keywords:
+            if key in user_input:
+                list_key = key
 
         if delete_key is not None:  # In other words: if "delete" in message.message_body.lower()
-            index = int(message.message_body.split(self.delete_keywords[delete_key] + " ")[1])
-            reply = self.delete_reminder_for_user(message.address, index)
-        elif "list" in message.message_body.lower():
-            reply = self.list_reminders_of(message.address)
+            language = self.delete_keywords[delete_key]
+            index = int(message.message_body.split(delete_key + " ")[1])
+            reply = self.delete_reminder_for_user(message.address, index, language)
+
+        elif list_key is not None:
+            language = self.list_keywords[list_key]
+            reply = self.get_user_reminders_as_string_from(message.address, language)
+
         else:
             language, reminder_options, reminder_message = self.parse_user_input(message.message_body)
             reminder_time = self.determine_reminder_time(reminder_options)
@@ -167,7 +198,8 @@ class ReminderService(Service):
         regex += "|" + Service.regex_string_from_dictionary_keys([ReminderService.tomorrow_keywords])
         regex += "|[0-9]{4}-[0-9]{2}-[0-9]{2}(-[0-9]{2}-[0-9]{2}-[0-9]{2})?)$"
 
-        list_regex = "^/" + Service.regex_string_from_dictionary_keys([ReminderService.remind_keywords]) + " list$"
+        list_regex = "^/" + Service.regex_string_from_dictionary_keys([ReminderService.remind_keywords]) + " "
+        list_regex += Service.regex_string_from_dictionary_keys([ReminderService.list_keywords]) + "$"
 
         delete_regex = "^/" + Service.regex_string_from_dictionary_keys([ReminderService.remind_keywords]) + " "
         delete_regex += Service.regex_string_from_dictionary_keys([ReminderService.delete_keywords]) + " [0-9]+$"
@@ -385,11 +417,12 @@ class ReminderService(Service):
 
         return sorted(user_reminders, key=lambda dictionary: dictionary["time"])
 
-    def get_user_reminders_as_string_from(self, sender: str) -> str:
+    def get_user_reminders_as_string_from(self, sender: str, language: str) -> str:
         """
         Creates a string that lists all currently active reminders of a specific user
 
         :param sender: the sender to check
+        :param language: The language to send the reply in
         :return: the generated string
         """
         reminders = self.list_reminders_of(sender)
@@ -409,22 +442,26 @@ class ReminderService(Service):
             if index != len(reminders):
                 list_string += "\n\n"
 
+        if not list_string:
+            list_string = self.no_reminders_stored[language]
+
         return list_string
 
-    def delete_reminder_for_user(self, user: str, reminder_to_delete_index: int) -> str:
+    def delete_reminder_for_user(self, user: str, reminder_to_delete_index: int, language: str) -> Dict[str, str]:
         """
         Deletes a stored reminder and returns the result of the deletion.
 
         :param user: the user whose reminder that is
         :param reminder_to_delete_index: the index for the reminder to delete
+        :param language: The language in which the reply should be sent
         :return: the reply to the user
         """
         try:
             reminder = self.list_reminders_of(user)[reminder_to_delete_index - 1]
             os.remove(reminder['file'])
-            return self.delete_file_success
+            return self.delete_file_success[language]
         except IndexError:
-            return self.reminder_delete_out_of_bounds
+            return self.reminder_delete_out_of_bounds[language]
 
     def background_process(self) -> None:
         """
