@@ -121,17 +121,9 @@ class ContinuousReminder(GenericPlugin):
         :return: the description in the specified language
         """
         if language == "en":
-            return "/cremind\tStores a continuous (weekly) reminder\n" \
-                   "syntax:\n" \
-                   "/cremind \"<message>\" <day> <hh-mm-ss>\n" \
-                   "/cremind list\tLists all reminders currently stored" \
-                   "/cremind delete <index>\tDeletes the reminder at the given index"
+            return
         elif language == "de":
-            return "/cremind\tSpeichert eine wöchentliche Errinnerung\n" \
-                   "syntax:\n" \
-                   "/cremind \"<nachricht>\" <tag> <hh-mm-ss>\n" \
-                   "/cremind list\tListet alle Erinnerungen " \
-                   "/cremind delete <index>\tDeletes the reminder at the given index"
+            return
         else:
             return "Help not available in this language"
 

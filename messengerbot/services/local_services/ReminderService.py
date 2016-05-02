@@ -27,7 +27,7 @@ import re
 import time
 import calendar
 import datetime
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 
 from messengerbot.servicehandlers.Service import Service
 from messengerbot.connection.generic.Message import Message
@@ -37,7 +37,7 @@ from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 class ReminderService(Service):
     """
     The ReminderService Class that extends the generic Service class.
-    The service parses www.kicktipp.de to get a kicktipp group's current standings
+    The service offers reminder at specific or relative times
     """
 
     identifier = "reminder"
@@ -106,6 +106,15 @@ class ReminderService(Service):
                     "seconds": 0}
     "The time when the reminder shoul be activated"
 
+    reminder_delete_out_of_bounds = {"en": "No reminder with that index stored",
+                                     "de": "Keine Erinnerung mit diesem Index."}
+
+    delete_file_success = {"en": "Successfully deleted reminder",
+                           "de": "Erinnerung erfolgreich gelöscht"}
+
+    delete_keywords = {"delete": "en",
+                       "löschen": "de"}
+
     def initialize(self) -> None:
         """
         Constructor extender for the Renamer class that initializes a directory for the reminder files
@@ -123,13 +132,25 @@ class ReminderService(Service):
         :param message: the message to process
         :return: None
         """
-        language, reminder_options, reminder_message = self.parse_user_input(message.message_body)
-        reminder_time = self.determine_reminder_time(reminder_options)
-        reminder_time = self.normalize_time(reminder_time)
+        user_input = message.message_body.lower()
+        delete_key = None
+        for key in self.delete_keywords:
+            if key in user_input:
+                delete_key = key
 
-        self.store_reminder(reminder_time, reminder_message, message.address)
+        if delete_key is not None:  # In other words: if "delete" in message.message_body.lower()
+            index = int(message.message_body.split(self.delete_keywords[delete_key] + " ")[1])
+            reply = self.delete_reminder_for_user(message.address, index)
+        elif "list" in message.message_body.lower():
+            reply = self.list_reminders_of(message.address)
+        else:
+            language, reminder_options, reminder_message = self.parse_user_input(message.message_body)
+            reminder_time = self.determine_reminder_time(reminder_options)
+            reminder_time = self.normalize_time(reminder_time)
 
-        reply = self.message_stored_reply[language]
+            self.store_reminder(reminder_time, reminder_message, message.address)
+            reply = self.message_stored_reply[language]
+
         reply_message = self.generate_reply_message(message, "Reminder", reply)
         self.send_text_message(reply_message)
 
@@ -146,7 +167,14 @@ class ReminderService(Service):
         regex += "|" + Service.regex_string_from_dictionary_keys([ReminderService.tomorrow_keywords])
         regex += "|[0-9]{4}-[0-9]{2}-[0-9]{2}(-[0-9]{2}-[0-9]{2}-[0-9]{2})?)$"
 
-        return re.search(re.compile(regex), message.message_body.lower())
+        list_regex = "^/" + Service.regex_string_from_dictionary_keys([ReminderService.remind_keywords]) + " list$"
+
+        delete_regex = "^/" + Service.regex_string_from_dictionary_keys([ReminderService.remind_keywords]) + " "
+        delete_regex += Service.regex_string_from_dictionary_keys([ReminderService.delete_keywords]) + " [0-9]+$"
+
+        return re.search(re.compile(regex), message.message_body.lower())\
+            or re.search(re.compile(list_regex), message.message_body.lower())\
+            or re.search(re.compile(delete_regex), message.message_body.lower())
 
     def parse_user_input(self, user_input: str) -> Tuple[str, str, str]:
         """
@@ -158,7 +186,7 @@ class ReminderService(Service):
         """
 
         remind_keyword, options = user_input.split(" ", 1)  # Split message into /remind and the rest of the message
-        language = self.remind_keywords[remind_keyword.split("/")[1]]  # Get the language using the /remind keyword
+        language = self.remind_keywords[remind_keyword.lower().split("/")[1]]  # Get the language using /remind keyword
 
         # Split message into three parts:
         # junk: empty string, stuff that comes before the first quotation mark
@@ -166,7 +194,7 @@ class ReminderService(Service):
         # options: the options after the reminder string
         junk, reminder_message, options = options.split("\"", 2)
 
-        options = options.lstrip()  # Remove leading whitespace
+        options = options.lower().lstrip()  # Remove leading whitespace
 
         return language, options, reminder_message
 
@@ -177,8 +205,7 @@ class ReminderService(Service):
         :param options: the options to be parsed
         :return: the reminder time as a dictionary
         """
-
-        reminder_time = self.get_current_time()
+        reminder_time = self.get_time()
 
         if options in self.tomorrow_keywords:
             reminder_time["days"] += 1
@@ -228,19 +255,23 @@ class ReminderService(Service):
         opened_file.close()
 
     @staticmethod
-    def get_current_time() -> Dict[str, int]:
+    def get_time(timestamp: int = None) -> Dict[str, int]:
         """
-        Returns the current time as a dicitonary
+        Returns the current time as a dicitonary, or optionally gets the time from a UTC timestamp
 
+        :param timestamp: Optional timestamp
         :return: the time dictionary
         """
-        current_time = datetime.datetime.utcnow()
-        return {"years": current_time.year,
-                "months": current_time.month,
-                "days": current_time.day,
-                "hours": current_time.hour,
-                "minutes": current_time.minute,
-                "seconds": current_time.second}
+        if timestamp is None:
+            date_time_object = datetime.datetime.utcnow()
+        else:
+            date_time_object = datetime.datetime.utcfromtimestamp(timestamp)
+        return {"years": date_time_object.year,
+                "months": date_time_object.month,
+                "days": date_time_object.day,
+                "hours": date_time_object.hour,
+                "minutes": date_time_object.minute,
+                "seconds": date_time_object.second}
 
     @staticmethod
     def normalize_time(time_dictionary: Dict[str, int]) -> Dict[str, int]:
@@ -328,6 +359,72 @@ class ReminderService(Service):
         date = time.strptime(date, "%Y-%m-%d:%H-%M-%S")
 
         return int(calendar.timegm(date))
+
+    # noinspection PyTypeChecker
+    def list_reminders_of(self, sender: str) -> List[Dict[str, str]]:
+        """
+        Lists all reminders of a user and the times they will be sent
+
+        :param sender: the sender to check reminder files for
+        :return: an indexed list of reminders
+        """
+        user_reminders = []
+        for reminder_file_name in os.listdir(self.reminder_directory):
+
+            if sender in reminder_file_name:
+                reminder_file = os.path.join(self.reminder_directory, reminder_file_name)
+                opened_file = open(reminder_file, 'r')
+
+                reminder_due_time = int(reminder_file_name.split("#", 1)[0])
+                reminder_text = opened_file.read()
+                opened_file.close()
+
+                user_reminders.append({"time": str(reminder_due_time),
+                                       "text": reminder_text,
+                                       "file": reminder_file})
+
+        return sorted(user_reminders, key=lambda dictionary: dictionary["time"])
+
+    def get_user_reminders_as_string_from(self, sender: str) -> str:
+        """
+        Creates a string that lists all currently active reminders of a specific user
+
+        :param sender: the sender to check
+        :return: the generated string
+        """
+        reminders = self.list_reminders_of(sender)
+        list_string = ""
+
+        for index in range(1, len(reminders) + 1):
+            # noinspection PyTypeChecker
+            time_dict = self.get_time(int(reminders[index - 1]['time']))
+
+            list_string += str(index) + ": "
+            list_string += str(time_dict['years']) + "-" + str(time_dict['months']) + "-" + str(time_dict['days'])
+            list_string += ":"
+            list_string += str(time_dict['hours']) + "-" + str(time_dict['minutes']) + "-" + str(time_dict['seconds'])
+            list_string += "\n"
+            list_string += reminders[index - 1]['text']
+
+            if index != len(reminders):
+                list_string += "\n\n"
+
+        return list_string
+
+    def delete_reminder_for_user(self, user: str, reminder_to_delete_index: int) -> str:
+        """
+        Deletes a stored reminder and returns the result of the deletion.
+
+        :param user: the user whose reminder that is
+        :param reminder_to_delete_index: the index for the reminder to delete
+        :return: the reply to the user
+        """
+        try:
+            reminder = self.list_reminders_of(user)[reminder_to_delete_index - 1]
+            os.remove(reminder['file'])
+            return self.delete_file_success
+        except IndexError:
+            return self.reminder_delete_out_of_bounds
 
     def background_process(self) -> None:
         """
