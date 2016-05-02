@@ -2,6 +2,9 @@
 
 This project was formerly known as whatsbot and whatsapp-bot.
 
+The repository is mirrored to [github](https://github.com/namboy94/messengerbot) and
+[gitlab.com](https://gitlab.com/namboy94/messengerbot)
+
 messengerbot is a bot framework that allows running a bot on a multitude of messaging services. It is completely
 modular, adding new bot services and new connection types is trivial.
 
