@@ -2,9 +2,6 @@
 
 This project was formerly known as whatsbot and whatsapp-bot.
 
-The repository is mirrored to [github](https://github.com/namboy94/messengerbot) and
-[gitlab.com](https://gitlab.com/namboy94/messengerbot)
-
 messengerbot is a bot framework that allows running a bot on a multitude of messaging services. It is completely
 modular, adding new bot services and new connection types is trivial.
 
@@ -53,6 +50,12 @@ If you have any questions, please don't hesitate to contact me at krumreyh@namib
 I know that documentation is currently lacking somewhat.
 
 ##Links
+
+The repository is mirrored to:
+
+* [github.com](https://github.com/namboy94/messengerbot)
+* [gitlab.com](https://gitlab.com/namboy94/messengerbot)
+* [bitbucket.org](https://bitbucket.org/namboy94/messengerbot)
 
 [Changelog](http://gitlab.namibsun.net/namboy94/messengerbot/raw/master/CHANGELOG)
 

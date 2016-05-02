@@ -14,6 +14,7 @@ clone:
     - cd messengerbot
     - git push -u git@gitlab.com:namboy94/messengerbot.git master
     - git push -u git@github.com:namboy94/messengerbot.git master
+    - git push -u git@bitbucket.org:namboy94/messengerbot.git master
 
 uninstall:
   stage: setup
