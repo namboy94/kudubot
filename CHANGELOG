@@ -1,3 +1,5 @@
+V 0.5.2
+  - Added weekly reminder service
 V 0.5.1.1
   - Bugfixes in the Reminder Service
   - Reminder Service now supports listing and deleting reminders

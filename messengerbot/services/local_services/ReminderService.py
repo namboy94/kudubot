@@ -48,11 +48,19 @@ class ReminderService(Service):
     help_description = {"en": "/remind\tSaves a reminder and sends it back at the specified time\n"
                               "syntax: /remind \"<message>\" <time>\n"
                               "time syntax: <YYYY-MM-DD-hh-mm-ss>\n"
-                              "or: <amount> [years|months|days|hours|minutes|seconds]",
+                              "or: <amount> [years|months|days|hours|minutes|seconds]\n"
+                              "or: tomorrow\n\n"
+                              "/remind list\tLists all reminders currently stored\n"
+                              "/remind delete <index>\tDeletes the reminder at the given index\n\n"
+                              "All times are stored in UTC",
                         "de": "/remind\tSpeichert eine Erinnerung und verschickt diese zum angegebenen Zeitpunkt\n"
-                              "syntax: /remind \"<nachricht>\" <zeit>\n"
+                              "syntax: /erinner \"<nachricht>\" <zeit>\n"
                               "zeit syntax: YYYY-MM-DD-hh-mm-ss\n"
-                              "oder: <anzahl> [jahre|monate|tage|stunden|minuten|sekunden]"}
+                              "oder: <anzahl> [jahre|monate|tage|stunden|minuten|sekunden]\n"
+                              "oder: morgen\n\n"
+                              "/erinner list\tListet alle Erinnerungen\n"
+                              "/erinner delete <index>\tDeletes the reminder at the given index\n\n"
+                              "Alle Zeiten werden in UTC gespeichert"}
     """
     Help description for this service.
     """
@@ -64,6 +72,9 @@ class ReminderService(Service):
 
     message_stored_reply = {"en": "Message Stored",
                             "de": "Nachricht gespeichert"}
+    """
+    Reply to signal the user that the reminder was successfully stored
+    """
 
     reminder_directory = "reminder"
     """
@@ -71,7 +82,7 @@ class ReminderService(Service):
     """
 
     remind_keywords = {"remind": "en",
-                       "erinner": "en"}
+                       "erinner": "de"}
     """
     Keywords for the remind command
     """
@@ -168,18 +179,18 @@ class ReminderService(Service):
         if delete_key is not None:  # In other words: if "delete" in message.message_body.lower()
             language = self.delete_keywords[delete_key]
             index = int(message.message_body.split(delete_key + " ")[1])
-            reply = self.delete_reminder_for_user(message.address, index, language)
+            reply = self.delete_reminder_for_user(message.identifier, index, language)
 
         elif list_key is not None:
             language = self.list_keywords[list_key]
-            reply = self.get_user_reminders_as_string_from(message.address, language)
+            reply = self.get_user_reminders_as_string_from(message.identifier, language)
 
         else:
             language, reminder_options, reminder_message = self.parse_user_input(message.message_body)
             reminder_time = self.determine_reminder_time(reminder_options)
             reminder_time = self.normalize_time(reminder_time)
 
-            self.store_reminder(reminder_time, reminder_message, message.address)
+            self.store_reminder(reminder_time, reminder_message, message.identifier)
             reply = self.message_stored_reply[language]
 
         reply_message = self.generate_reply_message(message, "Reminder", reply)

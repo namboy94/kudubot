@@ -32,6 +32,7 @@ from messengerbot.servicehandlers.required_services.ServiceSelectorService impor
 # other services
 from messengerbot.services.local_services.ReminderService import ReminderService
 from messengerbot.services.local_services.RestarterService import RestarterService
+from messengerbot.services.local_services.WeeklyReminderService import WeeklyReminderService
 from messengerbot.services.internet_services.TvdbService import TvdbService
 from messengerbot.services.internet_services.WeatherService import WeatherService
 from messengerbot.services.internet_services.KitMensaService import KitMensaService
@@ -63,6 +64,7 @@ class ServiceManager(object):
                     ServiceSelectorService,
                     RestarterService,
                     ReminderService,
+                    WeeklyReminderService,
                     KickTippService,
                     FootballInfoService,
                     WeatherService,
