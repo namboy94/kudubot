@@ -24,13 +24,15 @@ This file is part of messengerbot.
 # imports
 import os
 import re
+import time
 import random
 import datetime
 from typing import List, Tuple, Set
 
 from messengerbot.connection.generic.Message import Message
-from messengerbot.services.local_services.CasinoService import CasinoService
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
+from messengerbot.services.local_services.CasinoService import CasinoService
+from messengerbot.resources.images.__init__ import get_location as get_board_image_file
 
 
 class RouletteService(CasinoService):
@@ -43,6 +45,11 @@ class RouletteService(CasinoService):
     identifier = "roulette"
     """
     The identifier for this service
+    """
+
+    has_background_process = True
+    """
+    Class has a background process.
     """
 
     help_description = {"en": "/roulette\tAllows the sender to play roulette\n"
@@ -93,6 +100,11 @@ class RouletteService(CasinoService):
     roulette_directory = ""
     """
     Directory to store the roulette bets
+    """
+
+    roulette_board_image = get_board_image_file("rouletteboard.jpg")
+    """
+    The roulette board image file
     """
 
     spin_keywords = {"spin": "en",
@@ -185,6 +197,30 @@ class RouletteService(CasinoService):
     Message shown when the user has won.
     """
 
+    time_left_message = {"en": "s left until the board wil be spinned",
+                         "de": "s noch bis zum Drehen des Rades"}
+    """
+    Message to be sent when a request for time to next spin was sent
+    """
+
+    not_authenticated_method = {"en": "You are not authorized to spin the wheel",
+                                "de": "Du hast keine Erlaubniss das Rad zu drehen"}
+    """
+    Message sent when a non-admin user tries to spin the wheel
+    """
+
+    undefined_behaviour = {"en": "This should not happen",
+                           "de": "Dies sollte nicht passieren"}
+    """
+    Message for undefined behavour
+    """
+
+    bet_stored_message = {"en": "Bet stored",
+                          "de": "Wette gespeichert"}
+    """
+    Message to be sent to the user when a bet was saved
+    """
+
     def initialize(self) -> None:
         """
         Initializes the roulette bets directory
@@ -201,7 +237,7 @@ class RouletteService(CasinoService):
         :param message: the message to process
         :return: None
         """
-        reply = self.parse_user_input(message.message_body.lower(), message.get_unique_identifier())
+        reply = self.parse_user_input(message)
 
         if reply:
             reply_message = self.generate_reply_message(message, "Roulette", reply)
@@ -234,7 +270,7 @@ class RouletteService(CasinoService):
                                                                       RouletteService.cancel_keywords,
                                                                       RouletteService.board_keywords,
                                                                       RouletteService.time_keywords,
-                                                                      RouletteService.bets_keywords,]) + "$"
+                                                                      RouletteService.bets_keywords]) + "$"
 
         match = re.search(re.compile(regex), message.message_body.lower())
 
@@ -244,18 +280,20 @@ class RouletteService(CasinoService):
             neighbour_set = RouletteService.parse_neighbour_group(neighbours)
 
             match = neighbour_set in RouletteService.dual_neighbours \
-                    or neighbour_set in RouletteService.quad_neighbours
+                or neighbour_set in RouletteService.quad_neighbours
 
         return match
 
-    def parse_user_input(self, user_input: str, user_identifier: str) -> Stuff:
+    def parse_user_input(self, message: Message) -> str:
         """
-        Parses the user input
+        Parses the user input from the message
 
-        :param user_input: the user input to be parsed
-        :param user_identifier: the user identifier to identify the user's account etc.
-        :return: TBD
+        :param message: The message to be parsed
+        :return: a reply string
         """
+        user_input = message.message_body.lower()
+        user_identifier = message.get_unique_identifier()
+
         user_input = user_input.split("/roulette ")[1]
         options = user_input.split(" ")
 
@@ -263,13 +301,16 @@ class RouletteService(CasinoService):
             return self.is_spinning_message[self.connection.last_used_language]
 
         if options[0] in self.spin_keywords:
-            return self.spin_wheel(self.spin_keywords[options[0]])
+            if self.connection.authenticator.is_from_admin(message):
+                return self.spin_wheel(self.spin_keywords[options[0]])
+            else:
+                return self.not_authenticated_method[self.spin_keywords[options[0]]]
         elif options[0] in self.cancel_keywords:
             return self.cancel_bets(self.cancel_keywords[options[0]], user_identifier, int(options[1]))
         elif options[0] in self.board_keywords:
             return self.send_board(user_identifier)
         elif options[0] in self.time_keywords:
-            return self.request_time_to_spin(self.time_keywords[0])
+            return str(self.request_time_to_spin()) + "s" + self.time_left_message[self.time_keywords[options[1]]]
         elif options[0] in self.bets_keywords:
             return self.get_bets_as_formatted_string("roulette", user_identifier)
         else:
@@ -289,7 +330,7 @@ class RouletteService(CasinoService):
                 for number in (self.black_numbers + self.red_numbers):
                     if number % 2 == 0:
                         selection.append(number)
-            elif re.search(r"", options[1]):
+            elif re.search(r"(([0-9]?[0-3])|3[0-6])", options[1]):
                 selection = [int(options[1])]
             else:
                 parameter = options[2]
@@ -409,14 +450,58 @@ class RouletteService(CasinoService):
         Sends an image of a roulette board to the user
 
         :param address: the address of the user
-        :return:
+        :return: None
         """
+        self.send_image_message(address, self.roulette_board_image)
 
+    @staticmethod
+    def request_time_to_spin() -> int:
+        """
+        Returns the mount of time in seconds until the roulette wheel is spun again
 
+        :return: the time until the next spin in seconds
+        """
+        current_time = datetime.datetime.utcnow()
+        current_minute = int(current_time.minute)
+        current_second = int(current_time.second)
 
+        time_left = 120 - current_second - 5
+        if current_minute % 2 == 1:
+            time_left -= 60
 
+        return time_left
 
+    def create_bet(self, identifier: str, bet_items: List[int], value: int) -> str:
+        """
+        Creates a new bet
 
+        :param identifier: The identifier used to determine which user made the bet
+        :param bet_items: The items for which the user placed a bet
+        :param value: the value of the bet
+        :return: a message telling the user that the bet was placed succesfully
+        """
+        multiplier = int(36 / len(bet_items))
+        bet_string = ""
+
+        for element in bet_items:
+            bet_string += str(element) + "-"
+
+        bet_string = bet_string.rsplit("-", 1)[0]
+        bet_string += "X" + str(multiplier)
+        self.store_bet("roulette", identifier, value, bet_string)
+
+        return self.bet_stored_message[self.connection.last_used_language]
+
+    def background_process(self) -> None:
+        """
+        Spins the wheel in periodic intervals
+
+        :return: None
+        """
+        while True:
+            if self.is_spinning():
+                self.spin_wheel(self.connection.last_used_language)
+            time.sleep(3)
 
 
 def calculate_neighbour_group(roulette_board: List[List[int]]) -> List[Set[int]]:
@@ -451,270 +536,3 @@ def calculate_neighbour_group(roulette_board: List[List[int]]) -> List[Set[int]]
         row += 1
 
     return pairs, quads
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # Explanation: Since the board goes in the order 3-2-1 instead of 1-2-3, we have to reverse the order by
-        # Subtracting the mod3 result from the length of the columns(=3) minus 1
-
-
-
-
-        # These Combinations shift the index of the roulette board by maximum 1 tile
-        if not quad:
-            combinations = [[(1,0), (-1, 0), (0, 1), (0, -1)]]
-        else:
-            combinations = [[(1, 0), (1, 1), (0, 1)],
-                            [(1, 0), (1, -1), (0, -1)],
-                            [(-1, 0), (-1, -1), (0, -1)],
-                            [(-1, 0), (-1, 1), (0, 1)]]
-
-        neighbour_lists = []
-
-        for combination in combinations:
-            out_of_bounds = False
-            neighbours = []
-
-            for neigbour_config in combination:
-                neigbour_column = column_index + neigbour_config[0]
-                neighbour_row = row_index + neigbour_config[1]
-
-                if neigbour_column < 0 or neighbour_row < 0:
-                    out_of_bounds = True
-                    break
-
-                else:
-                    neighbours.append(self.roulette_board[neighbour_row][neigbour_column])
-
-            if not out_of_bounds:
-                neighbour_lists.append(neighbours)
-
-        return neighbour_lists
-
-
-
-
-
-    \        def parse_user_input(self):
-            """
-            Parses the user's input
-            :return: void
-            """
-            self.create_user(self.entity)
-            mode = self.message.split(" ")[1]
-            if mode == "time":
-                self.mode = "time"
-            elif mode == "bets":
-                self.mode = "bets"
-            elif mode == "board":
-                self.mode = "board"
-            elif mode == "cancel":
-                self.mode = "cancel"
-            elif mode == "spin":
-                self.mode = "spin"
-            else:
-                self.mode = "newBet"
-                dollars, cents = self.decode_money_string(self.message.split(" ")[1])
-                if self.has_sufficient_funds(self.user_id, dollars, cents):
-                    self.transfer_funds(self.user_id, -1 * dollars, -1 * cents)
-                    bet = self.message.split(" ")[2]
-                    if len(self.message.split(" ")) == 4:
-                        bet += ":" + self.message.split(" ")[3]
-                    self.store_bet("roulette", self.user_id, self.sender, dollars, cents, bet)
-                else:
-                    self.insufficient_funds = True
-
-        def get_response(self):
-            """
-            Returns the response calculated by the plugin
-            :return: the response as a MessageProtocolEntity
-            """
-            if self.mode == "newBet":
-                if self.insufficient_funds:
-                    return WrappedTextMessageProtocolEntity("Insufficient Funds", to=self.sender)
-                else:
-                    return WrappedTextMessageProtocolEntity("Bet Saved", to=self.sender)
-            elif self.mode == "bets":
-                return WrappedTextMessageProtocolEntity(self.get_bet_strings("roulette", self.user_id), to=self.sender)
-            elif self.mode == "spin":
-                if AddressBook().is_authenticated(self.user_id):
-                    self.parallel_run(True)
-                    return None
-                else:
-                    return WrappedTextMessageProtocolEntity("Sorry.", to=self.sender)
-            elif self.mode == "board":
-                roulette_image = os.getenv("HOME") + "/.whatsbot/resources/images/rouletteboard.jpg"
-                self.send_image(self.sender, roulette_image, "")
-                return None
-            elif self.mode == "cancel":
-                Popen(["rm", self.casino_dir + "roulette/" + self.user_id]).wait()
-                return WrappedTextMessageProtocolEntity("Bets cancelled", to=self.sender)
-            elif self.mode == "time":
-                current_time = datetime.datetime.now()
-                current_minute = int(current_time.minute)
-                current_second = int(current_time.second)
-                time_left = 120 - current_second - 5
-                if current_minute % 2 == 1:
-                    time_left -= 60
-                return WrappedTextMessageProtocolEntity(str(time_left) + "s to turn.", to=self.sender)
-
-        @staticmethod
-        def get_description(language):
-            """
-            Returns a helpful description of the plugin's syntax and functionality
-            :param language: the language to be returned
-            :return: the description as string
-            """
-            if language == "en":
-                return
-            elif language == "de":
-                return
-            else:
-                return "Help not available in this language"
-
-        @staticmethod
-        def get_plugin_name():
-            """
-            Returns the plugin name
-            :return: the plugin name
-            """
-            return "Roulette Plugin"
-
-        def parallel_run(self, once=False):
-            """
-            Starts a parallel background activity if this class has one.
-            :return: void
-            """
-            while True:
-                current_time = datetime.datetime.now()
-                minutes = int(current_time.minute)
-                seconds = int(current_time.second)
-
-                if (minutes % 2 == 1 and seconds >= 55) or once:
-                    recipients = []
-                    betters = []
-                    self.outcome = random.randint(0, 36)
-                    for better in os.listdir(self.casino_dir + "roulette"):
-                        win_cents = 0
-                        win_dollars = 0
-
-                        bets = self.get_bets("roulette", better)
-                        Popen(["rm", self.casino_dir + "roulette/" + better]).wait()
-
-                        user = self.get_user_nick(better)
-
-                        for bet in bets:
-                            sender = bet["sender"]
-                            if sender not in recipients:
-                                recipients.append(sender)
-
-                            dollars, cents = self.evaluate_bet(bet)
-                            win_cents += cents
-                            while win_cents >= 100:
-                                dollars += 1
-                                win_cents -= 100
-                            win_dollars += dollars
-
-                        self.transfer_funds(better, win_dollars, win_cents)
-
-                        betters.append((user, self.encode_money_string(win_dollars, win_cents, True)))
-
-                    for sender in recipients:
-                        if self.outcome in self.red:
-                            colour = " (red)\n"
-                        elif self.outcome in self.black:
-                            colour = " (black)\n"
-                        else:
-                            colour = "\n"
-                        winning_text = "The winning number is " + str(self.outcome) + colour
-                        for better in betters:
-                            winning_text += "\n" + better[0] + " won " + better[1] + "€"
-                        self.send_message(WrappedTextMessageProtocolEntity(winning_text, to=sender))
-                    if not once:
-                        time.sleep(5)
-                if once:
-                    break
-                time.sleep(1)
-
-        def evaluate_bet(self, bet):
-            """
-            Evaluates a bet
-            :param bet: the bet
-            :return: the amount won by the player
-            """
-            bet_type = bet["bet"]
-            bet_dollars, bet_cents = self.decode_money_string(bet["value"])
-            try:
-                intbet = int(bet_type)
-                if self.outcome == intbet:
-                    return self.multiply_money(35, bet_dollars, bet_cents)
-                else:
-                    return 0, 0
-            except Exception as e:
-                str(e)
-                if bet_type == "red":
-                    if self.outcome in self.red:
-                        return self.multiply_money(2, bet_dollars, bet_cents)
-                elif bet_type == "black":
-                    if self.outcome in self.black:
-                        return self.multiply_money(2, bet_dollars, bet_cents)
-                elif bet_type == "even":
-                    if self.outcome % 2 == 0:
-                        return self.multiply_money(2, bet_dollars, bet_cents)
-                elif bet_type == "odd":
-                    if self.outcome % 2 == 1:
-                        return self.multiply_money(2, bet_dollars, bet_cents)
-                elif bet_type.startswith("batch"):
-                    bet_string = bet_type.split("batch:")[1]
-                    bet_numbers = bet_string.split("-")
-                    i = 0
-                    while i < len(bet_numbers):
-                        bet_numbers[i] = int(bet_numbers[i])
-                        i += 1
-                    if self.outcome in bet_numbers:
-                        if len(bet_numbers) == 2:
-                            return self.multiply_money(18, bet_dollars, bet_cents)
-                        if len(bet_numbers) == 4:
-                            return self.multiply_money(9, bet_dollars, bet_cents)
-                elif bet_type.startswith("group"):
-                    group_number = int(bet_type.split("group:")[1])
-                    group = []
-                    i = (group_number - 1) * 4
-                    while i < group_number * 4:
-                        group.append(self.board[0][i])
-                        group.append(self.board[1][i])
-                        group.append(self.board[2][i])
-                        i += 1
-                    if self.outcome in group:
-                        return self.multiply_money(3, bet_dollars, bet_cents)
-                elif bet_type.startswith("row"):
-                    row_number = int(bet_type.split("row:")[1])
-                    if self.outcome in self.board[row_number - 1]:
-                        return self.multiply_money(3, bet_dollars, bet_cents)
-                elif bet_type.startswith("half"):
-                    half_number = int(bet_type.split("half:")[1])
-                    if half_number == 1:
-                        if 0 < self.outcome < 19:
-                            return self.multiply_money(2, bet_dollars, bet_cents)
-                    else:
-                        if self.outcome >= 19:
-                            return self.multiply_money(2, bet_dollars, bet_cents)
-            return 0, 0

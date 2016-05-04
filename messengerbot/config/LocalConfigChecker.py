@@ -43,11 +43,6 @@ class LocalConfigChecker(object):
     The parent directory of all config (and other local) files
     """
 
-    resource_directory = os.path.join(program_directory, "resources")
-    """
-    Directory containing various resources needed by the program
-    """
-
     config_directory = os.path.join(program_directory, "config")
     """
     Directory containing configuration files
@@ -85,7 +80,6 @@ class LocalConfigChecker(object):
         """
 
         LocalConfigChecker.validate_directory(LocalConfigChecker.program_directory)
-        LocalConfigChecker.validate_directory(LocalConfigChecker.resource_directory)
         LocalConfigChecker.validate_directory(LocalConfigChecker.config_directory)
         LocalConfigChecker.validate_directory(LocalConfigChecker.log_directory)
         LocalConfigChecker.validate_directory(LocalConfigChecker.contacts_directory)
