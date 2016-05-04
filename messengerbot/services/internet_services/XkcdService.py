@@ -76,13 +76,11 @@ class XkcdService(Service):
 
         if selected_xkcd_comic > current_xkcd_comic:
             reply = self.xkcd_does_not_exist_message[language]
+            reply_message = self.generate_reply_message(message, "XKCD", reply)
+            self.send_text_message(reply_message)
         else:
             file_path, title, alt_text = self.download_xkcd_comic(selected_xkcd_comic)
-            self.send_image_message(message.address, file_path, title)
-            reply = alt_text
-
-        reply_message = self.generate_reply_message(message, "XKCD", reply)
-        self.send_text_message(reply_message)
+            self.send_image_message(message.address, file_path, title + "\n\n" + alt_text)
 
     @staticmethod
     def regex_check(message: Message) -> bool:
@@ -106,7 +104,7 @@ class XkcdService(Service):
         xkcd_soup = BeautifulSoup(current_xkcd_html, 'html.parser')
 
         xkcd_body = xkcd_soup.select('body')[0].text
-        current = xkcd_body.split("Permanent link to this comic: ")[1].split("\n")[0]
+        current = xkcd_body.split("Permanent link to this comic: http://xkcd.com/")[1].split("/\n")[0]
 
         return int(current)
 
@@ -123,7 +121,7 @@ class XkcdService(Service):
 
         comic_info = str(xkcd_soup.find("div", {"id": "comic"}))
         title = comic_info.split("img alt=\"")[1].split("\"")[0]
-        alt_text = comic_info.split("img alt=\"")[1].split("\"/>")[0]
+        alt_text = comic_info.split("title=\"")[1].split("\"/>")[0]
         image_link = 'http:' + comic_info.split("src=\"")[1].split("\"")[0]
 
         image_file = os.path.join(LocalConfigChecker.program_directory, "temp_xkcd.png")

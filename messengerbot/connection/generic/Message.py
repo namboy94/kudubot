@@ -146,3 +146,19 @@ class Message(object):
             message_as_string = "SENT: To " + str(self.address) + ": " + str(self.message_body)
 
         return message_as_string
+
+    def get_unique_identifier(self) -> str:
+        """
+        Returns a unique identifier for the sender, useful when in groups
+
+        :return: the unique identifier
+        """
+        return self.single_identifier if self.group else self.identifier
+
+    def get_user_name(self) -> str:
+        """
+        Returns the name of the user (not of a group)
+
+        :return: the user's name
+        """
+        return self.single_name if self.group else self.name
