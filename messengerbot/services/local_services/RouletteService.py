@@ -24,6 +24,8 @@ This file is part of messengerbot.
 # imports
 import os
 import re
+import random
+import datetime
 from typing import List, Tuple, Set
 
 from messengerbot.connection.generic.Message import Message
@@ -171,6 +173,18 @@ class RouletteService(CasinoService):
     Keywords for the 'half' option
     """
 
+    is_spinning_message = {"en": "The wheel is currently spinning, please wait a few seconds",
+                           "de": "Das Rouletterad dreht sich gerade, hab einen moment Geduld"}
+    """
+    Message sent to the user when the roulette wheel is currently
+    """
+
+    won_message = {"en": " won ",
+                   "de": " hat gewonnen: "}
+    """
+    Message shown when the user has won.
+    """
+
     def initialize(self) -> None:
         """
         Initializes the roulette bets directory
@@ -188,8 +202,10 @@ class RouletteService(CasinoService):
         :return: None
         """
         reply = self.parse_user_input(message.message_body.lower(), message.get_unique_identifier())
-        reply_message = self.generate_reply_message(message, "Roulette", reply)
-        self.send_text_message(reply_message)
+
+        if reply:
+            reply_message = self.generate_reply_message(message, "Roulette", reply)
+            self.send_text_message(reply_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:
@@ -242,7 +258,6 @@ class RouletteService(CasinoService):
         """
         user_input = user_input.split("/roulette ")[1]
         options = user_input.split(" ")
-        reply = ""
 
         if self.is_spinning():
             return self.is_spinning_message[self.connection.last_used_language]
@@ -250,9 +265,9 @@ class RouletteService(CasinoService):
         if options[0] in self.spin_keywords:
             return self.spin_wheel(self.spin_keywords[options[0]])
         elif options[0] in self.cancel_keywords:
-            return self.cancel_bets(self.cancel_keywords[options[0]])
+            return self.cancel_bets(self.cancel_keywords[options[0]], user_identifier, int(options[1]))
         elif options[0] in self.board_keywords:
-            return self.send_board(self.board_keywords[options[0]])
+            return self.send_board(user_identifier)
         elif options[0] in self.time_keywords:
             return self.request_time_to_spin(self.time_keywords[0])
         elif options[0] in self.bets_keywords:
@@ -323,6 +338,79 @@ class RouletteService(CasinoService):
         :return: the column, the row
         """
         return int(tile / 3), (2 - (tile - 1) % 3)
+
+    @staticmethod
+    def is_spinning() -> bool:
+        """
+        Checks if the board is spinning/should be spinning (which is a 5 second
+        timeframe to avoid racing conditions)
+
+        :return: True if the wheel should be spinning, False otherwise
+        """
+        current_time = datetime.datetime.utcnow()
+        minutes = int(current_time.minute)
+        seconds = int(current_time.second)
+
+        return minutes % 2 == 1 and seconds >= 55
+
+    def spin_wheel(self, language: str) -> str:
+        """
+        Spins the roulette wheel, calculating winnings for all users
+
+        :param language: the languag to use
+        :return: the spin summary as string
+        """
+        result = random.randint(0, 36)
+        bets = []
+
+        for bet_file_name in os.listdir(self.roulette_directory):
+            bet = {"value": int(bet_file_name.split("###BETVAL=")[1]),
+                   "user": bet_file_name.split("###BETVAL=")[0],
+                   "selection": []}
+
+            file_path = os.path.join(self.roulette_directory, bet_file_name)
+
+            with open(file_path) as bet_file:
+                bet_type = bet_file.read()
+                selected_tiles, multiplier = bet_type.split("X")
+                selected_tiles = selected_tiles.split("-")
+
+                bet["multiplier"] = int(multiplier)
+                for tile in selected_tiles:
+                    bet['selection'].append(int(tile))
+
+            os.remove(file_path)
+            bets.append(bet)
+
+        summary = ""
+
+        for bet in bets:
+            if result in bet["selection"]:
+                won_value = bet["value"] * bet["multiplier"]
+                summary += bet["user"] + self.won_message[language] + self.format_money_string(won_value) + "\n\n"
+                self.transfer_funds(bet["user"], won_value)
+
+        return summary.split("\n\n")[0]
+
+    def cancel_bets(self, language: str, user_identifier: str, index: int) -> str:
+        """
+        Cancels a bet
+
+        :param language: the language to use
+        :param user_identifier: the user identifier string
+        :param index: the index of the bet to delete
+        :return: A message detailing the success or failure of the deletion
+        """
+        self.connection.last_used_language = language
+        return self.delete_bet("roulette", user_identifier, index)
+
+    def send_board(self, address: str) -> None:
+        """
+        Sends an image of a roulette board to the user
+
+        :param address: the address of the user
+        :return:
+        """
 
 
 
