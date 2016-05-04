@@ -22,16 +22,23 @@ This file is part of messengerbot.
 """
 
 # imports
+import os
 import re
+import time
+import random
+import datetime
+from typing import Dict, List
 
 from messengerbot.servicehandlers.Service import Service
 from messengerbot.connection.generic.Message import Message
+from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 
 class CasinoService(Service):
     """
     The CasinoService Class that extends the generic Service class.
-    The service parses www.kicktipp.de to get a kicktipp group's current standings
+    The service provides the backbone for all casino-related services, like the Roulette Service
+    Note: All monetary values are in cents
     """
 
     identifier = "casino"
@@ -39,10 +46,41 @@ class CasinoService(Service):
     The identifier for this service
     """
 
-    help_description = {"en": "No Help Description Available",
-                        "de": "Keine Hilfsbeschreibung verfügbar"}
+    has_background_process = True
+    """
+    Has a backround process
+    """
+
+    help_description = {"en": "/casino\tprovides basic casino functions\n"
+                              "syntax:\n"
+                              "/casino balance\tsends you your current balance\n"
+                              "/casino beg\tlets you beg for money",
+                        "de": "/casino\tBietet simple Casino Funktionen\n"
+                              "syntax:\n"
+                              "/casino kontostand\tSchickt den momentanen Kontostand des Nutzers\n"
+                              "/casino betteln\tLässt den Nutzer für Geld betteln"}
     """
     Help description for this service.
+    """
+
+    casino_directory = os.path.join(LocalConfigChecker.services_directory, "casino")
+    """
+    The directory containing the casino files
+    """
+
+    user_directory = os.path.join(casino_directory, "users")
+    """
+    The directory storing user account files
+    """
+
+    bet_directory = os.path.join(casino_directory, "bets")
+    """
+    The directory storing user bets
+    """
+
+    currency = "€"
+    """
+    The currency used
     """
 
     account_balance_keywords = {"balance": "en",
@@ -57,6 +95,42 @@ class CasinoService(Service):
     Keywords for the beg command
     """
 
+    beg_values = [50, 100, 200, 300, 400, 500, 30000]
+    """
+    Monetary Values that can be gained with begging
+    """
+
+    beg_message = {"en": ("You beg for money. You earn ", " while begging"),
+                   "de": ("Du bettelst für Geld. Du verdienst ", " während dem Betteln")}
+    """
+    Message sent to the user if he/she begs
+    """
+
+    balance_message = {"en": "Your account balance is: ",
+                       "de": "Dein Kontostand beträgt: "}
+    """
+    Message shown when the user requests his/her account balance
+    """
+
+    no_bets_stored = {"en": "No bets stored",
+                      "de": "Keine Wetten gespeichert"}
+
+    delete_bet_out_of_bound = {"en": "No bet with that index available",
+                               "de": "Keine Wette mit dem Index verfügbar"}
+
+    successful_bet_delete_message = {"en": "Bet successfully deleted",
+                                     "de": "Wette erfolgreich gelöscht"}
+
+    def initialize(self) -> None:
+        """
+        Initializes the casino directories
+
+        :return: None
+        """
+        LocalConfigChecker.validate_directory(self.casino_directory)
+        LocalConfigChecker.validate_directory(self.user_directory)
+        LocalConfigChecker.validate_directory(self.bet_directory)
+
     def process_message(self, message: Message) -> None:
         """
         Process a message according to the service's functionality
@@ -66,15 +140,15 @@ class CasinoService(Service):
         """
         identifier = message.get_unique_identifier()
         option = message.message_body.lower().split("/casino ")[1]
+        reply = ""
 
         if option in self.beg_keyword:
-            # BEG
-            pass
+            self.connection.last_used_language = self.beg_keyword[option]
+            reply = self.beg(identifier)
         elif option in self.account_balance_keywords:
-            # BALANCE
-            pass
+            self.connection.last_used_language = self.account_balance_keywords[option]
+            reply = self.get_balance_as_message(identifier)
 
-        reply = ""
         reply_message = self.generate_reply_message(message, "Casino", reply)
         self.send_text_message(reply_message)
 
@@ -89,348 +163,219 @@ class CasinoService(Service):
                                                                          CasinoService.account_balance_keywords]) + "$"
         return re.search(re.compile(regex), message.message_body.lower())
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    class Casino(GenericPlugin):
+    def beg(self, identifier: str) -> str:
         """
-        The Casino Class
+        Executes the 'beg' command, giving the user a random amount(mostly small) of money to gamble with
+
+        :param identifier: the identifier for the user
+        :return: A reply message for the user
         """
+        beg_amount = random.choice(self.beg_values)
+        response = self.beg_message[self.connection.last_used_language]
 
-        casino_dir = os.getenv("HOME") + "/.whatsbot/casino/"
-        user_dir = casino_dir + "users/"
+        self.transfer_funds(identifier, beg_amount)
+        return response[0] + self.format_money_string(beg_amount) + response[1]
 
-        def __init__(self, layer, message_protocol_entity=None):
-            """
-            Constructor
-            Defines parameters for the plugin.
-            :param layer: the overlying yowsup layer
-            :param message_protocol_entity: the received message information
-            :return: void
-            """
-            super().__init__(layer, message_protocol_entity)
+    def get_balance_as_message(self, identifier: str) -> str:
+        """
+        Gets the current balance of the user
 
-            if self.entity is not None:
-                self.user = self.participant
-                self.user_id = self.user.split("@")[0]
-                self.user_nick = self.notify
-                self.reply = None
+        :param identifier: the unique identifier
+        :return: the message to be sent to the user
+        """
+        try:
+            balance = self.get_balance(identifier)
+        except FileNotFoundError:
+            self.create_account(identifier)
+            balance = self.get_balance(identifier)
 
-        def regex_check(self):
-            """
-            Checks if the user input is valid for this plugin to continue
-            :return: True if input is valid, False otherwise
-            """
-            return re.search(r"^/casino (balance|beg)$", self.message)
+        response = self.balance_message[self.connection.last_used_language]
 
-        def parse_user_input(self):
-            """
-            Parses the user's input
-            :return: void
-            """
-            self.create_user(self.entity)
-            mode = self.message.split("/casino ")[1]
+        return response + self.format_money_string(int(balance))
 
-            reply_text = ""
-            if mode == "balance":
-                balance = self.get_balance(self.user_id)
-                reply_text = "Your balance is: " + self.encode_money_string(balance[0], balance[1], True) + "€"
-            elif mode == "beg":
-                self.transfer_funds(self.user_id, 1, 0)
-                reply_text = "You earn 1€ while begging for money"
-            self.reply = WrappedTextMessageProtocolEntity(reply_text, to=self.sender)
+    def create_account(self, identifier: str, starting_value: int = 200000) -> None:
+        """
+        Creates a new user account
 
-        def get_response(self):
-            """
-            Returns the response calculated by the plugin
-            :return: the response as a WrappedTextMessageProtocolEntity
-            """
-            return self.reply
+        :param identifier: the user identifier for whom the account is created
+        :param starting_value: can be used to set a custom starting value
+        :return: None
+        """
+        account_file = os.path.join(self.user_directory, identifier)
+        with open(account_file, 'w') as account:
+            account.write(str(starting_value))
 
-        @staticmethod
-        def get_description(language):
-            """
-            Returns a helpful description of the plugin's syntax and functionality
-            :param language: the language to be returned
-            :return: the description as string
-            """
-            if language == "en":
-                return "/casino\tprovides basic casino functions\n" \
-                       "syntax:\n" \
-                       "/casino balance\tsends you your current balance"
-            elif language == "de":
-                return "/casino\tBietet simple Casino Funktionen\n" \
-                       "syntax:\n" \
-                       "/casino balance\tSchickt den momentanen Kontostand des Nutzers"
+    def transfer_funds(self, identifier: str, amount: int) -> None:
+        """
+        Transfers funds to/from an account
+        It can be called with negative values to remove money from the account
+
+        :param identifier: the user's identifier
+        :param amount: the amount to transfer
+        :return: None
+        """
+        user_exists = False
+        for user_file in os.listdir(self.user_directory):
+            if user_file.startswith(identifier):
+                account_file = os.path.join(self.user_directory, user_file)
+
+                user_exists = True
+                current_balance = self.get_balance(identifier)
+
+                if current_balance + amount < 0:
+                    raise InsufficientFundsError()
+                else:
+                    with open(account_file, 'w') as account:
+                        account.write(str(current_balance + amount))
+
+        if not user_exists:
+            self.create_account(identifier)
+            if amount >= -200000:
+                self.transfer_funds(identifier, amount)
             else:
-                return "Help not available in this language"
+                raise InsufficientFundsError()
 
-        @staticmethod
-        def get_plugin_name():
-            """
-            Returns the plugin name
-            :return: the plugin name
-            """
-            return "Casino Plugin"
+    def get_balance(self, identifier: str) -> int:
+        """
+        Reads the current balance from the account file
 
-        def parallel_run(self):
-            """
-            Starts a parallel background activity if this class has one.
-            :return: void
-            """
-            while True:
-                current_time = datetime.datetime.now()
-                hours = int(current_time.hour)
-                if not hours < 23:
-                    for user in os.listdir(self.user_dir):
-                        self.transfer_funds(user, 2000, 0)
-                time.sleep(3600)
+        :param identifier: the user identifier
+        :return: the account balance.
+        """
+        account_file = os.path.join(self.user_directory, identifier)
+        with open(account_file, 'r') as account:
+            account_balance = int(account.read())
+        return account_balance
 
-        # Private methods
-        def create_user(self, message_entity):
-            """
-            Creates a new user file
-            :param message_entity: a messageEntity sent from the user
-            :return: void
-            """
-            user_id = message_entity.get_participant()
-            if not user_id:
-                user_id = message_entity.get_from(False)
-            user_id = user_id.split("@")[0]
-            user_nick = message_entity.get_notify()
-            user_file = self.user_dir + user_id
+    def format_money_string(self, value: int) -> str:
+        """
+        Formats a cent-based monetary value into a human-readable string
 
-            if not os.path.isfile(user_file):
-                self.generate_user(user_id, user_nick, "1000.00")
+        :param value: the value to be formatted
+        :return: the formatted money string
+        """
+        cents = value % 100
+        dollars = int((value - cents) / 100)
+        return str(dollars) + "," + str(cents) + self.currency
 
-        def generate_user(self, user_id, user_nick, balance):
-            """
-            Generates a user account
-            :param user_id: the user's ID
-            :param user_nick: the user's (nick)name
-            :param balance: the user's balance
-            :return: void
-            """
-            user_file = self.user_dir + user_id
-            file = open(user_file, "w")
-            file.write("[account]\n")
-            file.write("nick=" + user_nick + "\n")
-            file.write("balance=" + balance)
+    def parse_money_string(self, money_string: str) -> int:
+        """
+        Reads a money string and returns its value as a cent-based int value
 
-        def get_user_nick(self, user_id):
-            """
-            Gets the user's (nick)name from his/her account
-            :param user_id: the user's ID
-            :return: the user's (nick)name
-            """
-            user_file = self.user_dir + user_id
-            user_details = configparser.ConfigParser()
-            user_details.read(user_file)
-            nick = dict(user_details.items("account"))["nick"]
-            return nick
+        :param money_string: the string to be parsed
+        :return: the value of that string
+        """
+        money = money_string.replace(self.currency, "")
+        dollars, cents = money.split(",")
+        value = int(cents) + (int(dollars) * 2)
 
-        def get_balance(self, user_id):
-            """
-            Gets the balance of a user
-            :param user_id: the user's ID
-            :return: the user's balance
-            """
-            user_file = self.user_dir + user_id
-            user_details = configparser.ConfigParser()
-            user_details.read(user_file)
-            balance = dict(user_details.items("account"))["balance"]
-            return self.decode_money_string(balance)
+        return value
 
-        def set_balance(self, user_id, dollars, cents):
-            """
-            Sets a user's balance to a specified value
-            :param user_id: the user's ID
-            :param dollars: the amount of dollars
-            :param cents: the amount of cents
-            :return: void
-            """
-            balance_string = self.encode_money_string(dollars, cents)
-            user_nick = self.get_user_nick(user_id)
-            self.generate_user(user_id, user_nick, balance_string)
+    def store_bet(self, game: str, identifier: str, value: int, bet_type: str) -> None:
+        """
+        Stores a bet as a bet file
 
-        @staticmethod
-        def decode_money_string(money_string):
-            """
-            Decodes a money string
-            :param money_string: the String to be decoded
-            :return: the monetary value as a tuple of dollars and cents
-            """
-            dollars = int(money_string.split(".")[0])
-            try:
-                cents = money_string.split(".")[1]
-                if len(cents) < 2:
-                    cents += "0"
-                cents = int(cents)
-            except ValueError:
-                cents = 0
-            return dollars, cents
+        :param game: the game this bet was created by
+        :param identifier: te user identifier of the better
+        :param value: the value set
+        :param bet_type: the bet type - game-specific
+        :return: None
+        """
+        directory = os.path.join(self.bet_directory, game)
+        file_name = identifier + "###BETVAL=" + str(value)
+        bet_file = os.path.join(directory, file_name)
 
-        @staticmethod
-        def encode_money_string(dollars, cents, delimiters=False):
-            """
-            Encodes a tuple of dollars and cents to a moneyString
-            :param dollars: the amount of dollars
-            :param cents: the amount of cents
-            :param delimiters: switch for enabling delimiters
-            :return: the encoded dollar string
-            """
-            cent_string = str(cents)
-            if len(cent_string) < 2:
-                cent_string = "0" + cent_string
-            if len(cent_string) < 2:
-                cent_string = "0" + cent_string
-            if not delimiters:
-                return str(dollars) + "." + cent_string
-            else:
-                dollar_string = str(dollars)
-                dollar_list = []
-                for char in dollar_string:
-                    dollar_list.insert(0, char)
-                formated_dollar_string = ""
-                i = 0
-                while i < len(dollar_list):
-                    if i > 0 and i % 3 == 0:
-                        formated_dollar_string = " " + formated_dollar_string
-                    formated_dollar_string = dollar_list[i] + formated_dollar_string
-                    i += 1
-                return formated_dollar_string + "." + cent_string
+        if os.path.isfile(bet_file):
+            os.remove(bet_file)
+            bet_file = bet_file.rsplit("###BETVAL=", 1)[0]
+            bet_file += str(2 * value)
 
-        @staticmethod
-        def multiply_money(factor, dollars, cents):
-            """
-            Multiplies a monetary value by a given factor
-            :param factor: the actor with which to multiply
-            :param dollars: the initial amount of dollars
-            :param cents: the initial amount of cents
-            :return: the multiplied monetary value as a tuple of dollars and cents
-            """
-            multiplied_dollars = factor * dollars
-            multiplied_cents = factor * cents
-            while multiplied_cents >= 100:
-                multiplied_cents -= 100
-                multiplied_dollars += 1
-            return multiplied_dollars, multiplied_cents
+        with open(bet_file, 'w') as bet:
+            bet.write(bet_type)
 
-        def transfer_funds(self, user_id, dollars, cents):
-            """
-            Adds or subtracts an amount from the balance of a player
-            :param user_id: the user's ID
-            :param dollars: the amount of dollars to be transferred
-            :param cents: the amount of cents to be transferred
-            :return: void
-            """
-            current_dollars, current_cents = self.get_balance(user_id)
-            new_cents = current_cents + cents
-            while new_cents >= 100:
-                current_dollars += 1
-                new_cents -= 100
-            while new_cents < 0:
-                current_dollars -= 1
-                new_cents += 100
-            new_dollars = current_dollars + dollars
-            self.set_balance(user_id, new_dollars, new_cents)
+    def get_bets(self, game: str, identifier: str) -> List[Dict[str, (int or str)]]:
+        """
+        Returns a list of dictionaries representing bets of a specific user
 
-        def has_sufficient_funds(self, user_id, dollars, cents):
-            """
-            Checks if a user has enough funds for a specified bet
-            :param user_id: the user's ID
-            :param dollars: the amount of dollars to be bet
-            :param cents: the amount of cents to be bet
-            :return: True if the user has enough funds, False otherwise
-            """
-            current_dollars, current_cents = self.get_balance(user_id)
-            current_money = (current_dollars * 100) + current_cents
-            query_value = (dollars * 100) + cents
-            return query_value <= current_money
+        :param game: the game for which the bets should be fetched
+        :param identifier: the user's identifier
+        :return: the List of reminder dictionaries
+        """
+        directory = os.path.join(self.bet_directory, game)
+        bets = []
 
-        def store_bet(self, game, user_id, sender, dollars, cents, bet_type):
-            """
-            Stores a bet to a user's bet file
-            :param game: the game played
-            :param user_id: the user's ID
-            :param sender: the sender of the bet
-            :param dollars: the bet mount (dollars)
-            :param cents: the bet amount (cents)
-            :param bet_type: the bet type identifier
-            """
-            bet_string = sender + ";" + self.encode_money_string(dollars, cents) + ";" + bet_type + "\n"
-            user_bets = open(self.casino_dir + game + "/" + user_id, "a")
-            user_bets.write(bet_string)
-            user_bets.close()
+        for bet in os.listdir(directory):
+            if bet.startswith(identifier):
+                bet_file = os.path.join(directory, bet)
 
-        def get_bets(self, game, user_id):
-            """
-            Gets the bets from a user's bet file
-            :param game: the game played
-            :param user_id: the user's ID
-            :return: the bets as a list of strings
-            """
-            bet_file = open(self.casino_dir + game + "/" + user_id, "r")
-            raw_bets = bet_file.read().split("\n")
-            raw_bets.pop()
-            bet_file.close()
-            bets = []
+                bet_dictionary = {"value": int(bet.rsplit("###BETVAL=", 1)[1]),
+                                  "file": bet_file}
+                with open(bet_file, 'r') as opened_bet_file:
+                    bet_dictionary["bet_type"] = opened_bet_file.read()
 
-            for bet in raw_bets:
-                bet_parts = bet.split(";")
-                bet_dict = {"sender": bet_parts[0], "value": bet_parts[1], "bet": bet_parts[2]}
-                bets.append(bet_dict)
+                bets.append(bet_dictionary)
 
-            return bets
+        bets = sorted(bets, key=lambda dictionary: dictionary["value"])
+        return bets
 
-        def get_bet_strings(self, game, user_id):
-            """
-            Gets the bets of a user as strings
-            :param game: the game played
-            :param user_id: the user's ID
-            :return: the bets as a string
-            """
-            bet_string = "You have bet on the following:"
-            try:
-                bets = self.get_bets(game, user_id)
-                for bet in bets:
-                    dollars, cents = self.decode_money_string(bet["value"])
-                    bet_val = self.encode_money_string(dollars, cents, True)
-                    bet_string += "\nBet: " + bet["bet"] + "     Amount: " + bet_val + "€"
-            except Exception as e:
-                str(e)
-            return bet_string
+    def get_bets_as_formatted_string(self, game: str, identifier: str) -> str:
+        """
+        Return all bets of a user for a specific game as a formatted string
+
+        :param game: the game to which the bets belong
+        :param identifier: the user's identifier
+        :return: the formatted string
+        """
+        bets = self.get_bets(game, identifier)
+        bet_list_string = ""
+
+        for bet in range(1, len(bets) + 1):
+            bet_list_string += str(bet) + ": " + str(bets[bet]["value"]) + "\n"
+            bet_list_string += bets[bet]["bet_type"] + "\n\n"
+
+        if bet_list_string == "":
+            bet_list_string = self.no_bets_stored[self.connection.last_used_language] + game
+        else:
+            bet_list_string = bet_list_string.rsplit("\n\n", 1)[0]
+
+        return bet_list_string
+
+    def delete_bet(self, game: str, identifier: str, index: int) -> str:
+        """
+        Deletes a bet at the given iundex for the given game by the given user
+
+        :param game: the game the bet to delete belongs to
+        :param identifier: the user's unique identifier
+        :param index: the index of the bet to delete
+        :return: A message to the user
+        """
+        if index < 1:
+            return self.delete_bet_out_of_bound[self.connection.last_used_language]
+
+        bets = self.get_bets(game, identifier)
+        os.remove(bets[index - 1]['file'])
+
+        return self.successful_bet_delete_message[self.connection.last_used_language]
+
+    def background_process(self) -> None:
+        """
+        Adds 100 € each day to each account
+
+        :return: None
+        """
+        while True:
+            current_time = datetime.datetime.utcnow()
+            hour = int(current_time.hour)
+
+            if hour == 23:
+                for account_file in os.listdir(self.user_directory):
+                    user_identifier = str(account_file.rsplit("###BETVAL=", 1)[0])
+                    self.transfer_funds(user_identifier, 10000)
+            time.sleep(3600)
+
+
+class InsufficientFundsError(Exception):
+    """
+    Error to be raised when insufficient funds
+    """
+    pass
