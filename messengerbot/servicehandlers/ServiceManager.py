@@ -41,6 +41,7 @@ from messengerbot.services.internet_services.GoogleTtsService import GoogleTtsSe
 from messengerbot.services.internet_services.EmailSenderService import EmailSenderService
 from messengerbot.services.internet_services.ImageSenderService import ImageSenderService
 from messengerbot.services.internet_services.FootballInfoService import FootballInfoService
+from messengerbot.services.simple_services.SimpleCommandsService import SimpleCommandsService
 from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
 from messengerbot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
 
@@ -73,6 +74,7 @@ class ServiceManager(object):
                     KitMensaService,
                     EmailSenderService,
                     ImageSenderService,
+                    SimpleCommandsService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]
     """
