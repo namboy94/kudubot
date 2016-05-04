@@ -33,7 +33,7 @@ from messengerbot.connection.generic.Message import Message
 class SimpleCommandsService(Service):
     """
     The SimpleCommandsService Class that extends the generic Service class.
-    The service parses www.kicktipp.de to get a kicktipp group's current standings
+    The service offers several trivial commands to the user
     """
 
     identifier = "simple_commands"
