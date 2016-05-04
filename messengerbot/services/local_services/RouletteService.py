@@ -187,7 +187,7 @@ class RouletteService(CasinoService):
         :param message: the message to process
         :return: None
         """
-        reply = ""
+        reply = self.parse_user_input(message.message_body.lower(), message.get_unique_identifier())
         reply_message = self.generate_reply_message(message, "Roulette", reply)
         self.send_text_message(reply_message)
 
@@ -232,14 +232,71 @@ class RouletteService(CasinoService):
 
         return match
 
-    def parse_user_input(self, user_input: str) -> Stuff:
+    def parse_user_input(self, user_input: str, user_identifier: str) -> Stuff:
         """
         Parses the user input
 
         :param user_input: the user input to be parsed
+        :param user_identifier: the user identifier to identify the user's account etc.
         :return: TBD
         """
+        user_input = user_input.split("/roulette ")[1]
+        options = user_input.split(" ")
+        reply = ""
 
+        if self.is_spinning():
+            return self.is_spinning_message[self.connection.last_used_language]
+
+        if options[0] in self.spin_keywords:
+            return self.spin_wheel(self.spin_keywords[options[0]])
+        elif options[0] in self.cancel_keywords:
+            return self.cancel_bets(self.cancel_keywords[options[0]])
+        elif options[0] in self.board_keywords:
+            return self.send_board(self.board_keywords[options[0]])
+        elif options[0] in self.time_keywords:
+            return self.request_time_to_spin(self.time_keywords[0])
+        elif options[0] in self.bets_keywords:
+            return self.get_bets_as_formatted_string("roulette", user_identifier)
+        else:
+            money = self.parse_money_string(options[0])
+
+            if options[1] in self.red_keywords:
+                selection = self.red_numbers
+            elif options[1] in self.black_keywords:
+                selection = self.black_numbers
+            elif options[1] in self.odd_keywords:
+                selection = []
+                for number in (self.black_numbers + self.red_numbers):
+                    if number % 2 == 1:
+                        selection.append(number)
+            elif options[1] in self.even_keywords:
+                selection = []
+                for number in (self.black_numbers + self.red_numbers):
+                    if number % 2 == 0:
+                        selection.append(number)
+            elif re.search(r"", options[1]):
+                selection = [int(options[1])]
+            else:
+                parameter = options[2]
+
+                if options[1] in self.neighbour_keywords:
+                    selection = self.parse_neighbour_group(parameter)
+                elif options[1] in self.group_keywords:
+                    selection = []
+                    start_point = (int(options[1]) - 1) * 12
+                    for tile in range(start_point, start_point + 12):
+                        selection.append(tile + 1)
+                elif options[1] in self.half_keywords:
+                    selection = []
+                    start_point = (int(options[1]) - 1) * 18
+                    for tile in range(start_point, start_point + 18):
+                        selection.append(tile + 1)
+                elif options[1] in self.row_keywords:
+                    selection = self.roulette_board[int(options[1])]
+                else:
+                    return self.undefined_behaviour[self.connection.last_used_language]
+
+            return self.create_bet(user_identifier, selection, money)
 
     @staticmethod
     def parse_neighbour_group(neighbour_group_string: str) -> Set[int]:
