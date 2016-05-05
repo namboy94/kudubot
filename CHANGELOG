@@ -1,3 +1,6 @@
+V 0.6.3
+  - Worked around telegram's 4096 character limit
+  - Mad the Cinema service send a seperate message for each theater
 V 0.6.2
   - Implemented Cinema Service
 V 0.6.1
