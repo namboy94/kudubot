@@ -119,7 +119,7 @@ class Connection(object):
         :return: None
         """
         if self.authenticator.is_from_blacklisted_user(message):
-            PrintLogger.print("blocked message from blacklisted user " + message.identifier, 2)
+            PrintLogger.print("blocked message from blacklisted user " + message.address, 2)
             return
 
         # Process and log the message

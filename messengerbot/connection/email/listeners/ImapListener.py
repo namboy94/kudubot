@@ -97,7 +97,6 @@ class ImapListener(object):
 
                 sender_name = email_message['From'].split(" <")[0]
                 sender_address = email_message['From'].split("<", 1)[1].rsplit(">", 1)[0]
-                sender_identifier = sender_address
                 title = email_message["Subject"]
                 timestamp = time.mktime(email.utils.parsedate(email_message['Date']))
 
@@ -112,7 +111,8 @@ class ImapListener(object):
                         body += body_part
                 body = body.rstrip()
 
-                message_object = Message(body, title, sender_address, True, sender_identifier, sender_name,
+                message_object = Message(message_body=body, message_title=title, address=sender_address, incoming=True,
+                                         name=sender_name, group=False, single_name="", single_address="",
                                          timestamp=timestamp)
 
                 self.callback(message_object)
