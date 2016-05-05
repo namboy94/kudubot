@@ -1,3 +1,5 @@
+V 0.6.1
+  - implemented KVV Service
 V 0.6
   - Removed the concept of identifiers from the Message class
   - Small bugfixes in the Roulette/Casino services
