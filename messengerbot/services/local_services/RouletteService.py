@@ -93,18 +93,19 @@ class RouletteService(CasinoService):
                               "/roulette time\tDisplays the time left until the wheel is spun again\n"
                               "/roulette board\tSends an image of a Roulette board as reference\n"
                               "/roulette bets\tDisplays all bets of a user\n"
-                              "/roulette cancel\tCancels all bet of a user\n"
+                              "/roulette cancel <index>\tCancels a bet of a user\n"
                               "/roulette spin\tImmediately spins the wheel(admin)",
                         "de": "/roulette\tErmöglicht das Spielen von Roulette\n"
                               "syntax: /roulette <einsatz> <wette>\n"
                               "Mögliche Wetten:"
-                              " 0-36 | red | black | odd | even | half 1-2 | group 1-3 | row 1-3 | batch 0-36{2|4}\n"
-                              "/roulette time\t"
+                              " 0-36 | rot | schwarz | ungerade | gerade | hälfte 1-2 | gruppe 1-3 | reihe 1-3 |"
+                              "nachbarn 0-36{2|4}\n"
+                              "/roulette zeit\t"
                               "Zeigt die verbleibende Zeit bis zum nächsten Drehen des Roulette-Rads an.\n"
-                              "/roulette board\tSchickt ein Bild eines Roulettebretts als Referenz\n"
-                              "/roulette bets\tZeigt alle Wetten eines Nutzers an\n"
-                              "/roulette cancel\tBricht alle Wetten des Nutzers ab\n"
-                              "/roulette spin\tDreht das Rouletterad(admin)"}
+                              "/roulette bord\tSchickt ein Bild eines Roulettebretts als Referenz\n"
+                              "/roulette wetten\tZeigt alle Wetten eines Nutzers an\n"
+                              "/roulette abbruch <index>\tBricht eine Wette des Nutzers ab\n"
+                              "/roulette drehen\tDreht das Rouletterad(admin)"}
     """
     Help description for this service.
     """
@@ -142,7 +143,7 @@ class RouletteService(CasinoService):
     """
 
     spin_keywords = {"spin": "en",
-                     "dreh": "de"}
+                     "drehen": "de"}
     """
     Keywords for the 'spin' option
     """
@@ -171,26 +172,26 @@ class RouletteService(CasinoService):
     Keywords for the 'bets' option
     """
 
-    black_keywords = {"bets": "en",
-                      "wetten": "de"}
+    black_keywords = {"black": "en",
+                      "schwarz": "de"}
     """
     Keywords for the 'black' option
     """
 
-    red_keywords = {"bets": "en",
-                    "wetten": "de"}
+    red_keywords = {"red": "en",
+                    "rot": "de"}
     """
     Keywords for the 'red' option
     """
 
-    even_keywords = {"bets": "en",
-                     "wetten": "de"}
+    even_keywords = {"even": "en",
+                     "gerade": "de"}
     """
     Keywords for the 'even' option
     """
 
-    odd_keywords = {"bets": "en",
-                    "wetten": "de"}
+    odd_keywords = {"odd": "en",
+                    "ungerade": "de"}
     """
     Keywords for the 'odd' option
     """
@@ -201,8 +202,8 @@ class RouletteService(CasinoService):
     Keywords for the 'group' option
     """
 
-    neighbour_keywords = {"neighbour": "en",
-                          "nachbar": "de"}
+    neighbour_keywords = {"neighbours": "en",
+                          "nachbarn": "de"}
     """
     Keywords for the 'neighbour' option
     """
@@ -264,6 +265,7 @@ class RouletteService(CasinoService):
 
         :return: None
         """
+        super().initialize()
         self.roulette_directory = os.path.join(self.bet_directory, "roulette")
         LocalConfigChecker.validate_directory(self.roulette_directory)
 
@@ -304,10 +306,10 @@ class RouletteService(CasinoService):
         regex += "|" + half + "(1|2)|"
         regex += "|" + row + "(1|2|3))|" \
                  + RouletteService.regex_string_from_dictionary_keys([RouletteService.spin_keywords,
-                                                                      RouletteService.cancel_keywords,
                                                                       RouletteService.board_keywords,
                                                                       RouletteService.time_keywords,
-                                                                      RouletteService.bets_keywords]) + ")$"
+                                                                      RouletteService.bets_keywords]) + "|"
+        regex += RouletteService.regex_string_from_dictionary_keys([RouletteService.cancel_keywords]) + " [0-9]+)$"
 
         match = re.search(re.compile(regex), message.message_body.lower())
 
@@ -431,49 +433,61 @@ class RouletteService(CasinoService):
 
         return minutes % 2 == 1 and seconds >= 55
 
-    def spin_wheel(self, language: str) -> str:
+    def spin_wheel(self, language: str) -> None:
         """
         Spins the roulette wheel, calculating winnings for all users
 
         :param language: the languag to use
-        :return: the spin summary as string
+        :return: None
         """
         result = random.randint(0, 36)
-        bets = []
+        users = []
 
         for bet_file_name in os.listdir(self.roulette_directory):
-            bet = {"value": int(bet_file_name.split("###BETVAL=")[1]),
-                   "user": bet_file_name.split("###BETVAL=")[0],
-                   "selection": []}
+            user = bet_file_name.rsplit("###BETVAL=", 1)[0]
+            if user not in users:
+                users.append(user)
 
-            file_path = os.path.join(self.roulette_directory, bet_file_name)
+        bets = []
+        addresses = []
 
-            with open(file_path) as bet_file:
-                bet_type = bet_file.read()
-                selected_tiles, multiplier = bet_type.split("X")
+        for user in users:
+            user_bets = self.get_bets("roulette", user)
+
+            for bet in user_bets:
+                if bet["address"] not in addresses:
+                    addresses.append(bet["address"])
+
+                selected_tiles, multiplier = bet['bet_type'].split("X")
                 selected_tiles = selected_tiles.split("-")
 
-                bet["multiplier"] = int(multiplier)
+                bet['multiplier'] = int(multiplier)
+                bet['selection'] = []
+
                 for tile in selected_tiles:
                     bet['selection'].append(int(tile))
 
-            os.remove(file_path)
-            bets.append(bet)
+                os.remove(bet["file"])
+            bets += user_bets
 
         summary = ""
-        betters_exist = False
 
         for bet in bets:
-            betters_exist = True
+            if bet["address"] not in addresses:
+                addresses.append(bet["address"])
+
             if result in bet["selection"]:
                 won_value = bet["value"] * bet["multiplier"]
                 summary += bet["user"] + self.won_message[language] + self.format_money_string(won_value) + "\n\n"
                 self.transfer_funds(bet["user"], won_value)
 
-        if betters_exist:
+        if len(addresses) > 0:
             summary = self.spin_summary[language] + str(result) + "\n\n" + summary
 
-        return summary.split("\n\n")[0]
+            for better in addresses:
+                print(better)
+                message = Message(summary, "Roulette", better, False)
+                self.send_text_message(message)
 
     def cancel_bets(self, language: str, user_identifier: str, index: int) -> str:
         """

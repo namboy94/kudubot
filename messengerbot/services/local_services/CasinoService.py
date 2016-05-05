@@ -63,17 +63,17 @@ class CasinoService(Service):
     Help description for this service.
     """
 
-    casino_directory = os.path.join(LocalConfigChecker.services_directory, "casino")
+    casino_directory = ""
     """
     The directory containing the casino files
     """
 
-    user_directory = os.path.join(casino_directory, "users")
+    user_directory = ""
     """
     The directory storing user account files
     """
 
-    bet_directory = os.path.join(casino_directory, "bets")
+    bet_directory = ""
     """
     The directory storing user bets
     """
@@ -127,6 +127,11 @@ class CasinoService(Service):
 
         :return: None
         """
+        self.casino_directory = os.path.join(LocalConfigChecker.services_directory,
+                                             self.connection.identifier, "casino")
+        self.user_directory = os.path.join(self.casino_directory, "users")
+        self.bet_directory = os.path.join(self.casino_directory, "bets")
+
         LocalConfigChecker.validate_directory(self.casino_directory)
         LocalConfigChecker.validate_directory(self.user_directory)
         LocalConfigChecker.validate_directory(self.bet_directory)
@@ -256,7 +261,9 @@ class CasinoService(Service):
         """
         cents = value % 100
         dollars = int((value - cents) / 100)
-        return str(dollars) + "," + str(cents) + self.currency
+
+        cent_string = str(cents) if cents > 9 else "0" + str(cents)
+        return str(dollars) + "," + cent_string + self.currency
 
     def parse_money_string(self, money_string: str) -> int:
         """
@@ -272,7 +279,7 @@ class CasinoService(Service):
         dollars = money[0]
         cents = 0 if len(money) < 2 else money[1]
 
-        value = int(cents) + (int(dollars) * 2)
+        value = int(cents) + (int(dollars) * 100)
 
         return value
 
@@ -287,16 +294,16 @@ class CasinoService(Service):
         :return: None
         """
         directory = os.path.join(self.bet_directory, game)
-        file_name = identifier + "###BETVAL=" + str(value)
+        file_name = identifier + "###BETVAL=" + bet_type
         bet_file = os.path.join(directory, file_name)
 
         if os.path.isfile(bet_file):
-            os.remove(bet_file)
-            bet_file = bet_file.rsplit("###BETVAL=", 1)[0]
-            bet_file += str(2 * value)
+            with open(bet_file, 'r') as bet:
+                value = int(bet.read())
+                value *= 2
 
         with open(bet_file, 'w') as bet:
-            bet.write(bet_type)
+            bet.write(str(value))
 
     def get_bets(self, game: str, identifier: str) -> List[Dict[str, (int or str)]]:
         """
@@ -313,10 +320,13 @@ class CasinoService(Service):
             if bet.startswith(identifier):
                 bet_file = os.path.join(directory, bet)
 
-                bet_dictionary = {"value": int(bet.rsplit("###BETVAL=", 1)[1]),
-                                  "file": bet_file}
+                bet_dictionary = {"bet_type": bet.rsplit("###BETVAL=", 1)[1],
+                                  "file": bet_file,
+                                  "user": bet.rsplit("###BETVAL=", 1)[0],
+                                  "address": bet.rsplit("###BETVAL=", 1)[0]}
+
                 with open(bet_file, 'r') as opened_bet_file:
-                    bet_dictionary["bet_type"] = opened_bet_file.read()
+                    bet_dictionary["value"] = int(opened_bet_file.read())
 
                 bets.append(bet_dictionary)
 
@@ -334,12 +344,13 @@ class CasinoService(Service):
         bets = self.get_bets(game, identifier)
         bet_list_string = ""
 
-        for bet in range(1, len(bets) + 1):
-            bet_list_string += str(bet) + ": " + str(bets[bet]["value"]) + "\n"
+        for bet in range(0, len(bets)):
+            bet_list_string += str(bet + 1) + ": "
+            bet_list_string += self.format_money_string(bets[bet]["value"]) + "\n"
             bet_list_string += bets[bet]["bet_type"] + "\n\n"
 
         if bet_list_string == "":
-            bet_list_string = self.no_bets_stored[self.connection.last_used_language] + game
+            bet_list_string = self.no_bets_stored[self.connection.last_used_language]
         else:
             bet_list_string = bet_list_string.rsplit("\n\n", 1)[0]
 
