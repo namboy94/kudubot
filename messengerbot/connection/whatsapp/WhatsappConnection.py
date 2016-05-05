@@ -133,22 +133,20 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         body = message_protocol_entity.get_body()
 
         sender_number = message_protocol_entity.get_from(True)
-        sender_identifier = message_protocol_entity.get_from(False)
+        group_identifier = message_protocol_entity.get_from(False)
         sender_name = message_protocol_entity.get_notify()
         group = False
         individual_number = ""
-        individual_identifier = ""
         individual_name = ""
-        timestamp = float(message_protocol_entity.get_time_stamp())
+        timestamp = int(message_protocol_entity.get_time_stamp())
 
-        if re.search(r"[0-9]+-[0-9]+", sender_identifier):
+        if re.search(r"[0-9]+-[0-9]+", group_identifier):
             group = True
             individual_number = message_protocol_entity.get_participant(True)
-            individual_identifier = message_protocol_entity.get_participant(False)
             individual_name = message_protocol_entity.get_notify()
 
-        return Message(body, "", sender_number, True, sender_identifier, sender_name, group,
-                       individual_number, individual_identifier, individual_name, timestamp)
+        return Message(message_body=body, message_title="", address=sender_number, incoming=True, name=sender_name,
+                       single_address=individual_number, single_name=individual_name, group=group, timestamp=timestamp)
 
     @staticmethod
     def convert_message_to_text_message_protocol_entity(message: Message) -> WrappedTextMessageProtocolEntity:

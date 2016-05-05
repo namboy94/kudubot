@@ -123,12 +123,31 @@ class TelegramConnection(telegram.Bot, Connection):
         for update in self.getUpdates(offset=self.update_id, timeout=10):
 
             self.update_id = update.update_id + 1
-            chat_id = str(update.message.chat_id)
-            message = update.message.text
-            timestamp = update.message.date.timestamp()
+            telegram_message = update.message.to_dict()
+            telegram_chat = telegram_message['chat']
+            telegram_from = telegram_message['from']
 
-            messages.append(Message(message, "", chat_id, True, chat_id, chat_id, timestamp=timestamp))
+            address = str(telegram_chat['id'])
+            message_body = telegram_message['text']
+            timestamp = telegram_message['date']
 
+            name = telegram_from['username']
+            if not name:
+                name = telegram_from["first_name"] + telegram_chat["last_name"]
+
+            single_address = ""
+            single_name = ""
+            group = False
+
+            if telegram_chat['type'] == "group":
+                group = True
+                single_address = telegram_from['id']
+                single_name = name
+                name = telegram_chat['title']
+
+            messages.append(Message(message_body=message_body, message_title="", address=address, incoming=True,
+                                    name=name, single_address=single_address, single_name=single_name, group=group,
+                                    timestamp=timestamp))
         return messages
 
     @staticmethod

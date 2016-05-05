@@ -114,12 +114,33 @@ class CasinoService(Service):
 
     no_bets_stored = {"en": "No bets stored",
                       "de": "Keine Wetten gespeichert"}
+    """
+    Message shown when no bets are stored
+    """
 
     delete_bet_out_of_bound = {"en": "No bet with that index available",
                                "de": "Keine Wette mit dem Index verfügbar"}
+    """
+    Message shown if the user tries to delete a message at an invalid index
+    """
 
     successful_bet_delete_message = {"en": "Bet successfully deleted",
                                      "de": "Wette erfolgreich gelöscht"}
+    """
+    Message shown when a bet was successfully deleted
+    """
+
+    bet_stored_message = {"en": "The bet was successfully stored",
+                          "de": "Die Wette wurde erfolgreich gespeichert"}
+    """
+    Message shown when a bet was stored successfully
+    """
+
+    insufficient_funds_message = {"en": "Insufficient Funds for the placed bet",
+                                  "de": "Ungenügendes Guthaben für diese Wette"}
+    """
+    Message shown when the user tries to store a bet of a value higher than his/her account balance
+    """
 
     def initialize(self) -> None:
         """
@@ -143,16 +164,16 @@ class CasinoService(Service):
         :param message: the message to process
         :return: None
         """
-        identifier = message.get_unique_identifier()
+        address = message.get_individual_address()
         option = message.message_body.lower().split("/casino ")[1]
         reply = ""
 
         if option in self.beg_keyword:
             self.connection.last_used_language = self.beg_keyword[option]
-            reply = self.beg(identifier)
+            reply = self.beg(address)
         elif option in self.account_balance_keywords:
             self.connection.last_used_language = self.account_balance_keywords[option]
-            reply = self.get_balance_as_message(identifier)
+            reply = self.get_balance_as_message(address)
 
         reply_message = self.generate_reply_message(message, "Casino", reply)
         self.send_text_message(reply_message)
@@ -168,64 +189,64 @@ class CasinoService(Service):
                                                                          CasinoService.account_balance_keywords]) + "$"
         return re.search(re.compile(regex), message.message_body.lower())
 
-    def beg(self, identifier: str) -> str:
+    def beg(self, address: str) -> str:
         """
         Executes the 'beg' command, giving the user a random amount(mostly small) of money to gamble with
 
-        :param identifier: the identifier for the user
+        :param address: the address for the user
         :return: A reply message for the user
         """
         beg_amount = random.choice(self.beg_values)
         response = self.beg_message[self.connection.last_used_language]
 
-        self.transfer_funds(identifier, beg_amount)
+        self.transfer_funds(address, beg_amount)
         return response[0] + self.format_money_string(beg_amount) + response[1]
 
-    def get_balance_as_message(self, identifier: str) -> str:
+    def get_balance_as_message(self, address: str) -> str:
         """
         Gets the current balance of the user
 
-        :param identifier: the unique identifier
+        :param address: the unique address
         :return: the message to be sent to the user
         """
         try:
-            balance = self.get_balance(identifier)
+            balance = self.get_balance(address)
         except FileNotFoundError:
-            self.create_account(identifier)
-            balance = self.get_balance(identifier)
+            self.create_account(address)
+            balance = self.get_balance(address)
 
         response = self.balance_message[self.connection.last_used_language]
 
         return response + self.format_money_string(int(balance))
 
-    def create_account(self, identifier: str, starting_value: int = 200000) -> None:
+    def create_account(self, address: str, starting_value: int = 200000) -> None:
         """
         Creates a new user account
 
-        :param identifier: the user identifier for whom the account is created
+        :param address: the user address for whom the account is created
         :param starting_value: can be used to set a custom starting value
         :return: None
         """
-        account_file = os.path.join(self.user_directory, identifier)
+        account_file = os.path.join(self.user_directory, address)
         with open(account_file, 'w') as account:
             account.write(str(starting_value))
 
-    def transfer_funds(self, identifier: str, amount: int) -> None:
+    def transfer_funds(self, address: str, amount: int) -> None:
         """
         Transfers funds to/from an account
         It can be called with negative values to remove money from the account
 
-        :param identifier: the user's identifier
+        :param address: the user's address
         :param amount: the amount to transfer
         :return: None
         """
         user_exists = False
         for user_file in os.listdir(self.user_directory):
-            if user_file.startswith(identifier):
+            if user_file.startswith(address):
                 account_file = os.path.join(self.user_directory, user_file)
 
                 user_exists = True
-                current_balance = self.get_balance(identifier)
+                current_balance = self.get_balance(address)
 
                 if current_balance + amount < 0:
                     raise InsufficientFundsError()
@@ -234,20 +255,20 @@ class CasinoService(Service):
                         account.write(str(current_balance + amount))
 
         if not user_exists:
-            self.create_account(identifier)
+            self.create_account(address)
             if amount >= -200000:
-                self.transfer_funds(identifier, amount)
+                self.transfer_funds(address, amount)
             else:
                 raise InsufficientFundsError()
 
-    def get_balance(self, identifier: str) -> int:
+    def get_balance(self, address: str) -> int:
         """
         Reads the current balance from the account file
 
-        :param identifier: the user identifier
+        :param address: the user address
         :return: the account balance.
         """
-        account_file = os.path.join(self.user_directory, identifier)
+        account_file = os.path.join(self.user_directory, address)
         with open(account_file, 'r') as account:
             account_balance = int(account.read())
         return account_balance
@@ -283,41 +304,47 @@ class CasinoService(Service):
 
         return value
 
-    def store_bet(self, game: str, identifier: str, value: int, bet_type: str) -> None:
+    def store_bet(self, game: str, address: str, value: int, bet_type: str) -> str:
         """
         Stores a bet as a bet file
 
         :param game: the game this bet was created by
-        :param identifier: te user identifier of the better
+        :param address: the address of the better
         :param value: the value set
         :param bet_type: the bet type - game-specific
-        :return: None
+        :return: a confirmation message if everything went well, an insufficient funds message if not
         """
-        directory = os.path.join(self.bet_directory, game)
-        file_name = identifier + "###BETVAL=" + bet_type
-        bet_file = os.path.join(directory, file_name)
+        try:
+            self.transfer_funds(address, -value)
+            directory = os.path.join(self.bet_directory, game)
+            file_name = address + "###BETVAL=" + bet_type
+            bet_file = os.path.join(directory, file_name)
 
-        if os.path.isfile(bet_file):
-            with open(bet_file, 'r') as bet:
-                value = int(bet.read())
-                value *= 2
+            if os.path.isfile(bet_file):
+                with open(bet_file, 'r') as bet:
+                    value = int(bet.read())
+                    value *= 2
 
-        with open(bet_file, 'w') as bet:
-            bet.write(str(value))
+            with open(bet_file, 'w') as bet:
+                bet.write(str(value))
 
-    def get_bets(self, game: str, identifier: str) -> List[Dict[str, (int or str)]]:
+            return self.bet_stored_message[self.connection.last_used_language]
+        except InsufficientFundsError:
+            return self.insufficient_funds_message[self.connection.last_used_language]
+
+    def get_bets(self, game: str, address: str) -> List[Dict[str, (int or str)]]:
         """
         Returns a list of dictionaries representing bets of a specific user
 
         :param game: the game for which the bets should be fetched
-        :param identifier: the user's identifier
+        :param address: the user's address
         :return: the List of reminder dictionaries
         """
         directory = os.path.join(self.bet_directory, game)
         bets = []
 
         for bet in os.listdir(directory):
-            if bet.startswith(identifier):
+            if bet.startswith(address):
                 bet_file = os.path.join(directory, bet)
 
                 bet_dictionary = {"bet_type": bet.rsplit("###BETVAL=", 1)[1],
@@ -333,15 +360,15 @@ class CasinoService(Service):
         bets = sorted(bets, key=lambda dictionary: dictionary["value"])
         return bets
 
-    def get_bets_as_formatted_string(self, game: str, identifier: str) -> str:
+    def get_bets_as_formatted_string(self, game: str, address: str) -> str:
         """
         Return all bets of a user for a specific game as a formatted string
 
         :param game: the game to which the bets belong
-        :param identifier: the user's identifier
+        :param address: the user's address
         :return: the formatted string
         """
-        bets = self.get_bets(game, identifier)
+        bets = self.get_bets(game, address)
         bet_list_string = ""
 
         for bet in range(0, len(bets)):
@@ -356,19 +383,19 @@ class CasinoService(Service):
 
         return bet_list_string
 
-    def delete_bet(self, game: str, identifier: str, index: int) -> str:
+    def delete_bet(self, game: str, address: str, index: int) -> str:
         """
         Deletes a bet at the given iundex for the given game by the given user
 
         :param game: the game the bet to delete belongs to
-        :param identifier: the user's unique identifier
+        :param address: the user's address
         :param index: the index of the bet to delete
         :return: A message to the user
         """
         if index < 1:
             return self.delete_bet_out_of_bound[self.connection.last_used_language]
 
-        bets = self.get_bets(game, identifier)
+        bets = self.get_bets(game, address)
         os.remove(bets[index - 1]['file'])
 
         return self.successful_bet_delete_message[self.connection.last_used_language]
@@ -385,8 +412,8 @@ class CasinoService(Service):
 
             if hour == 23:
                 for account_file in os.listdir(self.user_directory):
-                    user_identifier = str(account_file.rsplit("###BETVAL=", 1)[0])
-                    self.transfer_funds(user_identifier, 10000)
+                    user_address = str(account_file.rsplit("###BETVAL=", 1)[0])
+                    self.transfer_funds(user_address, 10000)
             time.sleep(3600)
 
 

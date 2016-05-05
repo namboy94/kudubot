@@ -250,12 +250,6 @@ class RouletteService(CasinoService):
     Message for undefined behavour
     """
 
-    bet_stored_message = {"en": "Bet stored",
-                          "de": "Wette gespeichert"}
-    """
-    Message to be sent to the user when a bet was saved
-    """
-
     spin_summary = {"en": "The result of the spin is: ",
                     "de": "Das Resultat ist: "}
 
@@ -331,7 +325,7 @@ class RouletteService(CasinoService):
         :return: a reply string
         """
         user_input = message.message_body.lower()
-        user_identifier = message.get_unique_identifier()
+        user_address = message.get_individual_address()
 
         user_input = user_input.split("/roulette ")[1]
         options = user_input.split(" ")
@@ -345,13 +339,13 @@ class RouletteService(CasinoService):
             else:
                 return self.not_authenticated_method[self.spin_keywords[options[0]]]
         elif options[0] in self.cancel_keywords:
-            return self.cancel_bets(self.cancel_keywords[options[0]], user_identifier, int(options[1]))
+            return self.cancel_bets(self.cancel_keywords[options[0]], user_address, int(options[1]))
         elif options[0] in self.board_keywords:
-            return self.send_board(user_identifier)
+            return self.send_board(user_address)
         elif options[0] in self.time_keywords:
             return str(self.request_time_to_spin()) + self.time_left_message[self.time_keywords[options[0]]]
         elif options[0] in self.bets_keywords:
-            return self.get_bets_as_formatted_string("roulette", user_identifier)
+            return self.get_bets_as_formatted_string("roulette", user_address)
         else:
             money = self.parse_money_string(options[0])
 
@@ -391,7 +385,7 @@ class RouletteService(CasinoService):
                 else:
                     return self.undefined_behaviour[self.connection.last_used_language]
 
-            return self.create_bet(user_identifier, selection, money)
+            return self.create_bet(user_address, selection, money)
 
     @staticmethod
     def parse_neighbour_group(neighbour_group_string: str) -> Set[int]:
@@ -485,21 +479,20 @@ class RouletteService(CasinoService):
             summary = self.spin_summary[language] + str(result) + "\n\n" + summary
 
             for better in addresses:
-                print(better)
-                message = Message(summary, "Roulette", better, False)
+                message = Message(message_body=summary, message_title="Roulette", address=better)
                 self.send_text_message(message)
 
-    def cancel_bets(self, language: str, user_identifier: str, index: int) -> str:
+    def cancel_bets(self, language: str, user_address: str, index: int) -> str:
         """
         Cancels a bet
 
         :param language: the language to use
-        :param user_identifier: the user identifier string
+        :param user_address: the user address string
         :param index: the index of the bet to delete
         :return: A message detailing the success or failure of the deletion
         """
         self.connection.last_used_language = language
-        return self.delete_bet("roulette", user_identifier, index)
+        return self.delete_bet("roulette", user_address, index)
 
     def send_board(self, address: str) -> None:
         """
@@ -527,11 +520,11 @@ class RouletteService(CasinoService):
 
         return time_left
 
-    def create_bet(self, identifier: str, bet_items: List[int], value: int) -> str:
+    def create_bet(self, address: str, bet_items: List[int], value: int) -> str:
         """
         Creates a new bet
 
-        :param identifier: The identifier used to determine which user made the bet
+        :param address: The address used to determine which user made the bet
         :param bet_items: The items for which the user placed a bet
         :param value: the value of the bet
         :return: a message telling the user that the bet was placed succesfully
@@ -544,9 +537,9 @@ class RouletteService(CasinoService):
 
         bet_string = bet_string.rsplit("-", 1)[0]
         bet_string += "X" + str(multiplier)
-        self.store_bet("roulette", identifier, value, bet_string)
+        reply = self.store_bet("roulette", address, value, bet_string)
 
-        return self.bet_stored_message[self.connection.last_used_language]
+        return reply
 
     def background_process(self) -> None:
         """

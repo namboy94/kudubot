@@ -60,7 +60,7 @@ class ExceptionLogger(object):
             log_file.write("Causing Message:\n")
             log_file.write("Title: " + message.message_title + "\n")
             log_file.write("Message: " + message.message_body + "\n")
-            log_file.write("From: " + message.identifier + "\n\n")
+            log_file.write("From: " + message.address + "\n\n")
 
         log_file.write("Full stacktrace: " + stack_trace + "\n")
         log_file.write("-----------------------------------------------------------------------------------------" "\n")

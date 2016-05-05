@@ -55,16 +55,6 @@ class Message(object):
     If the message sender/receiver is a group, this is the address of the individual sender/receiver
     """
 
-    identifier = ""
-    """
-    A unique identifier for the sender/receiver. Can also be the identifier for a group
-    """
-
-    single_identifier = ""
-    """
-    A unique identifier for a unique user in a group
-    """
-
     name = ""
     """
     A friendly, human-readable name for the sender/receiver. Can also be the name of a group
@@ -90,24 +80,19 @@ class Message(object):
     The timestamp of the message's creation
     """
 
-    def __init__(self, message_body: str, message_title: str, address: str, incoming: bool,
-                 identifier: str = "", name: str = "",
-                 group: bool = False, single_address: str = "", single_identifier: str = "", single_name: str = "",
-                 timestamp: float = -1.0)\
-            -> None:
+    def __init__(self, message_body: str, address: str, message_title: str = "", incoming: bool = False, name: str = "",
+                 group: bool = False, single_address: str = "", single_name: str = "", timestamp: float = -1.0) -> None:
         """
-        Constructor for the Message class
+        Constructor for the Message class. The only required parameters are the address and message body parameters
 
         :param message_body: The actual message text
-        :param message_title: The title of the message
         :param address: the sender address
+        :param message_title: The title of the message
         :param incoming: True is incoming message, False if outgoing
-        :param identifier: the sender identifier
         :param name: the sender name
-        :param group: True if this is a group. The following information must onl be entered when the message comes
+        :param group: True if this is a group. The following information must only be entered when the message comes
                         from/is addressed at a group
         :param single_address: the address of the individual group participant
-        :param single_identifier: the identifier of the individual group participant
         :param single_name: the name of the individual group participant
         :param timestamp: The time stamp of the message creation
         """
@@ -115,24 +100,17 @@ class Message(object):
         self.message_title = message_title
 
         self.address = address
-        self.identifier = identifier
         self.name = name
         self.group = group
 
-        if incoming:
-            self.incoming = True
-        else:
-            self.outgoing = True
+        self.incoming = incoming
+        self.outgoing = not incoming
 
         if self.group:
             self.single_address = single_address
-            self.single_identifier = single_identifier
             self.single_name = single_name
 
-        if timestamp < 0.0:
-            self.timestamp = time.time()
-        else:
-            self.timestamp = timestamp
+        self.timestamp = time.time() if timestamp < 0.0 else timestamp
 
     def to_string(self) -> str:
         """
@@ -147,13 +125,13 @@ class Message(object):
 
         return message_as_string
 
-    def get_unique_identifier(self) -> str:
+    def get_individual_address(self) -> str:
         """
-        Returns a unique identifier for the sender, useful when in groups
+        Always returns the address of the uniques user, even when in a group
 
-        :return: the unique identifier
+        :return: the unique address
         """
-        return self.single_identifier if self.group else self.identifier
+        return self.single_address if self.group else self.address
 
     def get_user_name(self) -> str:
         """

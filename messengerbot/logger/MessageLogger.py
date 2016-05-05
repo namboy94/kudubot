@@ -68,35 +68,17 @@ class MessageLogger(object):
         PrintLogger.print(message.to_string(), 1)
 
         log_dir = os.path.join(self.log_directory, "messages")
+        log_dir = os.path.join(log_dir, "groups") if message.group else os.path.join(log_dir, "users")
 
-        if message.group:
-            log_dir = os.path.join(log_dir, "groups")
-            identifier = str(message.identifier)
-            if not identifier:
-                identifier = str(message.address)
-            log_dir = os.path.join(log_dir, identifier)
+        identifier = message.address
+        log_dir = os.path.join(log_dir, identifier)
+        LocalConfigChecker.validate_directory(log_dir)
 
-            log_file = os.path.join(log_dir, time.strftime("%Y-%m-%d"))
-
-        else:
-            log_dir = os.path.join(log_dir, "users")
-            identifier = str(message.identifier)
-            if not identifier:
-                identifier = str(message.address)
-            log_dir = os.path.join(log_dir, identifier)
-
-            log_file = os.path.join(log_dir, time.strftime("%Y-%m-%d"))
-
-        if not os.path.isdir(log_dir):
-            os.makedirs(log_dir)
+        log_file = os.path.join(log_dir, time.strftime("%Y-%m-%d"))
 
         opened_log_file = open(log_file, 'a')
 
-        if message.incoming:
-            in_or_outgoing = "RECV"
-        else:
-            in_or_outgoing = "SENT"
-
+        in_or_outgoing = "RECV" if message.incoming else "SENT"
         log_line = in_or_outgoing + ": " + message.message_title + ": " + message.message_body
 
         opened_log_file.write(log_line + "\n")

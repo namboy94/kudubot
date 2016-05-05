@@ -145,8 +145,9 @@ class Service(object):
         :param body: the new body of the message
         :return: the new message object
         """
-        return Message(body, title, message.address, False, message.identifier, message.name, message.group,
-                       message.single_address, message.single_identifier, message.single_name)
+        return Message(message_body=body, address=message.address, message_title=title, incoming=False,
+                       name=message.name, group=message.group, single_address=message.single_address,
+                       single_name=message.single_name, timestamp=message.timestamp)
 
     @staticmethod
     def regex_check(message: Message) -> bool:

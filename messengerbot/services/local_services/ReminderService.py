@@ -179,18 +179,18 @@ class ReminderService(Service):
         if delete_key is not None:  # In other words: if "delete" in message.message_body.lower()
             language = self.delete_keywords[delete_key]
             index = int(message.message_body.split(delete_key + " ")[1])
-            reply = self.delete_reminder_for_user(message.identifier, index, language)
+            reply = self.delete_reminder_for_user(message.address, index, language)
 
         elif list_key is not None:
             language = self.list_keywords[list_key]
-            reply = self.get_user_reminders_as_string_from(message.identifier, language)
+            reply = self.get_user_reminders_as_string_from(message.address, language)
 
         else:
             language, reminder_options, reminder_message = self.parse_user_input(message.message_body)
             reminder_time = self.determine_reminder_time(reminder_options)
             reminder_time = self.normalize_time(reminder_time)
 
-            self.store_reminder(reminder_time, reminder_message, message.identifier)
+            self.store_reminder(reminder_time, reminder_message, message.address)
             reply = self.message_stored_reply[language]
 
         reply_message = self.generate_reply_message(message, "Reminder", reply)

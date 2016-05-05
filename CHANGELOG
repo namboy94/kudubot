@@ -1,3 +1,8 @@
+V 0.6
+  - Removed the concept of identifiers from the Message class
+  - Small bugfixes in the Roulette/Casino services
+  - Reached functional equivalence to Whatsbot (mostly)
+  - Implemented group/non-group discerning mechanics in the telegram connection
 V 0.5.5
   - Implemented the Roulette Service
 V 0.5.4.5

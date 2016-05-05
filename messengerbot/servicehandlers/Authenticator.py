@@ -76,7 +76,7 @@ class Authenticator(object):
         :param message: the message to be checked
         :return: True if admin, False if not
         """
-        identifier = message.single_identifier if message.group else message.identifier
+        identifier = message.get_individual_address()
 
         return Authenticator.is_in_file(identifier, self.admin_contact_file)
 
@@ -87,6 +87,6 @@ class Authenticator(object):
         :param message: the message to be checked
         :return: True if blacklisted, False if not
         """
-        identifier = message.single_identifier if message.group else message.identifier
+        identifier = message.get_individual_address()
 
         return Authenticator.is_in_file(identifier, self.blacklisted_contact_file)
