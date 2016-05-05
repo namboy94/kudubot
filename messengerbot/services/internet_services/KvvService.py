@@ -1,0 +1,149 @@
+# coding=utf-8
+"""
+Copyright 2015,2016 Hermann Krumrey
+
+This file is part of messengerbot.
+
+    messengerbot makes use of various third-party python modules to serve
+    information via the online chat services.
+
+    messengerbot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    messengerbot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+# imports
+import re
+import sys
+import json
+import urllib.request
+from typing import List, Dict
+from datetime import datetime,timedelta
+from urllib.parse import quote_plus, urlencode
+
+
+from messengerbot.servicehandlers.Service import Service
+from messengerbot.connection.generic.Message import Message
+
+
+class KvvService(Service):
+    """
+    The KvvService Class that extends the generic Service class.
+    The service checks the curent timetables from the KVV Straßenbahn Network
+    and displays the most relevant times
+    """
+
+    identifier = "kvv"
+    """
+    The identifier for this service
+    """
+
+    help_description = {"en": "/kvv\tShows KVV timetable information\n"
+                              "syntax:\n"
+                              "/kvv <station>",
+                        "de": "/kvv\tZeigt KVV Zeiten an\n"
+                              "syntax:\n"
+                              "/kvv <station>"}
+    """
+    Help description for this service.
+    """
+
+    kvv_api_key = "377d840e54b59adbe53608ba1aad70e8"
+    """
+    The KVV API key
+    """
+
+    kvv_url = "http://live.kvv.de/webapp/"
+    """
+    The KVV URL
+    """
+
+    def process_message(self, message: Message) -> None:
+        """
+        Process a message according to the service's functionality
+
+        :param message: the message to process
+        :return: None
+        """
+        station = message.message_body.split(" ", 1)[1]
+        reply = self.get_kvv_info(station)
+        reply_message = self.generate_reply_message(message, "KVV", reply)
+        self.send_text_message(reply_message)
+
+    @staticmethod
+    def regex_check(message: Message) -> bool:
+        """
+        Checks if the user input is valid for this service to continue
+
+        :return: True if input is valid, False otherwise
+        """
+        regex = "^/kvv "
+        return re.search(re.compile(regex), message.message_body.lower())
+
+    def get_kvv_info(self, station: str) -> str:
+        """
+        Gets the KVV information for a selected station
+
+        :param station: the station for which information should be looked up
+        :return: the information for that station
+        """
+        return self.get_location_id(station)
+
+    # noinspection PyDefaultArgument
+    def query_kvv_webapp(self, path: str, options: Dict[str, str] = {}) -> Dict[str, str]:
+        """
+        Queries the KVV Webapp for a specified URL and returns a JSON parsed dictionary
+
+        :param path: the URL path to be queried
+        :param options: Options to be sent with the query
+        :return: the JSON parsed dictionary
+        """
+        options["key"] = self.kvv_api_key
+        query_url = self.kvv_url + path + "?" + urlencode(options)
+
+        query_request = urllib.request.Request(query_url)
+        opened_query_url = urllib.request.urlopen(query_request)
+        result = opened_query_url.read().decode("utf-8")
+
+        return json.loads(result)
+
+    def get_location_id(self, station_name) -> str:
+        """
+        Searches for the location id of a station
+
+        :param station_name: the name of the statio
+        :return: the station ID
+        """
+        location_search_path = "stops/byname/" + quote_plus(station_name)
+        json_parsed_dictionary = self.query_kvv_webapp(location_search_path)
+
+        # noinspection PyTypeChecker
+        return json_parsed_dictionary["stops"][0]["id"]
+
+    def get_times_from_stop_id(self, station_id) -> List[Dict[str, str]]:
+        """
+
+        :param station_id:
+        :return:
+        """
+        timetable_path = "departures/bystop/" + station_id
+        json_parsed_dictionary = self.query_kvv_webapp(timetable_path)
+
+        return json_parsed_dictionary["departures"]
+
+
+if __name__ == '__main__':
+
+    service = KvvService(None)
+    x = service.get_location_id("Gottesauer")
+    print(x)
+    service.get_times_from_stop_id(x)
