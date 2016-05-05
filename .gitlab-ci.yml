@@ -18,6 +18,8 @@ clone:
 
 uninstall:
   stage: setup
+  only:
+    - master
   script:
     - sudo pip3.5 uninstall -y messenger_bot
   allow_failure: true
@@ -28,7 +30,6 @@ run_unit_tests:
     - cd
     - cd messengerbot
     - python setup.py test
-  allow_failure: true
 
 generate_statistics:
   stage: test
@@ -42,6 +43,8 @@ generate_statistics:
 
 generate_documentation:
   stage: test
+  only:
+    - master
   script:
     - cd
     - cd messengerbot/doc
@@ -55,6 +58,8 @@ generate_documentation:
 
 upload_to_pypi:
   stage: upload
+  only:
+    - master
   script:
     - cd
     - cd messengerbot
@@ -82,6 +87,8 @@ delete_clone:
 upgrade_from_pypi:
   stage: upgrade
   when: always
+  only:
+    - master
   script:
     - sudo pip3.5 install messenger_bot --upgrade
     - sleep 5
