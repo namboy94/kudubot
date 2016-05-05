@@ -112,3 +112,7 @@ def main(override: str = "", verbosity: int = 0) -> None:
         pass
 
     PrintLogger.print("Thanks for using messengerbot")
+
+
+if __name__ == "__main__":
+    main(override="all", verbosity=2)
