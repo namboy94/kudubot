@@ -24,6 +24,7 @@ This file is part of messengerbot.
 # imports
 import re
 import json
+import urllib.error
 import urllib.request
 from typing import List, Dict, Tuple
 from urllib.parse import quote_plus, urlencode
@@ -64,6 +65,15 @@ class KvvService(Service):
     The KVV URL
     """
 
+    corrections = {"hauptbahnhof": "karlsruhe hauptbahnhof",
+                   "vorplatz": "karlsruhe hbf vorplatz",
+                   "karlruhe hauptbahnhof vorplatz": "karlsruhe hbf vorplatz",
+                   "hauptbahnhof vorplatz": "karlsruhe hbf vorplatz"}
+    """
+    Corrections for the station parameter given by the user to attempt to deliver more relevant
+    search results
+    """
+
     def process_message(self, message: Message) -> None:
         """
         Process a message according to the service's functionality
@@ -93,9 +103,14 @@ class KvvService(Service):
         :param station: the station for which information should be looked up
         :return: the information for that station
         """
-        station_id = self.get_location_id(station)
-        times, official_station_name = self.get_times_from_stop_id(station_id)
-        return self.format_timetable(times, official_station_name)
+        station_ids = self.get_location_ids(station)
+
+        for station_id in station_ids:
+            try:
+                times, official_station_name = self.get_times_from_stop_id(station_id['id'])
+                return self.format_timetable(times, official_station_name)
+            except urllib.error.HTTPError:
+                pass
 
     # noinspection PyDefaultArgument
     def query_kvv_webapp(self, path: str, options: Dict[str, str]={}) -> Dict[str, str]:
@@ -108,6 +123,7 @@ class KvvService(Service):
         """
         options["key"] = self.kvv_api_key
         query_url = self.kvv_url + path + "?" + urlencode(options)
+        print(query_url)
 
         query_request = urllib.request.Request(query_url)
         opened_query_url = urllib.request.urlopen(query_request)
@@ -115,18 +131,23 @@ class KvvService(Service):
 
         return json.loads(result)
 
-    def get_location_id(self, station_name) -> str:
+    def get_location_ids(self, station_name) -> List[Dict[str, str]]:
         """
         Searches for the location id of a station
 
-        :param station_name: the name of the statio
+        :param station_name: the name of the station
         :return: the station ID
         """
+        if station_name.lower() in self.corrections:
+            station_name = self.corrections[station_name.lower()]
+
+        station_name = station_name.replace(" ", "_")
+
         location_search_path = "stops/byname/" + quote_plus(station_name)
         json_parsed_dictionary = self.query_kvv_webapp(location_search_path)
 
         # noinspection PyTypeChecker
-        return json_parsed_dictionary["stops"][0]["id"]
+        return json_parsed_dictionary["stops"]
 
     def get_times_from_stop_id(self, station_id: str) -> Tuple[List[Dict[str, str]], str]:
         """
