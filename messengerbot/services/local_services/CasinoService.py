@@ -265,8 +265,13 @@ class CasinoService(Service):
         :param money_string: the string to be parsed
         :return: the value of that string
         """
+        money_string = money_string.replace(".", ",")
         money = money_string.replace(self.currency, "")
-        dollars, cents = money.split(",")
+        money = money.split(",")
+
+        dollars = money[0]
+        cents = 0 if len(money) < 2 else money[1]
+
         value = int(cents) + (int(dollars) * 2)
 
         return value

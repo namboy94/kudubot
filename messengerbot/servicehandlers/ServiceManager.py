@@ -31,6 +31,7 @@ from messengerbot.servicehandlers.required_services.ServiceSelectorService impor
 
 # other services
 from messengerbot.services.local_services.CasinoService import CasinoService
+from messengerbot.services.local_services.RouletteService import RouletteService
 from messengerbot.services.local_services.ReminderService import ReminderService
 from messengerbot.services.local_services.RestarterService import RestarterService
 from messengerbot.services.local_services.WeeklyReminderService import WeeklyReminderService
@@ -69,6 +70,7 @@ class ServiceManager(object):
                     ReminderService,
                     WeeklyReminderService,
                     CasinoService,
+                    RouletteService,
                     XkcdService,
                     KickTippService,
                     FootballInfoService,

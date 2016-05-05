@@ -35,6 +35,40 @@ from messengerbot.services.local_services.CasinoService import CasinoService
 from messengerbot.resources.images.__init__ import get_location as get_board_image_file
 
 
+def calculate_neighbour_group(roulette_board: List[List[int]]) -> List[Set[int]]:
+    """
+    Calculates the neighbouring tiles for a roulette board
+
+    :param roulette_board: the roulette board to be used
+    :return: the dual neghbours, the quad neighbours
+    """
+    board = roulette_board
+    pairs = []
+    quads = []
+    row = 0
+    while row < len(board):
+        row_crawler = 0
+        column_crawler = 1
+
+        while column_crawler < len(board[row]):
+            pairs.append([board[row][row_crawler], board[row][column_crawler]])
+
+            if row < (len(board) - 1):
+                pairs.append({board[row][row_crawler], board[row + 1][row_crawler]})
+                pairs.append({board[row][column_crawler], board[row + 1][column_crawler]})
+
+                quads.append({board[row][row_crawler],
+                              board[row + 1][row_crawler],
+                              board[row][column_crawler],
+                              board[row + 1][column_crawler]})
+
+                row_crawler += 1
+            column_crawler += 1
+        row += 1
+
+    return pairs, quads
+
+
 class RouletteService(CasinoService):
     """
     The RouletteService Class that extends the generic Service class.
@@ -197,7 +231,7 @@ class RouletteService(CasinoService):
     Message shown when the user has won.
     """
 
-    time_left_message = {"en": "s left until the board wil be spinned",
+    time_left_message = {"en": "s left until the board will be spinned",
                          "de": "s noch bis zum Drehen des Rades"}
     """
     Message to be sent when a request for time to next spin was sent
@@ -220,6 +254,9 @@ class RouletteService(CasinoService):
     """
     Message to be sent to the user when a bet was saved
     """
+
+    spin_summary = {"en": "The result of the spin is: ",
+                    "de": "Das Resultat ist: "}
 
     def initialize(self) -> None:
         """
@@ -256,7 +293,7 @@ class RouletteService(CasinoService):
         row = RouletteService.regex_string_from_dictionary_keys([RouletteService.row_keywords])
         zero_to_36_regex = "(([0-9]?[0-3])|3[0-6])"
 
-        regex = "^/roulette (([0-9]+(\.[0-9]{2})?) (" + zero_to_36_regex + "|"
+        regex = "^/roulette (([0-9]+((\.|,)[0-9]{2})?) (" + zero_to_36_regex + "|"
         regex += RouletteService.regex_string_from_dictionary_keys([RouletteService.red_keywords,
                                                                     RouletteService.black_keywords,
                                                                     RouletteService.odd_keywords,
@@ -270,7 +307,7 @@ class RouletteService(CasinoService):
                                                                       RouletteService.cancel_keywords,
                                                                       RouletteService.board_keywords,
                                                                       RouletteService.time_keywords,
-                                                                      RouletteService.bets_keywords]) + "$"
+                                                                      RouletteService.bets_keywords]) + ")$"
 
         match = re.search(re.compile(regex), message.message_body.lower())
 
@@ -310,7 +347,7 @@ class RouletteService(CasinoService):
         elif options[0] in self.board_keywords:
             return self.send_board(user_identifier)
         elif options[0] in self.time_keywords:
-            return str(self.request_time_to_spin()) + "s" + self.time_left_message[self.time_keywords[options[1]]]
+            return str(self.request_time_to_spin()) + self.time_left_message[self.time_keywords[options[0]]]
         elif options[0] in self.bets_keywords:
             return self.get_bets_as_formatted_string("roulette", user_identifier)
         else:
@@ -424,12 +461,17 @@ class RouletteService(CasinoService):
             bets.append(bet)
 
         summary = ""
+        betters_exist = False
 
         for bet in bets:
+            betters_exist = True
             if result in bet["selection"]:
                 won_value = bet["value"] * bet["multiplier"]
                 summary += bet["user"] + self.won_message[language] + self.format_money_string(won_value) + "\n\n"
                 self.transfer_funds(bet["user"], won_value)
+
+        if betters_exist:
+            summary = self.spin_summary[language] + str(result) + "\n\n" + summary
 
         return summary.split("\n\n")[0]
 
@@ -501,38 +543,5 @@ class RouletteService(CasinoService):
         while True:
             if self.is_spinning():
                 self.spin_wheel(self.connection.last_used_language)
+                time.sleep(60)
             time.sleep(3)
-
-
-def calculate_neighbour_group(roulette_board: List[List[int]]) -> List[Set[int]]:
-    """
-    Calculates the neighbouring tiles for a roulette board
-
-    :param roulette_board: the roulette board to be used
-    :return: the dual neghbours, the quad neighbours
-    """
-    board = roulette_board
-    pairs = []
-    quads = []
-    row = 0
-    while row < len(board):
-        row_crawler = 0
-        column_crawler = 1
-
-        while column_crawler < len(board[row]):
-            pairs.append([board[row][row_crawler], board[row][column_crawler]])
-
-            if row < (len(board) - 1):
-                pairs.append({board[row][row_crawler], board[row + 1][row_crawler]})
-                pairs.append({board[row][column_crawler], board[row + 1][column_crawler]})
-
-                quads.append({board[row][row_crawler],
-                              board[row + 1][row_crawler],
-                              board[row][column_crawler],
-                              board[row + 1][column_crawler]})
-
-                row_crawler += 1
-            column_crawler += 1
-        row += 1
-
-    return pairs, quads
