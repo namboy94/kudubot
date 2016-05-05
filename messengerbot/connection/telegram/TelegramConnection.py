@@ -77,7 +77,12 @@ class TelegramConnection(telegram.Bot, Connection):
         :param message: The message entity to be sent
         :return: None
         """
-        self.sendMessage(chat_id=message.address, text=message.message_body)
+        if len(message.message_body) > 4000:
+            for part in range(0, len(message.message_body), 4000):
+                message_part = message.message_body[part:part + 4000]
+                self.sendMessage(chat_id=message.address, text=message_part)
+        else:
+            self.sendMessage(chat_id=message.address, text=message.message_body)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
