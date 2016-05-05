@@ -38,6 +38,7 @@ from messengerbot.services.local_services.WeeklyReminderService import WeeklyRem
 from messengerbot.services.internet_services.KvvService import KvvService
 from messengerbot.services.internet_services.XkcdService import XkcdService
 from messengerbot.services.internet_services.TvdbService import TvdbService
+from messengerbot.services.internet_services.CinemaService import CinemaService
 from messengerbot.services.internet_services.WeatherService import WeatherService
 from messengerbot.services.internet_services.KitMensaService import KitMensaService
 from messengerbot.services.internet_services.KickTippService import KickTippService
@@ -79,6 +80,7 @@ class ServiceManager(object):
                     WeatherService,
                     GoogleTtsService,
                     TvdbService,
+                    CinemaService,
                     KitMensaService,
                     EmailSenderService,
                     ImageSenderService,
