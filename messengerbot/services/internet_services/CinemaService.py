@@ -166,7 +166,10 @@ class CinemaService(Service):
                                                       "times": []}
                 if movie.span.text:
                     theaters[theater_name][movie_name]["runtime"] = movie.span.text.split(" - Rated ")[0]
-                    theaters[theater_name][movie_name]["age_info"] = movie.span.text.split(" - Rated ")[1]
+                    try:
+                        theaters[theater_name][movie_name]["age_info"] = movie.span.text.split(" - Rated ")[1]
+                    except IndexError:
+                        pass
 
                 times = movie.find_all('div', {'class': 'times'})
                 for show_time in times:

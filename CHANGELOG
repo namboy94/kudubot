@@ -1,3 +1,5 @@
+V 0.6.3.1
+  - Hotfix for the cinema service
 V 0.6.3
   - Worked around telegram's 4096 character limit
   - Mad the Cinema service send a seperate message for each theater
