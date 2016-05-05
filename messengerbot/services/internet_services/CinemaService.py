@@ -24,9 +24,9 @@ This file is part of messengerbot.
 # imports
 import re
 import requests
-from typing import Tuple
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
+from typing import Tuple, List, Dict
 
 from messengerbot.servicehandlers.Service import Service
 from messengerbot.connection.generic.Message import Message
@@ -46,10 +46,10 @@ class CinemaService(Service):
 
     help_description = {"en": "/cinema\tLists show times for movies in cinema\n"
                               "syntax:\n"
-                              "/cinema <city>[, <theater>][, <movie>]",
+                              "/cinema <city> [in how many days]",
                         "de": "/kino\tListet die Spielzeiten für Filme im Kino\n"
                               "syntax:\n"
-                              "/kino <stadt>[, <theater>][, <film>]"}
+                              "/kino <stadt> [in wievielen Tage]"}
     """
     Help description for this service.
     """
@@ -67,9 +67,10 @@ class CinemaService(Service):
         :param message: the message to process
         :return: None
         """
-        city, theater, movie = self.parse_user_input(message.message_body.lower())
+        city, in_days = self.parse_user_input(message.message_body.lower())
+        cinema_data = self.get_cinema_data(city, in_days)
 
-        reply = ""
+        reply = self.format_cinema_data(cinema_data)
         reply_message = self.generate_reply_message(message, "Cinema", reply)
         self.send_text_message(reply_message)
 
@@ -80,65 +81,91 @@ class CinemaService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        any_word = "(([^ ,]+| )?[^ ,]+)"
-
         regex = "^" + CinemaService.regex_string_from_dictionary_keys([CinemaService.cinema_keywords])
-        regex += " " + any_word + "(, " + any_word + ")?(, " + any_word + ")?$"
+        regex += " (([^ ,]+| )?[^ ,]+)( [0-9]+)?$"
 
         return re.search(re.compile(regex), message.message_body.lower())
 
-    def parse_user_input(self, user_input: str) -> Tuple[str, str, str]:
+    def parse_user_input(self, user_input: str) -> Tuple[str, int]:
         """
-        Parses the user input for the city, theater and movie to search
+        Parses the user input for the city and the date for which information
+        should be fetched
 
         :param user_input: the user input to parse
-        :return: the city, theater, movie parsed
+        :return: the city and how many days into the future the request is made
         """
         language_key, options = user_input.split(" ", 1)
         self.connection.last_used_language = self.cinema_keywords[language_key]
 
-        city = ""
-        theater = ""
-        movie = ""
+        if re.search(r"^(([^ ,]+| )?[^ ,]+) [0-9]+$", options):
+            city, in_days = options.rsplit(" ", 1)
+            return city, int(in_days)
 
-        for part in options.split(" "):
-            if not city.endswith(", "):
-                city += part + " "
-            elif not theater.endswith(", "):
-                theater += part + " "
-            else:
-                movie += part + " "
+        else:
+            return options, 0
 
-        city = city.rsplit(",", 1)[0]
-        theater = theater.rsplit(",", 1)[0]
-        movie = movie.rsplit(",", 1)[0]
+    # noinspection PyTypeChecker
+    @staticmethod
+    def format_cinema_data(cinema_data: Dict[str, Dict[str, (str or List[str])]]) -> str:
+        """
+        Formats cinema data to be human-readable
 
-        return city, theater, movie
+        :param cinema_data: the cinema data
+        :return: A readable, formatted text of the information contained within the cinema data
+        """
+        cinema_data_string = ""
+        for theater in cinema_data:
+            cinema_data_string += theater + "\n\n\n"
+            for movie in cinema_data[theater]:
+                cinema_data_string += movie + "\n"
+                cinema_data_string += cinema_data[theater][movie]["runtime"] + "\n"
+                for show_time in cinema_data[theater][movie]["times"]:
+                    cinema_data_string += show_time + " "
+                cinema_data_string = cinema_data_string.rstrip()
+                cinema_data_string += "\n\n"
+            cinema_data_string += "\n\n"
+        return cinema_data_string.rstrip()
 
-    def get_cinema_data(self, city: str, theater: str, movie: str) -> str:
+    # noinspection PyTypeChecker
+    @staticmethod
+    def get_cinema_data(city: str, in_days: int = 0) -> Dict[str, Dict[str, (str or List[str])]]:
+        """
+        Retrieves the data for the given parameters from google.com/movies
+
+        :param city: the city whose cinemas should be listed
+        :param in_days: the data from how many days into the future is requested
+        :return: a dictionary containing all theaters and the movies playing in them, as well
+                    as some basic information on those movies as well as the show times
+        """
 
         # tid == theater ID, mid == movie ID
-        payload = {"near": city, "tid": theater, "mid": movie}
-        params = {}
-        for param in payload:
-            if payload[param] != "":
-                params[str(params)] = payload[param]
-        params = urlencode(params)
+        payload = urlencode({"near": city, "date": str(in_days)})
 
-        google_request = requests.get("http://google.com/movies?" + params).text
+        google_request = requests.get("http://google.com/movies?" + payload).text
         google_soup = BeautifulSoup(google_request, 'html.parser')
 
+        theaters = {}
         theater_selection = google_soup.find_all('div', attrs={'class': 'theater'})
 
         # print(movie_selection)
-        for x in theater_selection:
-            print(x.div.text)  # = Theater Name
-            movies = x.find_all('div', {'class': 'movie'})
-            for movie in movies:
-                print(movie.div.text)
-            print()
-            print()
+        for theater in theater_selection:
+            theater_name = theater.div.h2.text
 
-if __name__ == '__main__':
-    service = CinemaService(None)
-    service.get_cinema_data("karlsruhe", "", "")
+            theaters[theater_name] = {}
+            movies = theater.find_all('div', {'class': 'movie'})
+
+            for movie in movies:
+                movie_name = movie.div.text
+
+                theaters[theater_name][movie_name] = {"runtime": "",
+                                                      "age_info": "",
+                                                      "times": []}
+                if movie.span.text:
+                    theaters[theater_name][movie_name]["runtime"] = movie.span.text.split(" - Rated ")[0]
+                    theaters[theater_name][movie_name]["age_info"] = movie.span.text.split(" - Rated ")[1]
+
+                times = movie.find_all('div', {'class': 'times'})
+                for show_time in times:
+                    theaters[theater_name][movie_name]["times"].append(show_time.text)
+
+        return theaters

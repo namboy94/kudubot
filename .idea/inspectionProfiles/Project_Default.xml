@@ -24,6 +24,7 @@
           <option value="plugins.PluginManagerGui.Tkinter" />
           <option value="telegram.message.Message.update_id" />
           <option value="telegram.message.Message.message" />
+          <option value="dict.__add__" />
         </list>
       </option>
     </inspection_tool>
