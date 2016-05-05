@@ -23,13 +23,10 @@ This file is part of messengerbot.
 
 # imports
 import re
-import sys
 import json
 import urllib.request
-from typing import List, Dict
-from datetime import datetime,timedelta
+from typing import List, Dict, Tuple
 from urllib.parse import quote_plus, urlencode
-
 
 from messengerbot.servicehandlers.Service import Service
 from messengerbot.connection.generic.Message import Message
@@ -96,10 +93,12 @@ class KvvService(Service):
         :param station: the station for which information should be looked up
         :return: the information for that station
         """
-        return self.get_location_id(station)
+        station_id = self.get_location_id(station)
+        times, official_station_name = self.get_times_from_stop_id(station_id)
+        return self.format_timetable(times, official_station_name)
 
     # noinspection PyDefaultArgument
-    def query_kvv_webapp(self, path: str, options: Dict[str, str] = {}) -> Dict[str, str]:
+    def query_kvv_webapp(self, path: str, options: Dict[str, str]={}) -> Dict[str, str]:
         """
         Queries the KVV Webapp for a specified URL and returns a JSON parsed dictionary
 
@@ -129,21 +128,43 @@ class KvvService(Service):
         # noinspection PyTypeChecker
         return json_parsed_dictionary["stops"][0]["id"]
 
-    def get_times_from_stop_id(self, station_id) -> List[Dict[str, str]]:
+    def get_times_from_stop_id(self, station_id: str) -> Tuple[List[Dict[str, str]], str]:
         """
+        Searches for departure times at a KVV station
 
-        :param station_id:
-        :return:
+        :param station_id: The station ID of the station to be queried
+        :return: a list of departure dictionaries as well as the official station name
         """
         timetable_path = "departures/bystop/" + station_id
         json_parsed_dictionary = self.query_kvv_webapp(timetable_path)
 
-        return json_parsed_dictionary["departures"]
+        return json_parsed_dictionary["departures"], json_parsed_dictionary["stopName"]
 
+    @staticmethod
+    def format_timetable(station_times: List[Dict[str, str]], station_name: str) -> str:
+        """
+        Formats the timetable with the queried information
 
-if __name__ == '__main__':
+        :param station_times: the list of departure times of the station
+        :param station_name: the station name
+        :return: A formated string of the timetable information
+        """
+        direction_1_departures = []
+        direction_2_departures = []
+        for departure in station_times:
+            if departure['direction'] == '1':
+                direction_1_departures.append(departure)
+            elif departure['direction'] == '2':
+                direction_2_departures.append(departure)
+        all_directions = [direction_1_departures, direction_2_departures]
 
-    service = KvvService(None)
-    x = service.get_location_id("Gottesauer")
-    print(x)
-    service.get_times_from_stop_id(x)
+        formatted_string = "Abfahrten an der Haltestelle " + station_name + ":\n\n"
+
+        for direction in all_directions:
+            for departure in direction:
+                formatted_string += departure["time"] + " "
+                formatted_string += departure["route"] + " "
+                formatted_string += departure["destination"] + "\n"
+            formatted_string += "\n"
+
+        return formatted_string.rsplit("\n\n", 1)[0]
