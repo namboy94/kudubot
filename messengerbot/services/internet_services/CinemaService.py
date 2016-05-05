@@ -70,9 +70,11 @@ class CinemaService(Service):
         city, in_days = self.parse_user_input(message.message_body.lower())
         cinema_data = self.get_cinema_data(city, in_days)
 
-        reply = self.format_cinema_data(cinema_data)
-        reply_message = self.generate_reply_message(message, "Cinema", reply)
-        self.send_text_message(reply_message)
+        replies = self.format_cinema_data(cinema_data)
+
+        for reply in replies:
+            reply_message = self.generate_reply_message(message, "Cinema", reply)
+            self.send_text_message(reply_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:
@@ -106,25 +108,27 @@ class CinemaService(Service):
 
     # noinspection PyTypeChecker
     @staticmethod
-    def format_cinema_data(cinema_data: Dict[str, Dict[str, (str or List[str])]]) -> str:
+    def format_cinema_data(cinema_data: Dict[str, Dict[str, (str or List[str])]]) -> List[str]:
         """
         Formats cinema data to be human-readable
 
         :param cinema_data: the cinema data
-        :return: A readable, formatted text of the information contained within the cinema data
+        :return: A list of formatted string, one for each theater
         """
-        cinema_data_string = ""
+        theaters = []
+
         for theater in cinema_data:
-            cinema_data_string += theater + "\n\n\n"
+            theater_string = theater + "\n\n\n"
             for movie in cinema_data[theater]:
-                cinema_data_string += movie + "\n"
-                cinema_data_string += cinema_data[theater][movie]["runtime"] + "\n"
+                theater_string += movie + "\n"
+                theater_string += cinema_data[theater][movie]["runtime"] + "\n"
                 for show_time in cinema_data[theater][movie]["times"]:
-                    cinema_data_string += show_time + " "
-                cinema_data_string = cinema_data_string.rstrip()
+                    theater_string += show_time + " "
+                cinema_data_string = theater_string.rstrip()
                 cinema_data_string += "\n\n"
-            cinema_data_string += "\n\n"
-        return cinema_data_string.rstrip()
+            theaters.append(theater_string.rstrip())
+
+        return theaters
 
     # noinspection PyTypeChecker
     @staticmethod
