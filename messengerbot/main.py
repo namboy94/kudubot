@@ -30,12 +30,14 @@ import messengerbot.metadata as metadata
 from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.logger.ExceptionLogger import ExceptionLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
+from messengerbot.connection.irc.IrcConnection import IrcConnection
 from messengerbot.connection.email.EmailConnection import EmailConnection
 # from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
 from messengerbot.connection.telegram.TelegramConnection import TelegramConnection
 
 connections = [EmailConnection,
                # WhatsappConnection,
+               IrcConnection,
                TelegramConnection]
 """
 A list of possible connections
@@ -115,4 +117,4 @@ def main(override: str = "", verbosity: int = 0) -> None:
 
 
 if __name__ == "__main__":
-    main(override="all", verbosity=2)
+    main(override="irc", verbosity=2)

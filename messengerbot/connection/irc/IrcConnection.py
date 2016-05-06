@@ -58,9 +58,11 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         :param credentials: The credentials used to log in.
         :return: None
         """
-        super().__init__([credentials[1], credentials[2]], credentials[0], credentials[0])
+        print(credentials)
+        super().__init__([(credentials[1], int(credentials[3]))], credentials[0], credentials[0])
         self.channel = credentials[2]
 
+    # noinspection PyMethodMayBeStatic
     def on_nicknameinuse(self, connection: irc.client.Connection, event: irc.client.Event) -> None:
         """
         Method called when the nickname is already in use. It tries logging in again with the same
@@ -82,7 +84,25 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         :param event: The event that triggered the method call
         :return: None
         """
+        str(event)
         connection.join(self.channel)
+
+    def on_pubmsg(self, connection: irc.client.Connection, event: irc.client.Event) -> None:
+        """
+        Method called whenever a message from a channel is received. Converts the event into
+        a message and calls on_incoming_message with it.
+
+        :param connection:
+        :param event:
+        :return:
+        """
+        received_text = event.arguments[0]
+        sender_name = event.source.nick
+        channel = self.channel
+
+        message = Message(message_body=received_text, message_title="", address=sender_name)
+        self.connection.notice(sender_name, "Test")
+        #self.on_incoming_message()
 
     def send_text_message(self, message: Message) -> None:
         """
@@ -92,8 +112,7 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         :param message: The message to be sent
         :return: None
         """
-        message_protocol_entity = self.convert_message_to_text_message_protocol_entity(message)
-        self.to_lower(message_protocol_entity)
+        pass
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
@@ -104,7 +123,7 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         :param caption: The caption/title to be displayed along with the image, defaults to an empty string
         :return: None
         """
-        self.send_image(receiver, message_image, caption)
+        pass
 
     def send_audio_message(self, receiver: str, message_audio: str, caption: str = "") -> None:
         """
@@ -115,8 +134,7 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         :param caption: The caption/title to be displayed along with the audio, defaults to an empty string
         :return: None
         """
-        str(caption)
-        self.send_audio(receiver, message_audio)
+        pass
 
     @staticmethod
     def establish_connection() -> None:
@@ -125,9 +143,7 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
 
         :return: None
         """
-        credentials = WhatsappConfigParser.parse_whatsapp_config(WhatsappConnection.identifier)
-        echo_stack = YowsupEchoStack(WhatsappConnection, credentials)
+        credentials = IrcConfigParser.parse_irc_config(IrcConnection.identifier)
 
-        PrintLogger.print("Starting Whatsapp Connection", 1)
-
-        echo_stack.start()
+        bot = IrcConnection(credentials)
+        bot.start()
