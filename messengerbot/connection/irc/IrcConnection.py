@@ -22,13 +22,11 @@ This file is part of messengerbot.
 """
 
 # imports
-import re
-from typing import Tuple
-
 import irc.bot
 import irc.strings
 import irc.client
-from irc.client import ip_numstr_to_quad, ip_quad_to_numstr
+
+from typing import Tuple
 
 from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
@@ -58,9 +56,10 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         :param credentials: The credentials used to log in.
         :return: None
         """
-        print(credentials)
         super().__init__([(credentials[1], int(credentials[3]))], credentials[0], credentials[0])
         self.channel = credentials[2]
+
+        self.initialize()
 
     # noinspection PyMethodMayBeStatic
     def on_nicknameinuse(self, connection: irc.client.Connection, event: irc.client.Event) -> None:
@@ -92,17 +91,21 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         Method called whenever a message from a channel is received. Converts the event into
         a message and calls on_incoming_message with it.
 
-        :param connection:
-        :param event:
-        :return:
+        :param connection: the connection to the IRC server
+        :param event: The event that triggered the method call
+        :return: None
         """
+        str(connection)
         received_text = event.arguments[0]
         sender_name = event.source.nick
-        channel = self.channel
 
-        message = Message(message_body=received_text, message_title="", address=sender_name)
-        self.connection.notice(sender_name, "Test")
-        #self.on_incoming_message()
+        print(repr(received_text))
+
+        message = Message(message_body=received_text, message_title="", address=self.channel, incoming=True,
+                          name=sender_name, group=True, single_address=sender_name, single_name=sender_name,
+                          timestamp=1.0)
+
+        self.on_incoming_message(message)
 
     def send_text_message(self, message: Message) -> None:
         """
@@ -112,7 +115,9 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         :param message: The message to be sent
         :return: None
         """
-        pass
+        command = self.connection.notice if message.group else self.connection.privmsg
+        for line in message.message_body.split("\n"):
+            command(message.address, line)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
@@ -146,4 +151,6 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         credentials = IrcConfigParser.parse_irc_config(IrcConnection.identifier)
 
         bot = IrcConnection(credentials)
+
+        PrintLogger.print("Starting IRC connection", 1)
         bot.start()
