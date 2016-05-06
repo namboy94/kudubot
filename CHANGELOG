@@ -1,3 +1,7 @@
+V 0.6.5
+  - Implemented IRC Conection
+  - Implemented ZKM Kino Service
+  - Implemented smarter argument parsing
 V 0.6.3.2
   - Updated readme file to be more informative
 V 0.6.3.1
