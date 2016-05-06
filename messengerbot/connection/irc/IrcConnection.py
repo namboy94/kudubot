@@ -22,6 +22,7 @@ This file is part of messengerbot.
 """
 
 # imports
+import time
 import irc.bot
 import irc.strings
 import irc.client
@@ -99,11 +100,27 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         received_text = event.arguments[0]
         sender_name = event.source.nick
 
-        print(repr(received_text))
-
         message = Message(message_body=received_text, message_title="", address=self.channel, incoming=True,
                           name=sender_name, group=True, single_address=sender_name, single_name=sender_name,
-                          timestamp=1.0)
+                          timestamp=-1.0)
+
+        self.on_incoming_message(message)
+
+    def on_privmsg(self, connection: irc.client.Connection, event: irc.client.Event) -> None:
+        """
+        Method called whenever a message from a private chat is received. Converts the event into
+        a message and calls on_incoming_message with it.
+
+        :param connection: the connection to the IRC server
+        :param event: The event that triggered the method call
+        :return: None
+        """
+        str(connection)
+        received_text = event.arguments[0]
+        sender_name = event.source.nick
+
+        message = Message(message_body=received_text, message_title="", address=sender_name, incoming=True,
+                          name=sender_name, group=False, timestamp=-1.0)
 
         self.on_incoming_message(message)
 
@@ -116,8 +133,10 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         :return: None
         """
         command = self.connection.notice if message.group else self.connection.privmsg
+
         for line in message.message_body.split("\n"):
             command(message.address, line)
+            time.sleep(0.3)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
@@ -150,7 +169,7 @@ class IrcConnection(irc.bot.SingleServerIRCBot, Connection):
         """
         credentials = IrcConfigParser.parse_irc_config(IrcConnection.identifier)
 
-        bot = IrcConnection(credentials)
-
-        PrintLogger.print("Starting IRC connection", 1)
-        bot.start()
+        while True:
+            bot = IrcConnection(credentials)
+            PrintLogger.print("Starting IRC connection", 1)
+            bot.start()
