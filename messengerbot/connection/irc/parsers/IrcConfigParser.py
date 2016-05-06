@@ -31,7 +31,7 @@ from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 
-class IrcParser(object):
+class IrcConfigParser(object):
     """
     Class that handles the irc configuration
     """
@@ -39,15 +39,16 @@ class IrcParser(object):
     blank_config_file_template = "[credentials]\n" \
                                  "irc_username = \n" \
                                  "irc_server = \n" \
-                                 "irc_channel = "
+                                 "irc_channel = \n" \
+                                 "irc_port = 6667"
 
     @staticmethod
-    def parse_irc_config(connection_identifier: str) -> Tuple[str, str, str]:
+    def parse_irc_config(connection_identifier: str) -> Tuple[str, str, str, str]:
         """
         Parses the IRC config file and generates credentials from it
 
         :param connection_identifier: The identifier string of the Connection type
-        :return: the IRC username, the IRC server and the IRC channel
+        :return: the IRC username, the IRC server and the IRC channel and the IRC port
         """
         irc_config_file = os.path.join(LocalConfigChecker.config_directory, connection_identifier)
 
@@ -59,7 +60,7 @@ class IrcParser(object):
         # Is the file empty or doesn't have a credentials section? If yes, create basic template and delete current file
         if contents == "" or "[credentials]" not in contents:
             config_file = open(irc_config_file, 'w')
-            config_file.write(IrcParser.blank_config_file_template)
+            config_file.write(IrcConfigParser.blank_config_file_template)
             PrintLogger.print("Generated IRC Config Template, please enter your credentials in the file.")
             PrintLogger.print("The file is located at " + irc_config_file)
             sys.exit(1)
@@ -70,7 +71,10 @@ class IrcParser(object):
 
         try:
             # Get the values from the config file
-            return_tuple = (parsed_config["irc_username"], parsed_config["irc_username"], parsed_config["irc_username"])
+            return_tuple = (parsed_config["irc_username"],
+                            parsed_config["irc_server"],
+                            parsed_config["irc_channel"],
+                            parsed_config["irc_port"])
 
             # Check that all elements are entered
             for element in return_tuple:
