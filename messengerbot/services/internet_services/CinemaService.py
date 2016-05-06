@@ -60,6 +60,12 @@ class CinemaService(Service):
     Keywords for the cinema command
     """
 
+    no_information_available = {"en": "Sorry, no information available",
+                                "de": "Sorry, keine Daten verfügbar"}
+    """
+    Message sent when no information for the specified parameters could be found
+    """
+
     def process_message(self, message: Message) -> None:
         """
         Process a message according to the service's functionality
@@ -68,9 +74,16 @@ class CinemaService(Service):
         :return: None
         """
         city, in_days = self.parse_user_input(message.message_body.lower())
+        print(city)
+        print(in_days)
         cinema_data = self.get_cinema_data(city, in_days)
 
         replies = self.format_cinema_data(cinema_data)
+
+        if len(replies) == 0:
+            reply = self.no_information_available[self.connection.last_used_language]
+            reply_message = self.generate_reply_message(message, "Cinema", reply)
+            self.send_text_message(reply_message)
 
         for reply in replies:
             reply_message = self.generate_reply_message(message, "Cinema", reply)
@@ -84,7 +97,12 @@ class CinemaService(Service):
         :return: True if input is valid, False otherwise
         """
         regex = "^" + CinemaService.regex_string_from_dictionary_keys([CinemaService.cinema_keywords])
-        regex += " (([^ ,]+| )?[^ ,]+)( [0-9]+)?$"
+        regex += " (([^ ,]{1}([^,]*))?[^ ,]{1})( [0-9]+)?$"
+
+        print(regex)
+
+        if not re.search(re.compile(regex), message.message_body.lower()):
+            print("WHY NO MATCH?")
 
         return re.search(re.compile(regex), message.message_body.lower())
 
@@ -99,7 +117,7 @@ class CinemaService(Service):
         language_key, options = user_input.split(" ", 1)
         self.connection.last_used_language = self.cinema_keywords[language_key]
 
-        if re.search(r"^(([^ ,]+| )?[^ ,]+) [0-9]+$", options):
+        if re.search(r"^(([^ ,]{1}([^,]*))?[^ ,]{1})( [0-9]+)+$", options):
             city, in_days = options.rsplit(" ", 1)
             return city, int(in_days)
 
@@ -124,8 +142,8 @@ class CinemaService(Service):
                 theater_string += cinema_data[theater][movie]["runtime"] + "\n"
                 for show_time in cinema_data[theater][movie]["times"]:
                     theater_string += show_time + " "
-                cinema_data_string = theater_string.rstrip()
-                cinema_data_string += "\n\n"
+                theater_string = theater_string.rstrip()
+                theater_string += "\n\n"
             theaters.append(theater_string.rstrip())
 
         return theaters
