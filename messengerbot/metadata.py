@@ -79,7 +79,8 @@ python3_requirements = ['tvdb_api',
                         'beautifulsoup4',
                         'typing',
                         'python-telegram-bot',
-                        'gTTS']
+                        'gTTS',
+                        'irc']
 """
 Python 3 Python Packaging Index requirements
 """

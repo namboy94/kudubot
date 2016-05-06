@@ -25,57 +25,65 @@ This file is part of messengerbot.
 import os
 import sys
 import configparser
+from typing import Tuple
 
 from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 
-class TelegramConfigParser(object):
+class IrcConfigParser(object):
     """
-    Class that handles the telegram configuration
+    Class that handles the irc configuration
     """
 
     blank_config_file_template = "[credentials]\n" \
-                                 "api_key = "
+                                 "irc_username = \n" \
+                                 "irc_server = \n" \
+                                 "irc_channel = \n" \
+                                 "irc_port = 6667"
 
     @staticmethod
-    def parse_telegram_config(connection_identifier: str) -> str:
+    def parse_irc_config(connection_identifier: str) -> Tuple[str, str, str, str]:
         """
-        Parses the Telegram config file and generates credentials from it
+        Parses the IRC config file and generates credentials from it
 
         :param connection_identifier: The identifier string of the Connection type
-        :return: The API key for use with the TelegramConnection class
+        :return: the IRC username, the IRC server and the IRC channel and the IRC port
         """
-        telegram_config_file = os.path.join(LocalConfigChecker.config_directory, connection_identifier)
+        irc_config_file = os.path.join(LocalConfigChecker.config_directory, connection_identifier)
 
         # First read the current file contents and perform sanity checks
-        config_file = open(telegram_config_file, 'r')
+        config_file = open(irc_config_file, 'r')
         contents = config_file.read()
         config_file.close()
 
         # Is the file empty or doesn't have a credentials section? If yes, create basic template and delete current file
         if contents == "" or "[credentials]" not in contents:
-            config_file = open(telegram_config_file, 'w')
-            config_file.write(TelegramConfigParser.blank_config_file_template)
-            PrintLogger.print("Generated Telegram Config Template, please enter your credentials in the file.")
-            PrintLogger.print("The file is located at " + telegram_config_file)
+            config_file = open(irc_config_file, 'w')
+            config_file.write(IrcConfigParser.blank_config_file_template)
+            PrintLogger.print("Generated IRC Config Template, please enter your credentials in the file.")
+            PrintLogger.print("The file is located at " + irc_config_file)
             sys.exit(1)
 
         config = configparser.ConfigParser()
-        config.read(telegram_config_file)
+        config.read(irc_config_file)
         parsed_config = dict(config.items("credentials"))
 
         try:
             # Get the values from the config file
-            api_key = parsed_config["api_key"]
+            return_tuple = (parsed_config["irc_username"],
+                            parsed_config["irc_server"],
+                            parsed_config["irc_channel"],
+                            parsed_config["irc_port"])
 
-            # Check that the API key is filled out
-            if not api_key:
-                raise ValueError
+            # Check that all elements are entered
+            for element in return_tuple:
+                if not element:
+                    raise ValueError
 
             # If all went well, return the credentials
-            return api_key
+            return return_tuple
 
         except (KeyError, ValueError):
-            PrintLogger.print("Invalid Telegram config file loaded. Please correct this.")
+            PrintLogger.print("Invalid IRC config file loaded. Please correct this.")
             sys.exit(1)
