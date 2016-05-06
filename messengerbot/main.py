@@ -23,6 +23,7 @@ This file is part of messengerbot.
 
 # imports
 import sys
+import argparse
 import traceback
 from threading import Thread
 
@@ -42,7 +43,7 @@ A list of possible connections
 """
 
 
-def main(override: str = "", verbosity: int = 0) -> None:
+def main(override: str = "", verbosity: int = 1) -> None:
     """
     The main method of the program
 
@@ -50,25 +51,24 @@ def main(override: str = "", verbosity: int = 0) -> None:
     :param verbosity: Can be set to define how verbose the outpt will be. Defaults to 0, no or only basic output
     :return: None
     """
-    metadata.verbosity = verbosity
+    if override and len(sys.argv) == 1:
+        sys.argv.append(override)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mode", help="The connection type to start. Can be 'email', 'telegram', or 'all'")
+    parser.add_argument("--verbosity", help="Sets the output verbosity", type=int)
+    args = parser.parse_args()
+
+    metadata.verbosity = args.verbosity if args.verbosity else verbosity
 
     PrintLogger.print("Starting program", 1)
 
     try:
         try:
-            if not override:
-                # Check for invalid amount of arguments
-                if len(sys.argv) == 1:
-                    PrintLogger.print("No connection type selected.")
-                    sys.exit(1)
-                elif len(sys.argv) > 2:
-                    PrintLogger.print("Too many connection types defined")
-                    sys.exit(1)
-
             # Check if the local configs are OK and if necessary fix them
             LocalConfigChecker.check_and_fix_config(connections)
 
-            if override == "all" or (len(sys.argv) > 1 and sys.argv[1] == "all"):
+            if args.mode == "all":
                 for connection in connections:
 
                     def connect():
@@ -89,15 +89,10 @@ def main(override: str = "", verbosity: int = 0) -> None:
                 while True:
                     pass
             else:
-                if override:
-                    selected_connection = override
-                else:
-                    selected_connection = sys.argv[1]
-
                 # Generate the connection
                 connected = False
                 for connection in connections:
-                    if connection.identifier == selected_connection:
+                    if connection.identifier == args.mode:
                         connected = True
                         connection.establish_connection()
 
@@ -115,4 +110,4 @@ def main(override: str = "", verbosity: int = 0) -> None:
 
 
 if __name__ == "__main__":
-    main(override="all", verbosity=2)
+    main()
