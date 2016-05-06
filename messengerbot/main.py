@@ -43,7 +43,7 @@ A list of possible connections
 """
 
 
-def main(override: str = "", verbosity: int = 0) -> None:
+def main(override: str = "", verbosity: int = 1) -> None:
     """
     The main method of the program
 
@@ -51,15 +51,16 @@ def main(override: str = "", verbosity: int = 0) -> None:
     :param verbosity: Can be set to define how verbose the outpt will be. Defaults to 0, no or only basic output
     :return: None
     """
+    if override and len(sys.argv) == 1:
+        sys.argv.append(override)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", help="The connection type to start. Can be 'email', 'telegram', or 'all'")
     parser.add_argument("--verbosity", help="Sets the output verbosity", type=int)
     args = parser.parse_args()
 
-    if args.verbosity:
-        metadata.verbosity = args.verbosity
-    else:
-        metadata.verbosity = verbosity
+    metadata.verbosity = args.verbosity if args.verbosity else verbosity
+
     PrintLogger.print("Starting program", 1)
 
     try:
@@ -67,7 +68,7 @@ def main(override: str = "", verbosity: int = 0) -> None:
             # Check if the local configs are OK and if necessary fix them
             LocalConfigChecker.check_and_fix_config(connections)
 
-            if override == "all" or args.mode == "all":
+            if args.mode == "all":
                 for connection in connections:
 
                     def connect():
@@ -88,15 +89,10 @@ def main(override: str = "", verbosity: int = 0) -> None:
                 while True:
                     pass
             else:
-                if override:
-                    selected_connection = override
-                else:
-                    selected_connection = args.mode
-
                 # Generate the connection
                 connected = False
                 for connection in connections:
-                    if connection.identifier == selected_connection:
+                    if connection.identifier == args.mode:
                         connected = True
                         connection.establish_connection()
 
