@@ -60,6 +60,12 @@ class CinemaService(Service):
     Keywords for the cinema command
     """
 
+    no_information_available = {"en": "Sorry, no information available",
+                                "de": "Sorry, keine Daten verfügbar"}
+    """
+    Message sent when no information for the specified parameters could be found
+    """
+
     def process_message(self, message: Message) -> None:
         """
         Process a message according to the service's functionality
@@ -71,6 +77,11 @@ class CinemaService(Service):
         cinema_data = self.get_cinema_data(city, in_days)
 
         replies = self.format_cinema_data(cinema_data)
+
+        if len(replies) == 0:
+            reply = self.no_information_available[self.connection.last_used_language]
+            reply_message = self.generate_reply_message(message, "Cinema", reply)
+            self.send_text_message(reply_message)
 
         for reply in replies:
             reply_message = self.generate_reply_message(message, "Cinema", reply)
@@ -84,7 +95,7 @@ class CinemaService(Service):
         :return: True if input is valid, False otherwise
         """
         regex = "^" + CinemaService.regex_string_from_dictionary_keys([CinemaService.cinema_keywords])
-        regex += " (([^ ,]+| )?[^ ,]+)( [0-9]+)?$"
+        regex += " (([^ ,]{1}([^,]*))?[^ ,]{1})( [0-9]+)?$"
 
         return re.search(re.compile(regex), message.message_body.lower())
 
@@ -99,7 +110,7 @@ class CinemaService(Service):
         language_key, options = user_input.split(" ", 1)
         self.connection.last_used_language = self.cinema_keywords[language_key]
 
-        if re.search(r"^(([^ ,]+| )?[^ ,]+) [0-9]+$", options):
+        if re.search(r"^(([^ ,]{1}([^,]*))?[^ ,]{1})( [0-9]+)+$", options):
             city, in_days = options.rsplit(" ", 1)
             return city, int(in_days)
 
@@ -124,26 +135,31 @@ class CinemaService(Service):
                 theater_string += cinema_data[theater][movie]["runtime"] + "\n"
                 for show_time in cinema_data[theater][movie]["times"]:
                     theater_string += show_time + " "
-                cinema_data_string = theater_string.rstrip()
-                cinema_data_string += "\n\n"
+                theater_string = theater_string.rstrip()
+                theater_string += "\n\n"
             theaters.append(theater_string.rstrip())
 
         return theaters
 
     # noinspection PyTypeChecker
     @staticmethod
-    def get_cinema_data(city: str, in_days: int = 0) -> Dict[str, Dict[str, (str or List[str])]]:
+    def get_cinema_data(city: str, in_days: int = 0, theater_override: str = "") \
+            -> Dict[str, Dict[str, (str or List[str])]]:
         """
         Retrieves the data for the given parameters from google.com/movies
 
         :param city: the city whose cinemas should be listed
         :param in_days: the data from how many days into the future is requested
+        :param theater_override: Can be used to specify a specific cinema
         :return: a dictionary containing all theaters and the movies playing in them, as well
                     as some basic information on those movies as well as the show times
         """
 
         # tid == theater ID, mid == movie ID
-        payload = urlencode({"near": city, "date": str(in_days)})
+        payload = {"near": city, "date": str(in_days)}
+        if theater_override:
+            payload["tid"] = theater_override
+        payload = urlencode(payload)
 
         google_request = requests.get("http://google.com/movies?" + payload).text
         google_soup = BeautifulSoup(google_request, 'html.parser')
@@ -151,7 +167,6 @@ class CinemaService(Service):
         theaters = {}
         theater_selection = google_soup.find_all('div', attrs={'class': 'theater'})
 
-        # print(movie_selection)
         for theater in theater_selection:
             theater_name = theater.div.h2.text
 
