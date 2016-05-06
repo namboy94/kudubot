@@ -132,18 +132,23 @@ class CinemaService(Service):
 
     # noinspection PyTypeChecker
     @staticmethod
-    def get_cinema_data(city: str, in_days: int = 0) -> Dict[str, Dict[str, (str or List[str])]]:
+    def get_cinema_data(city: str, in_days: int = 0, theater_override: str = "") \
+            -> Dict[str, Dict[str, (str or List[str])]]:
         """
         Retrieves the data for the given parameters from google.com/movies
 
         :param city: the city whose cinemas should be listed
         :param in_days: the data from how many days into the future is requested
+        :param theater_override: Can be used to specify a specific cinema
         :return: a dictionary containing all theaters and the movies playing in them, as well
                     as some basic information on those movies as well as the show times
         """
 
         # tid == theater ID, mid == movie ID
-        payload = urlencode({"near": city, "date": str(in_days)})
+        payload = {"near": city, "date": str(in_days)}
+        if theater_override:
+            payload["tid"] = theater_override
+        payload = urlencode(payload)
 
         google_request = requests.get("http://google.com/movies?" + payload).text
         google_soup = BeautifulSoup(google_request, 'html.parser')
