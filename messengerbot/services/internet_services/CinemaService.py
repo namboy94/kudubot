@@ -74,8 +74,6 @@ class CinemaService(Service):
         :return: None
         """
         city, in_days = self.parse_user_input(message.message_body.lower())
-        print(city)
-        print(in_days)
         cinema_data = self.get_cinema_data(city, in_days)
 
         replies = self.format_cinema_data(cinema_data)
@@ -98,11 +96,6 @@ class CinemaService(Service):
         """
         regex = "^" + CinemaService.regex_string_from_dictionary_keys([CinemaService.cinema_keywords])
         regex += " (([^ ,]{1}([^,]*))?[^ ,]{1})( [0-9]+)?$"
-
-        print(regex)
-
-        if not re.search(re.compile(regex), message.message_body.lower()):
-            print("WHY NO MATCH?")
 
         return re.search(re.compile(regex), message.message_body.lower())
 
@@ -174,7 +167,6 @@ class CinemaService(Service):
         theaters = {}
         theater_selection = google_soup.find_all('div', attrs={'class': 'theater'})
 
-        # print(movie_selection)
         for theater in theater_selection:
             theater_name = theater.div.h2.text
 
