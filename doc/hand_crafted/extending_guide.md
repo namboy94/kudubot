@@ -1,6 +1,57 @@
 # How to extend the bot's functionality
 
+(WORK IN PROGRESS)
 
-Coming soon!
+## Preparation
 
-I promise!
+First, clone or fork the repository to get all the sources. Then, install all dependencies listed
+in messengerbot/metadata.py (or let setup.py do it for you).
+
+Now you can modify the projet files to extend the bot's funtionality.
+
+To do this effectively, you need to understand how the project is structured:
+
+
+## Project Structure
+
+The project is seperatd into three parts. There are the Services, the Connections and the Framework.
+
+The Services are individual modules that provide a bot service, for example, a service could listen to incoming
+messages that are 'ping' and then respond with 'pong'. These services are self-contained and should not do anything
+connection-depenent, but rather use the messengerbot.servicehandlers.Service Interface to send messages.
+
+The Connections are modules that handle the actual connections to the messaging servives.
+It enables listening to new incoming messages continuously and sending messages using the service as well.
+
+The framework manages the communication between the Service and Connection modules, providing an abstraction
+layer to make all connections and services exchangeable.
+
+## Creating a new Service
+
+Create a class with the following structure:
+
+```python
+from messengerbot.connection.generic.Service import Service
+
+class <ServiceNameService>(Service):
+	# Required Attributes:
+	# Optional Attributes:
+	# Required Methods:
+	# Optional Methods
+```
+
+## Creating a new Connection
+
+Create a class with the following structure:
+
+```python
+from messengerbot.connection.generic.Connection import Connection
+
+class <ConnectionName>Connection(Connection):
+	# Required Attributes:
+	# Optional Attributes:
+	# Required Methods:
+	# Optional Methods
+```
+
+## Integrating a Service or a Connection into messengerbot
