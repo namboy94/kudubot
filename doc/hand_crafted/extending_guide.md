@@ -35,6 +35,7 @@ Create a class with the following structure:
 
 ```python
 from messengerbot.connection.generic.Service import Service
+from messengerbot.connection.generic.Message import Message
 
 class <ServiceName>Service(Service):
 	# Required Attributes:
@@ -53,13 +54,16 @@ class <ServiceName>Service(Service):
 	protected = bool  # (default=False) this tells the ServiceSelectorService that this Service can not be deactivated
 					  # if this is set to true
 	
-	# Required Methods:
-	def regex_check(message) -> bool:
-		#This method checks if a message is valid to be used by the service. It is called before running process_message
-		#to ensure that only valid commands reach the service's logic.
 	
-	def process_message(self, message):
-		#This method is called if the regex_check returned True. The functionalty of the service should be bundled here
+	# Required Methods:
+	
+	@staticmethod
+	def regex_check(Message) -> bool:
+		# This method checks if a message is valid to be used by the service. It is called before running process_message
+		# to ensure that only valid commands reach the service's logic.
+	
+	def process_message(self, Message):
+		# This method is called if the regex_check returned True. The functionalty of the service should be bundled here
 	
 	# Optional Methods
 	
@@ -75,8 +79,8 @@ self.send_audio_message methods of the Service class to send messages.
 
 To integrate the Service into the bot, edit the ServiceManager class as follows:
 
-* add the created Service to the import
-* Add the Service into the 'all_services' at the position you want it to appear in the help message
+* add the created Service to the imports
+* Add the Service into the 'all_services' list at the position you want it to appear in the help message
 
 ## Creating a new Connection
 
@@ -84,16 +88,43 @@ Create a class with the following structure:
 
 ```python
 from messengerbot.connection.generic.Connection import Connection
+from messengerbot.connection.generic.Message import Message
 
 class <ConnectionName>Connection(Connection):
 	# Required Attributes:
-	identifier = str  # provide a unique identifier string for your service
 	
-	# Optional Attributes:
-	has_background_process = False
-	help
+	identifier = str  # provide a unique identifier string for your connection
+
 	# Required Methods:
+	
+	def send_text_message(Message):
+		# Implementation of sending a text message
+	
+	def send_image_message(file_path, recever_address, optional_caption):
+		# Implementation of sending an image message
+	
+	def send_audio_message(file_path, receiver_address, optional_caption):
+		# Implementation of sending an audio message
+	
+	@staticmethod
+	def establish_connection():
+		# This is a static method that establishes a new connection. It should:
+		# 	- load authentication credentials
+		#	- enter an infinite loop that listens for incoming messages, converts them into a Message object
+		#		and then calls self.on_incoming_message with the generate message as the parameter
+		#	Generally, you would want to create a new Connection object and start its mainloop defined elsewhere
+	
+	
 	# Optional Methods
+	
+	def initialize():
+		# Can be used to extend the functionality of the constructor. Don't forget to call super().initialize() in this
+		# method. You hould probably extend this method instead of __init__, especially if you extend another class
+		# besides the 
+	
 ```
 
-## Integrating a Service or a Connection into messengerbot
+To integrate the Connection into the bot, edit the main module as follows:
+
+* add the created Connection to the imports
+* Add the Connection into the 'connections' list
