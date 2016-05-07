@@ -33,12 +33,45 @@ Create a class with the following structure:
 ```python
 from messengerbot.connection.generic.Service import Service
 
-class <ServiceNameService>(Service):
+class <ServiceName>Service(Service):
 	# Required Attributes:
+	identifier = str  # provide a unique identifier string for your service
+	help_description = dict(str: str)  # A dictionary that defines help messages. The dictionary keys should be language
+									   # identifiers (For example, "en" for English or "de" for German), and the value
+									   # they map to is the help description itself.
+									   # The help description is used by the built-in Help service.
+	
 	# Optional Attributes:
+	has_background_process = bool  # (default=False) Can be used to tell the ServiceManager that this Service
+	                               # has a background process. If this is set to true, the method
+	                               # background_process will be run in a seperate thread
+	protected = bool  # (default=False) this tells the ServiceSelectorService that this Service can not be deactivated
+					  # if this is set to true
+	
+	
 	# Required Methods:
 	# Optional Methods
 ```
+
+
+
+
+
+    help_description = {"en": "A Generic Service Interface",
+                        "de": "Eine Generische Dienstleistungsschnittstelle"}
+    """
+    A dictionary containing help messages in various languages on the use of the service
+    """
+
+    identifier = "Service"
+    """
+    A unique identifier assigned to the plugin.
+    """
+
+    protected = False
+    """
+    Can be set to true if the service requires admin privileges
+    """
 
 ## Creating a new Connection
 
@@ -49,7 +82,11 @@ from messengerbot.connection.generic.Connection import Connection
 
 class <ConnectionName>Connection(Connection):
 	# Required Attributes:
+	identifier = str  # provide a unique identifier string for your service
+	
 	# Optional Attributes:
+	has_background_process = False
+	help
 	# Required Methods:
 	# Optional Methods
 ```
