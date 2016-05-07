@@ -77,6 +77,9 @@ class RestarterService(Service):
     """
 
     protected = True
+    """
+    May not be disabled
+    """
 
     def process_message(self, message: Message) -> None:
         """

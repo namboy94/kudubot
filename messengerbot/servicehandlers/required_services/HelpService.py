@@ -37,6 +37,11 @@ class HelpService(Service):
     The identifier for this service
     """
 
+    protected = True
+    """
+    May not be disabled
+    """
+
     help_description = {"en": "No Help Description Available",
                         "de": "Keine Hilfsbeschreibung verfügbar"}
     """
@@ -54,9 +59,15 @@ class HelpService(Service):
                                  "\nor \n/help <service-index>",
                            "de": "\nFür detailierte Anweisungen, geb \n/hilfe <service-name>"
                                  "\noder \n/hilfe <service-index> ein"}
+    """
+    The instruction message at the end of the help message
+    """
 
     service_not_found_warning = {"en": ("Sorry, the service \"", "\" was not found"),
                                  "de": ("Sorry, der Service \"", "\" wurde nicht gefunden")}
+    """
+    Message shown when the help service didn't find a specified service
+    """
 
     def process_message(self, message: Message) -> None:
         """

@@ -41,7 +41,7 @@ class ServiceSelectorService(Service):
 
     protected = True
     """
-    May only be used by admins
+    May not be disabled
     """
 
     help_description = {"en": "/service\tallows activation/deactivation of services (admin)\n"

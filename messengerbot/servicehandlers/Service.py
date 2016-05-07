@@ -61,7 +61,7 @@ class Service(object):
 
     protected = False
     """
-    Can be set to true if the service requires admin privileges
+    Can be set to true if the service may not be deactivated
     """
 
     def __init__(self, connection: Connection) -> None:
