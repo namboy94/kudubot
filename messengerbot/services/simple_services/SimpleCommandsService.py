@@ -28,6 +28,7 @@ from datetime import timedelta
 
 from messengerbot.servicehandlers.Service import Service
 from messengerbot.connection.generic.Message import Message
+from messengerbot.resources.images.__init__ import get_location as get_resource
 
 
 class SimpleCommandsService(Service):
@@ -50,7 +51,8 @@ class SimpleCommandsService(Service):
     """
 
     commands = {"/uptime": "en",
-                "/upzeit": "de"}
+                "/upzeit": "de",
+                "/sl": "en"}
     """
     List of commands together with the language they are in and the method they call (initialized in initialize())
     """
@@ -65,7 +67,8 @@ class SimpleCommandsService(Service):
         :return: None
         """
         self.commands = {"/uptime": ("en", self.get_uptime),
-                         "/upzeit": ("de", self.get_uptime)}
+                         "/upzeit": ("de", self.get_uptime),
+                         "/sl": ("en", self.steam_locomotive)}
 
     def process_message(self, message: Message) -> None:
         """
@@ -74,12 +77,9 @@ class SimpleCommandsService(Service):
         :param message: the message to process
         :return: None
         """
-        language = self.commands[message.message_body.lower()][0]
+        self.connection.last_used_language = self.commands[message.message_body.lower()][0]
         command = self.commands[message.message_body.lower()][1]
-
-        reply = command(language)
-        reply_message = self.generate_reply_message(message, "Simple Command", reply)
-        self.send_text_message(reply_message)
+        command(message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:
@@ -91,19 +91,31 @@ class SimpleCommandsService(Service):
         regex = "^" + Service.regex_string_from_dictionary_keys([SimpleCommandsService.commands]) + "$"
         return re.search(re.compile(regex), message.message_body.lower())
 
-    @staticmethod
-    def get_uptime(language: str) -> str:
+    def get_uptime(self, message: Message) -> None:
         """
-        Calculates the host PC's uptime and returns it as a string
+        Calculates the host PC's uptime and sends it to the sender
 
-        :param language: the language in which the command was sent
-        :return: the uptime of the computer running the bot
+        :param message: The received message
+        :return: None
         """
         if not os.path.isfile('/proc/uptime'):
-            return SimpleCommandsService.uptime_no_uptime_file[language]
+            reply = self.uptime_no_uptime_file[self.connection.last_used_language]
 
-        with open('/proc/uptime', 'r') as uptime_file:
-            uptime_seconds = float(uptime_file.readline().split()[0])
-            uptime_string = str(timedelta(seconds=uptime_seconds))
+        else:
+            with open('/proc/uptime', 'r') as uptime_file:
+                uptime_seconds = float(uptime_file.readline().split()[0])
+                uptime_string = str(timedelta(seconds=uptime_seconds))
+            reply = "Uptime: " + uptime_string
 
-        return "Uptime: " + uptime_string
+        reply_message = self.generate_reply_message(message, "Uptime", reply)
+        self.send_text_message(reply_message)
+
+    def steam_locomotive(self, message: Message) -> None:
+        """
+        Sends an image of a Steam locomotive to the sender
+
+        :param message: the received message
+        :return: None
+        """
+        image_file = get_resource("sl.jpg")
+        self.send_image_message(message.address, image_file)
