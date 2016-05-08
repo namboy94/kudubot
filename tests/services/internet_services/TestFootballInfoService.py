@@ -35,8 +35,6 @@ class TestFootballInfoService(object):
     A Unit Test Class for a Service class
     """
 
-    # TODO allow syntax like italy, serie a
-
     correct_messages = ["/matchday germany, bundesliga", "/league germany, bundesliga",
                         "/league england, premier-league", "/matchday namibia, premier-league",
                         "/league italy, serie a"]

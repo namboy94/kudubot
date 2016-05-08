@@ -34,11 +34,10 @@ class TestEmailSenderService(object):
     """
     A Unit Test Class for a Service class
     """
-    # TODO MAKE ^ PART OF REGEX
-    # TODO CHECK TLD ENDING
 
     correct_messages = ["/email \"Test\" user@domain.tld", "/email \"Test\" \"Title\" user@domain.tld",
-                        "/email \"Test Message\" user@domain.tld", "/email \"Te st\" \"Title Test\" user@domain.tld"]
+                        "/email \"Test Message\" user@domain.tld", "/email \"Te st\" \"Title Test\" user@domain.tld",
+                        "/email \"@#$%^&*(&^%*&úüéð®fëfðfëáfå,,w,e,d,d,...asdsd    e.. . .dfdaasdsad\" user@domain.tld"]
     incorrect_messages = ["---/email \"test\" user@domain.com", "/email \"test\" user@domain.com---", "/email",
                           "/email \"tes\"t message\" user@domain.tld", "/email \"tes\"t \"mes\"sage\" user@domain.tld"]
     service = EmailSenderService
@@ -76,8 +75,9 @@ class TestEmailSenderService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)

@@ -37,7 +37,8 @@ class TestCinemaService(object):
 
     correct_messages = ["/cinema karlsruhe", "/cinema karlsruhe 10", "/cinema new york city 20", "/cinema cape town",
                         "/kino place"]
-    incorrect_messages = ["/cinem karlsruhe", "/cinema karlsruhe -1", "balaalal/cinema karlsruhe shjsncksjsaax"]
+    incorrect_messages = ["/cinem karlsruhe", "/cinema karlsruhe -1", "balaalal/cinema karlsruhe shjsncksjsaax",
+                          "balaalal/cinema karlsruhe---------"]
     service = CinemaService
 
     @classmethod
@@ -73,8 +74,9 @@ class TestCinemaService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)
