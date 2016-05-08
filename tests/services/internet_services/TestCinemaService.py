@@ -37,7 +37,8 @@ class TestCinemaService(object):
 
     correct_messages = ["/cinema karlsruhe", "/cinema karlsruhe 10", "/cinema new york city 20", "/cinema cape town",
                         "/kino place"]
-    incorrect_messages = ["/cinem karlsruhe", "/cinema karlsruhe -1", "balaalal/cinema karlsruhe shjsncksjsaax"]
+    incorrect_messages = ["/cinem karlsruhe", "/cinema karlsruhe -1", "balaalal/cinema karlsruhe shjsncksjsaax",
+                          "balaalal/cinema karlsruhe---------"]
     service = CinemaService
 
     @classmethod

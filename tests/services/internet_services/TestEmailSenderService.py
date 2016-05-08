@@ -34,8 +34,6 @@ class TestEmailSenderService(object):
     """
     A Unit Test Class for a Service class
     """
-    # TODO MAKE ^ PART OF REGEX
-    # TODO CHECK TLD ENDING
 
     correct_messages = ["/email \"Test\" user@domain.tld", "/email \"Test\" \"Title\" user@domain.tld",
                         "/email \"Test Message\" user@domain.tld", "/email \"Te st\" \"Title Test\" user@domain.tld",

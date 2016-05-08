@@ -35,8 +35,10 @@ class TestGoogleTtsService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    correct_messages = ["/say \"Voice Message\"", "/sag \"Sprachnachricht\"", "/say \"Some Message\" de",
+                        "/say \"Test\" en", "/say \"Test,,,,,,,,,ss,s,s,s,s,s,s,ssss''a''a'a's'aaa\" en"]
+    incorrect_messages = ["/say", "/sag", "/say \"Te\"st\"", "/say something \"more\"", "/say \"Test\" fictional",
+                          "/say \"test\" fr-----", "-----/say \"test\" fr", "/sag/say \"ssdsd \"", "/say \"\" en"]
     service = GoogleTtsService
 
     @classmethod
