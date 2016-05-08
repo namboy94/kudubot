@@ -35,8 +35,13 @@ class TestFootballInfoService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    # TODO allow syntax like italy, serie a
+
+    correct_messages = ["/matchday germany, bundesliga", "/league germany, bundesliga",
+                        "/league england, premier-league", "/matchday namibia, premier-league",
+                        "/league italy, serie a"]
+    incorrect_messages = ["/matchday", "/league", "/matchday, germany, bundesliga", "/league germany,, bundesliga",
+                          "---/matchday germany, bundesliga", "/league spain, liga-adelante-----"]
     service = FootballInfoService
 
     @classmethod
@@ -72,8 +77,9 @@ class TestFootballInfoService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)
