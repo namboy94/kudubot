@@ -108,7 +108,7 @@ class EmailSenderService(Service):
         body = parts.split("\"", 2)[1]
         parts = parts.split("\"", 2)[2]
 
-        if re.search(r" (\"[^\"]+\" )[^ ]+@[^ ]+.[a-zA-Z]+$", parts):
+        if re.search(r" (\"[^\"]+\" )[^ ]+@[^ ]+\.[a-zA-Z]+$", parts):
             title = parts.split("\"", 2)[1]
         else:
             title = ""
