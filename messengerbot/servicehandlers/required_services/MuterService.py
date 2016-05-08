@@ -41,7 +41,7 @@ class MuterService(Service):
 
     protected = True
     """
-    May only be used by admins
+    May not be disabled
     """
 
     help_description = {"en": "/mute\tmutes the whatsbot (admin)\n"

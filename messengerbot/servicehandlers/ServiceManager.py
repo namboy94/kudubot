@@ -93,9 +93,7 @@ class ServiceManager(object):
     A list of all implemented services
     """
 
-    protected_services = [HelpService,
-                          MuterService,
-                          ServiceSelectorService]
+    protected_services = []
     """
     A list of services that may not be deactivated
     """
@@ -118,6 +116,10 @@ class ServiceManager(object):
         :param connection: The connection that handles the communication for the services
         :return: None
         """
+        for service in self.all_services:
+            if service.protected:
+                self.protected_services.append(service)
+
         self.connection = connection
         self.active_services = ServiceConfigParser.read_config(self.all_services, connection.identifier)
         self.start_background_processes()
