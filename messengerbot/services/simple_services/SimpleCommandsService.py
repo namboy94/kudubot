@@ -105,5 +105,6 @@ class SimpleCommandsService(Service):
         with open('/proc/uptime', 'r') as uptime_file:
             uptime_seconds = float(uptime_file.readline().split()[0])
             uptime_string = str(timedelta(seconds=uptime_seconds))
+            uptime_string = uptime_string.split(".")[0]
 
         return "Uptime: " + uptime_string
