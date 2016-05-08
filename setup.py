@@ -63,9 +63,9 @@ setup(name=metadata.project_name,
       license=metadata.license_type,
       packages=find_packages(),
       install_requires=metadata.python3_requirements,
+      scripts=metadata.scripts,
       test_suite='nose.collector',
       tests_require=['nose'],
-      scripts=metadata.scripts,
       zip_safe=False)
 
 # How to upload to pypi:
