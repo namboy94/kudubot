@@ -92,7 +92,7 @@ class EmailSenderService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        return re.search(r"^/email (\"[^\"]+\") (\"[^\"]+\" )?[^ ]+@[^ ]+$", message.message_body)
+        return re.search(r"^/email (\"[^\"]+\") (\"[^\"]+\" )?[^ ]+@[^ ]+.[a-zA-Z]+$", message.message_body)
 
     @staticmethod
     def parse_user_input(user_input) -> Tuple[str, str, str]:
@@ -108,7 +108,7 @@ class EmailSenderService(Service):
         body = parts.split("\"", 2)[1]
         parts = parts.split("\"", 2)[2]
 
-        if re.search(r" (\"[^\"]+\" )[^ ]+@[^ ]+$", parts):
+        if re.search(r" (\"[^\"]+\" )[^ ]+@[^ ]+.[a-zA-Z]+$", parts):
             title = parts.split("\"", 2)[1]
         else:
             title = ""
