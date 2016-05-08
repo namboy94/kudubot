@@ -43,9 +43,11 @@ class SimpleCommandsService(Service):
     """
 
     help_description = {"en": "Simple Commands: Collection of Commands that do simple things\n"
-                              "/uptime\tDisplays the uptime of the server running the bot",
+                              "/uptime\tDisplays the uptime of the server running the bot\n"
+                              "/sl\tlike ls, but different.",
                         "de": "Simple Befehle: Sammlung von Befehlen die simple Sachen machen\n"
-                              "/upzeit\tZeigt die 'uptime' des Servers auf dem der Bot läuft"}
+                              "/upzeit\tZeigt die 'uptime' des Servers auf dem der Bot läuft\n"
+                              "/sl\twie ls, aber anders"}
     """
     Help description for this service.
     """
