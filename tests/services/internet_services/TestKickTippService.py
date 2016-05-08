@@ -35,8 +35,8 @@ class TestKickTippService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    correct_messages = ["/kicktipp kickers", "/kicktipp xyz-community"]
+    incorrect_messages = ["---/kicktipp kickers", "/kicktipp kicker-community---", "/kicktipp xyz community"]
     service = KickTippService
 
     @classmethod

@@ -35,7 +35,7 @@ class TestKitMensaService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
+    correct_messages = ["/mensa", "/mensa tomorrow", "/mensa linie 1 morgen"]
     incorrect_messages = []
     service = KitMensaService
 
