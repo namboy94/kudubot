@@ -45,6 +45,7 @@ class SimpleContainsResponseService(Service):
     per say.
     """
 
+    # noinspection PyRedundantParentheses
     case_insensitive_options = {("keks", "cookie"): ["Ich will auch Kekse!",
                                                      "Wo gibt's Kekse?",
                                                      "Kekse sind klasse!",
@@ -60,7 +61,10 @@ class SimpleContainsResponseService(Service):
                                 ("beste bot", "bester bot"): ["😘"],
                                 ("doofer bot", "scheiß bot"): ["🖕🏻", "😡"],
                                 ("chicken", "nuggets", "huhn", "hühnchen"): ["🐤", "Die armen Kücken!\n🐤🐤🐤"],
-                                ("scheiße", "kacke"): ["💩"]}
+                                ("scheiße", "kacke"): ["💩"],
+                                ("kaputt", "zerbrochen"): ["¯\\_(ツ)_/¯"],
+                                ("😂", "😂"): ["😂😂😂"],
+                                ("FC Bayern"): ["Mia san mia!", "Deutscher Meister 2016! (+25 andere Jahre)"]}
     """
     Case-insensitive defined response conditions and responses
     """
