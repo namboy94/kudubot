@@ -26,6 +26,10 @@ uninstall:
 
 run_unit_tests:
   stage: test
+  only:
+    - master
+    - develop
+    - unit-test
   script:
     - cd
     - cd messengerbot
@@ -33,6 +37,8 @@ run_unit_tests:
 
 generate_statistics:
   stage: test
+  only:
+    - master
   script:
     - cd
     - cd messengerbot
@@ -69,6 +75,8 @@ upload_to_pypi:
 
 upload_documentation_and_statistics:
   stage: upload
+  only:
+    - master
   script:
     - cd
     - cd messengerbot.wiki
