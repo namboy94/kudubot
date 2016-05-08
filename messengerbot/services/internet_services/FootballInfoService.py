@@ -117,7 +117,7 @@ class FootballInfoService(Service):
         # Generate the Regex
         regex_term = "^/" + Service.regex_string_from_dictionary_keys([FootballInfoService.league_descriptors,
                                                                        FootballInfoService.matchday_descriptors]) \
-                     + "( [^ ]+, [^ ]+)$"
+                     + "( [a-zA-Z]+, [a-zA-Z]+( |[a-zA-Z]+|-)*)[a-zA-Z]+$"
 
         return re.search(re.compile(regex_term), message.message_body.lower())
 
@@ -140,7 +140,7 @@ class FootballInfoService(Service):
         # Determine league and country
         country_league = message_text.split(" ", 1)[1]
         self.country = country_league.split(", ")[0]
-        self.league = country_league.split(", ")[1]
+        self.league = country_league.split(", ")[1].replace(" ", "-")
 
     def get_league_info(self) -> str:
         """
