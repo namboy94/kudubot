@@ -95,8 +95,7 @@ class CinemaService(Service):
         :return: True if input is valid, False otherwise
         """
         regex = "^" + CinemaService.regex_string_from_dictionary_keys([CinemaService.cinema_keywords])
-        regex += " (([^ ,]{1}([^,]*))?[^ ,]{1})( [0-9]+)?$"
-
+        regex += " (([a-zA-Z]{1}(([a-zA-Z]| )*))?[a-zA-Z]{1})( [0-9]+)?$"
         return re.search(re.compile(regex), message.message_body.lower())
 
     def parse_user_input(self, user_input: str) -> Tuple[str, int]:
