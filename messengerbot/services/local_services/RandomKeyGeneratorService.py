@@ -39,11 +39,18 @@ class RandomKeyGeneratorService(Service):
     The identifier for this service
     """
 
-    help_description = {"en": "No Help Description Available",
-                        "de": "Keine Hilfsbeschreibung verfügbar"}
+    help_description = {"en": "/randomkey\tgenerates a random key\n"
+                              "syntax:\n"
+                              "/randomkey <length>",
+                        "de": "/zufallschlüssel\tgeneriert einen zufälligen Schlüssel\n"
+                              "syntax:\n"
+                              "/zufallschlüssel <Länge>"}
     """
     Help description for this service.
     """
+
+    random_key_keywords = {"/randomkey": "en",
+                           "/zufallschlüssel": "de"}
 
     def process_message(self, message: Message) -> None:
         """
@@ -63,5 +70,6 @@ class RandomKeyGeneratorService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        regex = ""
+        regex = "^" + Service.regex_string_from_dictionary_keys([RandomKeyGeneratorService.random_key_keywords]) \
+                + " [0-9]+$"
         return re.search(re.compile(regex), message.message_body.lower())
