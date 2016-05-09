@@ -112,8 +112,7 @@ class YowsupEchoLayer(YowInterfaceLayer):
         jid = self.alias_to_jid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO, filePath=path)
 
-        def success_fn(success_entity: TextMessageProtocolEntity, original_entity: MessageProtocolEntity) \
-                -> None:
+        def success_fn(success_entity: TextMessageProtocolEntity, original_entity: MessageProtocolEntity) -> None:
             """
             Function called on successful media upload
 
@@ -272,7 +271,7 @@ class YowsupEchoLayer(YowInterfaceLayer):
         entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
         self.toLower(entity)
 
-    def do_send_audio(self, file_path: str, url: str, to: str, ip: str = None) -> None:
+    def do_send_audio(self, file_path: str, url: str, to: str, ip: str = None, caption: str = None) -> None:
         """
         Sends an audio file
 
@@ -280,8 +279,10 @@ class YowsupEchoLayer(YowInterfaceLayer):
         :param url: the whatsapp upload url
         :param to: the receiver of the file
         :param ip: the ip of the receiver
+        :param caption: the caption to be displayed together with the audio
         :return: None
         """
+        print(AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to))
         entity = AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to)
         self.toLower(entity)
 
