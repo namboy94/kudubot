@@ -22,6 +22,7 @@ This file is part of messengerbot.
 """
 
 # imports
+import time
 import traceback
 
 import messengerbot.metadata as metadata
@@ -122,6 +123,13 @@ class Connection(object):
             PrintLogger.print("blocked message from blacklisted user " + message.address, 2)
             return
 
+        print(message.timestamp)
+        print(time.time())
+
+        # Check if the message is new enough to consider
+        if message.timestamp < (time.time() - 300.00):
+            return
+
         # Process and log the message
         self.message_logger.log_message(message)
         try:
@@ -134,6 +142,7 @@ class Connection(object):
         except Exception as e:
             stack_trace = traceback.format_exc()
             ExceptionLogger.log_exception(e, stack_trace, self.identifier, message)
+        time.sleep(1)  # TO avoid overloading any servers/get the bot banned
 
     @staticmethod
     def establish_connection() -> None:

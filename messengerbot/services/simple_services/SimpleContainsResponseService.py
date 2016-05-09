@@ -113,5 +113,4 @@ class SimpleContainsResponseService(Service):
                 if ind_key in message.message_body.lower():
                     matches += 1
 
-        print(matches)
         return matches == 1
