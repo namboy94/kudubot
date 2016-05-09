@@ -35,8 +35,8 @@ class TestEqualsResponseService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    correct_messages = ["uptime"]
+    incorrect_messages = [" uptime "]
     service = SimpleEqualsResponseService
 
     @classmethod

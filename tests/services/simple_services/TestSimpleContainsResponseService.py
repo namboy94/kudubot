@@ -35,8 +35,8 @@ class TestSimpleContainsResponseService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    correct_messages = ["Keks", "Ich habe heute kuchen gegessen", "CHICKEN!!!", "Dies ist der beste Bot."]
+    incorrect_messages = ["Ich habe nichts zu verstecken", "These tests are useles"]
     service = SimpleContainsResponseService
 
     @classmethod
