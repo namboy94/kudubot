@@ -83,9 +83,13 @@ class CinemaService(Service):
             reply_message = self.generate_reply_message(message, "Cinema", reply)
             self.send_text_message(reply_message)
 
+        # We don't want to spam, so a current workaround is to only show largest theater
+        largest_reply = ""
         for reply in replies:
-            reply_message = self.generate_reply_message(message, "Cinema", reply)
-            self.send_text_message(reply_message)
+            if len(reply) > len(largest_reply):
+                largest_reply = reply
+        reply_message = self.generate_reply_message(message, "Cinema", largest_reply)
+        self.send_text_message(reply_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:

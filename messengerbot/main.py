@@ -32,11 +32,11 @@ from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.logger.ExceptionLogger import ExceptionLogger
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 from messengerbot.connection.email.EmailConnection import EmailConnection
-# from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
+from messengerbot.connection.whatsapp.WhatsappConnection import WhatsappConnection
 from messengerbot.connection.telegram.TelegramConnection import TelegramConnection
 
 connections = [EmailConnection,
-               # WhatsappConnection,
+               WhatsappConnection,
                TelegramConnection]
 """
 A list of possible connections
