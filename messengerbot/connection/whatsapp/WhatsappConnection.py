@@ -23,6 +23,7 @@ This file is part of messengerbot.
 
 # imports
 import re
+import traceback
 
 from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.interface import ProtocolEntityCallback
@@ -30,6 +31,7 @@ from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocol
 
 from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
+from messengerbot.logger.ExceptionLogger import ExceptionLogger
 from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.whatsapp.layers.YowsupEchoLayer import YowsupEchoLayer
 from messengerbot.connection.whatsapp.stacks.YowsupEchoStack import YowsupEchoStack
@@ -101,11 +103,15 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         :return: None
         """
         credentials = WhatsappConfigParser.parse_whatsapp_config(WhatsappConnection.identifier)
-        echo_stack = YowsupEchoStack(WhatsappConnection, credentials)
 
-        PrintLogger.print("Starting Whatsapp Connection", 1)
-
-        echo_stack.start()
+        while True:
+            try:
+                PrintLogger.print("Starting Whatsapp Connection", 1)
+                echo_stack = YowsupEchoStack(WhatsappConnection, credentials)
+                echo_stack.start()
+            except Exception as e:
+                stack_trace = traceback.format_exc()
+                ExceptionLogger.log_exception(e, stack_trace, "whatsapp")
 
     @ProtocolEntityCallback("message")
     def on_message(self, message_protocol_entity: TextMessageProtocolEntity):
