@@ -35,6 +35,7 @@ from messengerbot.services.local_services.RouletteService import RouletteService
 from messengerbot.services.local_services.ReminderService import ReminderService
 from messengerbot.services.local_services.RestarterService import RestarterService
 from messengerbot.services.local_services.WeeklyReminderService import WeeklyReminderService
+from messengerbot.services.local_services.RandomKeyGeneratorService import RandomKeyGeneratorService
 from messengerbot.services.internet_services.KvvService import KvvService
 from messengerbot.services.internet_services.XkcdService import XkcdService
 from messengerbot.services.internet_services.TvdbService import TvdbService
@@ -86,6 +87,7 @@ class ServiceManager(object):
                     KitMensaService,
                     EmailSenderService,
                     ImageSenderService,
+                    RandomKeyGeneratorService,
                     SimpleCommandsService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]
