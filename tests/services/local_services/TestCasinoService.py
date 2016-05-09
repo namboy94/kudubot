@@ -35,7 +35,7 @@ class TestCasinoService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
+    correct_messages = ["/casino beg", "/casino balance"]
     incorrect_messages = []
     service = CasinoService
 

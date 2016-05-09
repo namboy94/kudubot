@@ -35,8 +35,8 @@ class TestSimpleCommandsService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    correct_messages = ["/uptime", "/sl", "upzeit"]
+    incorrect_messages = ["/uptime   ", "   /sl", "    / //   /upzeit  / /  "]
     service = SimpleCommandsService
 
     @classmethod
