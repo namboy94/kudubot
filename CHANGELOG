@@ -1,3 +1,8 @@
+V 0.7
+  - Fixed Whatsapp Connection
+  - Added Random Key Generator Service
+  - Expanded Unit Testing
+  - Implemented rudimentary spam protection
 V 0.6.5.5
   - Added some more mple commands/responses
 V 0.6.5.2
