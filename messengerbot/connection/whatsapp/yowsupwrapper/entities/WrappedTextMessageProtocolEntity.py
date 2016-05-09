@@ -83,7 +83,7 @@ class WrappedTextMessageProtocolEntity(EntityAdapter):
         :param broken_emoji: The broken unicode string
         :return: the fixed string
         """
-
+        return broken_emoji
         # Don't touch this. It works, trust me.
 
         byte_emoji = bytes(broken_emoji, 'utf-8')
@@ -109,6 +109,8 @@ class WrappedTextMessageProtocolEntity(EntityAdapter):
         :param good_unicode: the outgoing unicode string
         :return: the fixed string
         """
+
+        return good_unicode
 
         # Don't touch this. It works, trust me.
 
