@@ -138,7 +138,8 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         group = False
         individual_number = ""
         individual_name = ""
-        timestamp = int(message_protocol_entity.get_time_stamp())
+
+        timestamp = float(message_protocol_entity.get_time_stamp())
 
         if re.search(r"[0-9]+-[0-9]+", group_identifier):
             group = True

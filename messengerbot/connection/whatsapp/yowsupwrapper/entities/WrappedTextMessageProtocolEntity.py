@@ -75,6 +75,7 @@ class WrappedTextMessageProtocolEntity(EntityAdapter):
         else:
             return self.entity
 
+    # noinspection PyUnreachableCode
     @staticmethod
     def fix_incoming_unicode(broken_emoji):
         """
@@ -83,7 +84,10 @@ class WrappedTextMessageProtocolEntity(EntityAdapter):
         :param broken_emoji: The broken unicode string
         :return: the fixed string
         """
+        # Since the bot is currently working fine without this hack, just return the original message.
+        # I'll keep the code here just in case
 
+        return broken_emoji
         # Don't touch this. It works, trust me.
 
         byte_emoji = bytes(broken_emoji, 'utf-8')
@@ -102,6 +106,7 @@ class WrappedTextMessageProtocolEntity(EntityAdapter):
         good_byte_emoji = bytes(good_byte_emoji)
         return good_byte_emoji.decode()
 
+    # noinspection PyUnreachableCode
     @staticmethod
     def fix_outgoing_unicode(good_unicode):
         """
@@ -109,6 +114,10 @@ class WrappedTextMessageProtocolEntity(EntityAdapter):
         :param good_unicode: the outgoing unicode string
         :return: the fixed string
         """
+        # Since the bot is currently working fine without this hack, just return the original message.
+        # I'll keep the code here just in case
+
+        return good_unicode
 
         # Don't touch this. It works, trust me.
 

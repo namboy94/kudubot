@@ -22,24 +22,13 @@ This file is part of messengerbot.
 """
 
 # imports
-from yowsup.stacks import YowStack
-from yowsup.layers import YowLayerEvent
-from yowsup.layers import YowParallelLayer
-from yowsup.layers.auth import YowCryptLayer
-from yowsup.layers.coder import YowCoderLayer
-from yowsup.layers.logger import YowLoggerLayer
-from yowsup.layers.network import YowNetworkLayer
-from yowsup.layers.interface import YowInterfaceLayer
-from yowsup.layers.protocol_iq import YowIqProtocolLayer
-from yowsup.layers.protocol_acks import YowAckProtocolLayer
-from yowsup.layers.stanzaregulator import YowStanzaRegulator
-from yowsup.layers.auth import YowAuthenticationProtocolLayer
-from yowsup.layers.protocol_calls import YowCallsProtocolLayer
-from yowsup.layers.protocol_media import YowMediaProtocolLayer
-from yowsup.layers.protocol_messages import YowMessagesProtocolLayer
-from yowsup.layers.protocol_receipts import YowReceiptProtocolLayer
-
 from messengerbot.logger.PrintLogger import PrintLogger
+
+from messengerbot.yowsup.layers import YowLayerEvent
+from messengerbot.yowsup.layers.auth import AuthError
+from messengerbot.yowsup.stacks import YowStackBuilder
+from messengerbot.yowsup.layers.network import YowNetworkLayer
+from messengerbot.yowsup.layers.interface import YowInterfaceLayer
 
 
 class YowsupEchoStack(object):
@@ -47,7 +36,7 @@ class YowsupEchoStack(object):
     The Yowsup Stack that handles the communication to the whatsapp servers
     """
 
-    def __init__(self, bot_layer: YowInterfaceLayer, credentials, encryption_enabled=False) -> None:
+    def __init__(self, bot_layer: YowInterfaceLayer, credentials, encryption_enabled=True) -> None:
         """
         :param bot_layer: The Yowsup layer to include in the stack
         :param credentials: The credentials used to log in on the whatsapp servers
@@ -55,42 +44,12 @@ class YowsupEchoStack(object):
 
         :return: None
         """
-        if encryption_enabled:
-            from yowsup.layers.axolotl import YowAxolotlLayer
-            layers = (
-                bot_layer,
-                YowParallelLayer([YowAuthenticationProtocolLayer,
-                                  YowMessagesProtocolLayer,
-                                  YowReceiptProtocolLayer,
-                                  YowAckProtocolLayer,
-                                  YowMediaProtocolLayer,
-                                  YowIqProtocolLayer,
-                                  YowCallsProtocolLayer]),
-                YowAxolotlLayer,
-                YowLoggerLayer,
-                YowCoderLayer,
-                YowCryptLayer,
-                YowStanzaRegulator,
-                YowNetworkLayer
-            )
-        else:
-            layers = (
-                bot_layer,
-                YowParallelLayer([YowAuthenticationProtocolLayer,
-                                  YowMessagesProtocolLayer,
-                                  YowReceiptProtocolLayer,
-                                  YowAckProtocolLayer,
-                                  YowMediaProtocolLayer,
-                                  YowIqProtocolLayer,
-                                  YowCallsProtocolLayer]),
-                YowLoggerLayer,
-                YowCoderLayer,
-                YowCryptLayer,
-                YowStanzaRegulator,
-                YowNetworkLayer
-            )
+        stack_builder = YowStackBuilder()
+        self.stack = stack_builder \
+            .pushDefaultLayers(encryption_enabled) \
+            .push(bot_layer) \
+            .build()
 
-        self.stack = YowStack(layers)
         self.stack.setCredentials(credentials)
 
     def start(self) -> None:
@@ -102,5 +61,5 @@ class YowsupEchoStack(object):
         self.stack.broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT))
         try:
             self.stack.loop()
-        except Exception as e:
+        except AuthError as e:
             PrintLogger.print("Authentication Error: %s" % str(e))

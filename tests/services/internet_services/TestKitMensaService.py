@@ -35,8 +35,8 @@ class TestKitMensaService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    correct_messages = ["/mensa", "/mensa tomorrow", "/mensa linie 1 morgen", "/mensa schnitzelbar"]
+    incorrect_messages = ["/mensa linie 7", "/mensa morgen linie 2"]
     service = KitMensaService
 
     @classmethod
@@ -72,8 +72,9 @@ class TestKitMensaService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)

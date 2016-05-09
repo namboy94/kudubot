@@ -87,4 +87,4 @@ class ImageSenderService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        return re.search(r"^/img (http(s)?://|www.)[^;>\| ]+(.png|.jpg)$", message.message_body)
+        return re.search(r"^/img (http(s)?://|www.)[^;>\| ]+\.[^;>\| ]+/[^;>\| ]+(\.png|\.jpg)$", message.message_body)
