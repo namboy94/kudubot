@@ -1,3 +1,7 @@
+V 0.7.0.1
+  - Added message length spam protection
+V 0.7.0.1
+  - Removed yowsup from internal project
 V 0.7
   - Fixed Whatsapp Connection
   - Added Random Key Generator Service
