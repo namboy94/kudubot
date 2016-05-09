@@ -36,7 +36,7 @@ project_description = "A bot that interfaces with several different messenger se
 A short description of the project
 """
 
-version_number = "0.7"
+version_number = "0.7.0.1"
 """
 The current version of the program.
 """
@@ -73,7 +73,7 @@ The project's license type
 """
 
 python3_requirements = ['tvdb_api',
-                        'yowsup2',
+                        # 'yowsup2',     Currently the develop branch is needed, which is not on pypi
                         'pywapi',
                         'pillow',
                         'beautifulsoup4',

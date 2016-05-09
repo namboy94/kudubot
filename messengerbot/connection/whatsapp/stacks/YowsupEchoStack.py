@@ -24,11 +24,11 @@ This file is part of messengerbot.
 # imports
 from messengerbot.logger.PrintLogger import PrintLogger
 
-from messengerbot.yowsup.layers import YowLayerEvent
-from messengerbot.yowsup.layers.auth import AuthError
-from messengerbot.yowsup.stacks import YowStackBuilder
-from messengerbot.yowsup.layers.network import YowNetworkLayer
-from messengerbot.yowsup.layers.interface import YowInterfaceLayer
+from yowsup.layers import YowLayerEvent
+from yowsup.layers.auth import AuthError
+from yowsup.stacks import YowStackBuilder
+from yowsup.layers.network import YowNetworkLayer
+from yowsup.layers.interface import YowInterfaceLayer
 
 
 class YowsupEchoStack(object):
