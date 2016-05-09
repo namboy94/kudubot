@@ -23,6 +23,8 @@ This file is part of messengerbot.
 
 # imports
 import re
+import random
+import string
 
 from messengerbot.servicehandlers.Service import Service
 from messengerbot.connection.generic.Message import Message
@@ -49,8 +51,16 @@ class RandomKeyGeneratorService(Service):
     Help description for this service.
     """
 
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    """
+    The alphabet to be used to generate a random key
+    """
+
     random_key_keywords = {"/randomkey": "en",
                            "/zufallschlüssel": "de"}
+    """
+    Keywords for the /randomkey command
+    """
 
     def process_message(self, message: Message) -> None:
         """
@@ -59,7 +69,10 @@ class RandomKeyGeneratorService(Service):
         :param message: the message to process
         :return: None
         """
-        reply = ""
+        language, length = message.message_body.lower().split(" ", 1)
+        self.connection.last_used_language = self.random_key_keywords[language]
+
+        reply = self.generate_key(int(length))
         reply_message = self.generate_reply_message(message, "Random Key", reply)
         self.send_text_message(reply_message)
 
@@ -73,3 +86,15 @@ class RandomKeyGeneratorService(Service):
         regex = "^" + Service.regex_string_from_dictionary_keys([RandomKeyGeneratorService.random_key_keywords]) \
                 + " [0-9]+$"
         return re.search(re.compile(regex), message.message_body.lower())
+
+    def generate_key(self, length: int) -> str:
+        """
+        Generates a random key of specified length using the alphabet specified as class variable
+
+        :param length: the length of the keyphrase
+        :return: the random key
+        """
+        random_key = ""
+        for x in range(0, length):
+            random_key += random.choice(self.alphabet)
+        return random_key
