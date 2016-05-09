@@ -110,4 +110,4 @@ def main(override: str = "", verbosity: int = 1) -> None:
 
 
 if __name__ == "__main__":
-    main(override="whatsapp", verbosity=100)
+    main()

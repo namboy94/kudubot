@@ -123,9 +123,6 @@ class Connection(object):
             PrintLogger.print("blocked message from blacklisted user " + message.address, 2)
             return
 
-        print(message.timestamp)
-        print(time.time())
-
         # Check if the message is new enough to consider
         if message.timestamp < (time.time() - 300.00):
             return
