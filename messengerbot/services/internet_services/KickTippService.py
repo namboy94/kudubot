@@ -70,7 +70,7 @@ class KickTippService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        return message.message_body.startswith("/kicktipp ") and len(message.message_body) > len("/kicktipp ")
+        return re.search(r"^/kicktipp [a-z]+(\-|[a-z]+)*[a-z]+$", message.message_body.lower())
 
     def get_kicktipp_info(self, kicktipp_community: str) -> str:
         """
