@@ -125,6 +125,7 @@ class Connection(object):
 
         # Check if the message is new enough to consider
         if message.timestamp < (time.time() - 300.00):
+            PrintLogger.print("blocked old message", 2)
             return
 
         # Process and log the message

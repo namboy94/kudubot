@@ -88,7 +88,7 @@ class Service(object):
         :param message: the message to be sent
         :return: None
         """
-        if not self.connection.muted:
+        if not self.connection.muted and len(message.message_body) < 2048:
             self.connection.message_logger.log_message(message)
             self.connection.send_text_message(message)
 
