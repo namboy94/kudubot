@@ -25,39 +25,46 @@ This file is part of messengerbot.
 import os
 import sys
 
+from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.interface import ProtocolEntityCallback
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers.protocol_messages.protocolentities import MessageProtocolEntity
 from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
 from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
+from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
+from yowsup.layers.protocol_media.protocolentities import AudioDownloadableMediaMessageProtocolEntity
+
 
 from messengerbot.logger.PrintLogger import PrintLogger
-from messengerbot.connection.whatsapp.yowsupwrapper.entities.EntityAdapter import EntityAdapter
-from messengerbot.connection.whatsapp.yowsupwrapper.WrappedYowInterfaceLayer import WrappedYowInterfaceLayer
-from messengerbot.connection.whatsapp.yowsupwrapper.entities.WrappedTextMessageProtocolEntity import \
-    WrappedTextMessageProtocolEntity
-from messengerbot.connection.whatsapp.yowsupwrapper.entities.WrappedImageDownloadableMediaMessageProtocolEntity import \
-    WrappedImageDownloadableMediaMessageProtocolEntity
-from messengerbot.connection.whatsapp.yowsupwrapper.entities.WrappedAudioDownloadableMediaMessageProtocolEntity import \
-    WrappedAudioDownloadableMediaMessageProtocolEntity
 
 
-class YowsupEchoLayer(WrappedYowInterfaceLayer):
+class YowsupEchoLayer(YowInterfaceLayer):
     """
     The Yowsup Echo layer class
     The layer component of the whatsapp connection. Used to receive messages.
     """
 
+    # Required local variables
+    disconnect_action_prompt = 0
+    accountDelWarnings = 0
+    connected = False
+    username = None
+    sendReceipts = True
+    disconnectAction = 0
+    credentials = None
+    jid_aliases = {}
+
     @ProtocolEntityCallback("receipt")
-    def on_receipt(self, entity: EntityAdapter) -> None:
+    def on_receipt(self, entity: MessageProtocolEntity) -> None:
         """
         method run whenever a whatsapp receipt is issued
 
         :param entity: The receipt entity
         :return: void
         """
-        self.to_lower(entity.ack())
+        self.toLower(entity.ack())
 
     def send_image(self, number: str, path: str, caption: str = None) -> None:
         """
@@ -71,8 +78,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         jid = self.alias_to_jid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE, filePath=path)
 
-        def success_fn(success_entity: WrappedTextMessageProtocolEntity, original_entity: MessageProtocolEntity) \
-                -> None:
+        def success_fn(success_entity: TextMessageProtocolEntity, original_entity: MessageProtocolEntity) -> None:
             """
             Function called on successful media upload
 
@@ -93,7 +99,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
             """
             YowsupEchoLayer.on_request_upload_error(jid, path, error_entity, original_entity)
 
-        self.send_iq(entity, success_fn, error_fn)
+        self._sendIq(entity, success_fn, error_fn)
 
     def send_audio(self, number: str, path: str) -> None:
         """
@@ -106,7 +112,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         jid = self.alias_to_jid(number)
         entity = RequestUploadIqProtocolEntity(RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO, filePath=path)
 
-        def success_fn(success_entity: WrappedTextMessageProtocolEntity, original_entity: MessageProtocolEntity) \
+        def success_fn(success_entity: TextMessageProtocolEntity, original_entity: MessageProtocolEntity) \
                 -> None:
             """
             Function called on successful media upload
@@ -128,7 +134,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
             """
             YowsupEchoLayer.on_request_upload_error(jid, path, error_entity, original_entity)
 
-        self.send_iq(entity, success_fn, error_fn)
+        self._sendIq(entity, success_fn, error_fn)
 
     def on_request_upload_result(self, jid: str, file_path: str,
                                  result_request_upload_iq_protocol_entity: MessageProtocolEntity,
@@ -144,16 +150,14 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         :param caption: the media caption, if applicable
         :return: None
         """
-        result_request_upload_iq_protocol_entity = EntityAdapter(result_request_upload_iq_protocol_entity)
-
         if request_upload_iq_protocol_entity.mediaType == RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO:
             do_send_fn = self.do_send_audio
         else:
             do_send_fn = self.do_send_image
 
-        if result_request_upload_iq_protocol_entity.is_duplicate():
-            do_send_fn(file_path, result_request_upload_iq_protocol_entity.get_url(), jid,
-                       result_request_upload_iq_protocol_entity.get_ip(), caption)
+        if result_request_upload_iq_protocol_entity.isDuplicate():
+            do_send_fn(file_path, result_request_upload_iq_protocol_entity.getUrl(), jid,
+                       result_request_upload_iq_protocol_entity.getIp(), caption)
         else:
 
             def success_fn(inner_file_path: str, inner_jid: str, url: str) -> None:
@@ -165,11 +169,11 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
                 :param url: the whatsapp media url
                 :return: None
                 """
-                do_send_fn(inner_file_path, url, inner_jid, result_request_upload_iq_protocol_entity.get_ip(), caption)
+                do_send_fn(inner_file_path, url, inner_jid, result_request_upload_iq_protocol_entity.getIp(), caption)
 
-            media_uploader = MediaUploader(jid, self.get_own_jid(), file_path,
-                                           result_request_upload_iq_protocol_entity.get_url(),
-                                           result_request_upload_iq_protocol_entity.get_resume_offset(), success_fn,
+            media_uploader = MediaUploader(jid, self.getOwnJid(), file_path,
+                                           result_request_upload_iq_protocol_entity.getUrl(),
+                                           result_request_upload_iq_protocol_entity.getResumeOffset(), success_fn,
                                            YowsupEchoLayer.on_upload_error, YowsupEchoLayer.on_upload_progress,
                                            async=False)
             media_uploader.start()
@@ -251,8 +255,8 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         :param message_protocol_entity: the message protocol entity that was received
         :return: None
         """
-        self.to_lower(message_protocol_entity.ack())
-        self.to_lower(message_protocol_entity.ack(True))
+        self.toLower(message_protocol_entity.ack())
+        self.toLower(message_protocol_entity.ack(True))
 
     def do_send_image(self, file_path: str, url: str, to: str, ip: str = None, caption: str = None) -> None:
         """
@@ -265,9 +269,8 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         :param caption: the caption to be displayed together with the image
         :return: None
         """
-        entity = WrappedImageDownloadableMediaMessageProtocolEntity.from_file_path(file_path, url, ip, to,
-                                                                                   caption=caption)
-        self.to_lower(entity)
+        entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
+        self.toLower(entity)
 
     def do_send_audio(self, file_path: str, url: str, to: str, ip: str = None) -> None:
         """
@@ -279,8 +282,8 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         :param ip: the ip of the receiver
         :return: None
         """
-        entity = WrappedAudioDownloadableMediaMessageProtocolEntity.from_file_path(file_path, url, ip, to)
-        self.to_lower(entity)
+        entity = AudioDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to)
+        self.toLower(entity)
 
     def set_presence_name(self, name):
         """
@@ -289,7 +292,7 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
         :return: void
         """
         entity = PresenceProtocolEntity(name=name)
-        self.to_lower(entity)
+        self.toLower(entity)
 
     def profile_set_status(self, text: str) -> None:
         """
@@ -320,4 +323,4 @@ class YowsupEchoLayer(WrappedYowInterfaceLayer):
                 PrintLogger.print("Error updating status")
 
         entity = SetStatusIqProtocolEntity(text)
-        self.send_iq(entity, on_success, on_error)
+        self._sendIq(entity, on_success, on_error)
