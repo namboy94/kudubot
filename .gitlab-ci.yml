@@ -11,13 +11,9 @@ clone:
     - master
   script:
     - cd
+    - git clone git@gitlab.namibsun.net:namboy94/messengerbot.git
     - git clone git@gitlab.namibsun.net:namboy94/messengerbot.wiki.git
-    - git clone -b develop git@gitlab.namibsun.net:namboy94/messengerbot.wiki.git messengerbot-develop
     - cd messengerbot
-    - git push -u git@gitlab.com:namboy94/messengerbot.git --all
-    - git push -u git@github.com:namboy94/messengerbot.git --all
-    - git push -u git@bitbucket.org:namboy94/messengerbot.git --all
-    - cd ../messengerbot-develop
     - git push -u git@gitlab.com:namboy94/messengerbot.git --all
     - git push -u git@github.com:namboy94/messengerbot.git --all
     - git push -u git@bitbucket.org:namboy94/messengerbot.git --all
@@ -28,7 +24,7 @@ clone_develop:
     - develop
   script:
     - cd
-    - git clone -b develop git@gitlab.namibsun.net:namboy94/messengerbot.wiki.git messengerbot-develop
+    - git clone -b develop git@gitlab.namibsun.net:namboy94/messengerbot.git messengerbot-develop
     - cd messengerbot-develop
     - git push -u git@gitlab.com:namboy94/messengerbot.git --all
     - git push -u git@github.com:namboy94/messengerbot.git --all
