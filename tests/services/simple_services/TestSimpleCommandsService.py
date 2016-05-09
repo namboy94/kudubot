@@ -35,8 +35,8 @@ class TestSimpleCommandsService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    correct_messages = ["/uptime", "/sl", "/upzeit"]
+    incorrect_messages = ["/uptime   ", "   /sl", "    / //   /upzeit  / /  "]
     service = SimpleCommandsService
 
     @classmethod
@@ -72,8 +72,9 @@ class TestSimpleCommandsService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)

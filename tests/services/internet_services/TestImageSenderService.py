@@ -34,9 +34,12 @@ class TestImageSenderService(object):
     """
     A Unit Test Class for a Service class
     """
-
-    correct_messages = []
-    incorrect_messages = []
+    r"^/img (http(s)?://|www.)[^;>\| ]+(.png|.jpg)$"
+    correct_messages = ["/img http://www.google.com/image.jpg", "/img https://google.com/image.png",
+                        "/img www.google.com/image.png"]
+    incorrect_messages = ["/img www.goog|e.com/image.png", "/img www.image.png",
+                          "/img http://goo gle.com/image.png", "/img www.google;.com/image.png",
+                          "/img www.google.com/image.exe", "img /home/homedir.png"]
     service = ImageSenderService
 
     @classmethod
@@ -72,8 +75,9 @@ class TestImageSenderService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)

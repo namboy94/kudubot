@@ -35,7 +35,7 @@ class TestCasinoService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
+    correct_messages = ["/casino beg", "/casino balance"]
     incorrect_messages = []
     service = CasinoService
 
@@ -72,8 +72,9 @@ class TestCasinoService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)

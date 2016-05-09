@@ -35,8 +35,10 @@ class TestGoogleTtsService(object):
     A Unit Test Class for a Service class
     """
 
-    correct_messages = []
-    incorrect_messages = []
+    correct_messages = ["/say \"Voice Message\"", "/sag \"Sprachnachricht\"", "/say \"Some Message\" de",
+                        "/say \"Test\" en", "/say \"Test,,,,,,,,,ss,s,s,s,s,s,s,ssss''a''a'a's'aaa\" en"]
+    incorrect_messages = ["/say", "/sag", "/say \"Te\"st\"", "/say something \"more\"", "/say \"Test\" fictional",
+                          "/say \"test\" fr-----", "-----/say \"test\" fr", "/sag/say \"ssdsd \"", "/say \"\" en"]
     service = GoogleTtsService
 
     @classmethod
@@ -72,8 +74,9 @@ class TestGoogleTtsService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)
