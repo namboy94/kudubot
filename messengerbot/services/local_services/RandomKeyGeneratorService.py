@@ -84,7 +84,7 @@ class RandomKeyGeneratorService(Service):
         :return: True if input is valid, False otherwise
         """
         regex = "^" + Service.regex_string_from_dictionary_keys([RandomKeyGeneratorService.random_key_keywords]) \
-                + " [0-9]+$"
+                + " [1-9]{1}[0-9]*$"
         return re.search(re.compile(regex), message.message_body.lower())
 
     def generate_key(self, length: int) -> str:
