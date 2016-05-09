@@ -63,8 +63,8 @@ class SimpleContainsResponseService(Service):
                                 ("chicken", "nuggets", "huhn", "hühnchen"): ["🐤", "Die armen Kücken!\n🐤🐤🐤"],
                                 ("scheiße", "kacke"): ["💩"],
                                 ("kaputt", "zerbrochen"): ["¯\\_(ツ)_/¯"],
-                                ("😂", "😂"): ["😂😂😂"],
-                                ("FC Bayern"): ["Mia san mia!", "Deutscher Meister 2016! (+25 andere Jahre)"]}
+                                ("😂", "😂😂"): ["😂😂😂"],
+                                ("FC Bayern", "FCB"): ["Mia san mia!", "Deutscher Meister 2016! (+25 andere Jahre)"]}
     """
     Case-insensitive defined response conditions and responses
     """
@@ -113,4 +113,5 @@ class SimpleContainsResponseService(Service):
                 if ind_key in message.message_body.lower():
                     matches += 1
 
+        print(matches)
         return matches == 1
