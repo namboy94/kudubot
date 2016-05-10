@@ -42,11 +42,11 @@ class HelloWorldService(Service):
     help_description = {"en": "/helloworld\tSends a message containing how to write a 'Hello World'"
                               "Program in a specific language\n"
                               "syntax:\n"
-                              "/helloworld <language>",
+                              "/helloworld <language|list>",
                         "de": "/helloworld\tSchickt eine Nachricht mit einem 'Hello World' Codeschnipsel für eine"
                               "spezifische Programmiersprache\n"
                               "synatx:\n"
-                              "/helloworld <sprache>"}
+                              "/helloworld <sprache|liste>"}
     """
     Help description for this service.
     """
@@ -144,10 +144,13 @@ class HelloWorldService(Service):
         :return: None
         """
         prog_language = message.message_body.lower().split(" ", 1)[1]
-        try:
-            reply = self.implementations[prog_language]
-        except KeyError:
-            reply = self.language_not_found_error[self.connection.last_used_language]
+        if prog_language.startswith("list"):
+            reply = self.list_languages()
+        else:
+            try:
+                reply = self.implementations[prog_language]
+            except KeyError:
+                reply = self.language_not_found_error[self.connection.last_used_language]
 
         reply_message = self.generate_reply_message(message, "Hello World", reply)
         self.send_text_message(reply_message)
@@ -159,6 +162,18 @@ class HelloWorldService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        regex = "^/helloworld " + Service.regex_string_from_dictionary_keys([HelloWorldService.implementations]) + "$"
+        regex = "^/helloworld (list(e)?|" \
+                + Service.regex_string_from_dictionary_keys([HelloWorldService.implementations]) + ")$"
         regex = regex.replace("+", "\+")
         return re.search(re.compile(regex), message.message_body.lower())
+
+    def list_languages(self) -> str:
+        """
+        Creates a list of implemented languages
+
+        :return: the list of implemented languages
+        """
+        list_string = ""
+        for language in self.implementations:
+            list_string += language + "\n"
+        return list_string.rstrip("\n")
