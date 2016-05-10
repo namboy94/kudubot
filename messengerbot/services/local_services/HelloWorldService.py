@@ -51,25 +51,81 @@ class HelloWorldService(Service):
     Help description for this service.
     """
 
-    implementations = {"python": "if __name__ == \"main\":\n"
-                                 "    print(\"Hello World!\")",
+    implementations = {"python": "print(\"Hello World!\")",
+                       "python2": "print \"Hello World!\"",
+                       "python3": "print(\"Hello World!\")",
                        "java": "pubic class Main {\n"
                                "    public static void main(String[] args) {\n"
                                "        System.out.println(\"Hello World!\");\n"
                                "    }\n"
                                "}",
                        "c": "#include <stdio.h>\n\n"
-                            "int main() {"
+                            "int main() {\n"
                             "    printf(\"Hello World!\\n\");\n"
-                            "    return 0;"
+                            "    return 0;\n"
                             "}",
                        "c++": "#include <iostream>\n\n"
-                              "int main() {"
+                              "int main() {\n"
                               "    std::cout << \"Hello World!\";\n"
                               "    return 0;\n"
                               "}",
-                       "bash": "#!/bin/bash\n\n"
-                               "echo \"Hello World\""}
+                       "bash": "echo \"Hello World\"",
+                       "rust": "fn main() {\n"
+                               "    println!(\"Hello World!\");\n"
+                               "}",
+                       "ruby": "puts 'Hello, world!'",
+                       "perl": "print \"Hello World!\\n\";",
+                       "c#": "using System;\n"
+                             "namespace HelloWorldApplication{\n"
+                             "    class HelloWorld {\n"
+                             "        Console.WriteLine(\"Hello World!\");\n"
+                             "        Console.ReadKey();"
+                             "    }"
+                             "}",
+                       "basic": "10 PRINT \"Hello World!\"",
+                       "visual basic": "Module HelloWorld\n"
+                                       "    Sub Main()\n"
+                                       "        System.Console.WriteLine(\"Hello World!\")\n"
+                                       "        System.Console.ReadLine()\n"
+                                       "        End\n"
+                                       "    End Sub\n"
+                                       "End Module\n",
+                       "brainfuck": "++++++++++\n"
+                                    "[\n"
+                                    " >+++++++>++++++++++>+++>+<<<<-\n"
+                                    "]\n"
+                                    ">++.\n"
+                                    ">+.\n"
+                                    "+++++++.\n"
+                                    ".\n"
+                                    "+++.\n"
+                                    ">++.\n"
+                                    "<<+++++++++++++++.\n"
+                                    ">.\n"
+                                    "+++.\n"
+                                    "------.\n"
+                                    "--------.\n"
+                                    ">+.\n"
+                                    ">.\n"
+                                    "+++.",
+                       "haskell": "main = putStrLn \"Hello World!\"",
+                       "erlang": "-module(hello).\n"
+                                 "-export([hello_world/0]).\n\n"
+                                 "hello_world() -> io:fwrite(\"Hello World!\n\").",
+                       "x86 assembly": "section .data\n"
+                                       "str:     db 'Hello World!', 0Ah\n"
+                                       "str_len: equ $ - str\n\n\n"
+                                       "section .text\n"
+                                       "global _start\n\n"
+                                       "_start:\n"
+                                       "	mov	eax, 4\n"
+                                       "	mov	ebx, 1\n\n"
+                                       "    mov	ecx, str\n"
+                                       "    mov	edx, str_len\n"
+                                       "    int	80h\n\n"
+                                       "    mov	eax, 1\n"
+                                       "    mov	ebx, 0\n"
+                                       "    int	80h"}
     """
     The actual implementations of hello world in the different languages
     """
@@ -87,7 +143,7 @@ class HelloWorldService(Service):
         :param message: the message to process
         :return: None
         """
-        prog_language = message.message_body.lower().split(" ")[1]
+        prog_language = message.message_body.lower().split(" ", 1)[1]
         try:
             reply = self.implementations[prog_language]
         except KeyError:
@@ -104,4 +160,5 @@ class HelloWorldService(Service):
         :return: True if input is valid, False otherwise
         """
         regex = "^/helloworld " + Service.regex_string_from_dictionary_keys([HelloWorldService.implementations]) + "$"
+        regex = regex.replace("+", "\+")
         return re.search(re.compile(regex), message.message_body.lower())
