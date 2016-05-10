@@ -26,19 +26,18 @@ from nose.tools import assert_false
 from nose.tools import assert_true
 
 from messengerbot.connection.generic.Message import Message
-from messengerbot.services.local_services.RandomKeyGeneratorService import RandomKeyGeneratorService
+from messengerbot.services.local_services.XkcdRngService import XkcdRngService
 
 
 # noinspection PyMethodMayBeStatic
-class TestRandomKeyGeneratorService(object):
+class TestXkcdRngService(object):
     """
-    A Unit Test Class for the RandomKeyGeneratorService class
+    A Unit Test Class for the XKCD RNG Service class
     """
 
-    correct_messages = ["/randomkey 123", "/randomkey 23212", "/zufallschlüssel 1121"]
-    incorrect_messages = ["/randomkey 0", "/randomkey -1", "   /randomkey 121   ", "/randomkey   12", "/randomkey a"]
-
-    service = RandomKeyGeneratorService
+    correct_messages = ["/xkcd-rng", "/xkcd-rng source", "/xkcd-rng quelle"]
+    incorrect_messages = ["/xkcd-rng  source", "/xkcd-rng ", "/xkcd-rng quelle  ", "  /xkcd-rng"]
+    service = XkcdRngService
     initialized_service = None
     response = ""
 
@@ -104,15 +103,16 @@ class TestRandomKeyGeneratorService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)
 
-    def test_rng(self) -> None:
+    def test_response(self) -> None:
         """
-        Tests the service's RNG functionality
+        Tests the service's functionality
 
         :return: None
         """
