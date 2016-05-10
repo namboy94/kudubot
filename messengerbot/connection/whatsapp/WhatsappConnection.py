@@ -118,11 +118,10 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         :param message_protocol_entity: the message received
         :return: void
         """
-        PrintLogger.print("Received Message", 2)
-
         # Wrap the message protocol entity in a PEP8-compliant Wrapper
-        message = self.convert_text_message_protocol_entity_to_message(message_protocol_entity)
-        self.on_incoming_message(message)
+        if message_protocol_entity.getType() == "text":
+            message = self.convert_text_message_protocol_entity_to_message(message_protocol_entity)
+            self.on_incoming_message(message)
 
     @staticmethod
     def convert_text_message_protocol_entity_to_message(message_protocol_entity: TextMessageProtocolEntity) -> Message:
