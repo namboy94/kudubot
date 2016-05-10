@@ -79,8 +79,8 @@ class HelloWorldService(Service):
                              "namespace HelloWorldApplication{\n"
                              "    class HelloWorld {\n"
                              "        Console.WriteLine(\"Hello World!\");\n"
-                             "        Console.ReadKey();"
-                             "    }"
+                             "        Console.ReadKey();\n"
+                             "    }\n"
                              "}",
                        "basic": "10 PRINT \"Hello World!\"",
                        "visual basic": "Module HelloWorld\n"
