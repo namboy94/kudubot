@@ -88,4 +88,6 @@ class XkcdRngService(Service):
         :return: True if input is valid, False otherwise
         """
         regex = "^/xkcd-rng( " + Service.regex_string_from_dictionary_keys([XkcdRngService.source_keywords]) + ")?$"
+        print(regex)
+        print(message.message_body)
         return re.search(re.compile(regex), message.message_body.lower())

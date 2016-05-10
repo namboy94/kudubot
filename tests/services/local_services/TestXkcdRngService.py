@@ -116,9 +116,12 @@ class TestXkcdRngService(object):
 
         :return: None
         """
-        message = Message(message_body="/randomkey 100", address="")
-        self.initialized_service.process_message(message)
-        assert_true(len(self.response) == 100)
+        message_1 = Message(message_body="/xkcd-rng", address="")
+        message_2 = Message(message_body="/xkcd-rng source", address="")
+        self.initialized_service.process_message(message_1)
+        assert_true(self.response == "4")
+        self.initialized_service.process_message(message_2)
+        assert_true(self.response == XkcdRngService.source_code)
 
     def test_language_switch(self) -> None:
         """
@@ -126,8 +129,8 @@ class TestXkcdRngService(object):
 
         :return: None
         """
-        message_en = Message(message_body="/randomkey 1", address="")
-        message_de = Message(message_body="/zufallschlüssel 1", address="")
+        message_en = Message(message_body="/xkcd-rng source", address="")
+        message_de = Message(message_body="/xkcd-rng quelle", address="")
         assert_true(self.initialized_service.connection.last_used_language == "en")
         self.initialized_service.process_message(message_de)
         assert_true(self.initialized_service.connection.last_used_language == "de")
