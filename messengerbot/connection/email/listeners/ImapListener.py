@@ -95,21 +95,21 @@ class ImapListener(object):
 
                 email_message = email.message_from_bytes(message[0][1])  # generate an email obect from the message
 
-                sender_name = email_message['From'].split(" <")[0]
-                sender_address = email_message['From'].split("<", 1)[1].rsplit(">", 1)[0]
+                try:
+                    sender_name = email_message['From'].split(" <")[0]
+                    sender_address = email_message['From'].split("<", 1)[1].rsplit(">", 1)[0]
+                except IndexError:
+                    sender_name = email_message["From"]
+                    sender_address = sender_name
+
                 title = email_message["Subject"]
                 timestamp = time.mktime(email.utils.parsedate(email_message['Date']))
-
-                try:
-                    body_parts = email_message.get_payload(decode=False).split("\r\n")
-                except AttributeError:  # When attachments etc are included
-                    body_parts = email_message.get_payload(decode=False)[0].split("\r\n")
-
                 body = ""
-                for body_part in body_parts:
-                    if body_part:
-                        body += body_part
-                body = body.rstrip()
+
+                for part in email_message.walk():
+                    if part.get_content_type() == 'text/plain':
+                        body += (part.get_payload()) + "\n"
+                body = body.rstrip("\n")
 
                 message_object = Message(message_body=body, message_title=title, address=sender_address, incoming=True,
                                          name=sender_name, group=False, single_name="", single_address="",

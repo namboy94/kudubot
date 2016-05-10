@@ -2,6 +2,7 @@ V 0.7.1
    - Added Hello World Service
    - Added XKCD Random Number Generator Service
    - Optimized Whatsapp Connection
+   - Fixed Email Connection crashes
 V 0.7.0.2
   - Added message length spam protection
 V 0.7.0.1
