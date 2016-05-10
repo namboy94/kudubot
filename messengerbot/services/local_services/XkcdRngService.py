@@ -72,9 +72,9 @@ class XkcdRngService(Service):
         :param message: the message to process
         :return: None
         """
-        reply = "4" if message.message_body.lower() == "xkcd-rng" else self.source_code
+        reply = "4" if message.message_body.lower() == "/xkcd-rng" else self.source_code
 
-        if reply != 4:
+        if reply != "4":
             self.connection.last_used_language = self.source_keywords[message.message_body.lower().split(" ")[1]]
 
         reply_message = self.generate_reply_message(message, "XKCD RNG", reply)
@@ -87,5 +87,5 @@ class XkcdRngService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        regex = "^/xkcd-rng( " + Service.regex_string_from_dictionary_keys([XkcdRngService.source_keywords]) + "?$"
+        regex = "^/xkcd-rng( " + Service.regex_string_from_dictionary_keys([XkcdRngService.source_keywords]) + ")?$"
         return re.search(re.compile(regex), message.message_body.lower())
