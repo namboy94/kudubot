@@ -147,10 +147,7 @@ class HelloWorldService(Service):
         if prog_language.startswith("list"):
             reply = self.list_languages()
         else:
-            try:
-                reply = self.implementations[prog_language]
-            except KeyError:
-                reply = self.language_not_found_error[self.connection.last_used_language]
+            reply = self.implementations[prog_language]
 
         reply_message = self.generate_reply_message(message, "Hello World", reply)
         self.send_text_message(reply_message)
