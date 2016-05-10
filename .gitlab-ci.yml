@@ -2,10 +2,13 @@ stages:
   - setup
   - test
   - upload
-  - cleanup
   - upgrade
+  - cleanup
 
-clone:
+
+
+
+clone_master:
   stage: setup
   only:
     - master
@@ -30,25 +33,47 @@ clone_develop:
     - git push -u git@github.com:namboy94/messengerbot.git --all
     - git push -u git@bitbucket.org:namboy94/messengerbot.git --all
 
+
+
+
+
+
+
+
 uninstall:
   stage: setup
   only:
     - master
+    - develop
   script:
     - sudo pip3.5 uninstall -y messenger_bot
   allow_failure: true
 
-run_unit_tests:
+
+
+
+
+
+
+
+
+run_unit_tests_master:
   stage: test
   only:
     - master
-    - develop
-    - unit-test
   script:
     - cd
     - cd messengerbot
     - python setup.py test
-  allow_failure: true
+
+run_unit_tests_develop:
+  stage: test
+  only:
+    - develop
+  script:
+    - cd
+    - cd messengerbot-develop
+    - python setup.py test
 
 generate_statistics:
   stage: test
@@ -77,6 +102,13 @@ generate_documentation:
     - rm -rf html
     - cp -r ../messengerbot/doc/build/html .
 
+
+
+
+
+
+
+
 upload_to_pypi:
   stage: upload
   only:
@@ -99,20 +131,47 @@ upload_documentation_and_statistics:
     - git commit -m "Updated documentation and statistics"
     - git push -u origin master
 
-delete_clone:
-  stage: cleanup
-  when: always
-  script:
-    - cd
-    - rm -rf messengerbot
-    - rm -rf messengerbot.wiki
-    - rm -rf messengerbot-develop
+
+
+
+
+
 
 upgrade_from_pypi:
   stage: upgrade
-  when: always
   only:
     - master
   script:
     - sudo pip3.5 install messenger_bot --upgrade
-    - sleep 5
+
+upgrade_from_source:
+  stage: upgrade
+  only:
+    - develop
+  script:
+    - cd messengerbot-develop
+    - sudo python setup.py install
+
+
+
+
+
+
+delete_clone_master:
+  stage: cleanup
+  when: always
+  only:
+    - master
+  script:
+    - cd
+    - rm -rf messengerbot
+    - rm -rf messengerbot.wiki
+
+delete_clone_develop:
+  stage: cleanup
+  when: always
+  only:
+    - develop
+  script:
+    - cd
+    - rm -rf messengerbot-develop
