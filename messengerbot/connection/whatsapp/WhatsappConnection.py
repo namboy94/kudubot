@@ -36,8 +36,6 @@ from messengerbot.connection.generic.Connection import Connection
 from messengerbot.connection.whatsapp.layers.YowsupEchoLayer import YowsupEchoLayer
 from messengerbot.connection.whatsapp.stacks.YowsupEchoStack import YowsupEchoStack
 from messengerbot.connection.whatsapp.parsers.WhatsappConfigParser import WhatsappConfigParser
-from messengerbot.connection.whatsapp.yowsupwrapper.entities.WrappedTextMessageProtocolEntity \
-    import WrappedTextMessageProtocolEntity
 
 
 class WhatsappConnection(YowsupEchoLayer, Connection):
@@ -70,7 +68,7 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         :return: None
         """
         message_protocol_entity = self.convert_message_to_text_message_protocol_entity(message)
-        self.to_lower(message_protocol_entity)
+        self.toLower(message_protocol_entity)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
@@ -123,40 +121,38 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         PrintLogger.print("Received Message", 2)
 
         # Wrap the message protocol entity in a PEP8-compliant Wrapper
-        wrapped_entity = WrappedTextMessageProtocolEntity(entity=message_protocol_entity)
-        message = self.convert_text_message_protocol_entity_to_message(wrapped_entity)
+        message = self.convert_text_message_protocol_entity_to_message(message_protocol_entity)
         self.on_incoming_message(message)
 
     @staticmethod
-    def convert_text_message_protocol_entity_to_message(message_protocol_entity: WrappedTextMessageProtocolEntity) \
-            -> Message:
+    def convert_text_message_protocol_entity_to_message(message_protocol_entity: TextMessageProtocolEntity) -> Message:
         """
         Converts an incoming text message protocol entity into a Message object
 
         :param message_protocol_entity: The entity to convert
         :return: the converted message
         """
-        body = message_protocol_entity.get_body()
+        body = message_protocol_entity.getBody()
 
-        sender_number = message_protocol_entity.get_from(True)
-        group_identifier = message_protocol_entity.get_from(False)
-        sender_name = message_protocol_entity.get_notify()
+        sender_number = message_protocol_entity.getFrom(True)
+        group_identifier = message_protocol_entity.getFrom(False)
+        sender_name = message_protocol_entity.getNotify()
         group = False
         individual_number = ""
         individual_name = ""
 
-        timestamp = float(message_protocol_entity.get_time_stamp())
+        timestamp = float(message_protocol_entity.getTimestamp())
 
         if re.search(r"[0-9]+-[0-9]+", group_identifier):
             group = True
-            individual_number = message_protocol_entity.get_participant(True)
-            individual_name = message_protocol_entity.get_notify()
+            individual_number = message_protocol_entity.getParticipant(True)
+            individual_name = message_protocol_entity.getNotify()
 
         return Message(message_body=body, message_title="", address=sender_number, incoming=True, name=sender_name,
                        single_address=individual_number, single_name=individual_name, group=group, timestamp=timestamp)
 
     @staticmethod
-    def convert_message_to_text_message_protocol_entity(message: Message) -> WrappedTextMessageProtocolEntity:
+    def convert_message_to_text_message_protocol_entity(message: Message) -> TextMessageProtocolEntity:
         """
         Converts an outgoing message object into a text message protocol entity
 
@@ -166,4 +162,4 @@ class WhatsappConnection(YowsupEchoLayer, Connection):
         to = message.address
         body = message.message_body
 
-        return WrappedTextMessageProtocolEntity(body, to=to)
+        return TextMessageProtocolEntity(body, to=to)

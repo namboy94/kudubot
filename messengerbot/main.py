@@ -22,6 +22,7 @@ This file is part of messengerbot.
 """
 
 # imports
+import os
 import sys
 import argparse
 import traceback
@@ -60,6 +61,10 @@ def main(override: str = "", verbosity: int = 1) -> None:
     args = parser.parse_args()
 
     metadata.verbosity = args.verbosity if args.verbosity else verbosity
+
+    # block stderr messages from being printed.
+    dev_null = open(os.devnull, 'w')
+    sys.stderr = dev_null
 
     PrintLogger.print("Starting program", 1)
 
