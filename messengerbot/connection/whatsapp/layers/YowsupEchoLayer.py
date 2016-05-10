@@ -29,8 +29,6 @@ from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.interface import ProtocolEntityCallback
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
 from yowsup.layers.protocol_messages.protocolentities import MessageProtocolEntity
-from yowsup.layers.protocol_presence.protocolentities import PresenceProtocolEntity
-from yowsup.layers.protocol_profiles.protocolentities import SetStatusIqProtocolEntity
 from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import ResultRequestUploadIqProtocolEntity
@@ -127,6 +125,58 @@ class YowsupEchoLayer(YowInterfaceLayer):
         :return: None
         """
         self.send_media(number, path, RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO)
+
+    def send_video(self, number: str, path: str, caption: str = None) -> None:
+        """
+        Sends a video file
+
+        :param number: the number of the receiver of the file
+        :param path: the path to the video file
+        :param caption: an optional caption to be displayed together with the video file
+        :return: None
+        """
+        self.send_media(number, path, RequestUploadIqProtocolEntity.MEDIA_TYPE_VIDEO, caption)
+
+    def do_send_media(self, media_type: RequestUploadIqProtocolEntity.TYPES_MEDIA,
+                      file_path: str, url: str, to: str, ip: str = None, caption: str = None) -> None:
+        """
+        Sends a media file
+
+        :param media_type: The type of media to send
+        :param file_path: the path to the file
+        :param url: the whatsapp upload url
+        :param to: the receiver
+        :param ip: the ip of the receiver
+        :param caption: the caption to be displayed together with the media file
+        :return: None
+        """
+        entity = None
+        if media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE:
+            entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
+        elif media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO:
+            entity = self.create_audio_media(file_path, url, to, ip)
+        elif media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_VIDEO:
+            entity = VideoDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
+        self.toLower(entity)
+
+    @staticmethod
+    def create_audio_media(file_path: str, url: str, to: str, ip: str = None) \
+            -> AudioDownloadableMediaMessageProtocolEntity:
+        """
+        Creates an Audio Message Entity as a workaround for the missing fromFilePath method in
+        AudioDownloadableMediaMessageProtocolEntity's parent class
+
+        :param file_path: the path to the file
+        :param url: the whatsapp upload url
+        :param to: the receiver
+        :param ip: the ip of the receiver
+        :return: None
+        :return: the generatd audio entity
+        """
+        builder = DownloadableMediaMessageBuilder(AudioDownloadableMediaMessageProtocolEntity, to, file_path)
+        builder.set("url", url)
+        builder.set("ip", ip)
+        return AudioDownloadableMediaMessageProtocolEntity.fromBuilder(builder)
 
     def on_request_upload_result(self, jid: str, media_type: RequestUploadIqProtocolEntity.TYPES_MEDIA, file_path: str,
                                  result_request_upload_iq_protocol_entity: ResultRequestUploadIqProtocolEntity,
@@ -247,86 +297,3 @@ class YowsupEchoLayer(YowInterfaceLayer):
         """
         self.toLower(message_protocol_entity.ack())
         self.toLower(message_protocol_entity.ack(True))
-
-    def do_send_media(self, media_type: RequestUploadIqProtocolEntity.TYPES_MEDIA,
-                      file_path: str, url: str, to: str, ip: str = None, caption: str = None) -> None:
-        """
-        Sends a media file
-
-        :param media_type: The type of media to send
-        :param file_path: the path to the file
-        :param url: the whatsapp upload url
-        :param to: the receiver
-        :param ip: the ip of the receiver
-        :param caption: the caption to be displayed together with the media file
-        :return: None
-        """
-        print(AudioDownloadableMediaMessageProtocolEntity)
-        print(AudioDownloadableMediaMessageProtocolEntity.fromFilePath)
-        entity = None
-        if media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE:
-            entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
-        elif media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO:
-            entity = self.create_audio_media(file_path, url, to, ip)
-        elif media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_VIDEO:
-            entity = VideoDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
-        self.toLower(entity)
-
-    @staticmethod
-    def create_audio_media(file_path: str, url: str, to: str, ip: str = None) \
-            -> AudioDownloadableMediaMessageProtocolEntity:
-        """
-        Creates an Audio Message Entity as a workaround for the missing fromFilePath method in
-        AudioDownloadableMediaMessageProtocolEntity's parent class
-
-        :param file_path: the path to the file
-        :param url: the whatsapp upload url
-        :param to: the receiver
-        :param ip: the ip of the receiver
-        :return: None
-        :return: the generatd audio entity
-        """
-        builder = DownloadableMediaMessageBuilder(AudioDownloadableMediaMessageProtocolEntity, to, file_path)
-        builder.set("url", url)
-        builder.set("ip", ip)
-        return AudioDownloadableMediaMessageProtocolEntity.fromBuilder(builder)
-
-    def set_presence_name(self, name: str) -> None:
-        """
-        Sets the presence name of the messengerbot
-        :param name: the presence name to set
-        :return: void
-        """
-        entity = PresenceProtocolEntity(name=name)
-        self.toLower(entity)
-
-    def profile_set_status(self, text: str) -> None:
-        """
-        Sets the profile status of the messengerbot
-        :param text:
-        :return: None
-        """
-        def on_success(result_iq_entity: MessageProtocolEntity, original_iq_entity: MessageProtocolEntity) -> None:
-            """
-            Run when successful
-            :param result_iq_entity: the result entity
-            :param original_iq_entity: the original entity
-
-            :return: None
-            """
-            if result_iq_entity and original_iq_entity:
-                pass
-
-        def on_error(error_iq_entity: MessageProtocolEntity, original_iq_entity: MessageProtocolEntity) -> None:
-            """
-            Run when the profile status change failed
-
-            :param error_iq_entity: the error entity
-            :param original_iq_entity: the original entity
-            :return: None
-            """
-            if error_iq_entity and original_iq_entity:
-                PrintLogger.print("Error updating status")
-
-        entity = SetStatusIqProtocolEntity(text)
-        self._sendIq(entity, on_success, on_error)
