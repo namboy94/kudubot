@@ -109,7 +109,7 @@ class ImapListener(object):
                 for part in email_message.walk():
                     if part.get_content_type() == 'text/plain':
                         body += (part.get_payload()) + "\n"
-                body = body.rstrip("\n")
+                body = body.rstrip()
 
                 message_object = Message(message_body=body, message_title=title, address=sender_address, incoming=True,
                                          name=sender_name, group=False, single_name="", single_address="",
