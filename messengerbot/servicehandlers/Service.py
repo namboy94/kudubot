@@ -175,7 +175,7 @@ class Service(object):
                 dictionary_keys.append(key)
 
         regex_string = "("
-        first = False
+        first = True
         for key in dictionary_keys:
             if first:
                 regex_string += key

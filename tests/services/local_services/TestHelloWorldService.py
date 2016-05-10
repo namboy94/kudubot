@@ -26,19 +26,21 @@ from nose.tools import assert_false
 from nose.tools import assert_true
 
 from messengerbot.connection.generic.Message import Message
-from messengerbot.services.local_services.RandomKeyGeneratorService import RandomKeyGeneratorService
+from messengerbot.services.local_services.HelloWorldService import HelloWorldService
 
 
 # noinspection PyMethodMayBeStatic
-class TestRandomKeyGeneratorService(object):
+class TestHelloWorldService(object):
     """
-    A Unit Test Class for the RandomKeyGeneratorService class
+    A Unit Test Class for the HelloWorldService class
     """
 
-    correct_messages = ["/randomkey 123", "/randomkey 23212", "/zufallschlüssel 1121"]
-    incorrect_messages = ["/randomkey 0", "/randomkey -1", "   /randomkey 121   ", "/randomkey   12", "/randomkey a"]
+    correct_messages = ["/helloworld java", "/helloworld c++", "/helloworld c#", "/helloworld x86 assembly",
+                        "/helloworld list"]
+    incorrect_messages = ["/helloworld", "/helloworld  python", "/helloworld assembly x86", "helloworld python",
+                          "/ helloworld haskell", " /helloworld erlang", "/helloworld bash "]
 
-    service = RandomKeyGeneratorService
+    service = HelloWorldService
     initialized_service = None
     response = ""
 
@@ -110,26 +112,13 @@ class TestRandomKeyGeneratorService(object):
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
 
-    def test_rng(self) -> None:
+    def test_list_response(self) -> None:
         """
-        Tests the service's RNG functionality
+        Tests the service's list functionality
 
         :return: None
         """
-        message = Message(message_body="/randomkey 100", address="")
+        message = Message(message_body="/helloworld list", address="")
         self.initialized_service.process_message(message)
-        assert_true(len(self.response) == 100)
-
-    def test_language_switch(self) -> None:
-        """
-        Tests if the language switch works
-
-        :return: None
-        """
-        message_en = Message(message_body="/randomkey 1", address="")
-        message_de = Message(message_body="/zufallschlüssel 1", address="")
-        assert_true(self.initialized_service.connection.last_used_language == "en")
-        self.initialized_service.process_message(message_de)
-        assert_true(self.initialized_service.connection.last_used_language == "de")
-        self.initialized_service.process_message(message_en)
-        assert_true(self.initialized_service.connection.last_used_language == "en")
+        for language in HelloWorldService.implementations:
+            assert_true(language in self.response)

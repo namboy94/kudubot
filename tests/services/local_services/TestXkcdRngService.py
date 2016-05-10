@@ -26,19 +26,18 @@ from nose.tools import assert_false
 from nose.tools import assert_true
 
 from messengerbot.connection.generic.Message import Message
-from messengerbot.services.local_services.RandomKeyGeneratorService import RandomKeyGeneratorService
+from messengerbot.services.local_services.XkcdRngService import XkcdRngService
 
 
 # noinspection PyMethodMayBeStatic
-class TestRandomKeyGeneratorService(object):
+class TestXkcdRngService(object):
     """
-    A Unit Test Class for the RandomKeyGeneratorService class
+    A Unit Test Class for the XKCD RNG Service class
     """
 
-    correct_messages = ["/randomkey 123", "/randomkey 23212", "/zufallschlüssel 1121"]
-    incorrect_messages = ["/randomkey 0", "/randomkey -1", "   /randomkey 121   ", "/randomkey   12", "/randomkey a"]
-
-    service = RandomKeyGeneratorService
+    correct_messages = ["/xkcd-rng", "/xkcd-rng source", "/xkcd-rng quelle"]
+    incorrect_messages = ["/xkcd-rng  source", "/xkcd-rng ", "/xkcd-rng quelle  ", "  /xkcd-rng"]
+    service = XkcdRngService
     initialized_service = None
     response = ""
 
@@ -104,21 +103,25 @@ class TestRandomKeyGeneratorService(object):
         """
         for message in self.correct_messages:
             message_object = Message(message_body=message, address="")
-            print(message)
+            print("Testing correct Regex for: " + message)
             assert_true(self.service.regex_check(message_object))
         for message in self.incorrect_messages:
             message_object = Message(message_body=message, address="")
             assert_false(self.service.regex_check(message_object))
+            print("Testing incorrect Regex for: " + message)
 
-    def test_rng(self) -> None:
+    def test_response(self) -> None:
         """
-        Tests the service's RNG functionality
+        Tests the service's functionality
 
         :return: None
         """
-        message = Message(message_body="/randomkey 100", address="")
-        self.initialized_service.process_message(message)
-        assert_true(len(self.response) == 100)
+        message_1 = Message(message_body="/xkcd-rng", address="")
+        message_2 = Message(message_body="/xkcd-rng source", address="")
+        self.initialized_service.process_message(message_1)
+        assert_true(self.response == "4")
+        self.initialized_service.process_message(message_2)
+        assert_true(self.response == XkcdRngService.source_code)
 
     def test_language_switch(self) -> None:
         """
@@ -126,8 +129,8 @@ class TestRandomKeyGeneratorService(object):
 
         :return: None
         """
-        message_en = Message(message_body="/randomkey 1", address="")
-        message_de = Message(message_body="/zufallschlüssel 1", address="")
+        message_en = Message(message_body="/xkcd-rng source", address="")
+        message_de = Message(message_body="/xkcd-rng quelle", address="")
         assert_true(self.initialized_service.connection.last_used_language == "en")
         self.initialized_service.process_message(message_de)
         assert_true(self.initialized_service.connection.last_used_language == "de")

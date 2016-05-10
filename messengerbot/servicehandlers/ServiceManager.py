@@ -31,9 +31,11 @@ from messengerbot.servicehandlers.required_services.ServiceSelectorService impor
 
 # other services
 from messengerbot.services.local_services.CasinoService import CasinoService
+from messengerbot.services.local_services.XkcdRngService import XkcdRngService
 from messengerbot.services.local_services.RouletteService import RouletteService
 from messengerbot.services.local_services.ReminderService import ReminderService
 from messengerbot.services.local_services.RestarterService import RestarterService
+from messengerbot.services.local_services.HelloWorldService import HelloWorldService
 from messengerbot.services.local_services.WeeklyReminderService import WeeklyReminderService
 from messengerbot.services.local_services.RandomKeyGeneratorService import RandomKeyGeneratorService
 from messengerbot.services.internet_services.KvvService import KvvService
@@ -77,6 +79,7 @@ class ServiceManager(object):
                     RouletteService,
                     KvvService,
                     XkcdService,
+                    XkcdRngService,
                     KickTippService,
                     FootballInfoService,
                     WeatherService,
@@ -88,6 +91,7 @@ class ServiceManager(object):
                     EmailSenderService,
                     ImageSenderService,
                     RandomKeyGeneratorService,
+                    HelloWorldService,
                     SimpleCommandsService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService]
