@@ -151,7 +151,7 @@ upgrade_from_source:
   script:
     - cd
     - cd messengerbot-develop
-    - sudo python setup.py install
+    - sudo python3 setup.py install
 
 
 
