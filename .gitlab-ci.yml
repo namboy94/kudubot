@@ -175,4 +175,4 @@ delete_clone_develop:
     - develop
   script:
     - cd
-    - rm -rf messengerbot-develop
+    - sudo rm -rf messengerbot-develop
