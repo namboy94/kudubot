@@ -70,6 +70,15 @@ class HelloWorldService(Service):
                               "}",
                        "bash": "#!/bin/bash\n\n"
                                "echo \"Hello World\""}
+    """
+    The actual implementations of hello world in the different languages
+    """
+
+    language_not_found_error = {"en": "Programming Language not found",
+                                "de": "Programmiersprache nicht gefunden"}
+    """
+    Error message sent when the programming language could not be found.
+    """
 
     def process_message(self, message: Message) -> None:
         """
@@ -78,8 +87,13 @@ class HelloWorldService(Service):
         :param message: the message to process
         :return: None
         """
-        reply = ""
-        reply_message = self.generate_reply_message(message, "@@@FRIENDLY@@@", reply)
+        prog_language = message.message_body.lower().split(" ")[1]
+        try:
+            reply = self.implementations[prog_language]
+        except KeyError:
+            reply = self.language_not_found_error[self.connection.last_used_language]
+
+        reply_message = self.generate_reply_message(message, "Hello World", reply)
         self.send_text_message(reply_message)
 
     @staticmethod
@@ -89,5 +103,5 @@ class HelloWorldService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        regex = "^/helloworld"
+        regex = "^/helloworld " + Service.regex_string_from_dictionary_keys([HelloWorldService.implementations]) + "$"
         return re.search(re.compile(regex), message.message_body.lower())
