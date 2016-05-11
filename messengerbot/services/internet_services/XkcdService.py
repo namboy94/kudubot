@@ -81,7 +81,7 @@ class XkcdService(Service):
         else:
             file_path, title, alt_text = self.download_xkcd_comic(selected_xkcd_comic)
             self.send_image_message(message.address, file_path, title + "\n\n" + alt_text)
-            os.remove(file_path)
+            self.delete_file_after(file_path, 5)
 
     @staticmethod
     def regex_check(message: Message) -> bool:

@@ -23,6 +23,8 @@ This file is part of messengerbot.
 
 # imports
 import os
+import time
+from threading import Thread
 from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
@@ -128,7 +130,7 @@ class Service(object):
         image.save(image_file_path)
 
         self.send_image_message(message.address, image_file_path)
-        os.remove(image_file_path)
+        self.delete_file_after(image_file_path, 5)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
@@ -223,3 +225,26 @@ class Service(object):
         regex_string += ")"
 
         return regex_string
+
+    @staticmethod
+    def delete_file_after(file_path: str, after_seconds: int) -> None:
+        """
+        Deletes a file asynchronuously after a period of time
+
+        :param file_path: the path to the file to delete
+        :param after_seconds: after how many seconds should the file be deleted
+        :return: None
+        """
+
+        def delete_file_and_wait() -> None:
+            """
+            Deletes the file after the amount of seconds specified
+
+            :return: None
+            """
+            time.sleep(after_seconds)
+            os.remove(file_path)
+
+        delete_thread = Thread(target=delete_file_and_wait)
+        delete_thread.daemon = True
+        delete_thread.start()
