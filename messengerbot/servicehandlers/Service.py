@@ -23,10 +23,12 @@ This file is part of messengerbot.
 
 # imports
 import os
+from PIL import ImageFont
 from PIL import Image
 from PIL import ImageDraw
 from typing import Dict, List
 
+from messengerbot.resources.fonts.__init__ import get_location as get_font
 from messengerbot.connection.generic.Message import Message
 from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
@@ -103,29 +105,34 @@ class Service(object):
         :param message: the message to be sent
         :return: None
         """
-        # Notes to the calculation of width and height:
-        # 100px width == 16 letters
-        # 10px heigth == 1 line
-        # Padding of 1/1 => Starting width/height = 1
-
         image_file_path = os.path.join(LocalConfigChecker.program_directory, "temp_text_image.png")
-
         image_text = message.message_body
-        longest_line = 0
-        for line in image_text.split("\n"):
-            longest_line = len(line) if len(line) > longest_line else longest_line
 
-        height = 2 + len(image_text.split("\n")) * 10 + 10
-        width = 2 + int(longest_line / 16) * 100 + 16
+        fontsize = 30
+        font_file = get_font("NotCourierSans.otf")
+        font = ImageFont.truetype(font_file, fontsize)
+
+        width = 0
+        height = 0
+        avg_height = 0
+        for line in image_text.split("\n"):
+            line_width, line_height = font.getsize(line)
+            if avg_height == 0:
+                avg_height = line_height
+
+            width = line_width if line_width > width else width
+            height += avg_height
+
+        width += 2
+        height += 2
 
         image = Image.new("RGBA", (width, height), (255, 255, 255))  # Create a new image object
         draw = ImageDraw.Draw(image)
-        draw.text((1, 1), image_text, (0, 0, 0))
+        draw.text((1, 1), image_text, (0, 0, 0), font=font)
         ImageDraw.Draw(image)
-
         image.save(image_file_path)
-        self.send_image_message(message.address, image_file_path)
 
+        self.send_image_message(message.address, image_file_path)
         os.remove(image_file_path)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:

@@ -135,7 +135,7 @@ class HelloWorldService(Service):
                              "func main() {\n"
                              "    fmt.Println(\"Hello World!\")\n"
                              "}",
-                       "lua": "print (\"Hallo Welt!\")",
+                       "lua": "print (\"Hello World!\")",
                        "x86 assembly": "section .data\n"
                                        "str:     db 'Hello World!', 0Ah\n"
                                        "str_len: equ $ - str\n\n\n"
@@ -175,7 +175,7 @@ class HelloWorldService(Service):
 
         reply_message = self.generate_reply_message(message, "Hello World", reply)
 
-        if self.connection.identifier in ["whatsapp", "telegram"]:
+        if self.connection.identifier in ["whatsapp", "telegram"] and not prog_language.startswith("list"):
             self.send_text_as_image_message(reply_message)
         else:
             self.send_text_message(reply_message)
