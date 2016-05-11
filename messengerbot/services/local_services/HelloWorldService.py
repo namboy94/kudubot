@@ -174,7 +174,11 @@ class HelloWorldService(Service):
             reply = self.implementations[prog_language]
 
         reply_message = self.generate_reply_message(message, "Hello World", reply)
-        self.send_text_message(reply_message)
+
+        if self.connection.identifier in ["whatsapp", "telegram"]:
+            self.send_text_as_image_message(reply_message)
+        else:
+            self.send_text_message(reply_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:

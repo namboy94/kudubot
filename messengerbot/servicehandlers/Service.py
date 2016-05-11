@@ -22,9 +22,13 @@ This file is part of messengerbot.
 """
 
 # imports
+import os
+from PIL import Image
+from PIL import ImageDraw
 from typing import Dict, List
 
 from messengerbot.connection.generic.Message import Message
+from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 # Weird import structure due to cyclic dependency
 try:
@@ -91,6 +95,38 @@ class Service(object):
         if not self.connection.muted and len(message.message_body) < 2048:
             self.connection.message_logger.log_message(message)
             self.connection.send_text_message(message)
+
+    def send_text_as_image_message(self, message: Message) -> None:
+        """
+        Sends a text message, converted into a monospaced image.
+
+        :param message: the message to be sent
+        :return: None
+        """
+        # Notes to the calculation of width and height:
+        # 100px width == 16 letters
+        # 10px heigth == 1 line
+        # Padding of 1/1 => Starting width/height = 1
+
+        image_file_path = os.path.join(LocalConfigChecker.program_directory, "temp_text_image.png")
+
+        image_text = message.message_body
+        longest_line = 0
+        for line in image_text.split("\n"):
+            longest_line = len(line) if len(line) > longest_line else longest_line
+
+        height = 2 + len(image_text.split("\n")) * 10 + 10
+        width = 2 + int(longest_line / 16) * 100 + 16
+
+        image = Image.new("RGBA", (width, height), (255, 255, 255))  # Create a new image object
+        draw = ImageDraw.Draw(image)
+        draw.text((1, 1), image_text, (0, 0, 0))
+        ImageDraw.Draw(image)
+
+        image.save(image_file_path)
+        self.send_image_message(message.address, image_file_path)
+
+        os.remove(image_file_path)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
