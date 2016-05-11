@@ -108,27 +108,22 @@ class Service(object):
         image_file_path = os.path.join(LocalConfigChecker.program_directory, "temp_text_image.png")
         image_text = message.message_body
 
+        padding = (2, 2)
         fontsize = 30
         font_file = get_font("NotCourierSans.otf")
         font = ImageFont.truetype(font_file, fontsize)
 
-        width = 0
-        height = 0
-        avg_height = 0
-        for line in image_text.split("\n"):
-            line_width, line_height = font.getsize(line)
-            if avg_height == 0:
-                avg_height = line_height
+        image_size_test = Image.new("RGBA", (0, 0), (255, 255, 255))
+        draw_size_test = ImageDraw.Draw(image_size_test)
+        width, height = draw_size_test.textsize(image_text, font=font)
 
-            width = line_width if line_width > width else width
-            height += avg_height
+        width += 2 * padding[0]
+        height += 2 * padding[1]
 
-        width += 2
-        height += 2
-
-        image = Image.new("RGBA", (width, height), (255, 255, 255))  # Create a new image object
+        image = Image.new("RGBA", (width, height), (255, 255, 255))
         draw = ImageDraw.Draw(image)
-        draw.text((1, 1), image_text, (0, 0, 0), font=font)
+        draw.text(padding, image_text, (0, 0, 0), font=font)
+
         ImageDraw.Draw(image)
         image.save(image_file_path)
 
