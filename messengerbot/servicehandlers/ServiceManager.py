@@ -54,6 +54,7 @@ from messengerbot.services.simple_services.SimpleCommandsService import SimpleCo
 from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
 from messengerbot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
 
+from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
 from messengerbot.servicehandlers.ServiceConfigParser import ServiceConfigParser
 
@@ -138,7 +139,9 @@ class ServiceManager(object):
         """
         # Check every service if the message matches the service-specific regex
         for service in self.active_services:
+            PrintLogger.print("Checking Regex for service " + service.identifier, 4)
             if service.regex_check(message):
+                PrintLogger.print("Message passed regex check for service " + service.identifier, 3)
                 # noinspection PyCallingNonCallable
                 concrete_service = service(self.connection)  # Create a service object
                 concrete_service.process_message(message)  # Process the message using the selected service
