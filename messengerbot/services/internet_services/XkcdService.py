@@ -127,6 +127,8 @@ class XkcdService(Service):
 
         image_file = os.path.join(LocalConfigChecker.program_directory, "temp_xkcd.png")
 
+        Service.wait_until_delete(image_file, 5)
+
         try:
             urllib.request.urlretrieve(image_link, image_file)
         except (urllib.error.HTTPError, urllib.error.URLError):
