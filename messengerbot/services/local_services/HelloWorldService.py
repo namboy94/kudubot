@@ -45,7 +45,7 @@ class HelloWorldService(Service):
                               "/helloworld <language|list>",
                         "de": "/helloworld\tSchickt eine Nachricht mit einem 'Hello World' Codeschnipsel für eine"
                               "spezifische Programmiersprache\n"
-                              "synatx:\n"
+                              "syntax:\n"
                               "/helloworld <sprache|liste>"}
     """
     Help description for this service.
@@ -112,6 +112,30 @@ class HelloWorldService(Service):
                        "erlang": "-module(hello).\n"
                                  "-export([hello_world/0]).\n\n"
                                  "hello_world() -> io:fwrite(\"Hello World!\n\").",
+                       "prolog": "?- write('Hello World!'), nl.",
+                       "swift": "print(\"Hello World!\")",
+                       "b": "main() {\n"
+                            "    printf(\"Hello World!\");\n"
+                            "}",
+                       "d": "import std.stdio;\n"
+                            "void main() {\n"
+                            "    writeln(\"Hello World!\");\n"
+                            "}",
+                       "cobol": "000100 IDENTIFICATION DIVISION.\n"
+                                "000200 PROGRAM-ID. HELLOWORLD.\n"
+                                "000900 PROCEDURE DIVISION.\n"
+                                "001000 MAIN.\n"
+                                "001100 DISPLAY \"Hello World!\".\n"
+                                "001200 STOP RUN.",
+                       "fortran": "program hello\n"
+                                  "write(*,*) \"Hello World!\"\n"
+                                  "end program hello",
+                       "go": "package main\n\n"
+                             "import \"fmt\"\n\n"
+                             "func main() {\n"
+                             "    fmt.Println(\"Hello World!\")\n"
+                             "}",
+                       "lua": "print (\"Hallo Welt!\")",
                        "x86 assembly": "section .data\n"
                                        "str:     db 'Hello World!', 0Ah\n"
                                        "str_len: equ $ - str\n\n\n"
