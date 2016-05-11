@@ -52,7 +52,7 @@ def main(override: str = "", verbosity: int = 1) -> None:
     :param verbosity: Can be set to define how verbose the outpt will be. Defaults to 0, no or only basic output
     :return: None
     """
-    PrintLogger.print("Messengerbot V" + metadata.version_number)
+    PrintLogger.print("Messengerbot V " + metadata.version_number)
     PrintLogger.print("Parsing Command Line Arguments", 5)
 
     if override and len(sys.argv) == 1:
