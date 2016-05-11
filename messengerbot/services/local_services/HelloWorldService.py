@@ -142,14 +142,14 @@ class HelloWorldService(Service):
                                        "section .text\n"
                                        "global _start\n\n"
                                        "_start:\n"
-                                       "	mov	eax, 4\n"
-                                       "	mov	ebx, 1\n\n"
-                                       "    mov	ecx, str\n"
-                                       "    mov	edx, str_len\n"
-                                       "    int	80h\n\n"
-                                       "    mov	eax, 1\n"
-                                       "    mov	ebx, 0\n"
-                                       "    int	80h"}
+                                       "    mov eax, 4\n"
+                                       "    mov ebx, 1\n\n"
+                                       "    mov ecx, str\n"
+                                       "    mov edx, str_len\n"
+                                       "    int 80h\n\n"
+                                       "    mov eax, 1\n"
+                                       "    mov ebx, 0\n"
+                                       "    int 80h"}
     """
     The actual implementations of hello world in the different languages
     """
