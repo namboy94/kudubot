@@ -125,6 +125,7 @@ class GoogleTtsService(Service):
         speech_text, language = self.parse_user_input(message.message_body.lower())
         audio_file = self.generate_audio(speech_text, language)
         self.send_audio_message(message.address, audio_file, caption=speech_text)
+        self.delete_file_after(audio_file, 5)
 
     @staticmethod
     def regex_check(message: Message) -> bool:
@@ -172,6 +173,8 @@ class GoogleTtsService(Service):
         :return: the file path to the audio file
         """
         temp_file = os.path.join(LocalConfigChecker.program_directory, "tts_temp.mp3")
+        Service.wait_until_delete(temp_file, 5)
+
         tts = gTTS(text=text_string, lang=language)
         tts.save(temp_file)
         return temp_file

@@ -71,9 +71,10 @@ class ImageSenderService(Service):
         # Download file via http url
         try:
             local_file = os.path.join(LocalConfigChecker.program_directory, image_name)
+            self.wait_until_delete(local_file, 5)
             urllib.request.urlretrieve(link, local_file)
             self.send_image_message(message.address, local_file, image_name)
-            os.remove(local_file)
+            self.delete_file_after(local_file, 5)
 
         except (urllib.error.HTTPError, urllib.error.URLError):
             reply = self.image_download_error[self.connection.last_used_language]
