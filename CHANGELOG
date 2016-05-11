@@ -1,3 +1,7 @@
+V 0.7.2
+   - Implemented text-to image converter
+   - fixed issues in email receiver
+   - added a couple more verbosity options
 V 0.7.1
    - Added Hello World Service
    - Added XKCD Random Number Generator Service
