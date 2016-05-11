@@ -86,6 +86,7 @@ class TestHelloWorldService(object):
 
         dummy_connection = Dummy()
         dummy_connection.last_used_language = "en"
+        dummy_connection.identifier = "dummy"
         self.initialized_service = self.service(dummy_connection)
         self.initialized_service.send_text_message = self.store_reply
 

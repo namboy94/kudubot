@@ -45,7 +45,7 @@ class HelloWorldService(Service):
                               "/helloworld <language|list>",
                         "de": "/helloworld\tSchickt eine Nachricht mit einem 'Hello World' Codeschnipsel für eine"
                               "spezifische Programmiersprache\n"
-                              "synatx:\n"
+                              "syntax:\n"
                               "/helloworld <sprache|liste>"}
     """
     Help description for this service.
@@ -112,20 +112,44 @@ class HelloWorldService(Service):
                        "erlang": "-module(hello).\n"
                                  "-export([hello_world/0]).\n\n"
                                  "hello_world() -> io:fwrite(\"Hello World!\n\").",
+                       "prolog": "?- write('Hello World!'), nl.",
+                       "swift": "print(\"Hello World!\")",
+                       "b": "main() {\n"
+                            "    printf(\"Hello World!\");\n"
+                            "}",
+                       "d": "import std.stdio;\n"
+                            "void main() {\n"
+                            "    writeln(\"Hello World!\");\n"
+                            "}",
+                       "cobol": "000100 IDENTIFICATION DIVISION.\n"
+                                "000200 PROGRAM-ID. HELLOWORLD.\n"
+                                "000900 PROCEDURE DIVISION.\n"
+                                "001000 MAIN.\n"
+                                "001100 DISPLAY \"Hello World!\".\n"
+                                "001200 STOP RUN.",
+                       "fortran": "program hello\n"
+                                  "write(*,*) \"Hello World!\"\n"
+                                  "end program hello",
+                       "go": "package main\n\n"
+                             "import \"fmt\"\n\n"
+                             "func main() {\n"
+                             "    fmt.Println(\"Hello World!\")\n"
+                             "}",
+                       "lua": "print (\"Hello World!\")",
                        "x86 assembly": "section .data\n"
                                        "str:     db 'Hello World!', 0Ah\n"
                                        "str_len: equ $ - str\n\n\n"
                                        "section .text\n"
                                        "global _start\n\n"
                                        "_start:\n"
-                                       "	mov	eax, 4\n"
-                                       "	mov	ebx, 1\n\n"
-                                       "    mov	ecx, str\n"
-                                       "    mov	edx, str_len\n"
-                                       "    int	80h\n\n"
-                                       "    mov	eax, 1\n"
-                                       "    mov	ebx, 0\n"
-                                       "    int	80h"}
+                                       "    mov eax, 4\n"
+                                       "    mov ebx, 1\n\n"
+                                       "    mov ecx, str\n"
+                                       "    mov edx, str_len\n"
+                                       "    int 80h\n\n"
+                                       "    mov eax, 1\n"
+                                       "    mov ebx, 0\n"
+                                       "    int 80h"}
     """
     The actual implementations of hello world in the different languages
     """
@@ -147,13 +171,14 @@ class HelloWorldService(Service):
         if prog_language.startswith("list"):
             reply = self.list_languages()
         else:
-            try:
-                reply = self.implementations[prog_language]
-            except KeyError:
-                reply = self.language_not_found_error[self.connection.last_used_language]
+            reply = self.implementations[prog_language]
 
         reply_message = self.generate_reply_message(message, "Hello World", reply)
-        self.send_text_message(reply_message)
+
+        if self.connection.identifier in ["whatsapp", "telegram"] and not prog_language.startswith("list"):
+            self.send_text_as_image_message(reply_message)
+        else:
+            self.send_text_message(reply_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:

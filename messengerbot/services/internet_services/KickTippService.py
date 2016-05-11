@@ -61,7 +61,10 @@ class KickTippService(Service):
         reply = self.get_kicktipp_info(kicktipp_community)
 
         reply_message = self.generate_reply_message(message, "Kicktipp", reply)
-        self.send_text_message(reply_message)
+        if self.connection.identifier in ["whatsapp", "telegram"]:
+            self.send_text_as_image_message(reply_message)
+        else:
+            self.send_text_message(reply_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:

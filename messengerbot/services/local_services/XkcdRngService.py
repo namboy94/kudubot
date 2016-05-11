@@ -78,7 +78,10 @@ class XkcdRngService(Service):
             self.connection.last_used_language = self.source_keywords[message.message_body.lower().split(" ")[1]]
 
         reply_message = self.generate_reply_message(message, "XKCD RNG", reply)
-        self.send_text_message(reply_message)
+        if reply != 4 and self.connection.identifier in ["telegram", "whatsapp"]:
+            self.send_text_as_image_message(reply_message)
+        else:
+            self.send_text_message(reply_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:

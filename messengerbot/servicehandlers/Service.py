@@ -22,9 +22,17 @@ This file is part of messengerbot.
 """
 
 # imports
+import os
+import time
+from threading import Thread
+from PIL import ImageFont
+from PIL import Image
+from PIL import ImageDraw
 from typing import Dict, List
 
+from messengerbot.resources.fonts.__init__ import get_location as get_font
 from messengerbot.connection.generic.Message import Message
+from messengerbot.config.LocalConfigChecker import LocalConfigChecker
 
 # Weird import structure due to cyclic dependency
 try:
@@ -91,6 +99,40 @@ class Service(object):
         if not self.connection.muted and len(message.message_body) < 2048:
             self.connection.message_logger.log_message(message)
             self.connection.send_text_message(message)
+
+    def send_text_as_image_message(self, message: Message) -> None:
+        """
+        Sends a text message, converted into a monospaced image.
+
+        :param message: the message to be sent
+        :return: None
+        """
+        image_file_path = os.path.join(LocalConfigChecker.program_directory, "temp_text_image.png")
+        image_text = message.message_body
+
+        self.wait_until_delete(image_file_path, 5)
+
+        padding = (2, 2)
+        fontsize = 30
+        font_file = get_font("NotCourierSans.otf")
+        font = ImageFont.truetype(font_file, fontsize)
+
+        image_size_test = Image.new("RGBA", (0, 0), (255, 255, 255))
+        draw_size_test = ImageDraw.Draw(image_size_test)
+        width, height = draw_size_test.textsize(image_text, font=font)
+
+        width += 2 * padding[0]
+        height += 2 * padding[1]
+
+        image = Image.new("RGBA", (width, height), (255, 255, 255))
+        draw = ImageDraw.Draw(image)
+        draw.text(padding, image_text, (0, 0, 0), font=font)
+
+        ImageDraw.Draw(image)
+        image.save(image_file_path)
+
+        self.send_image_message(message.address, image_file_path)
+        self.delete_file_after(image_file_path, 5)
 
     def send_image_message(self, receiver: str, message_image: str, caption: str = "") -> None:
         """
@@ -185,3 +227,49 @@ class Service(object):
         regex_string += ")"
 
         return regex_string
+
+    @staticmethod
+    def delete_file_after(file_path: str, after_seconds: int) -> None:
+        """
+        Deletes a file asynchronuously after a period of time
+
+        :param file_path: the path to the file to delete
+        :param after_seconds: after how many seconds should the file be deleted
+        :return: None
+        """
+
+        def delete_file_and_wait() -> None:
+            """
+            Deletes the file after the amount of seconds specified
+
+            :return: None
+            """
+            time.sleep(after_seconds)
+            try:
+                os.remove(file_path)
+            except FileNotFoundError:
+                pass
+
+        delete_thread = Thread(target=delete_file_and_wait)
+        delete_thread.daemon = True
+        delete_thread.start()
+
+    @staticmethod
+    def wait_until_delete(file_path: str, time_out: int) -> None:
+        """
+        Waits until a file is deleted. If it is not deleted within a given time period, manually delete the file
+
+        :param file_path: the file to wait for
+        :param time_out: the maximum time period to wait
+        :return: None
+        """
+        sleep_seconds = 0
+        while os.path.isfile(file_path):
+            time.sleep(1)
+            sleep_seconds += 1
+
+            if sleep_seconds >= time_out:
+                try:
+                    os.remove(file_path)
+                except FileNotFoundError:
+                    pass
