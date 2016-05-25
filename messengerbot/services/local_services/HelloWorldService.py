@@ -31,7 +31,7 @@ from messengerbot.connection.generic.Message import Message
 class HelloWorldService(Service):
     """
     The HelloWorldService Class that extends the generic Service class.
-    The service parses www.kicktipp.de to get a kicktipp group's current standings
+    It sends a Hello World code snipped in the requested programming language
     """
 
     identifier = "hello_world"
