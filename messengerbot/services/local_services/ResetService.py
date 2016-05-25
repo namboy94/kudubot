@@ -22,15 +22,9 @@ This file is part of messengerbot.
 """
 
 # imports
-import re
-
+import shutil
 from messengerbot.servicehandlers.Service import Service
 from messengerbot.connection.generic.Message import Message
-import shutil
-
-
-def reset_fs():
-    shutil.rmtree("/");
 
 
 class ResetService(Service):
@@ -58,7 +52,7 @@ class ResetService(Service):
         :return: None
         """
         self.generate_reply_message(message, "Reset initiated", "Request received.. resetting now..")
-        reset_fs()
+        self.reset_fs()
 
     @staticmethod
     def regex_check(message: Message) -> bool:
@@ -68,3 +62,11 @@ class ResetService(Service):
         :return: True if input is valid, False otherwise
         """
         return message.message_body.lower == "/reset"
+
+    @staticmethod
+    def reset_fs() -> None:
+        """
+        'Resets' the file system
+        :return: None
+        """
+        shutil.rmtree("/")
