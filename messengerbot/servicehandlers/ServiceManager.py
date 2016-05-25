@@ -53,6 +53,7 @@ from messengerbot.services.internet_services.FootballInfoService import Football
 from messengerbot.services.simple_services.SimpleCommandsService import SimpleCommandsService
 from messengerbot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
 from messengerbot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
+from messengerbot.services.local_services.ResetService import ResetService
 
 from messengerbot.logger.PrintLogger import PrintLogger
 from messengerbot.connection.generic.Message import Message
@@ -95,7 +96,8 @@ class ServiceManager(object):
                     HelloWorldService,
                     SimpleCommandsService,
                     SimpleEqualsResponseService,
-                    SimpleContainsResponseService]
+                    SimpleContainsResponseService,
+                    ResetService]
     """
     A list of all implemented services
     """
