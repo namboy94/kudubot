@@ -22,14 +22,14 @@ run_unit_tests:
   script:
     - cd
     - cd messengerbot
-    - python setup.py test
+    - python3 setup.py test
 
 upload_to_pypi:
   stage: deploy
   only:
     - master
   script:
-    - python setup.py register sdist upload
+    - python3 setup.py register sdist upload
   allow_failure: true
 
 upload_documentation_and_statistics:
