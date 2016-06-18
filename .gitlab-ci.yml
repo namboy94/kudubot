@@ -20,8 +20,6 @@ run_unit_tests:
     - master
     - develop
   script:
-    - cd
-    - cd messengerbot
     - python3 setup.py test
 
 upload_to_pypi:
