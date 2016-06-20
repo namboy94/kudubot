@@ -30,10 +30,10 @@ from messengerbot.servicehandlers.required_services.MuterService import MuterSer
 from messengerbot.servicehandlers.required_services.ServiceSelectorService import ServiceSelectorService
 
 # other services
-from messengerbot.services.local_services.ResetService import ResetService
+# from services.thirdparty.ResetService import ResetService
+# from services.thirdparty.BotMuteService import BotMuteService
 from messengerbot.services.local_services.CasinoService import CasinoService
 from messengerbot.services.local_services.XkcdRngService import XkcdRngService
-from messengerbot.services.local_services.BotMuteService import BotMuteService
 from messengerbot.services.local_services.RouletteService import RouletteService
 from messengerbot.services.local_services.ReminderService import ReminderService
 from messengerbot.services.local_services.RestarterService import RestarterService
@@ -98,8 +98,9 @@ class ServiceManager(object):
                     SimpleCommandsService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService,
-                    ResetService,
-                    BotMuteService]
+                    # ResetService,
+                    # BotMuteService
+                    ]
     """
     A list of all implemented services
     """
