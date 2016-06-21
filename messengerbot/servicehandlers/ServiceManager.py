@@ -164,5 +164,5 @@ class ServiceManager(object):
                 threads.append(Thread(target=service(self.connection).background_process))
 
         for thread in threads:
-            thread.setDaemon(True)
+            thread.daemon = True
             thread.start()
