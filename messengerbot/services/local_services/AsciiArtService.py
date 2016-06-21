@@ -46,14 +46,52 @@ class AsciiArtService(Service):
                         "de": "/ascii\tSchickt ein Bild mit ASCII Kunst\n"
                               "syntax:\n"
                               "/ascii liste (Listet alle verfügbaren bilder auf)"
-                              "/ascii <bild>"}
+                              "/ascii linux ascii art<bild>"}
     """
     Help description for this service.
     """
 
-    art = {
-        "test": "TEST"
-    }
+    art = {"tux":
+           ""
+           "                         4MMMMMMMMMMMML"
+           "                       4MMMMMMMMMMMMMMMML"
+           "                      MMMMMMMMMMMMMMMMMMML"
+           "                     4MMMMMMMMMMMMMMMMMMMMM"
+           "                    4MMMMMMMMMMMMMMMMMMMMMML"
+           "                    MMMMP   MMMMMM   MMMMMMM"
+           "                    MMMM MM  MMM  MM  MMMMMM"
+           "                    MMMM MM  MMM  MM  MMMMML"
+           "                     MMM MP,,,,,,,MM  MMMMMM"
+           "                      MM,\"          \"MMMMMMP"
+           "                      MMw           'MMMMMM"
+           "                      MM\"w         w MMMMMMML"
+           "                      MM\" w       w \" MMMoMMML"
+           "                     MMM \" wwwwwww \"  MMMMMMML"
+           "                   MMMP   \".,,,,,,\"     MMMMMMMML"
+           "                  MMMP                    MMMMMMMML"
+           "                MMMMM                      MMMMMMMML"
+           "               MMMMM,,-''             ''-,,MMMMMMMMML"
+           "              MMMMM                          MMMMMMMMML"
+           "             MMMMM                            MMMMMMMMML"
+           "            MMMMM                             MMMMMMMMMM"
+           "            MMMM                               MMMMMMMMMM"
+           "           MMMMM                               MMMMMMMMMML"
+           "          MMMMM                                MMMMMMMMMMM"
+           "         MMMMMM                                MMMMMMMMMMM"
+           "         MMMMMMM                               MMMMMMMMMMM"
+           "         \"\"\"\"MMMM                             MMMMMMMMMMP"
+           "        \"     \"\"MMM                            MMMMMMMMP"
+           "   \"\" \"         \"MMMMMM                      \"\"\"\"MMMMMP\"\"\""
+           " \"               \"MMMMMMM                   \"\"   \"\"\"\"\"\"   \""
+           " \"                \"\"MMMMMM                 M\"             \" \"\""
+           "  \"                 \"                   MMM\"                  \""
+           " \"                   \"M               MMMM\"                   \""
+           " \"                    \"MM        MMMMMMMMM\"                \"\""
+           " \"                    \"MMMMMMMMMMMMMMMMMMM\"              \"\"\""
+           "  \"\"\"\"                \"MMMMMMMMMMMMMMMMMM\"           \"\"\"\""
+           "      \"\"\"\"\"\"\"\"       MMMMM               \"        \"\""
+           "              \"\"\"\"\"\"\"\"                      \"\"\"\"\"\"\""
+           ""}
 
     def process_message(self, message: Message) -> None:
         """
