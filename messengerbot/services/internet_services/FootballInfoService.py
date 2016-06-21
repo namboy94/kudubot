@@ -215,7 +215,8 @@ class FootballInfoService(Service):
         soup = BeautifulSoup(html, "html.parser")
         return soup.select(html_element)
 
-    def format_league_table(self, league_table_dictionary: Dict[int, Dict[str, str]]) -> str:
+    @staticmethod
+    def format_league_table(league_table_dictionary: Dict[int, Dict[str, str]]) -> str:
         """
         Formats a league table dictionary
 
