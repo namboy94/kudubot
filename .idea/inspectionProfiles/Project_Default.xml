@@ -7,12 +7,14 @@
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="5">
+          <list size="7">
             <item index="0" class="java.lang.String" itemvalue="yowsup" />
             <item index="1" class="java.lang.String" itemvalue="bs4" />
             <item index="2" class="java.lang.String" itemvalue="PIL" />
             <item index="3" class="java.lang.String" itemvalue="telegram" />
             <item index="4" class="java.lang.String" itemvalue="yowsup2" />
+            <item index="5" class="java.lang.String" itemvalue="gTTS" />
+            <item index="6" class="java.lang.String" itemvalue="python-telegram-bot" />
           </list>
         </value>
       </option>

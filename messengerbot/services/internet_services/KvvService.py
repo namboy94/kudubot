@@ -123,7 +123,6 @@ class KvvService(Service):
         """
         options["key"] = self.kvv_api_key
         query_url = self.kvv_url + path + "?" + urlencode(options)
-        print(query_url)
 
         query_request = urllib.request.Request(query_url)
         opened_query_url = urllib.request.urlopen(query_request)

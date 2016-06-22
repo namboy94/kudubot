@@ -95,6 +95,8 @@ class RandomKeyGeneratorService(Service):
         :return: the random key
         """
         random_key = ""
+        if length > 100:
+            return "Sorry"
         for x in range(0, length):
             random_key += random.choice(self.alphabet)
         return random_key

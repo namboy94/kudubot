@@ -1,178 +1,49 @@
 stages:
   - setup
   - test
-  - upload
-  - upgrade
-  - cleanup
+  - deploy
+  - wiki
 
-
-
-
-clone_master:
+mirror_repo:
   stage: setup
   only:
     - master
+    - develop
   script:
-    - cd
-    - git clone git@gitlab.namibsun.net:namboy94/messengerbot.git
-    - git clone git@gitlab.namibsun.net:namboy94/messengerbot.wiki.git
-    - cd messengerbot
-    - git push -u git@gitlab.com:namboy94/messengerbot.git --all
+    #- git push -u git@gitlab.com:namboy94/messengerbot.git --all
     - git push -u git@github.com:namboy94/messengerbot.git --all
-    - git push -u git@bitbucket.org:namboy94/messengerbot.git --all
+    #- git push -u git@bitbucket.org:namboy94/messengerbot.git --all
 
-clone_develop:
-  stage: setup
-  only:
-    - develop
-  script:
-    - cd
-    - git clone -b develop git@gitlab.namibsun.net:namboy94/messengerbot.git messengerbot-develop
-    - cd messengerbot-develop
-    - git push -u git@gitlab.com:namboy94/messengerbot.git --all
-    - git push -u git@github.com:namboy94/messengerbot.git --all
-    - git push -u git@bitbucket.org:namboy94/messengerbot.git --all
-
-
-
-
-
-
-
-
-uninstall:
-  stage: setup
+run_unit_tests:
+  stage: test
   only:
     - master
     - develop
   script:
-    - sudo pip3.5 uninstall -y messenger_bot
-  allow_failure: true
-
-
-
-
-
-
-
-
-
-run_unit_tests_master:
-  stage: test
-  only:
-    - master
-  script:
-    - cd
-    - cd messengerbot
-    - python setup.py test
-
-run_unit_tests_develop:
-  stage: test
-  only:
-    - develop
-  script:
-    - cd
-    - cd messengerbot-develop
-    - python setup.py test
-
-generate_statistics:
-  stage: test
-  only:
-    - master
-  script:
-    - cd
-    - cd messengerbot
-    - git_stats generate
-    - cd
-    - cd messengerbot.wiki
-    - cp -r ../messengerbot/git_stats .
-
-generate_documentation:
-  stage: test
-  only:
-    - master
-  script:
-    - cd
-    - cd messengerbot/doc
-    - make clean
-    - make buildsource
-    - make html
-    - cd
-    - cd messengerbot.wiki
-    - rm -rf html
-    - cp -r ../messengerbot/doc/build/html .
-
-
-
-
-
-
-
+    - python3 setup.py test
 
 upload_to_pypi:
-  stage: upload
+  stage: deploy
   only:
     - master
   script:
-    - cd
-    - cd messengerbot
-    - python setup.py register sdist upload
-    - sleep 60
+    - python3 setup.py register sdist upload
   allow_failure: true
 
 upload_documentation_and_statistics:
-  stage: upload
+  stage: wiki
   only:
     - master
   script:
-    - cd
+    - git_stats generate
+    - cd doc
+    - make clean
+    - make buildsource
+    - make html
+    - cd ..
+
+    - git clone git@gitlab.namibsun.net:namboy94/messengerbot.wiki.git
     - cd messengerbot.wiki
-    - git add --all
-    - git commit -m "Updated documentation and statistics"
-    - git push -u origin master
-
-
-
-
-
-
-
-upgrade_from_pypi:
-  stage: upgrade
-  only:
-    - master
-  script:
-    - sudo pip3.5 install messenger_bot --upgrade
-
-upgrade_from_source:
-  stage: upgrade
-  only:
-    - develop
-  script:
-    - cd
-    - cd messengerbot-develop
-    - sudo python3 setup.py install
-
-
-
-
-
-
-delete_clone_master:
-  stage: cleanup
-  when: always
-  only:
-    - master
-  script:
-    - cd
-    - rm -rf messengerbot
-    - rm -rf messengerbot.wiki
-
-delete_clone_develop:
-  stage: cleanup
-  when: always
-  only:
-    - develop
-  script:
-    - cd
-    - sudo rm -rf messengerbot-develop
+    - rm -rf git_stats html
+    - mv ../git_stats .
+    - mv ../doc/build/html .
