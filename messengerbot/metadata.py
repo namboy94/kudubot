@@ -90,15 +90,6 @@ python2_requirements = python3_requirements
 Python 2 Python Packaging Index requirements
 """
 
-scripts = ["bin/messengerbot",
-           'bin/messengerbot-email',
-           'bin/messengerbot-whatsapp',
-           'bin/messengerbot-telegram',
-           'bin/messengerbot-all']
-"""
-List of script files to be installed during installation
-"""
-
 verbosity = 0
 """
 Identifier for the selected verbosity
