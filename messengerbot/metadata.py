@@ -36,7 +36,7 @@ project_description = "A bot that interfaces with several different messenger se
 A short description of the project
 """
 
-version_number = "0.7.2"
+version_number = "0.7.3"
 """
 The current version of the program.
 """
@@ -88,15 +88,6 @@ Python 3 Python Packaging Index requirements
 python2_requirements = python3_requirements
 """
 Python 2 Python Packaging Index requirements
-"""
-
-scripts = ["bin/messengerbot",
-           'bin/messengerbot-email',
-           'bin/messengerbot-whatsapp',
-           'bin/messengerbot-telegram',
-           'bin/messengerbot-all']
-"""
-List of script files to be installed during installation
 """
 
 verbosity = 0
