@@ -10,9 +10,9 @@ mirror_repo:
     - master
     - develop
   script:
-    #- git push -u git@gitlab.com:namboy94/messengerbot.git --all
-    - git push -u git@github.com:namboy94/messengerbot.git --all
-    #- git push -u git@bitbucket.org:namboy94/messengerbot.git --all
+    #- git push -u git@gitlab.com:namboy94/kudubot.git --all
+    - git push -u git@github.com:namboy94/kudubot.git --all
+    #- git push -u git@bitbucket.org:namboy94/kudubot.git --all
 
 run_unit_tests:
   stage: test
@@ -42,8 +42,8 @@ upload_documentation_and_statistics:
     - make html
     - cd ..
 
-    - git clone git@gitlab.namibsun.net:namboy94/messengerbot.wiki.git
-    - cd messengerbot.wiki
+    - git clone git@gitlab.namibsun.net:namboy94/kudubot.wiki.git
+    - cd kudubot.wiki
     - rm -rf git_stats html
     - mv ../git_stats .
     - mv ../doc/build/html .

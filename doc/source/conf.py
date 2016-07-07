@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# messengerbot documentation build configuration file, created by
+# kudubot documentation build configuration file, created by
 # sphinx-quickstart on Sat Apr  9 01:18:26 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -55,7 +55,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'messengerbot'
+project = 'kudubot'
 copyright = '2016, Hermann Krumrey'
 author = 'Hermann Krumrey'
 
@@ -231,7 +231,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'messengerbot.tex', 'messengerbot Documentation',
+    (master_doc, 'kudubot.tex', 'kudubot Documentation',
      'Hermann Krumrey', 'manual'),
 ]
 
@@ -261,7 +261,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'messengerbot', 'messengerbot Documentation',
+    (master_doc, 'kudubot', 'kudubot Documentation',
      [author], 1)
 ]
 
@@ -275,8 +275,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'messengerbot', 'messengerbot Documentation',
-     author, 'messengerbot', 'One line description of project.',
+    (master_doc, 'kudubot', 'kudubot Documentation',
+     author, 'kudubot', 'One line description of project.',
      'Miscellaneous'),
 ]
 

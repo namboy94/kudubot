@@ -25,7 +25,7 @@ LICENSE
 
 # imports
 from setuptools import setup, find_packages
-import messengerbot.metadata as metadata
+import kudubot.metadata as metadata
 
 
 def readme() -> str:
