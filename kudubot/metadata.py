@@ -80,7 +80,7 @@ The project's license type
 """
 
 dependencies = ['tvdb_api',
-                'yowsup2'
+                'yowsup2',
                 'pywapi',
                 'pillow',
                 'beautifulsoup4',

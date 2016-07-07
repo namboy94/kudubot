@@ -24,6 +24,7 @@ LICENSE
 """
 
 # imports
+import os
 from setuptools import setup, find_packages
 import kudubot.metadata as metadata
 
@@ -48,6 +49,19 @@ def readme() -> str:
             return f.read()
 
 
+def find_scripts():
+    """
+    Returns a list of scripts in the bin directory
+
+    :return: the list of scripts
+    """
+    scripts = []
+    for file_name in os.listdir("bin"):
+        if not file_name == "__init__.py" and os.path.isfile(os.path.join("bin", file_name)):
+            scripts.append(os.path.join("bin", file_name))
+    return scripts
+
+
 setup(name=metadata.project_name,
       version=metadata.version_number,
       description=metadata.project_description,
@@ -69,5 +83,5 @@ setup(name=metadata.project_name,
       dependency_links=[],
       test_suite='nose.collector',
       tests_require=['nose'],
-      scripts=[],
+      scripts=find_scripts(),
       zip_safe=False)
