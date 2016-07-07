@@ -1,5 +1,6 @@
 # coding=utf-8
 """
+LICENSE:
 Copyright 2015,2016 Hermann Krumrey
 
 This file is part of kudubot.
@@ -19,6 +20,7 @@ This file is part of kudubot.
 
     You should have received a copy of the GNU General Public License
     along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
+LICENSE
 """
 
 # imports

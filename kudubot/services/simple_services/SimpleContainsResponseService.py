@@ -1,11 +1,12 @@
 # coding=utf-8
 """
+LICENSE:
 Copyright 2015,2016 Hermann Krumrey
 
 This file is part of kudubot.
 
     kudubot makes use of various third-party python modules to serve
-    information via the online chat services.
+    information via online chat services.
 
     kudubot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,8 +20,8 @@ This file is part of kudubot.
 
     You should have received a copy of the GNU General Public License
     along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
+LICENSE
 """
-
 import random
 
 from kudubot.servicehandlers.Service import Service
