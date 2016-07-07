@@ -27,7 +27,7 @@ import messengerbot.metadata as metadata
 from setuptools import setup, find_packages
 
 
-def readme() -> str:
+def readme():
     """
     Reads the readme file and converts it from markdown to restructured text
 
@@ -65,7 +65,6 @@ setup(name=metadata.project_name,
       description=metadata.project_description,
       long_description=readme(),
       classifiers=[metadata.development_status,
-                   'Intended Audience :: End Users/Desktop',
                    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
                    'Programming Language :: Python :: 3',
                    'Topic :: Internet',

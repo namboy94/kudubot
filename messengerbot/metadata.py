@@ -21,12 +21,17 @@ This file is part of messengerbot.
     along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+verbosity = 0
+"""
+Identifier for the selected verbosity
+"""
+
 """
 The metadata is stored here. It can be used by any other module in this project this way, most
 notably by the setup.py file
 """
 
-project_name = "messenger_bot"
+project_name = "kudubot"
 """
 The name of the project
 """
@@ -46,13 +51,13 @@ development_status = "Development Status :: 3 - Alpha"
 The current development status of the program
 """
 
-project_url = "http://namibsun.net/namboy94/messengerbot"
+project_url = "http://namibsun.net/namboy94/kudubot"
 """
 A URL linking to the home page of the project, in this case a
 self-hosted Gitlab page
 """
 
-download_url = "http://gitlab.namibsun.net/namboy94/messengerbot/repository/archive.zip?ref=master"
+download_url = "http://gitlab.namibsun.net/namboy94/kudubot/repository/archive.zip?ref=master"
 """
 A URL linking to the current source zip file.
 """
@@ -72,25 +77,52 @@ license_type = "GNU GPL3"
 The project's license type
 """
 
-python3_requirements = ['tvdb_api',
-                        # 'yowsup2',     Currently the develop branch is needed, which is not on pypi
-                        'pywapi',
-                        'pillow',
-                        'beautifulsoup4',
-                        'typing',
-                        'python-telegram-bot',
-                        'gTTS',
-                        'irc']
+dependencies = ['tvdb_api',
+                'yowsup2'
+                'pywapi',
+                'pillow',
+                'beautifulsoup4',
+                'typing',
+                'python-telegram-bot',
+                'gTTS',
+                'irc']
 """
-Python 3 Python Packaging Index requirements
-"""
-
-python2_requirements = python3_requirements
-"""
-Python 2 Python Packaging Index requirements
+Python Packaging Index requirements
 """
 
-verbosity = 0
+audiences = ["Intended Audience :: End Users/Desktop",
+             "Intended Audience :: Developers"]
 """
-Identifier for the selected verbosity
+The intended audience of this software
+"""
+
+environment = "Environment :: Other Environment"
+"""
+The intended environment in which the program will be used
+"""
+
+programming_languages = ['Programming Language :: Python :: 3',
+                         'Programming Language :: Python :: 2']
+"""
+The programming language used in this project
+"""
+
+topic = "'Topic :: Internet'"
+"""
+The broad subject/topic of the project
+"""
+
+language = "Natural Language :: English"
+"""
+The (default) language of this project
+"""
+
+compatible_os = "'Operating System :: POSIX :: Linux"
+"""
+The Operating Systems on which the program can run
+"""
+
+license_identifier = "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+"""
+The license used for this project
 """
