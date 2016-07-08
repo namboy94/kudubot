@@ -7,6 +7,7 @@
           <resourceRoots>
             <path value="file://$PROJECT_DIR$/res" />
             <path value="file://$PROJECT_DIR$/messengerbot/resources" />
+            <path value="file://$PROJECT_DIR$/kudubot/resources" />
           </resourceRoots>
         </entryData>
       </entry>

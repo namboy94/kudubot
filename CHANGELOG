@@ -1,3 +1,9 @@
+V 0.7.4
+   - Updated Documentation
+   - Renamed project to 'kudubot'
+   - Enabled binary python 2 support
+V 0.7.3
+   - Added ASCII art generator
 V 0.7.2
    - Added support for asynchronous media file sending
    - Implemented text-to image converter

@@ -1,35 +1,37 @@
 # coding=utf-8
 """
+LICENSE:
 Copyright 2015,2016 Hermann Krumrey
 
-This file is part of messengerbot.
+This file is part of kudubot.
 
-    messengerbot makes use of various third-party python modules to serve
+    kudubot makes use of various third-party python modules to serve
     information via online chat services.
 
-    messengerbot is free software: you can redistribute it and/or modify
+    kudubot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    messengerbot is distributed in the hope that it will be useful,
+    kudubot is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with messengerbot.  If not, see <http://www.gnu.org/licenses/>.
+    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
+LICENSE
 """
 
 # imports
 import os
-import messengerbot.metadata as metadata
 from setuptools import setup, find_packages
+import kudubot.metadata as metadata
 
 
 def readme() -> str:
     """
-    Reads the readme file and converts it from markdown to restructured text
+    Reads the readme file.
 
     :return: the readme file as a string
     """
@@ -47,7 +49,7 @@ def readme() -> str:
             return f.read()
 
 
-def find_scripts() -> "list of scripts":
+def find_scripts():
     """
     Returns a list of scripts in the bin directory
 
@@ -55,8 +57,8 @@ def find_scripts() -> "list of scripts":
     """
     scripts = []
     for file_name in os.listdir("bin"):
-        if not file_name == "__init__.py":
-            scripts.append("bin/" + file_name)
+        if not file_name == "__init__.py" and os.path.isfile(os.path.join("bin", file_name)):
+            scripts.append(os.path.join("bin", file_name))
     return scripts
 
 
@@ -65,23 +67,21 @@ setup(name=metadata.project_name,
       description=metadata.project_description,
       long_description=readme(),
       classifiers=[metadata.development_status,
-                   'Intended Audience :: End Users/Desktop',
-                   'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-                   'Programming Language :: Python :: 3',
-                   'Topic :: Internet',
-                   'Natural Language :: English',
-                   'Operating System :: POSIX :: Linux'
-                   ],
+                   metadata.license_identifier,
+                   metadata.topic,
+                   metadata.language,
+                   metadata.compatible_os,
+                   metadata.environment
+                   ] + metadata.programming_languages + metadata.audiences,
       url=metadata.project_url,
+      download_url=metadata.download_url,
       author=metadata.author_name,
       author_email=metadata.author_email,
       license=metadata.license_type,
       packages=find_packages(),
-      install_requires=metadata.python3_requirements,
-      scripts=find_scripts(),
+      install_requires=metadata.dependencies,
+      dependency_links=[],
       test_suite='nose.collector',
       tests_require=['nose'],
+      scripts=find_scripts(),
       zip_safe=False)
-
-# How to upload to pypi:
-# python setup.py register sdist upload
