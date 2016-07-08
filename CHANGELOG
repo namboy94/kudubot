@@ -1,3 +1,5 @@
+V 0.7.3
+   - Added ASCII art generator
 V 0.7.2
    - Added support for asynchronous media file sending
    - Implemented text-to image converter
