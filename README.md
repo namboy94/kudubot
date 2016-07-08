@@ -69,24 +69,24 @@ issues on your version control hoster of choice.
 
 For a guide on how to extend the bot, see [this](doc/hand_crafted/extending_guide.md).
 
+## Contributing
 
+This project is automatically mirrored to [github](https://github.com/namboy94/kudubot), however all development
+is conducted at a privately hosted [Gitlab instance](http://gitlab.namibsun.net/namboy94/kudubot). Issues
+on both services are taken unto consideration.
+
+## Documentation
+
+Sphinx Documentation can be found [here](http://krumreyh.eu/kudubot/documentation/html/index.html).
+A [PDF version](http://krumreyh.eu/kudubot/documentation/documentation.pdf) is also available
 
 ## Support
 
 If you have any questions about kudubot, feel free to open an issue or contact me directly at
-krumreyh@namibsun.net.
+hermann@krumreyh.com.
 
-## Links
+## Statistics
 
-The repository is mirrored to:
+Automatically generated git statistics can be found [here](http://krumreyh.eu/kudubot/git_stats/index.html)
 
-* [Github Mirror](https://github.com/namboy94/kudubot)
-* [Gitlab Mirror](https://gitlab.com/namboy94/kudubot)
-* [Bitbucket Mirror](https://bitbucket.org/namboy94/kudubot)
-
-Other links:
-
-* [Changelog](http://gitlab.namibsun.net/namboy94/kudubot/raw/master/CHANGELOG)
-* [Python Package Index Site](https://pypi.python.org/pypi/messenger_bot)
-* [Git Statistics](http://gitlab.namibsun.net/namboy94/kudubot/wikis/git_stats/general.html)
-* [Documentation](http://gitlab.namibsun.net/namboy94/kudubot/wikis/html/index.html)
+[Changelog](http://gitlab.namibsun.net/namboy94/kudubot/raw/master/CHANGELOG)
