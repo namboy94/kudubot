@@ -43,7 +43,7 @@ project_description = "A bot that interfaces with several different messenger se
 A short description of the project
 """
 
-version_number = "0.7.4"
+version_number = "0.7.5"
 """
 The current version of the program.
 """
@@ -109,7 +109,7 @@ programming_languages = ['Programming Language :: Python :: 3',
 The programming language used in this project
 """
 
-topic = "'Topic :: Internet'"
+topic = "Topic :: Internet"
 """
 The broad subject/topic of the project
 """
@@ -119,7 +119,7 @@ language = "Natural Language :: English"
 The (default) language of this project
 """
 
-compatible_os = "'Operating System :: POSIX :: Linux"
+compatible_os = "Operating System :: POSIX :: Linux"
 """
 The Operating Systems on which the program can run
 """
