@@ -1,6 +1,6 @@
-# Messengerbot
+# Kudubot
 
-Messengerbot is a bot framework that allows running a bot on a multitude of messaging services. It is completely
+Kudubot is a bot framework that allows running a bot on a multitude of messaging services. It is completely
 modular, adding new bot services and new connection types is relatively trivial.
 
 The framework offers abstractions that allow all properly implemented bot services to work with different types of
@@ -10,7 +10,7 @@ connections (Email, Telegram, Whatsapp or IRC for example) without having to cha
 
 To install the program, either run
 
-    sudo pip install messenger_bot
+    sudo pip install kudubot
     
 or download the sources and run
 
@@ -23,7 +23,7 @@ tested.
 
 ## Usage
 
-You can start the bot using the 'messengerbot' command (setuptools should have installed it for you).
+You can start the bot using the 'kudubot' command (setuptools should have installed it for you).
 
 You will need to specify a connection type, which is the identifier string for one of the implemented
 connections or 'all', which starts the bot using all services.
@@ -34,19 +34,19 @@ upper limit (Though to keep it sane, the highest verbosity that actually changes
 You can also directly run the bot without setting options by using one of these commands (again, they should be
 installed by setuptools automatically)
 
-    messengerbot-email     # For the email connection
-    messengerbot-telegram  # For the Telegram Connection
-    messengerbot-whatsapp  # For the Whatsapp Connection  (Doesn't work right now)
-    messengerbot-all       # For all connections
+    kudubot-email     # For the email connection
+    kudubot-telegram  # For the Telegram Connection
+    kudubot-whatsapp  # For the Whatsapp Connection  (Doesn't work right now)
+    kudubot-all       # For all connections
     
 After starting the program for the first time, you will be notified that config files were created.
-The program creates a directory called '.messengerbot' (which is a hidden directory on Linux). it contains
+The program creates a directory called '.kudubot' (which is a hidden directory on Linux). it contains
 all configs, logs and other files/directories used by the bot services.
 
 To be able to connect to a service, you will have to enter login credentials into the config file of the chosen
 connection type, which will be located under
 
-    ~/.messengerbot/config
+    ~/.kudubot/config
     
 The credential types are different for all types of connections and need to be set accordingly. The program creates
 template files when first run, so figuring out which kind of information to enter should not be all that difficult.
@@ -56,7 +56,7 @@ Once the credentials are entered, you can adjust which services will be run on s
 
 As a last step you may want to adjust the admin and blacklist files in the 
 
-    ~/.messengerbot/contacts
+    ~/.kudubot/contacts
     
 directory to give yourself admin rights for the bot and ignore things like other bots.
 
@@ -73,20 +73,20 @@ For a guide on how to extend the bot, see [this](doc/hand_crafted/extending_guid
 
 ## Support
 
-If you have any questions about messengerbot, feel free to open an issue or contact me directly at
+If you have any questions about kudubot, feel free to open an issue or contact me directly at
 krumreyh@namibsun.net.
 
 ## Links
 
 The repository is mirrored to:
 
-* [Github Mirror](https://github.com/namboy94/messengerbot)
-* [Gitlab Mirror](https://gitlab.com/namboy94/messengerbot)
-* [Bitbucket Mirror](https://bitbucket.org/namboy94/messengerbot)
+* [Github Mirror](https://github.com/namboy94/kudubot)
+* [Gitlab Mirror](https://gitlab.com/namboy94/kudubot)
+* [Bitbucket Mirror](https://bitbucket.org/namboy94/kudubot)
 
 Other links:
 
-* [Changelog](http://gitlab.namibsun.net/namboy94/messengerbot/raw/master/CHANGELOG)
+* [Changelog](http://gitlab.namibsun.net/namboy94/kudubot/raw/master/CHANGELOG)
 * [Python Package Index Site](https://pypi.python.org/pypi/messenger_bot)
-* [Git Statistics](http://gitlab.namibsun.net/namboy94/messengerbot/wikis/git_stats/general.html)
-* [Documentation](http://gitlab.namibsun.net/namboy94/messengerbot/wikis/html/index.html)
+* [Git Statistics](http://gitlab.namibsun.net/namboy94/kudubot/wikis/git_stats/general.html)
+* [Documentation](http://gitlab.namibsun.net/namboy94/kudubot/wikis/html/index.html)
