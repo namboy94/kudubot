@@ -41,3 +41,4 @@ class Converter(object):
         :param source_connections: the connections to be forwarded to the destination connection
         :return: None
         """
+        #TODO Nach der Klausurphase
