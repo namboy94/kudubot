@@ -26,15 +26,10 @@ LICENSE
 # imports
 import traceback
 from threading import Thread
-
 from kudubot.logger.ExceptionLogger import ExceptionLogger
-
 from kudubot.connection.whatsapp.stacks.YowsupEchoStack import YowsupEchoStack
-
 from kudubot.logger.PrintLogger import PrintLogger
-
 from kudubot.connection.whatsapp.parsers.WhatsappConfigParser import WhatsappConfigParser
-
 from kudubot.connection.generic.Message import Message
 from kudubot.connection.whatsapp.WhatsappConnection import WhatsappConnection
 
@@ -53,7 +48,8 @@ class ForwardedWhatsappConnection(WhatsappConnection):
         Used to initialize stuff instead of the constructor
         :return: None
         """
-        self.singleton_variable = self
+        ForwardedWhatsappConnection.singleton_variable = self
+        print("SEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
     def set_callback(self, callback: callable) -> None:
         """
@@ -79,6 +75,8 @@ class ForwardedWhatsappConnection(WhatsappConnection):
         :return: None
         """
 
+        print("OKHERE")
+
         def start_connection():
             """
 
@@ -86,18 +84,25 @@ class ForwardedWhatsappConnection(WhatsappConnection):
             """
             credentials = WhatsappConfigParser.parse_whatsapp_config(WhatsappConnection.identifier)
 
+            print("OKHEREIN")
+
             while True:
                 try:
-                    PrintLogger.print("Starting Whatsapp Connection", 1)
-                    echo_stack = YowsupEchoStack(WhatsappConnection, credentials)
+                    PrintLogger.print("Starting Whatsapp Forwarding Connection", 1)
+                    echo_stack = YowsupEchoStack(ForwardedWhatsappConnection, credentials)
                     echo_stack.start()
                 except Exception as e:
                     stack_trace = traceback.format_exc()
-                    ExceptionLogger.log_exception(e, stack_trace, "whatsapp")
+                    ExceptionLogger.log_exception(e, stack_trace, "whatsapp Forwarder")
 
         thread = Thread(target=start_connection)
         thread.daemon = True
-        thread.run()
+        print("SET DAEMON")
+        thread.start()
+        print("START!")
 
+        i = 0
         while ForwardedWhatsappConnection.singleton_variable is None:
+            # print("is None" + str(i))
+            i+=1
             pass

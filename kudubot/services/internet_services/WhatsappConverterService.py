@@ -42,11 +42,11 @@ class WhatsappConverterService(Service):
     help_description = {"en": "/wc\tThe Whatsapp Converter\n"
                               "syntax:\n"
                               "/wc start (starts the whatsapp converter)\n"
-                              "/wc send \"recipient\" \"message\" (sends a message to the recipient)",
+                              "/wc send <\"recipient\"> \"message\" (sends a message to the recipient)",
                         "de": "/wc\tDer Whatsapp Konvertierer\n"
                               "Syntax:\n"
                               "/wc start (startet den Whatsapp Konvertierer)\n"
-                              "/wc send \"recipient\" \"message\" (sendet eine Nachricht zum Empfänger)"}
+                              "/wc send <\"recipient\"> \"message\" (sendet eine Nachricht zum Empfänger)"}
     """
     Help description for this service.
     """
@@ -57,6 +57,10 @@ class WhatsappConverterService(Service):
     """
 
     owner = None
+    """
+    """
+
+    last_sender = None
     """
     """
 
@@ -83,8 +87,16 @@ class WhatsappConverterService(Service):
             WhatsappConverterService.whatsapp_connection.set_callback(self.forward_message)
             WhatsappConverterService.owner = message.address
         else:
+
             receiver = message.message_body.split("\"", 1)[1].split("\"", 1)[0]
             message_text = message.message_body.rsplit("\"", 2)[1]
+
+            if receiver == message_text:
+                receiver = WhatsappConverterService.last_sender
+
+            if receiver is None:
+                return
+
             whatsapp_message = Message(message_text, receiver)
             WhatsappConverterService.whatsapp_connection.send_text_message(whatsapp_message)
 
@@ -98,6 +110,7 @@ class WhatsappConverterService(Service):
 
         :return:
         """
+        WhatsappConverterService.last_sender = message.address
         message_text = "FROM:" + message.address + "\n\n" + message.message_body
         forward_message = Message(message_text, WhatsappConverterService.owner)
         self.connection.send_text_message(forward_message)
@@ -109,5 +122,5 @@ class WhatsappConverterService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        regex = "^/wc (start|msg \"[^\"]+\" \"[^\"]+\")$"
+        regex = "^/wc (start|msg \"[^\"]+\"( \"[^\"]+\")?)$"
         return re.search(re.compile(regex), message.message_body.lower())
