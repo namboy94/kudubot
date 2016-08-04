@@ -73,8 +73,9 @@ class WhatsappConverterService(Service):
         """
         from kudubot.connection.whatsapp.wrappers.ForwardedWhatsappConnection import ForwardedWhatsappConnection
 
-        if self.connection.identifier == "whatsapp":
+        if self.connection.identifier == "whatsapp" or not self.connection.authenticator.is_from_admin(message):
             # Why would we convert Whatsapp to Whatsapp? That's stupid.
+            # Also, we don't want Non-Admins abusing this power
             return
 
         if message.message_body.lower().startswith("/wc start"):
