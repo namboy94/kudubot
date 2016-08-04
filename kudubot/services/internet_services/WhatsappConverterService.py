@@ -1,0 +1,89 @@
+# coding=utf-8
+"""
+LICENSE:
+Copyright 2015,2016 Hermann Krumrey
+
+This file is part of kudubot.
+
+    kudubot makes use of various third-party python modules to serve
+    information via online chat services.
+
+    kudubot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    kudubot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
+LICENSE
+"""
+
+# imports
+import re
+from kudubot.servicehandlers.Service import Service
+from kudubot.connection.generic.Message import Message
+
+
+class WhatsappConverterService(Service):
+    """
+    Class that converts incoming Whatsapp messages. It also allows the user to reply.
+    """
+
+    identifier = "whatsapp_convert"
+    """
+    The identifier for this service
+    """
+
+    help_description = {"en": "/wc\tThe Whatsapp Converter\n"
+                              "syntax:\n"
+                              "/wc start (starts the whatsapp converter)\n"
+                              "/wc send \"recipient\" \"message\" (sends a message to the recipient)",
+                        "de": "/wc\tDer Whatsapp Konvertierer\n"
+                              "Syntax:\n"
+                              "/wc start (startet den Whatsapp Konvertierer)\n"
+                              "/wc send \"recipient\" \"message\" (sendet eine Nachricht zum Empfänger)"}
+    """
+    Help description for this service.
+    """
+
+    whatsapp_connection = None
+    """
+    The internal Whatsapp connection
+    """
+
+    def process_message(self, message: Message) -> None:
+        """
+        Processes the message, either starting the whatsapp connection or sending a new message
+
+        :param message: the message to process
+        :return: None
+        """
+        if self.connection.identifier == "whatsapp":
+            # Why would we convert Whatsapp to Whatsapp? That's stupid.
+            return
+
+        if message.message_body.lower().startswith("/wc start"):
+            self.whatsapp_connection = None  # start the connection
+        else:
+            receiver = message.message_body.split("\"", 1)[1].split("\"", 1)[0]
+            message_text = message.message_body.rsplit("\"", 2)[1]
+            pass  # Forward to whatsapp connection
+            # Problems: How do we identify the recipient number?
+            # Store in Database?
+            # IDK
+
+    @staticmethod
+    def regex_check(message: Message) -> bool:
+        """
+        Checks if the user input is valid for this service to continue
+
+        :return: True if input is valid, False otherwise
+        """
+        regex = "^/wc (start|msg \"[^\"]+\" \"[^\"]+\")$"
+        return re.search(re.compile(regex), message.message_body.lower())
+

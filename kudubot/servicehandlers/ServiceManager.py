@@ -75,7 +75,8 @@ class ServiceManager(object):
     The ServiceManager class handles the implemented Services and processes incoming messages
     """
 
-    all_services = [HelpService,
+    all_services = [
+                    HelpService,
                     MuterService,
                     ServiceSelectorService,
                     RestarterService,
