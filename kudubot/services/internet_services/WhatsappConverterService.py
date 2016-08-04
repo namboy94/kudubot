@@ -27,7 +27,6 @@ LICENSE
 import re
 from kudubot.servicehandlers.Service import Service
 from kudubot.connection.generic.Message import Message
-from kudubot.connection.whatsapp.WhatsappConnection import WhatsappConnection
 
 
 class WhatsappConverterService(Service):
@@ -68,6 +67,7 @@ class WhatsappConverterService(Service):
         :param message: the message to process
         :return: None
         """
+        from kudubot.connection.whatsapp.wrappers.ForwardedWhatsappConnection import ForwardedWhatsappConnection
 
         if self.connection.identifier == "whatsapp":
             # Why would we convert Whatsapp to Whatsapp? That's stupid.
@@ -78,8 +78,8 @@ class WhatsappConverterService(Service):
             if WhatsappConverterService.whatsapp_connection is not None:
                 return
 
-            ForwardingWhatsappConnection.establish_connection()
-            WhatsappConverterService.whatsapp_connection = ForwardingWhatsappConnection.singleton_variable
+            ForwardedWhatsappConnection.establish_connection()
+            WhatsappConverterService.whatsapp_connection = ForwardedWhatsappConnection.singleton_variable
             WhatsappConverterService.whatsapp_connection.set_callback(self.forward_message)
             WhatsappConverterService.owner = message.address
         else:
@@ -111,47 +111,3 @@ class WhatsappConverterService(Service):
         """
         regex = "^/wc (start|msg \"[^\"]+\" \"[^\"]+\")$"
         return re.search(re.compile(regex), message.message_body.lower())
-
-
-class ForwardingWhatsappConnection(WhatsappConnection):
-    """
-    Wrapper around the Whatsapp Connection class that starts a whatsapp connection that reports the incoming
-    Whatsapp messages and can also send Whatsapp messages
-    """
-
-    singleton_variable = None
-    callback = None
-
-    def initialize(self) -> None:
-        """
-        Used to initialize stuff instead of the constructor
-        :return: None
-        """
-        self.singleton_variable = self
-
-    def set_callback(self, callback: callable) -> None:
-        """
-
-        :param callback:
-        :return:
-        """
-        self.callback = callback
-
-    def on_incoming_message(self, message: Message) -> None:
-        """
-        Handles incoming messages
-        :param message:
-        :return:
-        """
-        while self.callback is None:
-            pass
-        self.callback(message)
-
-    @staticmethod
-    def establish_connection():
-        """
-        :return: None
-        """
-        super().establish_connection()
-        while ForwardingWhatsappConnection.singleton_variable is None:
-            pass

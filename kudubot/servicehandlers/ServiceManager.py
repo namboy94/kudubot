@@ -55,6 +55,7 @@ from kudubot.services.internet_services.GoogleTtsService import GoogleTtsService
 from kudubot.services.internet_services.EmailSenderService import EmailSenderService
 from kudubot.services.internet_services.ImageSenderService import ImageSenderService
 from kudubot.services.internet_services.FootballInfoService import FootballInfoService
+from kudubot.services.internet_services.WhatsappConverterService import WhatsappConverterService
 from kudubot.services.simple_services.SimpleCommandsService import SimpleCommandsService
 from kudubot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
 from kudubot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
@@ -103,6 +104,7 @@ class ServiceManager(object):
                     SimpleCommandsService,
                     SimpleEqualsResponseService,
                     SimpleContainsResponseService,
+                    WhatsappConverterService
                     # ResetService,
                     # BotMuteService
                     ]
