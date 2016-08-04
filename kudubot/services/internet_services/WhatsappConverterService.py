@@ -112,7 +112,7 @@ class WhatsappConverterService(Service):
         :return:
         """
         WhatsappConverterService.last_sender = message.address
-        message_text = "FROM:" + message.address + "\n\n" + message.message_body
+        message_text = "Sender\n" + message.address + "\n" + message.name + "\n\n" + message.message_body
         forward_message = Message(message_text, WhatsappConverterService.owner)
         self.connection.send_text_message(forward_message)
 
