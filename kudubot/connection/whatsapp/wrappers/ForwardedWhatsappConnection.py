@@ -41,50 +41,61 @@ class ForwardedWhatsappConnection(WhatsappConnection):
     """
 
     singleton_variable = None
+    """
+    Used to store the forarded Whatsapp Connection class
+    """
+
     callback = None
+    """
+    Callback method called whenever an incoming message is received
+    """
 
     def initialize(self) -> None:
         """
-        Used to initialize stuff instead of the constructor
+        Initializes the singleton veriable with itself
+
         :return: None
         """
         ForwardedWhatsappConnection.singleton_variable = self
-        print("SEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
     def set_callback(self, callback: callable) -> None:
         """
+        Sets the callback method
 
-        :param callback:
-        :return:
+        :param callback: the callback method
+        :return: None
         """
         self.callback = callback
 
     def on_incoming_message(self, message: Message) -> None:
         """
-        Handles incoming messages
+        Handles incoming messages, calls the callback method
+        Also waits until callback method is initialized by outer source
+
         :param message:
         :return:
         """
+        # TODO Mark messages read
+
         while self.callback is None:
             pass
+
         self.callback(message)
 
     @staticmethod
     def establish_connection():
         """
+        Establishes the connection in a different daemon thread
+
         :return: None
         """
 
-        print("OKHERE")
-
         def start_connection():
             """
-
-            :return:
+            Starts the actual whatsapp connection
+            :return: None
             """
             credentials = WhatsappConfigParser.parse_whatsapp_config(WhatsappConnection.identifier)
-
-            print("OKHEREIN")
 
             while True:
                 try:
@@ -97,12 +108,8 @@ class ForwardedWhatsappConnection(WhatsappConnection):
 
         thread = Thread(target=start_connection)
         thread.daemon = True
-        print("SET DAEMON")
         thread.start()
-        print("START!")
 
-        i = 0
         while ForwardedWhatsappConnection.singleton_variable is None:
-            # print("is None" + str(i))
-            i+=1
+            # Wait until connected
             pass
