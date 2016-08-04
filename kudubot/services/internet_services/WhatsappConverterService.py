@@ -27,6 +27,7 @@ LICENSE
 import re
 from kudubot.servicehandlers.Service import Service
 from kudubot.connection.generic.Message import Message
+from kudubot.connection.whatsapp.WhatsappConnection import WhatsappConnection
 
 
 class WhatsappConverterService(Service):
@@ -56,6 +57,10 @@ class WhatsappConverterService(Service):
     The internal Whatsapp connection
     """
 
+    owner = None
+    """
+    """
+
     def process_message(self, message: Message) -> None:
         """
         Processes the message, either starting the whatsapp connection or sending a new message
@@ -63,19 +68,39 @@ class WhatsappConverterService(Service):
         :param message: the message to process
         :return: None
         """
+
         if self.connection.identifier == "whatsapp":
             # Why would we convert Whatsapp to Whatsapp? That's stupid.
             return
 
         if message.message_body.lower().startswith("/wc start"):
-            self.whatsapp_connection = None  # start the connection
+
+            if WhatsappConverterService.whatsapp_connection is not None:
+                return
+
+            ForwardingWhatsappConnection.establish_connection()
+            WhatsappConverterService.whatsapp_connection = ForwardingWhatsappConnection.singleton_variable
+            WhatsappConverterService.whatsapp_connection.set_callback(self.forward_message)
+            WhatsappConverterService.owner = message.address
         else:
             receiver = message.message_body.split("\"", 1)[1].split("\"", 1)[0]
             message_text = message.message_body.rsplit("\"", 2)[1]
-            pass  # Forward to whatsapp connection
+            whatsapp_message = Message(message_text, receiver)
+            WhatsappConverterService.whatsapp_connection.send_text_message(whatsapp_message)
+
+            # Forward to whatsapp connection
             # Problems: How do we identify the recipient number?
             # Store in Database?
             # IDK
+
+    def forward_message(self, message: Message) -> None:
+        """
+
+        :return:
+        """
+        message_text = "FROM:" + message.address + "\n\n" + message.message_body
+        forward_message = Message(message_text, WhatsappConverterService.owner)
+        self.connection.send_text_message(forward_message)
 
     @staticmethod
     def regex_check(message: Message) -> bool:
@@ -87,3 +112,46 @@ class WhatsappConverterService(Service):
         regex = "^/wc (start|msg \"[^\"]+\" \"[^\"]+\")$"
         return re.search(re.compile(regex), message.message_body.lower())
 
+
+class ForwardingWhatsappConnection(WhatsappConnection):
+    """
+    Wrapper around the Whatsapp Connection class that starts a whatsapp connection that reports the incoming
+    Whatsapp messages and can also send Whatsapp messages
+    """
+
+    singleton_variable = None
+    callback = None
+
+    def initialize(self) -> None:
+        """
+        Used to initialize stuff instead of the constructor
+        :return: None
+        """
+        self.singleton_variable = self
+
+    def set_callback(self, callback: callable) -> None:
+        """
+
+        :param callback:
+        :return:
+        """
+        self.callback = callback
+
+    def on_incoming_message(self, message: Message) -> None:
+        """
+        Handles incoming messages
+        :param message:
+        :return:
+        """
+        while self.callback is None:
+            pass
+        self.callback(message)
+
+    @staticmethod
+    def establish_connection():
+        """
+        :return: None
+        """
+        super().establish_connection()
+        while ForwardingWhatsappConnection.singleton_variable is None:
+            pass
