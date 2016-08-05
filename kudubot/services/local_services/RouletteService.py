@@ -30,9 +30,8 @@ import time
 import random
 import datetime
 from typing import List, Tuple, Set
-
+from puffotter.fileops import ensure_directory_exists
 from kudubot.connection.generic.Message import Message
-from kudubot.config.LocalConfigChecker import LocalConfigChecker
 from kudubot.services.local_services.CasinoService import CasinoService
 from kudubot.resources.images.__init__ import get_location as get_board_image_file
 
@@ -263,7 +262,7 @@ class RouletteService(CasinoService):
         """
         super().initialize()
         self.roulette_directory = os.path.join(self.bet_directory, "roulette")
-        LocalConfigChecker.validate_directory(self.roulette_directory)
+        ensure_directory_exists(self.roulette_directory)
 
     def process_message(self, message: Message) -> None:
         """

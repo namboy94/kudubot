@@ -21,6 +21,12 @@ Setuptools should automatically download all required dependencies without furth
 The program is being developed on Linux, it should in theory work on Windows and Mac OS X, though this has not been
 tested.
 
+**WARNING**
+To use the Whatsapp connection, you need to have Yowsup installed. However, the current master
+branch of the original project contains a bug that breaks things when receiving private messages.
+
+To circumvent this, please install [my fork](https://github.com/namboy94/yowsup) of the project in the meantime.
+
 ## Usage
 
 You can start the bot using the 'kudubot' command (setuptools should have installed it for you).

@@ -87,7 +87,8 @@ dependencies = ['tvdb_api',
                 'typing',
                 'python-telegram-bot',
                 'gTTS',
-                'irc']
+                'irc',
+                'puffotter']
 """
 Python Packaging Index requirements
 """
