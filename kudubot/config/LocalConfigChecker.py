@@ -26,6 +26,7 @@ LICENSE
 # imports
 import os
 from typing import List
+from puffotter.fileops import ensure_directory_exists, ensure_file_exists, ensure_sqlite_db_exists
 
 # Import structure to combat cyclic imports
 try:
@@ -81,12 +82,12 @@ class LocalConfigChecker(object):
         :return: None
         """
 
-        LocalConfigChecker.validate_directory(LocalConfigChecker.program_directory)
-        LocalConfigChecker.validate_directory(LocalConfigChecker.config_directory)
-        LocalConfigChecker.validate_directory(LocalConfigChecker.log_directory)
-        LocalConfigChecker.validate_directory(LocalConfigChecker.contacts_directory)
-        LocalConfigChecker.validate_directory(LocalConfigChecker.exception_logs_directory)
-        LocalConfigChecker.validate_directory(LocalConfigChecker.services_directory)
+        ensure_directory_exists(LocalConfigChecker.program_directory)
+        ensure_directory_exists(LocalConfigChecker.config_directory)
+        ensure_directory_exists(LocalConfigChecker.log_directory)
+        ensure_directory_exists(LocalConfigChecker.contacts_directory)
+        ensure_directory_exists(LocalConfigChecker.exception_logs_directory)
+        ensure_directory_exists(LocalConfigChecker.services_directory)
 
         for connection in connection_types:
             connection_logs = os.path.join(LocalConfigChecker.log_directory, connection.identifier)
@@ -95,42 +96,29 @@ class LocalConfigChecker(object):
             connection_contacts = os.path.join(LocalConfigChecker.contacts_directory, connection.identifier)
             connection_service_directory = os.path.join(LocalConfigChecker.services_directory, connection.identifier)
 
-            LocalConfigChecker.validate_directory(connection_logs)
-            LocalConfigChecker.validate_directory(connection_contacts)
-            LocalConfigChecker.validate_directory(connection_service_directory)
-            LocalConfigChecker.validate_text_file(connection_service_config)
-            LocalConfigChecker.validate_text_file(connection_config)
+            ensure_directory_exists(connection_logs)
+            ensure_directory_exists(connection_contacts)
+            ensure_directory_exists(connection_service_directory)
+            ensure_file_exists(connection_service_config)
+            ensure_file_exists(connection_config)
 
             message_logs = os.path.join(connection_logs, "messages")
             group_logs = os.path.join(message_logs, "groups")
             user_logs = os.path.join(message_logs, "users")
 
-            LocalConfigChecker.validate_directory(message_logs)
-            LocalConfigChecker.validate_directory(group_logs)
-            LocalConfigChecker.validate_directory(user_logs)
+            ensure_directory_exists(message_logs)
+            ensure_directory_exists(group_logs)
+            ensure_directory_exists(user_logs)
 
             admin_contacts = os.path.join(connection_contacts, "admin")
             blacklist_contacts = os.path.join(connection_contacts, "blacklist")
+            connection_addressbook = os.path.join(connection_contacts, "addressbook.db")
 
-            LocalConfigChecker.validate_text_file(admin_contacts)
-            LocalConfigChecker.validate_text_file(blacklist_contacts)
-              
-    @staticmethod  
-    def validate_directory(directory: str) -> None:
-        """
-        Checks if a directory exists, and if not, creates it
-        
-        :return: None
-        """
-        if not os.path.isdir(directory):
-            os.makedirs(directory)
+            ensure_file_exists(admin_contacts)
+            ensure_file_exists(blacklist_contacts)
 
-    @staticmethod
-    def validate_text_file(text_file: str) -> None:
-        """
-        Checks if a text file exists, and if not, creates it
+            addressbook_sql = "CREATE TABLE Contacts (" \
+                              "    address TEXT," \
+                              "    name TEXT"
 
-        :return: None
-        """
-        if not os.path.isfile(text_file):
-            open(text_file, 'w').close()
+            ensure_sqlite_db_exists(connection_addressbook, addressbook_sql, True)

@@ -40,9 +40,14 @@ class ForwardedWhatsappConnection(WhatsappConnection):
     Whatsapp messages and can also send Whatsapp messages
     """
 
+    # identifier = "Whatsapp Forwarder"
+    """
+    The identifier for this connection type
+    """
+
     singleton_variable = None
     """
-    Used to store the forarded Whatsapp Connection class
+    Used to store the forwarded Whatsapp Connection class
     """
 
     callback = None
@@ -111,5 +116,4 @@ class ForwardedWhatsappConnection(WhatsappConnection):
         thread.start()
 
         while ForwardedWhatsappConnection.singleton_variable is None:
-            # Wait until connected
             pass
