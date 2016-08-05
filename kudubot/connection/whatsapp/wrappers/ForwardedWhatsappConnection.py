@@ -40,11 +40,6 @@ class ForwardedWhatsappConnection(WhatsappConnection):
     Whatsapp messages and can also send Whatsapp messages
     """
 
-    # identifier = "Whatsapp Forwarder"
-    """
-    The identifier for this connection type
-    """
-
     singleton_variable = None
     """
     Used to store the forwarded Whatsapp Connection class
@@ -72,16 +67,14 @@ class ForwardedWhatsappConnection(WhatsappConnection):
         """
         self.callback = callback
 
-    def on_incoming_message(self, message: Message) -> None:
+    def process_message(self, message: Message) -> None:
         """
         Handles incoming messages, calls the callback method
         Also waits until callback method is initialized by outer source
 
-        :param message:
-        :return:
+        :param message: the message to process
+        :return: None
         """
-        # TODO Mark messages read
-
         while self.callback is None:
             pass
 
