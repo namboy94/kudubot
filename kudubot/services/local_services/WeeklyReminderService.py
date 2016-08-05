@@ -29,7 +29,7 @@ import re
 import time
 import datetime
 from typing import Tuple, List, Dict
-
+from puffotter.fileops import ensure_directory_exists
 from kudubot.servicehandlers.Service import Service
 from kudubot.connection.generic.Message import Message
 from kudubot.config.LocalConfigChecker import LocalConfigChecker
@@ -139,7 +139,7 @@ class WeeklyReminderService(Service):
         """
         self.w_reminder_directory = \
             os.path.join(LocalConfigChecker.services_directory, self.connection.identifier, self.w_reminder_directory)
-        LocalConfigChecker.validate_directory(self.w_reminder_directory)
+        ensure_directory_exists(self.w_reminder_directory)
 
     def process_message(self, message: Message) -> None:
         """

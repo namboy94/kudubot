@@ -27,6 +27,7 @@ LICENSE
 import os
 import time
 
+from puffotter.fileops import ensure_directory_exists
 from kudubot.logger.PrintLogger import PrintLogger
 from kudubot.connection.generic.Message import Message
 from kudubot.config.LocalConfigChecker import LocalConfigChecker
@@ -74,7 +75,7 @@ class MessageLogger(object):
 
         identifier = message.address
         log_dir = os.path.join(log_dir, identifier)
-        LocalConfigChecker.validate_directory(log_dir)
+        ensure_directory_exists(log_dir)
 
         log_file = os.path.join(log_dir, time.strftime("%Y-%m-%d"))
 

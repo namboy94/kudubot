@@ -24,7 +24,9 @@ LICENSE
 """
 
 # imports
+import os
 import time
+import sqlite3
 import traceback
 
 import kudubot.metadata as metadata
@@ -33,6 +35,7 @@ from kudubot.connection.generic.Message import Message
 from kudubot.logger.MessageLogger import MessageLogger
 from kudubot.logger.ExceptionLogger import ExceptionLogger
 from kudubot.servicehandlers.Authenticator import Authenticator
+from kudubot.config.LocalConfigChecker import LocalConfigChecker
 from kudubot.servicehandlers.ServiceManager import ServiceManager
 
 
@@ -132,6 +135,17 @@ class Connection(object):
 
         # Process and log the message
         self.message_logger.log_message(message)
+        self.update_addressbook(message)
+        self.process_message(message)
+
+        time.sleep(1)  # TO avoid overloading any servers/get the bot banned
+
+    def process_message(self, message: Message) -> None:
+        """
+        Processes the message after the initial sanity checks are completed
+        :param message: the message to process
+        :return: None
+        """
         try:
             self.service_manager.process_message(message)
         except KeyError:
@@ -142,7 +156,28 @@ class Connection(object):
         except Exception as e:
             stack_trace = traceback.format_exc()
             ExceptionLogger.log_exception(e, stack_trace, self.identifier, message)
-        time.sleep(1)  # TO avoid overloading any servers/get the bot banned
+
+    def update_addressbook(self, message: Message) -> None:
+        """
+        Updates the addressbook database with the incoming message's sender infomation
+
+        :param message: the message whose sender should be added to the addressbook, in case the
+                sender is not yet in the addressbook
+        :return: None
+        """
+        database_file = os.path.join(LocalConfigChecker.contacts_directory, self.identifier, "addressbook.db")
+        database = sqlite3.connect(database_file)
+
+        query = "SELECT * FROM Contacts WHERE ? = address"
+        query_result = database.execute(query, (message.address,)).fetchall()
+        if len(query_result) == 0:
+
+            PrintLogger.print("Adding Contact to Database: " + message.name, 3)
+            insertion = "INSERT INTO Contacts (address, name) VALUES(?, ?)"
+            database.execute(insertion, (message.address, message.name))
+
+        database.commit()
+        database.close()
 
     @staticmethod
     def establish_connection() -> None:
