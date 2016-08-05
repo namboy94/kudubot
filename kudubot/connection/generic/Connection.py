@@ -175,6 +175,9 @@ class Connection(object):
             insertion = "INSERT INTO Contacts (address, name) VALUES(?, ?)"
             database.execute(insertion, (message.address, message.name))
 
+        database.commit()
+        database.close()
+
     @staticmethod
     def establish_connection() -> None:
         """

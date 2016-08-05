@@ -24,9 +24,13 @@ LICENSE
 """
 
 # imports
+import os
 import re
+import sqlite3
+
 from kudubot.servicehandlers.Service import Service
 from kudubot.connection.generic.Message import Message
+from kudubot.config.LocalConfigChecker import LocalConfigChecker
 
 
 class WhatsappConverterService(Service):
@@ -71,6 +75,8 @@ class WhatsappConverterService(Service):
         :param message: the message to process
         :return: None
         """
+        addressbook = os.path.join(LocalConfigChecker.contacts_directory, self.connection.identifier, "addressbook.db")
+
         from kudubot.connection.whatsapp.wrappers.ForwardedWhatsappConnection import ForwardedWhatsappConnection
 
         if self.connection.identifier == "whatsapp" or not self.connection.authenticator.is_from_admin(message):
@@ -98,17 +104,19 @@ class WhatsappConverterService(Service):
             if receiver is None:
                 return
 
+            database = sqlite3.connect(addressbook)
+            query = database.execute("SELECT address FROM Contacts WHERE name = ?", (receiver,)).fetchall()
+            database.close()
+
+            if len(query) > 0:
+                receiver = query[0][0]
+
             whatsapp_message = Message(message_text, receiver)
             WhatsappConverterService.whatsapp_connection.send_text_message(whatsapp_message)
 
-            # Forward to whatsapp connection
-            # Problems: How do we identify the recipient number?
-            # Store in Database?
-            # IDK
-
     def forward_message(self, message: Message) -> None:
         """
-
+        Forwards a Whatsapp message to the connected service
         :return:
         """
         WhatsappConverterService.last_sender = message.address
