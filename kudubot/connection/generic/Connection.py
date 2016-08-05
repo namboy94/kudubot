@@ -172,6 +172,7 @@ class Connection(object):
         query_result = database.execute(query, (message.address,)).fetchall()
         if len(query_result) == 0:
 
+            PrintLogger.print("Adding Contact to Database: " + message.name, 3)
             insertion = "INSERT INTO Contacts (address, name) VALUES(?, ?)"
             database.execute(insertion, (message.address, message.name))
 

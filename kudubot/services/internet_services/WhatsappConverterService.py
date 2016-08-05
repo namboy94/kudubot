@@ -75,7 +75,7 @@ class WhatsappConverterService(Service):
         :param message: the message to process
         :return: None
         """
-        addressbook = os.path.join(LocalConfigChecker.contacts_directory, self.connection.identifier, "addressbook.db")
+        addressbook = os.path.join(LocalConfigChecker.contacts_directory, "whatsapp", "addressbook.db")
 
         from kudubot.connection.whatsapp.wrappers.ForwardedWhatsappConnection import ForwardedWhatsappConnection
 
@@ -93,6 +93,7 @@ class WhatsappConverterService(Service):
             WhatsappConverterService.whatsapp_connection = ForwardedWhatsappConnection.singleton_variable
             WhatsappConverterService.whatsapp_connection.set_callback(self.forward_message)
             WhatsappConverterService.owner = message.address
+            self.connection.send_text_message(Message("Whatsapp Converter Started", message.address))
 
         else:
 

@@ -26,7 +26,7 @@ LICENSE
 # imports
 import os
 from typing import List
-from puffotter.fileops import ensure_directory_exists, ensure_file_exists, ensure_sqlite_db_exists
+from puffotter.fileops import ensure_directory_exists, ensure_file_exists, ensure_sqlite3_db_exists
 
 # Import structure to combat cyclic imports
 try:
@@ -121,4 +121,4 @@ class LocalConfigChecker(object):
                               "    address TEXT," \
                               "    name TEXT)"
 
-            ensure_sqlite_db_exists(connection_addressbook, addressbook_sql, True)
+            ensure_sqlite3_db_exists(connection_addressbook, addressbook_sql, True)

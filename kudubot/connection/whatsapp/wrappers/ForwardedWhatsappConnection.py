@@ -56,6 +56,7 @@ class ForwardedWhatsappConnection(WhatsappConnection):
 
         :return: None
         """
+        super().initialize()
         ForwardedWhatsappConnection.singleton_variable = self
 
     def set_callback(self, callback: callable) -> None:
