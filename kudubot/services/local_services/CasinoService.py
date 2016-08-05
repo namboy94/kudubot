@@ -30,7 +30,7 @@ import time
 import random
 import datetime
 from typing import Dict, List
-
+from puffotter.fileops import ensure_directory_exists
 from kudubot.servicehandlers.Service import Service
 from kudubot.connection.generic.Message import Message
 from kudubot.config.LocalConfigChecker import LocalConfigChecker
@@ -155,9 +155,9 @@ class CasinoService(Service):
         self.user_directory = os.path.join(self.casino_directory, "users")
         self.bet_directory = os.path.join(self.casino_directory, "bets")
 
-        LocalConfigChecker.validate_directory(self.casino_directory)
-        LocalConfigChecker.validate_directory(self.user_directory)
-        LocalConfigChecker.validate_directory(self.bet_directory)
+        ensure_directory_exists(self.casino_directory)
+        ensure_directory_exists(self.user_directory)
+        ensure_directory_exists(self.bet_directory)
 
     def process_message(self, message: Message) -> None:
         """

@@ -91,6 +91,7 @@ class ForwardedWhatsappConnection(WhatsappConnection):
         def start_connection():
             """
             Starts the actual whatsapp connection
+
             :return: None
             """
             credentials = WhatsappConfigParser.parse_whatsapp_config(WhatsappConnection.identifier)

@@ -119,6 +119,6 @@ class LocalConfigChecker(object):
 
             addressbook_sql = "CREATE TABLE Contacts (" \
                               "    address TEXT," \
-                              "    name TEXT"
+                              "    name TEXT)"
 
             ensure_sqlite_db_exists(connection_addressbook, addressbook_sql, True)

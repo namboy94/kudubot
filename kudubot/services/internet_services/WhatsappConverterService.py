@@ -93,6 +93,7 @@ class WhatsappConverterService(Service):
             WhatsappConverterService.whatsapp_connection = ForwardedWhatsappConnection.singleton_variable
             WhatsappConverterService.whatsapp_connection.set_callback(self.forward_message)
             WhatsappConverterService.owner = message.address
+
         else:
 
             receiver = message.message_body.split("\"", 1)[1].split("\"", 1)[0]
@@ -117,7 +118,8 @@ class WhatsappConverterService(Service):
     def forward_message(self, message: Message) -> None:
         """
         Forwards a Whatsapp message to the connected service
-        :return:
+
+        :return: None
         """
         WhatsappConverterService.last_sender = message.address
         message_text = "Sender\n" + message.address + "\n" + message.name + "\n\n" + message.message_body
