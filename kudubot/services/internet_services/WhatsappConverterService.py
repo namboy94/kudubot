@@ -108,12 +108,12 @@ class WhatsappConverterService(Service):
         # Import here to avoid import errors
         from kudubot.connection.whatsapp.wrappers.ForwardedWhatsappConnection import ForwardedWhatsappConnection
 
-        if self.connection.identifier == "whatsapp" or not self.connection.authenticator.is_from_admin(message):
-            # Why would we convert Whatsapp to Whatsapp? That's stupid.
-            # Also, we don't want Non-Admins abusing this power
-            return
+        if not self.connection.authenticator.is_from_admin(message):
+            self.connection.send_text_message(Message("Sorry, only admins are allowed to do that", message.address))
+        elif self.connection.identifier != "telegram":
+            self.connection.send_text_message(Message("The service is already running", message.address))
 
-        if message.message_body.lower().startswith("/wc start"):
+        elif message.message_body.lower().startswith("/wc start"):
 
             if WhatsappConverterService.whatsapp_connection is not None:
                 return
@@ -142,7 +142,7 @@ class WhatsappConverterService(Service):
             if WhatsappConverterService.whatsapp_connection is not None:
                 self.initialize_single_telegram_listener(telegram_key, whatsapp_address)
 
-        else:
+        elif message.message_body.lower().startswith("/wc msg"):
 
             receiver = message.message_body.split("\"", 1)[1].split("\"", 1)[0]
             message_text = message.message_body.rsplit("\"", 2)[1]
