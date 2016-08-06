@@ -134,8 +134,10 @@ class WhatsappConverterService(Service):
 
             insertion = "INSERT INTO Bots (whatsapp_address, telegram_api_key) VALUES(?, ?)"
             database.execute(insertion, (whatsapp_address, telegram_key))
-
+            database.commit()
             database.close()
+
+            self.connection.send_text_message(Message("New Telegram API key stored", message.address))
 
             if WhatsappConverterService.whatsapp_connection is not None:
                 self.initialize_single_telegram_listener(telegram_key, whatsapp_address)
