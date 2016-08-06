@@ -1,7 +1,7 @@
 # coding=utf-8
 """
 LICENSE:
-Copyright 2015,2016 Hermann Krumrey
+Copyright 2015,2016 Hermann Krumrey, Johannes Bucher
 
 This file is part of kudubot.
 
