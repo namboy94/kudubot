@@ -119,7 +119,6 @@ class LocalConfigChecker(object):
 
             addressbook_sql = "CREATE TABLE Contacts (" \
                               "    address TEXT," \
-                              "    name TEXT," \
-                              "    telegram_bot TEXT)"
+                              "    name TEXT)"
 
             ensure_sqlite3_db_exists(connection_addressbook, addressbook_sql, True)

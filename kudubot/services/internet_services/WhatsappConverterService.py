@@ -28,6 +28,7 @@ import os
 import re
 import sqlite3
 
+from puffotter.fileops import ensure_directory_exists, ensure_sqlite3_db_exists
 from kudubot.servicehandlers.Service import Service
 from kudubot.connection.generic.Message import Message
 from kudubot.config.LocalConfigChecker import LocalConfigChecker
@@ -77,6 +78,11 @@ class WhatsappConverterService(Service):
     The addressbook database file path
     """
 
+    telegram_bot_db = ""
+    """
+    Path to the telegram bot directory
+    """
+
     telegram_bots = {}
     """
     List of telegram listeners
@@ -89,6 +95,16 @@ class WhatsappConverterService(Service):
         :param message: the message to process
         :return: None
         """
+        WhatsappConverterService.telegram_bot_db = os.path.join(LocalConfigChecker.services_directory,
+                                                                self.connection.identifier,
+                                                                "whatsapp_convert",
+                                                                "telegrambots.db")
+
+        sql_init = "CREATE TABLE Bots (whatsapp_address TEXT, telegram_api_key TEXT)"
+
+        ensure_directory_exists(os.path.dirname(WhatsappConverterService.telegram_bot_db))
+        ensure_sqlite3_db_exists(WhatsappConverterService.telegram_bot_db, sql_init, True)
+
         # Import here to avoid import errors
         from kudubot.connection.whatsapp.wrappers.ForwardedWhatsappConnection import ForwardedWhatsappConnection
 
@@ -114,12 +130,15 @@ class WhatsappConverterService(Service):
             whatsapp_address = message.message_body.split("\"", 1)[1].split("\"", 1)[0]
             telegram_key = message.message_body.rsplit("\"", 2)[1]
 
-            database = sqlite3.connect(self.addressbook)
-            database.execute("UPDATE Contacts SET telegram_bot=\"?\" WHERE address = ?",
-                             (telegram_key, whatsapp_address)).fetchall()
+            database = sqlite3.connect(WhatsappConverterService.telegram_bot_db)
+
+            insertion = "INSERT INTO Bots (whatsapp_address, telegram_api_key) VALUES(?, ?)"
+            database.execute(insertion, (whatsapp_address, telegram_key))
+
             database.close()
 
-            self.initialize_single_telegram_listener(telegram_key, whatsapp_address)
+            if WhatsappConverterService.whatsapp_connection is not None:
+                self.initialize_single_telegram_listener(telegram_key, whatsapp_address)
 
         else:
 
@@ -148,18 +167,18 @@ class WhatsappConverterService(Service):
 
         :return: None
         """
-        database = sqlite3.connect(self.addressbook)
-        query = database.execute("SELECT telegram_bot FROM Contacts WHERE name = ?", (message.name,)).fetchall()
+        database = sqlite3.connect(self.telegram_bot_db)
+        query = database.execute("SELECT telegram_api_key FROM Bots WHERE whatsapp_address = ?", (message.address,))\
+            .fetchall()
         database.close()
 
-        message_text = "Sender\n" + message.address + "\n" + message.name + "\n\n" + message.message_body
-        forward_message = Message(message_text, WhatsappConverterService.owner)
-
-        if query[0][0] != "":
+        if len(query) != 0:
             telegram_bot = WhatsappConverterService.telegram_bots[query[0][0]]
-            telegram_bot.send_text_message(forward_message)
+            telegram_bot.send_text_message(Message(message.message_body, WhatsappConverterService.owner))
 
         else:
+            message_text = "Sender\n" + message.address + "\n" + message.name + "\n\n" + message.message_body
+            forward_message = Message(message_text, WhatsappConverterService.owner)
             WhatsappConverterService.last_sender = message.address
             self.connection.send_text_message(forward_message)
 
@@ -170,11 +189,8 @@ class WhatsappConverterService(Service):
 
         :return: None
         """
-        # import here to avoid import errors:
-        from kudubot.connection.telegram.wrappers.SimpleTelegramConnection import SimpleTelegramConnection
-
-        database = sqlite3.connect(self.addressbook)
-        query = database.execute("SELECT address, telegram_bot FROM Contacts WHERE telegram_bot != \"\"").fetchall()
+        database = sqlite3.connect(self.telegram_bot_db)
+        query = database.execute("SELECT whatsapp_address, telegram_api_key FROM Bots").fetchall()
         database.close()
 
         for contact in query:
@@ -192,6 +208,8 @@ class WhatsappConverterService(Service):
         :param whatsapp_address: the whatsapp address linked to this bot
         :return: None
         """
+        # import here to avoid import errors:
+        from kudubot.connection.telegram.wrappers.SimpleTelegramConnection import SimpleTelegramConnection
 
         def forward_message_to_whatsapp(message: Message) -> None:
             """
@@ -204,7 +222,7 @@ class WhatsappConverterService(Service):
                 Message(message.message_body, whatsapp_address))
 
         bot = SimpleTelegramConnection.establish_async_connection(api_key, forward_message_to_whatsapp)
-        WhatsappConverterService.telegram_bots[key] = bot
+        WhatsappConverterService.telegram_bots[api_key] = bot
 
     @staticmethod
     def regex_check(message: Message) -> bool:
