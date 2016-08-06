@@ -166,6 +166,7 @@ class WhatsappConverterService(Service):
     def forward_message(self, message: Message) -> None:
         """
         Forwards a Whatsapp message to the connected service
+        WHATSAPP->TELEGRAM
 
         :return: None
         """
@@ -175,8 +176,13 @@ class WhatsappConverterService(Service):
         database.close()
 
         if len(query) != 0:
+
+            message_text = message.message_body
+            if message.group:
+                message_text = message.single_name + ":\n" + message_text
+
             telegram_bot = WhatsappConverterService.telegram_bots[query[0][0]]
-            telegram_bot.send_text_message(Message(message.message_body, WhatsappConverterService.owner))
+            telegram_bot.send_text_message(Message(message_text, WhatsappConverterService.owner))
 
         else:
             message_text = "Sender\n" + message.address + "\n" + message.name + "\n\n" + message.message_body
