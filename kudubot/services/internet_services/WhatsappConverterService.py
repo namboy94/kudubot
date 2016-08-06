@@ -28,6 +28,7 @@ import os
 import re
 import sqlite3
 
+from puffotter.fileops import ensure_directory_exists, ensure_sqlite3_db_exists
 from kudubot.servicehandlers.Service import Service
 from kudubot.connection.generic.Message import Message
 from kudubot.config.LocalConfigChecker import LocalConfigChecker
@@ -46,10 +47,12 @@ class WhatsappConverterService(Service):
     help_description = {"en": "/wc\tThe Whatsapp Converter\n"
                               "syntax:\n"
                               "/wc start (starts the whatsapp converter)\n"
+                              "/wc register \"whatsapp-number\" \"telegram-api-key\"\n"
                               "/wc send <\"recipient\"> \"message\" (sends a message to the recipient)",
                         "de": "/wc\tDer Whatsapp Konvertierer\n"
                               "Syntax:\n"
                               "/wc start (startet den Whatsapp Konvertierer)\n"
+                              "/wc register \"whatsapp-number\" \"telegram-api-key\"\n"
                               "/wc send <\"recipient\"> \"message\" (sendet eine Nachricht zum Empfänger)"}
     """
     Help description for this service.
@@ -62,10 +65,27 @@ class WhatsappConverterService(Service):
 
     owner = None
     """
+    The 'owner' of the telegram bot, i.e. the person that activated the converter
     """
 
     last_sender = None
     """
+    The last sender, useful for simplifying the syntax
+    """
+
+    addressbook = os.path.join(LocalConfigChecker.contacts_directory, "whatsapp", "addressbook.db")
+    """
+    The addressbook database file path
+    """
+
+    telegram_bot_db = ""
+    """
+    Path to the telegram bot directory
+    """
+
+    telegram_bots = {}
+    """
+    List of telegram listeners
     """
 
     def process_message(self, message: Message) -> None:
@@ -75,8 +95,17 @@ class WhatsappConverterService(Service):
         :param message: the message to process
         :return: None
         """
-        addressbook = os.path.join(LocalConfigChecker.contacts_directory, "whatsapp", "addressbook.db")
+        WhatsappConverterService.telegram_bot_db = os.path.join(LocalConfigChecker.services_directory,
+                                                                self.connection.identifier,
+                                                                "whatsapp_convert",
+                                                                "telegrambots.db")
 
+        sql_init = "CREATE TABLE Bots (whatsapp_address TEXT, telegram_api_key TEXT)"
+
+        ensure_directory_exists(os.path.dirname(WhatsappConverterService.telegram_bot_db))
+        ensure_sqlite3_db_exists(WhatsappConverterService.telegram_bot_db, sql_init, True)
+
+        # Import here to avoid import errors
         from kudubot.connection.whatsapp.wrappers.ForwardedWhatsappConnection import ForwardedWhatsappConnection
 
         if self.connection.identifier == "whatsapp" or not self.connection.authenticator.is_from_admin(message):
@@ -94,6 +123,24 @@ class WhatsappConverterService(Service):
             WhatsappConverterService.whatsapp_connection.set_callback(self.forward_message)
             WhatsappConverterService.owner = message.address
             self.connection.send_text_message(Message("Whatsapp Converter Started", message.address))
+            self.initialize_telegram_listeners()
+
+        elif message.message_body.lower().startswith("/wc register"):
+
+            whatsapp_address = message.message_body.split("\"", 1)[1].split("\"", 1)[0]
+            telegram_key = message.message_body.rsplit("\"", 2)[1]
+
+            database = sqlite3.connect(WhatsappConverterService.telegram_bot_db)
+
+            insertion = "INSERT INTO Bots (whatsapp_address, telegram_api_key) VALUES(?, ?)"
+            database.execute(insertion, (whatsapp_address, telegram_key))
+            database.commit()
+            database.close()
+
+            self.connection.send_text_message(Message("New Telegram API key stored", message.address))
+
+            if WhatsappConverterService.whatsapp_connection is not None:
+                self.initialize_single_telegram_listener(telegram_key, whatsapp_address)
 
         else:
 
@@ -106,7 +153,7 @@ class WhatsappConverterService(Service):
             if receiver is None:
                 return
 
-            database = sqlite3.connect(addressbook)
+            database = sqlite3.connect(self.addressbook)
             query = database.execute("SELECT address FROM Contacts WHERE name = ?", (receiver,)).fetchall()
             database.close()
 
@@ -122,10 +169,62 @@ class WhatsappConverterService(Service):
 
         :return: None
         """
-        WhatsappConverterService.last_sender = message.address
-        message_text = "Sender\n" + message.address + "\n" + message.name + "\n\n" + message.message_body
-        forward_message = Message(message_text, WhatsappConverterService.owner)
-        self.connection.send_text_message(forward_message)
+        database = sqlite3.connect(self.telegram_bot_db)
+        query = database.execute("SELECT telegram_api_key FROM Bots WHERE whatsapp_address = ?", (message.address,))\
+            .fetchall()
+        database.close()
+
+        if len(query) != 0:
+            telegram_bot = WhatsappConverterService.telegram_bots[query[0][0]]
+            telegram_bot.send_text_message(Message(message.message_body, WhatsappConverterService.owner))
+
+        else:
+            message_text = "Sender\n" + message.address + "\n" + message.name + "\n\n" + message.message_body
+            forward_message = Message(message_text, WhatsappConverterService.owner)
+            WhatsappConverterService.last_sender = message.address
+            self.connection.send_text_message(forward_message)
+
+    # noinspection PyUnresolvedReferences
+    def initialize_telegram_listeners(self) -> None:
+        """
+        Initializes existing Telegram bots for contacts with API keys
+
+        :return: None
+        """
+        database = sqlite3.connect(self.telegram_bot_db)
+        query = database.execute("SELECT whatsapp_address, telegram_api_key FROM Bots").fetchall()
+        database.close()
+
+        for contact in query:
+
+            whatsapp_address = contact[0]
+            key = contact[1]
+            self.initialize_single_telegram_listener(key, whatsapp_address)
+
+    # noinspection PyUnresolvedReferences,PyMethodMayBeStatic
+    def initialize_single_telegram_listener(self, api_key: str, whatsapp_address: str) -> 'SimpleTelegramConnection':
+        """
+        Initializes a single Telegram listener bot
+
+        :param api_key: the bot's API key
+        :param whatsapp_address: the whatsapp address linked to this bot
+        :return: None
+        """
+        # import here to avoid import errors:
+        from kudubot.connection.telegram.wrappers.SimpleTelegramConnection import SimpleTelegramConnection
+
+        def forward_message_to_whatsapp(message: Message) -> None:
+            """
+            Forwards a message to the Whatsapp service
+
+            :param message: the message to forward
+            :return: None
+            """
+            WhatsappConverterService.whatsapp_connection.send_text_message(
+                Message(message.message_body, whatsapp_address))
+
+        bot = SimpleTelegramConnection.establish_async_connection(api_key, forward_message_to_whatsapp)
+        WhatsappConverterService.telegram_bots[api_key] = bot
 
     @staticmethod
     def regex_check(message: Message) -> bool:
@@ -134,5 +233,5 @@ class WhatsappConverterService(Service):
 
         :return: True if input is valid, False otherwise
         """
-        regex = "^/wc (start|msg \"[^\"]+\"( \"[^\"]+\")?)$"
+        regex = "^/wc (start|register \"[^\"]+\" \"[^\"]+\"|msg \"[^\"]+\"( \"[^\"]+\")?)$"
         return re.search(re.compile(regex), message.message_body.lower())
