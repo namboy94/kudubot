@@ -27,18 +27,19 @@ LICENSE
 import os
 import time
 from threading import Thread
-from PIL import ImageFont
-from PIL import Image
-from PIL import ImageDraw
 from typing import Dict, List
 
-from kudubot.resources.fonts.__init__ import get_location as get_font
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 from kudubot.connection.generic.Message import Message
+from kudubot.resources.fonts.__init__ import get_location as get_font
+
 from kudubot.config.LocalConfigChecker import LocalConfigChecker
 
 # Weird import structure due to cyclic dependency
 try:
-    from kudubot.connection.generic.Connection import Connection
+    from kudubot.connection.Connection import Connection
 except ImportError:
     Connection = object
 

@@ -26,47 +26,42 @@ LICENSE
 # imports
 from threading import Thread
 
-# required services
+from kudubot.connection.generic.Message import Message
+from kudubot.logger.PrintLogger import PrintLogger
+from kudubot.services.internet_services.CinemaService import CinemaService
+from kudubot.services.internet_services.EmailSenderService import EmailSenderService
+from kudubot.services.internet_services.FootballInfoService import FootballInfoService
+from kudubot.services.internet_services.GoogleTtsService import GoogleTtsService
+from kudubot.services.internet_services.ImageSenderService import ImageSenderService
+from kudubot.services.internet_services.KickTippService import KickTippService
+from kudubot.services.internet_services.KitMensaService import KitMensaService
+from kudubot.services.internet_services.KvvService import KvvService
+from kudubot.services.internet_services.TvdbService import TvdbService
+from kudubot.services.internet_services.WeatherService import WeatherService
+from kudubot.services.internet_services.WhatsappConverterService import WhatsappConverterService
+from kudubot.services.internet_services.XkcdService import XkcdService
+from kudubot.services.internet_services.ZkmKinoService import ZkmKinoService
+from kudubot.services.local_services.AsciiArtService import AsciiArtService
+from kudubot.services.local_services.CasinoService import CasinoService
+from kudubot.services.local_services.HelloWorldService import HelloWorldService
+from kudubot.services.local_services.RandomKeyGeneratorService import RandomKeyGeneratorService
+from kudubot.services.local_services.ReminderService import ReminderService
+from kudubot.services.local_services.RestarterService import RestarterService
+from kudubot.services.local_services.RouletteService import RouletteService
+from kudubot.services.local_services.WeeklyReminderService import WeeklyReminderService
+from kudubot.services.local_services.XkcdRngService import XkcdRngService
+from kudubot.services.simple_services.SimpleCommandsService import SimpleCommandsService
+from kudubot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
+from kudubot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
+
+from kudubot.servicehandlers.ServiceConfigParser import ServiceConfigParser
 from kudubot.servicehandlers.required_services.HelpService import HelpService
 from kudubot.servicehandlers.required_services.MuterService import MuterService
 from kudubot.servicehandlers.required_services.ServiceSelectorService import ServiceSelectorService
 
-# other services
-# from services.thirdparty.ResetService import ResetService
-# from services.thirdparty.BotMuteService import BotMuteService
-from kudubot.services.local_services.CasinoService import CasinoService
-from kudubot.services.local_services.XkcdRngService import XkcdRngService
-from kudubot.services.local_services.RouletteService import RouletteService
-from kudubot.services.local_services.ReminderService import ReminderService
-from kudubot.services.local_services.AsciiArtService import AsciiArtService
-from kudubot.services.local_services.RestarterService import RestarterService
-from kudubot.services.local_services.HelloWorldService import HelloWorldService
-from kudubot.services.local_services.WeeklyReminderService import WeeklyReminderService
-from kudubot.services.local_services.RandomKeyGeneratorService import RandomKeyGeneratorService
-from kudubot.services.internet_services.KvvService import KvvService
-from kudubot.services.internet_services.XkcdService import XkcdService
-from kudubot.services.internet_services.TvdbService import TvdbService
-from kudubot.services.internet_services.CinemaService import CinemaService
-from kudubot.services.internet_services.ZkmKinoService import ZkmKinoService
-from kudubot.services.internet_services.WeatherService import WeatherService
-from kudubot.services.internet_services.KitMensaService import KitMensaService
-from kudubot.services.internet_services.KickTippService import KickTippService
-from kudubot.services.internet_services.GoogleTtsService import GoogleTtsService
-from kudubot.services.internet_services.EmailSenderService import EmailSenderService
-from kudubot.services.internet_services.ImageSenderService import ImageSenderService
-from kudubot.services.internet_services.FootballInfoService import FootballInfoService
-from kudubot.services.internet_services.WhatsappConverterService import WhatsappConverterService
-from kudubot.services.simple_services.SimpleCommandsService import SimpleCommandsService
-from kudubot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
-from kudubot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
-
-from kudubot.logger.PrintLogger import PrintLogger
-from kudubot.connection.generic.Message import Message
-from kudubot.servicehandlers.ServiceConfigParser import ServiceConfigParser
-
 # Weird import strucutre due to cyclic imports
 try:
-    from kudubot.connection.generic.Connection import Connection
+    from kudubot.connection.Connection import Connection
 except ImportError:
     Connection = object
 

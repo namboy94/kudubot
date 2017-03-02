@@ -26,8 +26,8 @@ LICENSE
 # imports
 import re
 
+from kudubot.connection.Message import Message
 from kudubot.servicehandlers.Service import Service
-from kudubot.connection.generic.Message import Message
 
 
 class MuterService(Service):
