@@ -25,16 +25,17 @@ LICENSE
 
 # imports
 import os
+from kudubot.metadata import version
 from setuptools import setup, find_packages
-import kudubot.metadata as metadata
 
 
-def readme() -> str:
+def readme():
     """
     Reads the readme file.
 
     :return: the readme file as a string
     """
+    # noinspection PyBroadException
     try:
         # noinspection PyPackageRequirements
         import pypandoc
@@ -43,7 +44,7 @@ def readme() -> str:
             markdown = f.read()
             rst = pypandoc.convert(markdown, 'rst', format='md')
             return rst
-    except (OSError, ImportError):
+    except:
         # If pandoc is not installed, just return the raw markdown text
         with open('README.md') as f:
             return f.read()
@@ -55,32 +56,39 @@ def find_scripts():
 
     :return: the list of scripts
     """
-    scripts = []
-    for file_name in os.listdir("bin"):
-        if not file_name == "__init__.py" and os.path.isfile(os.path.join("bin", file_name)):
-            scripts.append(os.path.join("bin", file_name))
-    return scripts
+    try:
+        scripts = []
+        for file_name in os.listdir("bin"):
+            if not file_name == "__init__.py" and os.path.isfile(os.path.join("bin", file_name)):
+                scripts.append(os.path.join("bin", file_name))
+        return scripts
+    except OSError:
+        return []
 
 
-setup(name=metadata.project_name,
-      version=metadata.version_number,
-      description=metadata.project_description,
+setup(name="kudubot",
+      version=version,
+      description="A messaging bot framework",
       long_description=readme(),
-      classifiers=[metadata.development_status,
-                   metadata.license_identifier,
-                   metadata.topic,
-                   metadata.language,
-                   metadata.compatible_os,
-                   metadata.environment
-                   ] + metadata.programming_languages + metadata.audiences,
-      url=metadata.project_url,
-      download_url=metadata.download_url,
-      author=metadata.author_name,
-      author_email=metadata.author_email,
-      license=metadata.license_type,
+      classifiers=[
+        "Environment :: Other Environment",
+        "Natural Language :: English",
+        "Intended Audience :: Developers",
+        "Development Status :: 3 - Alpha",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 2",
+        "Topic :: Internet",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+      ],
+      url="https://gitlab.namibsun.net/namboy94/kudubot",
+      download_url="https://gitlab.namibsun.net/namboy94/kudubot/repository/archive.zip?ref=master",
+      author="Hermann Krumrey",
+      author_email="hermann@krumreyh.com",
+      license="GNU GPL3",
       packages=find_packages(),
       package_data={'': ['*.png', '*.jpg', '*.otf']},
-      install_requires=metadata.dependencies,
+      install_requires=['typing'],
       dependency_links=[],
       test_suite='nose.collector',
       tests_require=['nose'],
