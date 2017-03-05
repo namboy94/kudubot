@@ -25,6 +25,7 @@ LICENSE
 import os
 import sqlite3
 from typing import List
+from kudubot.users.Contact import Contact
 from kudubot.services.Service import Service
 from kudubot.connections.Message import Message
 from kudubot.users.AddressBook import AddressBook
@@ -67,6 +68,39 @@ class Connection(object):
         Sends a Message using the connection
 
         :param message: The message to send
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def send_audio_message(self, receiver: Contact, caption: str, audio_file: str):
+        """
+        Sends an audio message using the connection
+
+        :param receiver: The receiver of the message
+        :param caption: The caption sent together with the message
+        :param audio_file: The path to the audio file to send
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def send_video_message(self, receiver: Contact, caption: str, video_file: str):
+        """
+        Sends a video message using the connection
+
+        :param receiver: The recipient of the video message
+        :param caption: The caption to be displayed with the video
+        :param video_file: The path to the video file to be sent
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def send_image_message(self, receiver: Contact, caption: str, image_file: str):
+        """
+        Sends an image message using the connection
+
+        :param receiver: The recipient of the image message
+        :param caption: The caption to be displayed with the image
+        :param image_file: The path to the image file
         :return: None
         """
         raise NotImplementedError()
