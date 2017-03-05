@@ -24,7 +24,7 @@ LICENSE
 
 import os
 import sqlite3
-from typing import List
+from typing import List, Dict
 from kudubot.users.Contact import Contact
 from kudubot.services.Service import Service
 from kudubot.connections.Message import Message
@@ -62,6 +62,34 @@ class Connection(object):
         self.connection_database_file_location = os.path.join(self.connection_database_file_location, self.identifier)
         self.db = sqlite3.connect(self.connection_database_file_location)
         self.address_book = AddressBook(self.db)
+
+        self.config = self.load_config()
+        self.user_contact = self.define_user_contact()
+
+    def load_config(self) -> Dict[str, object]:
+        """
+        Loads the configuration for the connection. If this fails for some reason, an InvalidConfigException
+        is raised
+
+        :return: A dictionary containing the configuration
+        """
+        raise NotImplementedError()
+
+    def generate_configuration(self):
+        """
+        Generates a new configuration file for this connection.
+
+        :return: None
+        """
+        raise NotImplementedError()
+
+    def define_user_contact(self) -> Contact:
+        """
+        Creates a Contact object for the connection by which the connection itself is identified
+
+        :return: The connection's user object
+        """
+        raise NotImplementedError()
 
     def send_message(self, message: Message):
         """
