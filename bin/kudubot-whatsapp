@@ -24,7 +24,8 @@ This file is part of kudubot.
 
 # imports
 from kudubot.main import main
-from kudubot.connection.whatsapp.WhatsappConnection import WhatsappConnection
+
+from kudubot.old.connection import WhatsappConnection
 
 if __name__ == '__main__':
     main(WhatsappConnection.identifier, verbosity=1)

@@ -23,7 +23,7 @@ This file is part of kudubot.
 """
 
 # imports
-from kudubot.main import main
+from kudubot.old.main import main
 
 if __name__ == '__main__':
     main(override="all", verbosity=1)

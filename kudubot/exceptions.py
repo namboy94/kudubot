@@ -1,12 +1,11 @@
-#!/usr/bin/env python
-# coding=utf-8
 """
-Copyright 2015,2016 Hermann Krumrey
+LICENSE:
+Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot makes use of various third-party python modules to serve
-    information via online chat services.
+    kudubot is a chat bot framework. It allows developers to write
+    services for arbitrary chat services.
 
     kudubot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,12 +19,12 @@ This file is part of kudubot.
 
     You should have received a copy of the GNU General Public License
     along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
+LICENSE
 """
 
-# imports
-from kudubot.main import main
 
-from kudubot.old.connection import TelegramConnection
-
-if __name__ == '__main__':
-    main(TelegramConnection.identifier, verbosity=1)
+class InvalidConfigException(Exception):
+    """
+    An Exception that is raised whenever an invalid configuration is detected.
+    """
+    pass
