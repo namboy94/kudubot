@@ -23,10 +23,10 @@ LICENSE
 """
 
 import os
+import sqlite3
 from typing import List
-
-from kudubot.connections.Message import Message
 from kudubot.services.Service import Service
+from kudubot.connections.Message import Message
 from kudubot.users.AddressBook import AddressBook
 
 
@@ -44,7 +44,7 @@ class Connection(object):
     subclasses of the Connection class
     """
 
-    connection_data_location = os.path.join(os.path.expanduser("~"), ".kudubot", "data_config")
+    connection_database_file_location = os.path.join(os.path.expanduser("~"), ".kudubot", "data_config")
     """
     The location of the connection's data location
     """
@@ -52,12 +52,14 @@ class Connection(object):
     def __init__(self, services: List[Service]):
         """
         Initializes the connection object using the specified services
+        Starts the database connection
 
         :param services: The services to use with the connection
         """
         self.services = services
-        self.connection_data_location = os.path.join(self.connection_data_location, self.identifier)
-        self.address_book = AddressBook(self.connection_data_location)
+        self.connection_database_file_location = os.path.join(self.connection_database_file_location, self.identifier)
+        self.db = sqlite3.connect(self.connection_database_file_location)
+        self.address_book = AddressBook(self.db)
 
     def send_message(self, message: Message):
         """

@@ -22,6 +22,34 @@ This file is part of kudubot.
 LICENSE
 """
 
+import time
+from kudubot.users.Contact import Contact
+
 
 class Message(object):
-    pass
+    """
+    Class that models a message entity.
+    """
+
+    def __init__(self, message_title: str, message_body: str,
+                 sender: Contact, group: Contact = None, timestamp: float = None):
+        """
+        Initializes the Message object
+
+        Since Messages may also come from chat groups, an optional group argument exists.
+        A group is another contact, just like any other contact. Group messages must define
+        a contact for the group as well as for the individual sender of the message.
+
+        A Message object whose group is None is a private message.
+
+        :param message_title: The title of the message. Not always applicable, depending on the connection
+        :param message_body: The body of the message
+        :param sender: The sender of the message, which is a Contact object
+        :param group: Optionally the group Contact object if this is a message originating from a group
+        :param timestamp: The timestamp of the message. If it is not specified, the current UNIX timestamp is used
+        """
+        self.message_title = message_title
+        self.message_body = message_body
+        self.sender = sender
+        self.group = group
+        self.timestamp = timestamp if timestamp != -1.0 else time.time()
