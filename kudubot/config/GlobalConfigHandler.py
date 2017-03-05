@@ -128,8 +128,9 @@ class GlobalConfigHandler(object):
         if len(connections) == 0:
             logging.warning("No connections loaded")
 
-        return connections
+        return self.__remove_duplicate_services_or_connections__(connections)
 
+    # noinspection PyUnresolvedReferences
     def load_services(self) -> List[type]:
         """
         Loads all Services from the services configuration file
@@ -139,10 +140,71 @@ class GlobalConfigHandler(object):
         logging.info("Loading Services")
         services = self.__load_import_config__(self.services_config_location, Service)
 
+        # Check if dependencies for each service are satisfied
+        # This loop structure is admittedly a bit weird, but there's a valid reason!
+        # Since we are removing Services with unsatisfied dependencies, we need to re-check all
+        # previous Services again if a Service is removed.
+        # This is done by directly modifying the index variable i
+        i = 0
+        while i < len(services):
+
+            service = services[i]
+
+            for dependency in service.requires:
+
+                dependency_satisfied = False
+                for other_service in services:
+                    if other_service.identifier == dependency:
+                        dependency_satisfied = True
+                        break
+
+                if not dependency_satisfied:
+                    logging.warning(
+                        "Dependency '" + dependency + "' for service '" + service.identifier + "is not satisfied")
+                    services.remove(service)
+                    i = -1
+                    break
+            i += 1
+
         if len(services) == 0:
             logging.warning("No services loaded")
 
-        return services
+        return self.__remove_duplicate_services_or_connections__(services)
+
+    # noinspection PyUnresolvedReferences,PyMethodMayBeStatic
+    def __remove_duplicate_services_or_connections__(self, target: List[type]) -> List[type]:
+        """
+        Removes any duplicate Connections or Services from a list
+
+        :param target: The list to remove the duplicates from
+        :return: The list with duplicates removed
+        """
+
+        results = []
+
+        for element in target:
+
+            hitcount = 0
+
+            for other in target:
+                if other.identifier == element.identifier:
+                    hitcount += 1
+
+            if hitcount == 1:
+                results.append(element)
+            else:
+
+                exists = False
+
+                for result in results:
+                    if result.identifier == element.identifier:
+                        exists = True
+                        break
+
+                if not exists:
+                    results.append(element)
+
+        return results
 
     # noinspection PyMethodMayBeStatic
     def __load_import_config__(self, file_location: str, class_type: type) -> List[type]:

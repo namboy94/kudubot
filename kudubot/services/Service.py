@@ -22,5 +22,47 @@ This file is part of kudubot.
 LICENSE
 """
 
+from kudubot.connections.Message import Message
+from kudubot.connections.Connection import Connection
+
+
 class Service(object):
-    pass
+    """
+    A class that defines how a chat bot service integrates with a Connection
+    """
+
+    identifier = "service"
+    """
+    A unique identifier for a service. Must be overridden by subclasses
+    """
+
+    requires = []
+    """
+    A list of other services this Service may depend on being running
+    """
+
+    def __init__(self, connection: Connection):
+        """
+        Initializes the Service using a specified Connection
+
+        :param connection: The connection used by this service
+        """
+        self.connection = connection
+
+    def is_applicable_to(self, message: Message) -> bool:
+        """
+        Checks if the Service is applicable to a given message
+
+        :param message: The message to check
+        :return: True if applicable, else False
+        """
+        raise NotImplementedError()
+
+    def handle_message(self, message: Message):
+        """
+        Handles the message, provided this service is applicable to it
+
+        :param message: The message to process
+        :return: None
+        """
+        raise NotImplementedError()

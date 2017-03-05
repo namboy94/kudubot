@@ -22,5 +22,9 @@ This file is part of kudubot.
 LICENSE
 """
 
+
 class InvalidConfigException(Exception):
+    """
+    An Exception that is raised whenever an invalid configuration is detected.
+    """
     pass

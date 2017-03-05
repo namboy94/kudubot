@@ -41,7 +41,7 @@ class Connection(object):
 
     identifier = "connection"
     """
-    A unique identifier that is attributed to the connection. Must be implemented by
+    A unique identifier that is attributed to the connection. Must be overridden by
     subclasses of the Connection class
     """
 
