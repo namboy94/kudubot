@@ -23,9 +23,11 @@ LICENSE
 """
 
 import sys
+import raven
 import argparse
+from kudubot.metadata import version, sentry_dsn
 from kudubot.connections.Connection import Connection
-from kudubot.config.GlobalConfigHandler import GlobalCongigHandler
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 from kudubot.config.ServiceConfigHandler import ServiceConfigHandler
 
 
@@ -37,24 +39,31 @@ def main():
     :return: None
     """
 
-    args = parse_args()
-    connection = initialize_connection(args.connection.lower())
-    services = ServiceConfigHandler.load_services(connection.get_identifier())
-    connection.load_services(services)
+    config_handler = GlobalConfigHandler()
 
-    connection.listen()
+    try:
+        args = parse_args()
+        connection = initialize_connection(args.connection.lower(), config_handler)
+        services = ServiceConfigHandler.load_services(connection.get_identifier())
+        connection.load_services(services)
+
+        connection.listen()
+    except Exception as e:
+        sentry = raven.Client(dsn=sentry_dsn, release=version)
+        sentry.captureException()
+        raise e
 
 
-def initialize_connection(identifier: str) -> Connection:
+def initialize_connection(identifier: str, config_handler: GlobalConfigHandler) -> Connection:
     """
     Loads the connection for the specified identifier
     If the connection was not found in the local configuration, the program exits.
 
     :param identifier: The identifier for the Connection
+    :param config_handler: An initialized global configuration handler object
     :return: The Connection object
     """
 
-    config_handler = GlobalCongigHandler()
     connections = config_handler.load_connections()
 
     try:
