@@ -42,7 +42,7 @@ class GlobalConfigHandler(object):
     user's home directory
     """
 
-    connection_config_location = os.path.join(config_location, "connections.conf")
+    global_connection_config_location = os.path.join(config_location, "connections.conf")
     """
     The location of the connections config file, which defines the available connection types
     """
@@ -50,6 +50,16 @@ class GlobalConfigHandler(object):
     services_config_location = os.path.join(config_location, "services.conf")
     """
     The location of the services config file, which defines the various service modules available
+    """
+
+    data_location = os.path.join(config_location, "data")
+    """
+    The location of the data directory
+    """
+
+    specific_connection_config_location = os.path.join(config_location, "connection_config")
+    """
+    The location of the config directory for individual connections
     """
 
     def __init__(self):
@@ -62,10 +72,14 @@ class GlobalConfigHandler(object):
 
         if not os.path.isdir(self.config_location):
             raise InvalidConfigException("Configuration directory " + self.config_location + " does not exist")
-        elif not os.path.isfile(self.connection_config_location):
+        elif not os.path.isfile(self.global_connection_config_location):
             raise InvalidConfigException("Connection config file does not exist")
         elif not os.path.isfile(self.services_config_location):
             raise InvalidConfigException("Services config file does not exist")
+        elif not os.path.isdir(self.data_location):
+            raise InvalidConfigException("Data Location directory does not exist")
+        elif not os.path.isdir(self.specific_connection_config_location):
+            raise InvalidConfigException("Connection Configuration directory does not exist")
 
         logging.info("Configuration successfully checked")
 
@@ -86,13 +100,21 @@ class GlobalConfigHandler(object):
             logging.info("Creating directory " + GlobalConfigHandler.config_location)
             os.makedirs(GlobalConfigHandler.config_location)
 
-        if not os.path.isfile(GlobalConfigHandler.connection_config_location):
-            logging.info("Creating file " + GlobalConfigHandler.connection_config_location)
-            open(GlobalConfigHandler.connection_config_location, "w").close()
+        if not os.path.isfile(GlobalConfigHandler.global_connection_config_location):
+            logging.info("Creating file " + GlobalConfigHandler.global_connection_config_location)
+            open(GlobalConfigHandler.global_connection_config_location, "w").close()
 
         if not os.path.isfile(GlobalConfigHandler.services_config_location):
             logging.info("Creating file " + GlobalConfigHandler.services_config_location)
             open(GlobalConfigHandler.services_config_location, "w").close()
+
+        if not os.path.isdir(GlobalConfigHandler.data_location):
+            logging.info("Creating directory " + GlobalConfigHandler.data_location)
+            os.makedirs(GlobalConfigHandler.data_location)
+
+        if not os.path.isdir(GlobalConfigHandler.data_location):
+            logging.info("Creating directory " + GlobalConfigHandler.specific_connection_config_location)
+            os.makedirs(GlobalConfigHandler.specific_connection_config_location)
 
     def load_connections(self) -> List[type]:
         """
@@ -101,7 +123,7 @@ class GlobalConfigHandler(object):
         :return: A list of successfully imported Connection subclasses
         """
         logging.info("Loading connections")
-        connections = self.__load_import_config__(self.connection_config_location, Connection)
+        connections = self.__load_import_config__(self.global_connection_config_location, Connection)
 
         if len(connections) == 0:
             logging.warning("No connections loaded")

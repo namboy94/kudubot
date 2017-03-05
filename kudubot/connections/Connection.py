@@ -44,9 +44,10 @@ class Connection(object):
     subclasses of the Connection class
     """
 
-    connection_database_file_location = os.path.join(os.path.expanduser("~"), ".kudubot", "data_config")
+    connection_database_file_location = os.path.join(os.path.expanduser("~"), ".kudubot", "data")
     """
-    The location of the connection's data location
+    The location of the connection's data location. Has to be adjusted by the __init__ method to point to the
+    correct database file for the connection's data
     """
 
     def __init__(self, services: List[Service]):

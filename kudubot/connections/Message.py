@@ -31,8 +31,8 @@ class Message(object):
     Class that models a message entity.
     """
 
-    def __init__(self, message_title: str, message_body: str,
-                 sender: Contact, group: Contact = None, timestamp: float = None):
+    def __init__(self, message_title: str, message_body: str, receiver: Contact, sender: Contact,
+                 sender_group: Contact = None, timestamp: float = None):
         """
         Initializes the Message object
 
@@ -44,12 +44,14 @@ class Message(object):
 
         :param message_title: The title of the message. Not always applicable, depending on the connection
         :param message_body: The body of the message
+        :param receiver: The recipient of the message, which is a Contact object
         :param sender: The sender of the message, which is a Contact object
-        :param group: Optionally the group Contact object if this is a message originating from a group
+        :param sender_group: Optionally the group Contact object if this is a message originating from a group
         :param timestamp: The timestamp of the message. If it is not specified, the current UNIX timestamp is used
         """
         self.message_title = message_title
         self.message_body = message_body
+        self.receiver = receiver
         self.sender = sender
-        self.group = group
+        self.sender_group = sender_group
         self.timestamp = timestamp if timestamp != -1.0 else time.time()
