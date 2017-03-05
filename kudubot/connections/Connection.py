@@ -24,9 +24,10 @@ LICENSE
 
 import os
 from typing import List
-from kudubot.services.Service import Service
+
 from kudubot.connections.Message import Message
-from kudubot.connections.AddressBook import AddressBook
+from kudubot.services.Service import Service
+from kudubot.users.AddressBook import AddressBook
 
 
 class Connection(object):
