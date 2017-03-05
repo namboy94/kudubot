@@ -40,10 +40,7 @@ class AddressBook(object):
     schema = "CREATE TABLE IF NOT EXISTS address_book (" \
              "    id INTEGER CONSTRAINT constraint_name PRIMARY KEY," \
              "    display_name VARCHAR(255) NOT NULL," \
-             "    address VARCHAR(255) NOT NULL," \
-             "    selected_language VARCHAR(255) NOT NULL," \
-             "    is_admin BOOLEAN NOT NULL," \
-             "    is_blacklisted BOOLEAN NOT NULL" \
+             "    address VARCHAR(255) NOT NULL" \
              ")"
     """
     The Address book's database schema
@@ -77,9 +74,8 @@ class AddressBook(object):
             contact.database_id = self.db.execute("SELECT MAX(id) FROM address_book").fetchall()[0][0]
 
         # Insert into the database
-        self.db.execute("INSERT OR REPLACE INTO address_book VALUES (?, ?, ?, ?, ?, ?)",
-                        (contact.database_id, contact.display_name, contact.address,
-                         contact.language, contact.is_admin, contact.is_blacklisted))
+        self.db.execute("INSERT OR REPLACE INTO address_book VALUES (?, ?, ?)",
+                        (contact.database_id, contact.display_name, contact.address))
         self.db.commit()
         return contact
 
@@ -97,4 +93,4 @@ class AddressBook(object):
             return None
         else:
             data = result[0]
-            return Contact(int(data[0]), str(data[0]), str(data[0]), str(data[0]), bool(data[0]), bool(data[0]))
+            return Contact(int(data[0]), str(data[0]), str(data[0]))

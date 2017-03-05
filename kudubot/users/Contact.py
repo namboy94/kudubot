@@ -28,21 +28,14 @@ class Contact(object):
     Class that models a contact in the connection's address book database
     """
 
-    def __init__(self, database_id: int, display_name: str, address: str,
-                 language: str, is_admin: bool, is_blacklisted: bool):
+    def __init__(self, database_id: int, display_name: str, address: str):
         """
         Initializes the contact object
 
         :param database_id: The contact's ID in the database
         :param display_name: The display name of the contact
         :param address: The contact's address
-        :param language: The language specified by the user
-        :param is_admin: The admin status of the user
-        :param is_blacklisted: The blacklist status of the user
         """
         self.database_id = database_id
         self.display_name = display_name
         self.address = address
-        self.language = language
-        self.is_admin = is_admin
-        self.is_blacklisted = is_blacklisted
