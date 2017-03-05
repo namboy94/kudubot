@@ -1,2 +1,0 @@
-class ServiceConfigHandler(object):
-    pass

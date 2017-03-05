@@ -67,6 +67,8 @@ class GlobalConfigHandler(object):
         elif not os.path.isfile(self.services_config_location):
             raise InvalidConfigException("Services config file does not exist")
 
+        logging.info("Configuration successfully checked")
+
     @staticmethod
     def generate_configuration(delete_old):
         """
@@ -77,14 +79,20 @@ class GlobalConfigHandler(object):
         """
 
         if delete_old and os.path.isdir(GlobalConfigHandler.config_location):
+            logging.info("Deleting old configuration files")
             shutil.rmtree(GlobalConfigHandler.config_location)
 
         if not os.path.isdir(GlobalConfigHandler.config_location):
-            open(GlobalConfigHandler.config_location, "w").close()
+            logging.info("Creating directory " + GlobalConfigHandler.config_location)
+            os.makedirs(GlobalConfigHandler.config_location)
+
         if not os.path.isfile(GlobalConfigHandler.connection_config_location):
-            open(GlobalConfigHandler.config_location, "w").close()
+            logging.info("Creating file " + GlobalConfigHandler.connection_config_location)
+            open(GlobalConfigHandler.connection_config_location, "w").close()
+
         if not os.path.isfile(GlobalConfigHandler.services_config_location):
-            open(GlobalConfigHandler.config_location, "w").close()
+            logging.info("Creating file " + GlobalConfigHandler.services_config_location)
+            open(GlobalConfigHandler.services_config_location, "w").close()
 
     def load_connections(self) -> List[type]:
         """
@@ -92,14 +100,27 @@ class GlobalConfigHandler(object):
 
         :return: A list of successfully imported Connection subclasses
         """
-        return self.__load_import_config__(self.connection_config_location, Connection)
+        logging.info("Loading connections")
+        connections = self.__load_import_config__(self.connection_config_location, Connection)
 
-    def load_service_config(self) -> List[type]:
+        if len(connections) == 0:
+            logging.warning("No connections loaded")
+
+        return connections
+
+    def load_services(self) -> List[type]:
         """
+        Loads all Services from the services configuration file
 
         :return: A list of successfully imported Service subclasses
         """
-        return self.__load_import_config__(self.services_config_location, Service)
+        logging.info("Loading Services")
+        services = self.__load_import_config__(self.services_config_location, Service)
+
+        if len(services) == 0:
+            logging.warning("No services loaded")
+
+        return services
 
     # noinspection PyMethodMayBeStatic
     def __load_import_config__(self, file_location: str, class_type: type) -> List[type]:
@@ -122,7 +143,10 @@ class GlobalConfigHandler(object):
 
         for line in content:
 
+            logging.debug("Trying to import '" + line + "'")
+
             if line.strip().startswith("#") or line == "":
+                logging.debug("Skipping line: " + line + "")
                 continue
             else:
                 try:
