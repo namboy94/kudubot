@@ -35,11 +35,11 @@ from PIL import ImageFont
 from kudubot.connection.generic.Message import Message
 from kudubot.resources.fonts.__init__ import get_location as get_font
 
-from kudubot.config.LocalConfigChecker import LocalConfigChecker
+from kudubot.old.config import LocalConfigChecker
 
 # Weird import structure due to cyclic dependency
 try:
-    from kudubot.connection.Connection import Connection
+    from kudubot.old.connection import Connection
 except ImportError:
     Connection = object
 

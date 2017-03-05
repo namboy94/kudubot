@@ -28,6 +28,9 @@ from threading import Thread
 
 from kudubot.connection.generic.Message import Message
 from kudubot.logger.PrintLogger import PrintLogger
+from kudubot.servicehandlers.ServiceConfigParser import ServiceConfigParser
+from kudubot.servicehandlers.required_services.HelpService import HelpService
+from kudubot.servicehandlers.required_services.MuterService import MuterService
 from kudubot.services.internet_services.CinemaService import CinemaService
 from kudubot.services.internet_services.EmailSenderService import EmailSenderService
 from kudubot.services.internet_services.FootballInfoService import FootballInfoService
@@ -54,14 +57,11 @@ from kudubot.services.simple_services.SimpleCommandsService import SimpleCommand
 from kudubot.services.simple_services.SimpleContainsResponseService import SimpleContainsResponseService
 from kudubot.services.simple_services.SimpleEqualsResponseService import SimpleEqualsResponseService
 
-from kudubot.servicehandlers.ServiceConfigParser import ServiceConfigParser
-from kudubot.servicehandlers.required_services.HelpService import HelpService
-from kudubot.servicehandlers.required_services.MuterService import MuterService
-from kudubot.servicehandlers.required_services.ServiceSelectorService import ServiceSelectorService
+from kudubot.old.servicehandlers.required_services.ServiceSelectorService import ServiceSelectorService
 
 # Weird import strucutre due to cyclic imports
 try:
-    from kudubot.connection.Connection import Connection
+    from kudubot.old.connection import Connection
 except ImportError:
     Connection = object
 

@@ -25,8 +25,10 @@ LICENSE
 
 # imports
 import os
-from kudubot.metadata import version
+
 from setuptools import setup, find_packages
+
+from kudubot.metadata import version
 
 
 def readme():

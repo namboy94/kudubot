@@ -26,8 +26,9 @@ LICENSE
 # imports
 import os
 
-from kudubot.config.LocalConfigChecker import LocalConfigChecker
-from kudubot.connection.Message import Message
+from kudubot.messages.Message import Message
+
+from kudubot.old.config import LocalConfigChecker
 
 
 class Authenticator(object):

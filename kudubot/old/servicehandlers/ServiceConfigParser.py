@@ -24,12 +24,13 @@ LICENSE
 """
 
 # imports
-import os
 import configparser
+import os
 from typing import List
 
-from kudubot.servicehandlers.Service import Service
 from kudubot.config.LocalConfigChecker import LocalConfigChecker
+
+from kudubot.old.servicehandlers.Service import Service
 
 
 class ServiceConfigParser(object):

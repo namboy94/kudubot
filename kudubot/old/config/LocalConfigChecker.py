@@ -31,7 +31,7 @@ from puffotter.fileops import ensure_directory_exists, ensure_file_exists, ensur
 
 # Import structure to combat cyclic imports
 try:
-    from kudubot.connection.Connection import Connection
+    from kudubot.old.connection import Connection
 except ImportError:
     Connection = None
 

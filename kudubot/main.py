@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 LICENSE:
 Copyright 2015,2016 Hermann Krumrey
@@ -23,101 +22,56 @@ This file is part of kudubot.
 LICENSE
 """
 
-# imports
-import os
 import sys
 import argparse
-import traceback
-from threading import Thread
-
-import kudubot.metadata as metadata
-from kudubot.logger.PrintLogger import PrintLogger
-from kudubot.logger.ExceptionLogger import ExceptionLogger
-from kudubot.config.LocalConfigChecker import LocalConfigChecker
-from kudubot.connection.email.EmailConnection import EmailConnection
-from kudubot.connection.whatsapp.WhatsappConnection import WhatsappConnection
-from kudubot.connection.telegram.TelegramConnection import TelegramConnection
-
-connections = [EmailConnection,
-               WhatsappConnection,
-               TelegramConnection]
-"""
-A list of possible connections
-"""
+from kudubot.connections.Connection import Connection
+from kudubot.config.GlobalConfigHandler import GlobalCongigHandler
+from kudubot.config.ServiceConfigHandler import ServiceConfigHandler
 
 
-def main(override: str = "", verbosity: int = 1) -> None:
+def main():
     """
-    The main method of the program
+    The Main Method of the Program that starts the Connection Listener in accordance with the
+    command line arguments
 
-    :param override: Can be used to override the main method to force a specific connection to run
-    :param verbosity: Can be set to define how verbose the outpt will be. Defaults to 0, no or only basic output
     :return: None
     """
-    PrintLogger.print("Messengerbot V " + metadata.version_number)
-    PrintLogger.print("Parsing Command Line Arguments", 5)
 
-    if override and len(sys.argv) == 1:
-        sys.argv.append(override)
+    args = parse_args()
+    connection = initialize_connection(args.connection.lower())
+    services = ServiceConfigHandler.load_services(connection.get_identifier())
+    connection.load_services(services)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("mode", help="The connection type to start. Can be 'email', 'telegram', or 'all'")
-    parser.add_argument("--verbosity", help="Sets the output verbosity", type=int)
-    args = parser.parse_args()
+    connection.listen()
 
-    metadata.verbosity = args.verbosity if args.verbosity else verbosity
 
-    # block stderr messages from being printed.
-    dev_null = open(os.devnull, 'w')
-    sys.stderr = dev_null
+def initialize_connection(identifier: str) -> Connection:
+    """
+    Loads the connection for the specified identifier
+    If the connection was not found in the local configuration, the program exits.
 
-    PrintLogger.print("Starting program", 1)
+    :param identifier: The identifier for the Connection
+    :return: The Connection object
+    """
+
+    config_handler = GlobalCongigHandler()
+    connections = config_handler.load_connections()
 
     try:
-        try:
-            # Check if the local configs are OK and if necessary fix them
-            LocalConfigChecker.check_and_fix_config(connections)
-
-            if args.mode == "all":
-                for connection in connections:
-
-                    def connect():
-                        """
-                        Connects to a service
-
-                        :return: None
-                        """
-                        try:
-                            connection.establish_connection()
-                        except Exception as ex:
-                            stack_t = traceback.format_exc()
-                            ExceptionLogger.log_exception(ex, stack_t, connection.identifier)
-
-                    connection_thread = Thread(target=connect)
-                    connection_thread.daemon = True
-                    connection_thread.start()
-                while True:
-                    pass
-            else:
-                # Generate the connection
-                connected = False
-                for connection in connections:
-                    if connection.identifier == args.mode:
-                        connected = True
-                        connection.establish_connection()
-
-                if not connected:
-                    PrintLogger.print("No valid connection type selected")
-                    sys.exit(1)
-        except Exception as e:
-            stack_trace = traceback.format_exc()
-            ExceptionLogger.log_exception(e, stack_trace, "main")
-
-    except KeyboardInterrupt:
-        pass
-
-    PrintLogger.print("Thanks for using kudubot")
+        connection_type = list(filter(lambda x: x.identifier == identifier, connections))[0]
+        return connection_type()
+    except IndexError:
+        print("Connection Type " + identifier)
+        sys.exit(1)
 
 
-if __name__ == "__main__":
-    main()
+def parse_args() -> argparse.Namespace:
+    """
+    Parses the Command Line Arguments using argparse
+
+    :return: The parsed arguments
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("connection", help="The Type of Connection to use")
+    return parser.parse_args()

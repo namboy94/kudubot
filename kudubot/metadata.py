@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 LICENSE:
 Copyright 2015,2016 Hermann Krumrey

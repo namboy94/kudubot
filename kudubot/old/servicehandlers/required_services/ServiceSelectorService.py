@@ -26,8 +26,9 @@ LICENSE
 # imports
 import re
 
-from kudubot.connection.Message import Message
-from kudubot.servicehandlers.Service import Service
+from kudubot.messages.Message import Message
+
+from kudubot.old.servicehandlers.Service import Service
 
 
 class ServiceSelectorService(Service):

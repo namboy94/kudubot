@@ -29,15 +29,15 @@ import sqlite3
 import time
 import traceback
 
+import kudubot.metadata as metadata
 from kudubot.logger.ExceptionLogger import ExceptionLogger
 from kudubot.logger.MessageLogger import MessageLogger
 from kudubot.logger.PrintLogger import PrintLogger
-
-import kudubot.metadata as metadata
-from kudubot.config.LocalConfigChecker import LocalConfigChecker
-from kudubot.connection.Message import Message
+from kudubot.messages.Message import Message
 from kudubot.servicehandlers.Authenticator import Authenticator
 from kudubot.servicehandlers.ServiceManager import ServiceManager
+
+from kudubot.old.config import LocalConfigChecker
 
 
 class Connection(object):
