@@ -26,6 +26,7 @@ import sys
 import raven
 import argparse
 from kudubot.metadata import version, sentry_dsn
+from kudubot.exceptions import InvalidConfigException
 from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
@@ -59,7 +60,13 @@ def initialize_connection(identifier: str) -> Connection:
     :return: The Connection object
     """
 
-    config_handler = GlobalConfigHandler()
+    try:
+        config_handler = GlobalConfigHandler()
+    except InvalidConfigException as e:
+        print("Loading configuration failed:")
+        print(str(e))
+        sys.exit(1)
+
     connections = config_handler.load_connections()
     services = config_handler.load_services()
 
