@@ -28,6 +28,7 @@ from typing import List, Dict
 from kudubot.users.Contact import Contact
 from kudubot.connections.Message import Message
 from kudubot.users.AddressBook import AddressBook
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 class Connection(object):
@@ -44,10 +45,15 @@ class Connection(object):
     subclasses of the Connection class
     """
 
-    connection_database_file_location = os.path.join(os.path.expanduser("~"), ".kudubot", "data")
+    database_file_location = GlobalConfigHandler.data_location
     """
     The location of the connection's data location. Has to be adjusted by the __init__ method to point to the
     correct database file for the connection's data
+    """
+
+    config_file_location = GlobalConfigHandler.specific_connection_config_location
+    """
+    The location of the connection's configuration file
     """
 
     def __init__(self, services: List[type]):
@@ -61,8 +67,9 @@ class Connection(object):
         for service in services:
             self.services.append(service(self))
 
-        self.connection_database_file_location = os.path.join(self.connection_database_file_location, self.identifier)
-        self.db = sqlite3.connect(self.connection_database_file_location)
+        self.database_file_location = os.path.join(self.database_file_location, self.identifier)
+        self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
+        self.db = sqlite3.connect(self.database_file_location)
         self.address_book = AddressBook(self.db)
 
         self.config = self.load_config()
