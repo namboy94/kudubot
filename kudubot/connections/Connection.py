@@ -26,7 +26,6 @@ import os
 import sqlite3
 from typing import List, Dict
 from kudubot.users.Contact import Contact
-from kudubot.services.Service import Service
 from kudubot.connections.Message import Message
 from kudubot.users.AddressBook import AddressBook
 
@@ -51,20 +50,42 @@ class Connection(object):
     correct database file for the connection's data
     """
 
-    def __init__(self, services: List[Service]):
+    def __init__(self, services: List[type]):
         """
         Initializes the connection object using the specified services
         Starts the database connection
 
         :param services: The services to use with the connection
         """
-        self.services = services
+        self.services = []
+        for service in services:
+            self.services.append(service(self))
+
         self.connection_database_file_location = os.path.join(self.connection_database_file_location, self.identifier)
         self.db = sqlite3.connect(self.connection_database_file_location)
         self.address_book = AddressBook(self.db)
 
         self.config = self.load_config()
         self.user_contact = self.define_user_contact()
+
+    def apply_services(self, message: Message, break_on_match: bool = False):
+        """
+        Applies the services to a Message
+        First, the method checks if a service is applicable to a message.
+        Then, if it is applicable, the service will process the message
+        If the break_on_match parameter is set to True, the first match will
+        always end the loop.
+
+        :param message: The message to process
+        :param break_on_match: Can be set to True to not allow more than one result
+        :return: None
+        """
+
+        for service in self.services:
+            if service.is_applicable_to(message):
+                service.handle_message(message)
+                if break_on_match:
+                    break
 
     def load_config(self) -> Dict[str, object]:
         """
