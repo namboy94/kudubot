@@ -25,6 +25,7 @@ LICENSE
 import os
 import shutil
 import logging
+import importlib
 from typing import List
 from kudubot.services.Service import Service
 from kudubot.exceptions import InvalidConfigException
@@ -172,6 +173,23 @@ class GlobalConfigHandler(object):
 
         return self.__remove_duplicate_services_or_connections__(services)
 
+    # noinspection PyMethodMayBeStatic
+    def __handle_import_statement(self, statement: str) -> type:
+        """
+        Handles an import statement string
+
+        :param statement: The import string to parse and execute
+        :return: The retrieved class or module
+        """
+
+        if statement.startswith("import"):
+            return importlib.import_module(statement)
+        else:
+            statement = statement.split("from ", 1)[1]
+            statement = statement.split(" import ")
+            module = importlib.import_module(statement[0])
+            return getattr(module, statement[1])
+
     # noinspection PyUnresolvedReferences,PyMethodMayBeStatic
     def __remove_duplicate_services_or_connections__(self, target: List[type]) -> List[type]:
         """
@@ -235,7 +253,7 @@ class GlobalConfigHandler(object):
                 continue
             else:
                 try:
-                    module = __import__(line)
+                    module = self.__handle_import_statement(line)
 
                     if issubclass(module, class_type):
                         modules.append(module)

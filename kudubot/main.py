@@ -24,6 +24,7 @@ LICENSE
 
 import sys
 import raven
+import logging
 import argparse
 from kudubot.metadata import version, sentry_dsn
 from kudubot.exceptions import InvalidConfigException
@@ -41,6 +42,13 @@ def main():
 
     try:
         args = parse_args()
+
+        # noinspection PyUnresolvedReferences
+        if args.debug:
+            logging.basicConfig(level=logging.DEBUG)
+        elif args.verbose:
+            logging.basicConfig(level=logging.INFO)
+
         # noinspection PyUnresolvedReferences
         connection = initialize_connection(args.connection.lower())
 
@@ -74,7 +82,7 @@ def initialize_connection(identifier: str) -> Connection:
         connection_type = list(filter(lambda x: x.identifier == identifier, connections))[0]
         return connection_type(services)
     except IndexError:
-        print("Connection Type " + identifier)
+        print("Connection Type " + identifier + " is not implemented or imported using the config file")
         sys.exit(1)
     except InvalidConfigException as e:
         print("Connection Configuration failed:")
@@ -91,4 +99,8 @@ def parse_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
     parser.add_argument("connection", help="The Type of Connection to use")
+
+    parser.add_argument("-v", "--verbose", action="store_true", help="Activates verbose output")
+    parser.add_argument("-d", "--debug", action="store_true", help="Activates debug-level logging output")
+
     return parser.parse_args()

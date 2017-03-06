@@ -68,7 +68,7 @@ class Connection(object):
         for service in services:
             self.services.append(service(self))
 
-        self.database_file_location = os.path.join(self.database_file_location, self.identifier)
+        self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
         self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
         self.db = sqlite3.connect(self.database_file_location)
         self.address_book = AddressBook(self.db)

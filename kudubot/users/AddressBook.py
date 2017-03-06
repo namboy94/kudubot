@@ -68,10 +68,16 @@ class AddressBook(object):
         # Check if the contact currently exists
         old = self.db.execute("SELECT * FROM address_book WHERE id=? OR address=?",
                               (contact.database_id, contact.address)).fetchall()
+
         if len(old) != 1:
-            # Modify the ID
+            # Increment the ID
             logging.info("Address " + contact.address + " does not exist yet. Inserting into address book.")
-            contact.database_id = self.db.execute("SELECT MAX(id) FROM address_book").fetchall()[0][0]
+            max_id = self.db.execute("SELECT CASE WHEN COUNT(id) > 0 THEN MAX(id) ELSE 0 END AS max_id "
+                                     "FROM address_book").fetchall()[0][0]
+            contact.database_id = max_id + 1
+        elif contact.database_id == -1:
+            contact.database_id = self.db.execute("SELECT id FROM address_book WHERE address=?",
+                                                  (contact.address,)).fetchall()[0][0]
 
         # Insert into the database
         self.db.execute("INSERT OR REPLACE INTO address_book VALUES (?, ?, ?)",
