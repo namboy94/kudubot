@@ -24,6 +24,7 @@ LICENSE
 
 import os
 import sqlite3
+from threading import Thread
 from typing import List, Dict
 from kudubot.users.Contact import Contact
 from kudubot.connections.Message import Message
@@ -128,35 +129,35 @@ class Connection(object):
         """
         raise NotImplementedError()
 
-    def send_audio_message(self, receiver: Contact, caption: str, audio_file: str):
+    def send_audio_message(self, receiver: Contact, audio_file: str, caption: str = ""):
         """
         Sends an audio message using the connection
 
         :param receiver: The receiver of the message
-        :param caption: The caption sent together with the message
         :param audio_file: The path to the audio file to send
+        :param caption: The caption sent together with the message
         :return: None
         """
         raise NotImplementedError()
 
-    def send_video_message(self, receiver: Contact, caption: str, video_file: str):
+    def send_video_message(self, receiver: Contact, video_file: str, caption: str = ""):
         """
         Sends a video message using the connection
 
         :param receiver: The recipient of the video message
-        :param caption: The caption to be displayed with the video
         :param video_file: The path to the video file to be sent
+        :param caption: The caption to be displayed with the video
         :return: None
         """
         raise NotImplementedError()
 
-    def send_image_message(self, receiver: Contact, caption: str, image_file: str):
+    def send_image_message(self, receiver: Contact, image_file: str, caption: str = ""):
         """
         Sends an image message using the connection
 
         :param receiver: The recipient of the image message
-        :param caption: The caption to be displayed with the image
         :param image_file: The path to the image file
+        :param caption: The caption to be displayed with the image
         :return: None
         """
         raise NotImplementedError()
@@ -170,6 +171,16 @@ class Connection(object):
         :return: None
         """
         raise NotImplementedError()
+
+    def listen_in_separate_thread(self) -> Thread:
+        """
+        Runs the listen() method in a separate daemon thread
+
+        :return: The listening thread
+        """
+        thread = Thread(target=self.listen, daemon=True)
+        thread.start()
+        return thread
 
     def on_message_received(self, message: Message):
         """
