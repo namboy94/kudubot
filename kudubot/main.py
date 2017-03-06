@@ -76,6 +76,10 @@ def initialize_connection(identifier: str) -> Connection:
     except IndexError:
         print("Connection Type " + identifier)
         sys.exit(1)
+    except InvalidConfigException as e:
+        print("Connection Configuration failed:")
+        print(str(e))
+        sys.exit(1)
 
 
 def parse_args() -> argparse.Namespace:
