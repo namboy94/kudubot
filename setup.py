@@ -1,12 +1,11 @@
-# coding=utf-8
 """
 LICENSE:
-Copyright 2015,2016 Hermann Krumrey
+Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot makes use of various third-party python modules to serve
-    information via online chat services.
+    kudubot is a chat bot framework. It allows developers to write
+    services for arbitrary chat services.
 
     kudubot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,11 +22,8 @@ This file is part of kudubot.
 LICENSE
 """
 
-# imports
 import os
-
 from setuptools import setup, find_packages
-
 from kudubot.metadata import version
 
 
