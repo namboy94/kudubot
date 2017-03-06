@@ -23,13 +23,11 @@ LICENSE
 """
 
 import unittest
-from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 class UnitTests(unittest.TestCase):
 
     def setUp(self):
-        GlobalConfigHandler.config_location = "kudubot/"
         pass
 
     def tearDown(self):
