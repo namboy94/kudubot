@@ -28,7 +28,6 @@ import logging
 from typing import List
 from kudubot.services.Service import Service
 from kudubot.exceptions import InvalidConfigException
-from kudubot.connections.Connection import Connection
 
 
 class GlobalConfigHandler(object):
@@ -112,7 +111,7 @@ class GlobalConfigHandler(object):
             logging.info("Creating directory " + GlobalConfigHandler.data_location)
             os.makedirs(GlobalConfigHandler.data_location)
 
-        if not os.path.isdir(GlobalConfigHandler.data_location):
+        if not os.path.isdir(GlobalConfigHandler.specific_connection_config_location):
             logging.info("Creating directory " + GlobalConfigHandler.specific_connection_config_location)
             os.makedirs(GlobalConfigHandler.specific_connection_config_location)
 
@@ -122,6 +121,8 @@ class GlobalConfigHandler(object):
 
         :return: A list of successfully imported Connection subclasses
         """
+        from kudubot.connections.Connection import Connection
+
         logging.info("Loading connections")
         connections = self.__load_import_config__(self.global_connection_config_location, Connection)
 

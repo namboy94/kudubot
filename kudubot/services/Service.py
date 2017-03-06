@@ -23,7 +23,6 @@ LICENSE
 """
 
 from kudubot.connections.Message import Message
-from kudubot.connections.Connection import Connection
 
 
 class Service(object):
@@ -41,7 +40,8 @@ class Service(object):
     A list of other services this Service may depend on being running
     """
 
-    def __init__(self, connection: Connection):
+    def __init__(self, connection  # Connection  (Can't import due to circular imports)
+                 ):
         """
         Initializes the Service using a specified Connection
 

@@ -23,7 +23,23 @@ This file is part of kudubot.
 LICENSE
 """
 
-from kudubot.main import main
+import logging
+import argparse
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--delete-old", action="store_true",
+                        help="Can be used to completely wipe theprevious configuration.")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Activates verbose output")
+    parser.add_argument("-b", "--debug", action="store_true", help="Activates debug-level logging output")
+
+    args = parser.parse_args()
+
+    if args.debug:
+        logging.basicConfig(level=logging.INFO)
+    elif args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+
+    GlobalConfigHandler.generate_configuration(parser.parse_args().delete_old)
