@@ -181,12 +181,3 @@ class Connection(object):
         thread = Thread(target=self.listen, daemon=True)
         thread.start()
         return thread
-
-    def on_message_received(self, message: Message):
-        """
-        Specifies how the connection reacts on incoming messages.
-
-        :param message: The message that was received
-        :return: None
-        """
-        raise NotImplementedError()
