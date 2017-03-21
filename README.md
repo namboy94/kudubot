@@ -24,7 +24,7 @@ that would import your Connection class.
 
 For examples see:
 
-* No Examples so far
+* [kudubot-telegram](https://gitlab.namibsun.net/namboy94/kudubot-telegram)
 
 ## Implementing a Service
 
@@ -36,6 +36,10 @@ To integrate the service with Kudubot, make sure your class is in
 your system's python path (i.e. importable) and add an import statement
 to the config file located at ```$HOME/.kudubot/services.conf``` 
 that would import your Service class.
+
+For examples see:
+
+* [kudubot-simple-responder](https://gitlab.namibsun.net/namboy94/kudubot-simple-responder)
 
 ## Further Information
 
