@@ -174,7 +174,7 @@ class GlobalConfigHandler(object):
         return self.__remove_duplicate_services_or_connections__(services)
 
     # noinspection PyMethodMayBeStatic
-    def __handle_import_statement(self, statement: str) -> type:
+    def __handle_import_statement__(self, statement: str) -> type:
         """
         Handles an import statement string
 
@@ -183,7 +183,7 @@ class GlobalConfigHandler(object):
         """
 
         if statement.startswith("import"):
-            return importlib.import_module(statement)
+            return importlib.import_module(statement.split("import ", 1)[1])
         else:
             statement = statement.split("from ", 1)[1]
             statement = statement.split(" import ")
@@ -253,7 +253,7 @@ class GlobalConfigHandler(object):
                 continue
             else:
                 try:
-                    module = self.__handle_import_statement(line)
+                    module = self.__handle_import_statement__(line)
 
                     if issubclass(module, class_type):
                         modules.append(module)
