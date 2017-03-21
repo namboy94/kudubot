@@ -22,6 +22,7 @@ This file is part of kudubot.
 LICENSE
 """
 
+from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
@@ -43,5 +44,22 @@ def backup_global_config_handler_variables() -> callable:
         GlobalConfigHandler.services_config_location = services_config_location
         GlobalConfigHandler.data_location = data_location
         GlobalConfigHandler.specific_connection_config_location = specific_connection_config_location
+
+    return restore
+
+
+def backup_connection_variables() -> callable:
+    """
+    Backs up the Connection class variables
+
+    :return: A method that restores the class's initial values
+    """
+
+    database_file_location = Connection.database_file_location
+    config_file_location = Connection.config_file_location
+
+    def restore():
+        Connection.database_file_location = database_file_location
+        Connection.config_file_location = config_file_location
 
     return restore

@@ -22,13 +22,18 @@ This file is part of kudubot.
 LICENSE
 """
 
+import os
 import time
+import shutil
 import unittest
-from kudubot.users.AddressBook import AddressBook, Contact
+from kudubot.users.AddressBook import Contact
 from kudubot.connections.Message import Message
 from kudubot.connections.Connection import Connection
 from kudubot.tests.helpers.DummyService import DummyService
 from kudubot.tests.helpers.DummyConnection import DummyConnection
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
+from kudubot.tests.helpers.backup_class_variables import backup_connection_variables
+from kudubot.tests.helpers.backup_class_variables import backup_global_config_handler_variables
 
 
 class UnitTests(unittest.TestCase):
@@ -40,13 +45,27 @@ class UnitTests(unittest.TestCase):
         """
         :return: None
         """
-        pass
+        self.restore_connection = backup_connection_variables()
+        self.restore_config = backup_global_config_handler_variables()
+
+        GlobalConfigHandler.config_location = "test-kudu"
+        GlobalConfigHandler.global_connection_config_location = os.path.join("test-kudu", "connections.conf")
+        GlobalConfigHandler.services_config_location = os.path.join("test-kudu", "services.conf")
+        GlobalConfigHandler.data_location = os.path.join("test-kudu", "data")
+        GlobalConfigHandler.specific_connection_config_location = os.path.join("test-kudu", "connection_config")
+        Connection.config_file_location = os.path.join("test-kudu", "connection_config")
+        Connection.database_file_location = os.path.join("test-kudu", "data")
+
+        GlobalConfigHandler.generate_configuration(True)
 
     def tearDown(self):
         """
         :return: None
         """
-        pass
+        self.restore_connection()
+        self.restore_config()
+        if os.path.isdir("test-kudu"):
+            shutil.rmtree("test-kudu")
 
     def test_abstract_methods(self):
         """

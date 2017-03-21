@@ -26,9 +26,11 @@ import os
 import shutil
 import unittest
 from kudubot.exceptions import InvalidConfigException
+from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 from kudubot.tests.helpers.DummyService import DummyService
 from kudubot.tests.helpers.DummyConnection import DummyConnection
+from kudubot.tests.helpers.backup_class_variables import backup_connection_variables
 from kudubot.tests.helpers.backup_class_variables import backup_global_config_handler_variables
 
 
@@ -43,7 +45,8 @@ class UnitTests(unittest.TestCase):
         to ones that make sense for the unit tests
         :return: None
         """
-        self.restore = backup_global_config_handler_variables()
+        self.restore_config_handler = backup_global_config_handler_variables()
+        self.restore_connection = backup_connection_variables()
 
         GlobalConfigHandler.config_location = "test-kudu"
         GlobalConfigHandler.global_connection_config_location = os.path.join("test-kudu", "connections.conf")
@@ -51,12 +54,16 @@ class UnitTests(unittest.TestCase):
         GlobalConfigHandler.data_location = os.path.join("test-kudu", "data")
         GlobalConfigHandler.specific_connection_config_location = os.path.join("test-kudu", "connection_config")
 
+        Connection.database_file_location = os.path.join("test-kudu", "data")
+        Connection.config_file_location = os.path.join("test-kudu", "connection_config")
+
     def tearDown(self):
         """
         Restores the class variables and deletes any temporary directories and files
         :return: None
         """
-        self.restore()
+        self.restore_config_handler()
+        self.restore_connection()
 
         if os.path.isdir("test-kudu"):
             shutil.rmtree("test-kudu")
