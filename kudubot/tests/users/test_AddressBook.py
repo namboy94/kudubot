@@ -53,8 +53,11 @@ class UnitTests(unittest.TestCase):
         :return: None
         """
         self.restore()
-        if os.path.isdir("test-kudu"):
-            shutil.rmtree("test-kudu")
+        try:
+            if os.path.isdir("test-kudu"):
+                shutil.rmtree("test-kudu")
+        except PermissionError:
+            pass
 
     def test_contact_operations(self):
         """
