@@ -64,8 +64,11 @@ class UnitTests(unittest.TestCase):
         """
         self.restore_connection()
         self.restore_config()
-        if os.path.isdir("test-kudu"):
-            shutil.rmtree("test-kudu")
+        try:
+            if os.path.isdir("test-kudu"):
+                shutil.rmtree("test-kudu")
+        except PermissionError:
+            pass
 
     def test_abstract_methods(self):
         """
