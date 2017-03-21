@@ -261,7 +261,7 @@ class GlobalConfigHandler(object):
                     else:
                         logging.warning("Import " + line + " is not of type " + str(class_type))
 
-                except ModuleNotFoundError:  # Ignore invalid imports
+                except ImportError:  # Ignore invalid imports
                     logging.warning("Import " + line + " has failed")
 
         return modules
