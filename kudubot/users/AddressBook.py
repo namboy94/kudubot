@@ -58,7 +58,7 @@ class AddressBook(object):
         self.db.commit()
         logging.info("Address Book initialized")
 
-    def add_or_update_contact(self, contact: Contact):
+    def add_or_update_contact(self, contact: Contact) -> Contact:
         """
         Adds or updates a contact in the address book
 
@@ -85,7 +85,7 @@ class AddressBook(object):
         self.db.commit()
         return contact
 
-    def get_contact_for_address(self, address: str):
+    def get_contact_for_address(self, address: str) -> Contact:
         """
         Generates a Contact object for an address in the address book table.
 
@@ -96,7 +96,8 @@ class AddressBook(object):
         result = self.db.execute("SELECT * FROM address_book WHERE address=?", (address,)).fetchall()
 
         if len(result) != 1:
+            # noinspection PyTypeChecker
             return None
         else:
             data = result[0]
-            return Contact(int(data[0]), str(data[0]), str(data[0]))
+            return Contact(int(data[0]), str(data[1]), str(data[2]))

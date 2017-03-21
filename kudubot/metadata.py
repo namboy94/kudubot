@@ -27,12 +27,12 @@ The metadata is stored here. It can be used by any other module in this project 
 notably by the setup.py file
 """
 
-version = "0.8.0"
+version = "0.8.0"  # pragma: no cover
 """
 The current version of the program
 """
 
-sentry_dsn = ""
-"""
+sentry_dsn = ""  # pragma: no cover
+"""  # pragma: no cover
 The DSN used for Sentry Error Logging
 """
