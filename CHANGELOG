@@ -1,5 +1,8 @@
 V 0.8.0
   - Removed all connections and services
+  - Complete Architecture redesign
+  - Focus on modularity
+  - New configuration structure
 V 0.7.6
   - Created Whatsapp Converter for other connection types
 V 0.7.5
