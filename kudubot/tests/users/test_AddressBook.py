@@ -43,7 +43,7 @@ class UnitTests(unittest.TestCase):
         :return: None
         """
         self.restore = prepare_class_variables_for_use()
-        GlobalConfigHandler.generate_configuration(True)
+        GlobalConfigHandler.generate_configuration(False)
         self.connection = DummyConnection([])
 
     def tearDown(self):
