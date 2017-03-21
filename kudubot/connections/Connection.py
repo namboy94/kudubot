@@ -178,6 +178,7 @@ class Connection(object):
 
         :return: The listening thread
         """
-        thread = Thread(target=self.listen, daemon=True)
+        thread = Thread(target=self.listen)
+        thread.daemon = True
         thread.start()
         return thread
