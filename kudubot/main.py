@@ -32,7 +32,7 @@ from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
-def main():
+def main():  # pragma: no cover
     """
     The Main Method of the Program that starts the Connection Listener in accordance with the
     command line arguments
@@ -59,7 +59,7 @@ def main():
         raise e
 
 
-def initialize_connection(identifier: str) -> Connection:
+def initialize_connection(identifier: str) -> Connection:  # pragma: no cover
     """
     Loads the connection for the specified identifier
     If the connection was not found in the local configuration, the program exits.
@@ -90,7 +90,7 @@ def initialize_connection(identifier: str) -> Connection:
         sys.exit(1)
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args() -> argparse.Namespace:  # pragma: no cover
     """
     Parses the Command Line Arguments using argparse
 
