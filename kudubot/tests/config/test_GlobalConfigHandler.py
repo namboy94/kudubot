@@ -27,6 +27,8 @@ import shutil
 import unittest
 from kudubot.exceptions import InvalidConfigException
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
+from kudubot.tests.helpers.DummyService import DummyService
+from kudubot.tests.helpers.DummyConnection import DummyConnection
 from kudubot.tests.helpers.backup_class_variables import backup_global_config_handler_variables
 
 
@@ -133,7 +135,7 @@ class UnitTests(unittest.TestCase):
         with open(os.path.join("test-kudu", "connections.conf"), 'w') as f:
             f.write("from kudubot.tests.helpers.DummyConnection import DummyConnection")
 
-        self.assertEqual(len(handler.load_connections()), 1)
+        self.assertEqual(handler.load_connections()[0], DummyConnection)
 
     def test_service_loading(self):
         """
@@ -150,7 +152,7 @@ class UnitTests(unittest.TestCase):
         with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
             f.write("from kudubot.tests.helpers.DummyService import DummyService")
 
-        self.assertEqual(len(handler.load_services()), 1)
+        self.assertEqual(handler.load_services()[0], DummyService)
 
     def test_importing(self):
         """
@@ -166,3 +168,58 @@ class UnitTests(unittest.TestCase):
 
         self.assertEqual(os, os_import)
         self.assertEqual(dict_import, Dict)
+
+    def test_service_dependency_imports(self):
+        """
+        Tests the dependency resolution of the services.
+
+        :return: None
+        """
+
+        # Setup
+        GlobalConfigHandler.generate_configuration(True)
+        handler = GlobalConfigHandler()
+
+        # First, test service having itself as dependency
+        DummyService.requires = ["dummyservice"]
+        with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
+            f.write("from kudubot.tests.helpers.DummyService import DummyService")
+        services = handler.load_services()
+        self.assertEqual(services, [DummyService])
+
+        # Now test unresolved dependency
+        DummyService.requires = ["otherservice"]
+        services = handler.load_services()
+        self.assertEqual(services, [])
+        DummyService.requires = []
+
+    def test_duplicate_removal(self):
+        """
+        Tests the duplicate removal method
+
+        :return: None
+        """
+        GlobalConfigHandler.generate_configuration(True)
+        handler = GlobalConfigHandler()
+
+        second_dummy = DummyConnection([])
+        second_dummy.identifier = "other"
+
+        connections = [second_dummy, DummyConnection, DummyConnection]
+        new_connections = handler.__remove_duplicate_services_or_connections__(connections)
+        self.assertEqual(new_connections, [second_dummy, DummyConnection])
+
+    def test_loading_invalid_classes(self):
+
+        GlobalConfigHandler.generate_configuration(True)
+        handler = GlobalConfigHandler()
+
+        with open(os.path.join("test-kudu", "connections.conf"), 'w') as f:
+            f.write("from kudubot.tests.helpers.DummyService import DummyService")
+
+        self.assertEqual(handler.load_connections(), [])
+
+        with open(os.path.join("test-kudu", "connections.conf"), 'w') as f:
+            f.write("from kudubot.doesnotexists import AClass")
+
+        self.assertEqual(handler.load_connections(), [])

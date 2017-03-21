@@ -162,7 +162,7 @@ class GlobalConfigHandler(object):
 
                 if not dependency_satisfied:
                     logging.warning(
-                        "Dependency '" + dependency + "' for service '" + service.identifier + "is not satisfied")
+                        "Dependency '" + dependency + "' for service '" + service.identifier + "' is not satisfied")
                     services.remove(service)
                     i = -1
                     break

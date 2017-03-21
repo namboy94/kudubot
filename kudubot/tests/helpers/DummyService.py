@@ -31,6 +31,10 @@ class DummyService(Service):
     A class that implements a Service for use in unit tests
     """
 
+    identifier = "dummyservice"
+
+    requires = []
+
     def handle_message(self, message: Message):
         pass
 

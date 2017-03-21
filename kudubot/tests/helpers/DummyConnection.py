@@ -33,6 +33,8 @@ class DummyConnection(Connection):
     A class that implements a Connection for use in unit tests
     """
 
+    identifier = "dummyconnection"
+
     def listen(self):
         pass
 
