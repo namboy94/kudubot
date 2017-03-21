@@ -1,23 +1,28 @@
+V 0.8.0
+  - Removed all connections and services
+  - Complete Architecture redesign
+  - Focus on modularity
+  - New configuration structure
 V 0.7.6
-    - Created Whatsapp Converter for other connection types
+  - Created Whatsapp Converter for other connection types
 V 0.7.5
-    - Fixed distribution
+  - Fixed distribution
 V 0.7.4
-    - Updated Documentation
-    - Renamed project to 'kudubot'
-    - Enabled binary python 2 support
+  - Updated Documentation
+  - Renamed project to 'kudubot'
+  - Enabled binary python 2 support
 V 0.7.3
-   - Added ASCII art generator
+  - Added ASCII art generator
 V 0.7.2
-   - Added support for asynchronous media file sending
-   - Implemented text-to image converter
-   - fixed issues in email receiver
-   - added a couple more verbosity options
+  - Added support for asynchronous media file sending
+  - Implemented text-to image converter
+  - fixed issues in email receiver
+  - added a couple more verbosity options
 V 0.7.1
-   - Added Hello World Service
-   - Added XKCD Random Number Generator Service
-   - Optimized Whatsapp Connection
-   - Fixed Email Connection crashes
+  - Added Hello World Service
+  - Added XKCD Random Number Generator Service
+  - Optimized Whatsapp Connection
+  - Fixed Email Connection crashes
 V 0.7.0.2
   - Added message length spam protection
 V 0.7.0.1

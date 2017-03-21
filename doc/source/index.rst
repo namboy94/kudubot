@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   messengerbot.rst
+   kudubot.rst
 
 Indices and tables
 ==================

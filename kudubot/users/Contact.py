@@ -22,17 +22,20 @@ This file is part of kudubot.
 LICENSE
 """
 
-"""
-The metadata is stored here. It can be used by any other module in this project this way, most
-notably by the setup.py file
-"""
 
-version = "0.8.0"  # pragma: no cover
-"""
-The current version of the program
-"""
+class Contact(object):
+    """
+    Class that models a contact in the connection's address book database
+    """
 
-sentry_dsn = ""  # pragma: no cover
-"""  # pragma: no cover
-The DSN used for Sentry Error Logging
-"""
+    def __init__(self, database_id: int, display_name: str, address: str):
+        """
+        Initializes the contact object
+
+        :param database_id: The contact's ID in the database
+        :param display_name: The display name of the contact
+        :param address: The contact's address
+        """
+        self.database_id = database_id
+        self.display_name = display_name
+        self.address = address

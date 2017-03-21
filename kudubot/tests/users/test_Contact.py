@@ -22,17 +22,34 @@ This file is part of kudubot.
 LICENSE
 """
 
-"""
-The metadata is stored here. It can be used by any other module in this project this way, most
-notably by the setup.py file
-"""
+import unittest
+from kudubot.users.Contact import Contact
 
-version = "0.8.0"  # pragma: no cover
-"""
-The current version of the program
-"""
 
-sentry_dsn = ""  # pragma: no cover
-"""  # pragma: no cover
-The DSN used for Sentry Error Logging
-"""
+class UnitTests(unittest.TestCase):
+    """
+    Tests the Contact class
+    """
+
+    def setUp(self):
+        """
+        :return: None
+        """
+        pass
+
+    def tearDown(self):
+        """
+        :return: None
+        """
+        pass
+
+    def test_initialization(self):
+        """
+        Tests if the Contact class is initialized correctly
+
+        :return: None
+        """
+        contact = Contact(1, "A", "B")
+        self.assertEqual(contact.database_id, 1)
+        self.assertEqual(contact.display_name, "A")
+        self.assertEqual(contact.address, "B")

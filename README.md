@@ -1,98 +1,54 @@
 # Kudubot
 
-Kudubot is a bot framework that allows running a bot on a multitude of messaging services. It is completely
-modular, adding new bot services and new connection types is relatively trivial.
+|master|develop|
+|:----:|:-----:|
+|[![build status](https://gitlab.namibsun.net/namboy94/kudubot/badges/master/build.svg)](https://gitlab.namibsun.net/namboy94/kudubot/commits/master)|[![build status](https://gitlab.namibsun.net/namboy94/kudubot/badges/develop/build.svg)](https://gitlab.namibsun.net/namboy94/kudubot/commits/develop)|
 
-The framework offers abstractions that allow all properly implemented bot services to work with different types of
-connections (Email, Telegram, Whatsapp or IRC for example) without having to change the code.
- 
-## Installation
+![Logo](kudubot/resources/logo/logo-readme.png)
 
-To install the program, either run
+Kudubot is a chat bot framework designed to work with arbitrary messaging
+services, be it Whatsapp, Telegram, IRC or even Email. The framework is
+completely modular and can be extended with other connection types
+and services.
 
-    sudo pip install kudubot
-    
-or download the sources and run
+## Implementing a Connection.
 
-    sudo python setup.py install
-    
-Setuptools should automatically download all required dependencies without further input.
+To implement a new Connection, you will have to create a subclass
+the ```kudubot.connections.Connection.Connection``` class and implement the
+various abstract methods.
 
-The program is being developed on Linux, it should in theory work on Windows and Mac OS X, though this has not been
-tested.
+To integrate the connection with Kudubot, make sure your class is in
+your system's python path (i.e. importable) and add an import statement
+to the config file located at ```$HOME/.kudubot/connections.conf``` 
+that would import your Connection class.
 
-**WARNING**
-To use the Whatsapp connection, you need to have Yowsup installed. However, the current master
-branch of the original project contains a bug that breaks things when receiving private messages.
+For examples see:
 
-To circumvent this, please install [my fork](https://github.com/namboy94/yowsup) of the project in the meantime.
+* [kudubot-telegram](https://gitlab.namibsun.net/namboy94/kudubot-telegram)
 
-## Usage
+## Implementing a Service
 
-You can start the bot using the 'kudubot' command (setuptools should have installed it for you).
+To implement a Service, you will have to create a subclass of the
+```kudubot.services.Service.Service``` class and implement the various
+abstract methods.
 
-You will need to specify a connection type, which is the identifier string for one of the implemented
-connections or 'all', which starts the bot using all services.
+To integrate the service with Kudubot, make sure your class is in
+your system's python path (i.e. importable) and add an import statement
+to the config file located at ```$HOME/.kudubot/services.conf``` 
+that would import your Service class.
 
-You can also specify the output verbosity using the --verbosity. 0 disables all input, and there's no real
-upper limit (Though to keep it sane, the highest verbosity that actually changes things is 5)
+For examples see:
 
-You can also directly run the bot without setting options by using one of these commands (again, they should be
-installed by setuptools automatically)
+* [kudubot-simple-responder](https://gitlab.namibsun.net/namboy94/kudubot-simple-responder)
 
-    kudubot-email     # For the email connection
-    kudubot-telegram  # For the Telegram Connection
-    kudubot-whatsapp  # For the Whatsapp Connection  (Doesn't work right now)
-    kudubot-all       # For all connections
-    
-After starting the program for the first time, you will be notified that config files were created.
-The program creates a directory called '.kudubot' (which is a hidden directory on Linux). it contains
-all configs, logs and other files/directories used by the bot services.
+## Further Information
 
-To be able to connect to a service, you will have to enter login credentials into the config file of the chosen
-connection type, which will be located under
-
-    ~/.kudubot/config
-    
-The credential types are different for all types of connections and need to be set accordingly. The program creates
-template files when first run, so figuring out which kind of information to enter should not be all that difficult.
-
-Once the credentials are entered, you can adjust which services will be run on startup by editing the
-<connection-type>-services file in the same directory.
-
-As a last step you may want to adjust the admin and blacklist files in the 
-
-    ~/.kudubot/contacts
-    
-directory to give yourself admin rights for the bot and ignore things like other bots.
-
-
-## Developing
-    
-If you are not viewing this on gitlab.namibsun.net, this is only a mirror of that repository, active development
-is only being done on gitlab.namibsun.net. Issues are being checked on all mirrors though, so feel free to open
-issues on your version control hoster of choice.
-
-For a guide on how to extend the bot, see [this](doc/hand_crafted/extending_guide.md).
-
-## Contributing
-
-This project is automatically mirrored to [github](https://github.com/namboy94/kudubot), however all development
-is conducted at a privately hosted [Gitlab instance](http://gitlab.namibsun.net/namboy94/kudubot). Issues
-on both services are taken unto consideration.
-
-## Documentation
-
-Sphinx Documentation can be found [here](http://krumreyh.eu/kudubot/documentation/html/index.html).
-A [PDF version](http://krumreyh.eu/kudubot/documentation/documentation.pdf) is also available
-
-## Support
-
-If you have any questions about kudubot, feel free to open an issue or contact me directly at
-hermann@krumreyh.com.
-
-## Statistics
-
-Automatically generated git statistics can be found [here](http://krumreyh.eu/kudubot/git_stats/index.html)
-
-[Changelog](http://gitlab.namibsun.net/namboy94/kudubot/raw/master/CHANGELOG)
+* [Changelog](https://gitlab.namibsun.net/namboy94/kudubot/raw/master/CHANGELOG)
+* [Gitlab](https://gitlab.namibsun.net/namboy94/kudubot)
+* [Github](https://github.com/namboy94/kudubot)
+* [Python Package Index Site](https://pypi.python.org/pypi/kudubot)
+* [Documentation(HTML)](https://docs.namibsun.net/html_docs/kudubot/index.html)
+* [Documentation(PDF)](https://docs.namibsun.net/pdf_docs/kudubot.pdf)
+* [Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/kudubot/index.html)
+* [Git Statistics (git_stats)](https://gitstats.namibsun.net/git_stats/kudubot/index.html)
+* [Test Coverage](https://coverage.namibsun.net/kudubot/index.html)

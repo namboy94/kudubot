@@ -22,17 +22,21 @@ This file is part of kudubot.
 LICENSE
 """
 
-"""
-The metadata is stored here. It can be used by any other module in this project this way, most
-notably by the setup.py file
-"""
+from kudubot.services.Service import Service
+from kudubot.connections.Message import Message
 
-version = "0.8.0"  # pragma: no cover
-"""
-The current version of the program
-"""
 
-sentry_dsn = ""  # pragma: no cover
-"""  # pragma: no cover
-The DSN used for Sentry Error Logging
-"""
+class DummyService(Service):
+    """
+    A class that implements a Service for use in unit tests
+    """
+
+    identifier = "dummyservice"
+
+    requires = []
+
+    def handle_message(self, message: Message):
+        pass
+
+    def is_applicable_to(self, message: Message) -> bool:
+        pass
