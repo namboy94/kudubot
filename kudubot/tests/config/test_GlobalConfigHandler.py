@@ -191,6 +191,8 @@ class UnitTests(unittest.TestCase):
         DummyService.requires = ["otherservice"]
         services = handler.load_services()
         self.assertEqual(services, [])
+
+        # Reset
         DummyService.requires = []
 
     def test_duplicate_removal(self):

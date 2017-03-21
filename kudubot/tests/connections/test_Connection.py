@@ -22,21 +22,39 @@ This file is part of kudubot.
 LICENSE
 """
 
+import time
 import unittest
+from kudubot.users.AddressBook import AddressBook, Contact
+from kudubot.connections.Message import Message
 from kudubot.connections.Connection import Connection
+from kudubot.tests.helpers.DummyService import DummyService
+from kudubot.tests.helpers.DummyConnection import DummyConnection
 
 
 class UnitTests(unittest.TestCase):
+    """
+    Class that tests the Connection class
+    """
 
     def setUp(self):
+        """
+        :return: None
+        """
         pass
 
     def tearDown(self):
+        """
+        :return: None
+        """
         pass
 
     def test_abstract_methods(self):
+        """
+        Tests if the methods of the connection class are abstract
+        :return: None
+        """
 
-        dummy = object()
+        dummy = DummyConnection([])
 
         for method in [(Connection.define_user_contact, 0),
                        (Connection.define_user_contact, 0),
@@ -60,3 +78,37 @@ class UnitTests(unittest.TestCase):
                 self.fail()
             except NotImplementedError:
                 pass
+
+    def test_daemon_thread_start(self):
+        """
+        Tests if the daemon thread is started correctly
+        :return: None
+        """
+
+        DummyConnection.listen = lambda x: time.sleep(1)
+        t = DummyConnection([]).listen_in_separate_thread()
+
+        self.assertTrue(t.is_alive())
+        while t.is_alive():
+            pass
+        self.assertFalse(t.is_alive())
+
+    # noinspection PyMethodMayBeStatic
+    def test_processing_message(self):
+        """
+        Tests if the connection correctly processes a message using the services
+        :return: None
+        """
+        user = Contact(1, "1", "1")
+
+        connection = DummyConnection([DummyService])
+        connection.apply_services(Message("Test", "Body", user, user))
+
+        old = DummyService.is_applicable_to
+        DummyService.is_applicable_to = lambda x, y: True
+
+        connection = DummyConnection([DummyService])
+        connection.apply_services(Message("Test", "Body", user, user), True)
+        connection.apply_services(Message("Test", "Body", user, user), False)
+
+        DummyService.is_applicable_to = old
