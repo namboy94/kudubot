@@ -23,12 +23,42 @@ LICENSE
 """
 
 import unittest
+from kudubot.services.Service import Service
+from kudubot.tests.helpers.DummyService import DummyService
 
 
 class UnitTests(unittest.TestCase):
+    """
+    Tests the Service class
+    """
 
     def setUp(self):
+        """
+        :return: None
+        """
         pass
 
     def tearDown(self):
+        """
+        :return: None
+        """
         pass
+
+    def test_abstract_methods(self):
+        """
+        Tests if the methods of the Service class are abstract
+        :return: None
+        """
+        dummy = DummyService([])
+
+        for method in [(Service.handle_message, 1),
+                       (Service.is_applicable_to, 1)]:
+            try:
+
+                if method[1] == 0:
+                    method[0](dummy)
+                elif method[1] == 1:
+                    method[0](dummy, dummy)
+                self.fail()
+            except NotImplementedError:
+                pass

@@ -23,12 +23,33 @@ LICENSE
 """
 
 import unittest
+from kudubot.users.Contact import Contact
 
 
 class UnitTests(unittest.TestCase):
+    """
+    Tests the Contact class
+    """
 
     def setUp(self):
+        """
+        :return: None
+        """
         pass
 
     def tearDown(self):
+        """
+        :return: None
+        """
         pass
+
+    def test_initialization(self):
+        """
+        Tests if the Contact class is initialized correctly
+
+        :return: None
+        """
+        contact = Contact(1, "A", "B")
+        self.assertEqual(contact.database_id, 1)
+        self.assertEqual(contact.display_name, "A")
+        self.assertEqual(contact.address, "B")

@@ -26,6 +26,9 @@ import unittest
 
 
 class UnitTests(unittest.TestCase):
+    """
+    Class that tests the AddressBook class
+    """
 
     def setUp(self):
         pass
