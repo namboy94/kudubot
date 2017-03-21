@@ -131,3 +131,4 @@ class UnitTests(unittest.TestCase):
         connection.apply_services(Message("Test", "Body", user, user), False)
 
         DummyService.is_applicable_to = old
+        connection.db.close()
