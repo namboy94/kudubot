@@ -36,7 +36,7 @@ class GlobalConfigHandler(object):
     Class that handles the global kudubot configuration files located in $HOME/.kudubot
     """
 
-    logger = logging.getLogger("kudubot.GlobalConfigHandler")
+    logger = logging.getLogger("kudubot.config.GlobalConfigHandler")
     """
     The Logger for this class
     """
