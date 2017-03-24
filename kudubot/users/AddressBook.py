@@ -37,6 +37,11 @@ class AddressBook(object):
               | id | display_name | address | selected_language | is_admin | is_blacklisted |
     """
 
+    logger = logging.getLogger("kudubot.users.AddressBook")
+    """
+    The Logger for this class
+    """
+
     schema = "CREATE TABLE IF NOT EXISTS address_book (" \
              "    id INTEGER CONSTRAINT constraint_name PRIMARY KEY," \
              "    display_name VARCHAR(255) NOT NULL," \
@@ -56,7 +61,7 @@ class AddressBook(object):
         self.db = database
         self.db.execute(self.schema)
         self.db.commit()
-        logging.info("Address Book initialized")
+        self.logger.info("Address Book initialized")
 
     def add_or_update_contact(self, contact: Contact) -> Contact:
         """
@@ -71,7 +76,7 @@ class AddressBook(object):
 
         if len(old) != 1:
             # Increment the ID
-            logging.info("Address " + contact.address + " does not exist yet. Inserting into address book.")
+            self.logger.info("Address " + contact.address + " does not exist yet. Inserting into address book.")
             max_id = self.db.execute("SELECT CASE WHEN COUNT(id) > 0 THEN MAX(id) ELSE 0 END AS max_id "
                                      "FROM address_book").fetchall()[0][0]
             contact.database_id = max_id + 1

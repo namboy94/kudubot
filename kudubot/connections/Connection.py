@@ -24,6 +24,7 @@ LICENSE
 
 import os
 import sqlite3
+import logging
 from threading import Thread
 from typing import List, Dict
 from kudubot.users.Contact import Contact
@@ -38,6 +39,11 @@ class Connection(object):
     It keeps track of various state variables and provides APIs to send messages
     and start a listener that reacts on incoming messages using the implemented
     service modules
+    """
+
+    logger = logging.getLogger("kudubot.Connection")
+    """
+    The Logger for this class
     """
 
     identifier = "connection"
@@ -88,6 +94,8 @@ class Connection(object):
         :param break_on_match: Can be set to True to not allow more than one result
         :return: None
         """
+
+        self.logger.debug("Applying services to " + repr(message.message_body) + ".")
 
         for service in self.services:
             if service.is_applicable_to(message):
@@ -178,6 +186,9 @@ class Connection(object):
 
         :return: The listening thread
         """
+
+        self.logger.info("Starting daemon thread for connection " + self.identifier + ".")
+
         thread = Thread(target=self.listen)
         thread.daemon = True
         thread.start()

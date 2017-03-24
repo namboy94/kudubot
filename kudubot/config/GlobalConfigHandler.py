@@ -36,6 +36,11 @@ class GlobalConfigHandler(object):
     Class that handles the global kudubot configuration files located in $HOME/.kudubot
     """
 
+    logger = logging.getLogger("kudubot.GlobalConfigHandler")
+    """
+    The Logger for this class
+    """
+
     config_location = os.path.join(os.path.expanduser("~"), ".kudubot")
     """
     The Location of the global config directory. It is a subdirectory called .kudubot in the
@@ -81,7 +86,7 @@ class GlobalConfigHandler(object):
         elif not os.path.isdir(self.specific_connection_config_location):
             raise InvalidConfigException("Connection Configuration directory does not exist")
 
-        logging.info("Configuration successfully checked")
+        self.logger.info("Configuration successfully checked")
 
     @staticmethod
     def generate_configuration(delete_old):
@@ -93,27 +98,27 @@ class GlobalConfigHandler(object):
         """
 
         if delete_old and os.path.isdir(GlobalConfigHandler.config_location):
-            logging.info("Deleting old configuration files")
+            self.logger.info("Deleting old configuration files")
             shutil.rmtree(GlobalConfigHandler.config_location)
 
         if not os.path.isdir(GlobalConfigHandler.config_location):
-            logging.info("Creating directory " + GlobalConfigHandler.config_location)
+            self.logger.info("Creating directory " + GlobalConfigHandler.config_location)
             os.makedirs(GlobalConfigHandler.config_location)
 
         if not os.path.isfile(GlobalConfigHandler.global_connection_config_location):
-            logging.info("Creating file " + GlobalConfigHandler.global_connection_config_location)
+            self.logger.info("Creating file " + GlobalConfigHandler.global_connection_config_location)
             open(GlobalConfigHandler.global_connection_config_location, "w").close()
 
         if not os.path.isfile(GlobalConfigHandler.services_config_location):
-            logging.info("Creating file " + GlobalConfigHandler.services_config_location)
+            self.logger.info("Creating file " + GlobalConfigHandler.services_config_location)
             open(GlobalConfigHandler.services_config_location, "w").close()
 
         if not os.path.isdir(GlobalConfigHandler.data_location):
-            logging.info("Creating directory " + GlobalConfigHandler.data_location)
+            self.logger.info("Creating directory " + GlobalConfigHandler.data_location)
             os.makedirs(GlobalConfigHandler.data_location)
 
         if not os.path.isdir(GlobalConfigHandler.specific_connection_config_location):
-            logging.info("Creating directory " + GlobalConfigHandler.specific_connection_config_location)
+            self.logger.info("Creating directory " + GlobalConfigHandler.specific_connection_config_location)
             os.makedirs(GlobalConfigHandler.specific_connection_config_location)
 
     def load_connections(self) -> List[type]:
@@ -124,11 +129,11 @@ class GlobalConfigHandler(object):
         """
         from kudubot.connections.Connection import Connection
 
-        logging.info("Loading connections")
+        self.logger.info("Loading connections")
         connections = self.__load_import_config__(self.global_connection_config_location, Connection)
 
         if len(connections) == 0:
-            logging.warning("No connections loaded")
+            self.logger.warning("No connections loaded")
 
         return self.__remove_duplicate_services_or_connections__(connections)
 
@@ -139,7 +144,7 @@ class GlobalConfigHandler(object):
 
         :return: A list of successfully imported Service subclasses
         """
-        logging.info("Loading Services")
+        self.logger.info("Loading Services")
         services = self.__load_import_config__(self.services_config_location, Service)
 
         # Check if dependencies for each service are satisfied
@@ -161,7 +166,7 @@ class GlobalConfigHandler(object):
                         break
 
                 if not dependency_satisfied:
-                    logging.warning(
+                    self.logger.warning(
                         "Dependency '" + dependency + "' for service '" + service.identifier + "' is not satisfied")
                     services.remove(service)
                     i = -1
@@ -169,7 +174,7 @@ class GlobalConfigHandler(object):
             i += 1
 
         if len(services) == 0:
-            logging.warning("No services loaded")
+            self.logger.warning("No services loaded")
 
         return self.__remove_duplicate_services_or_connections__(services)
 
@@ -246,10 +251,10 @@ class GlobalConfigHandler(object):
 
         for line in content:
 
-            logging.debug("Trying to import '" + line + "'")
+            self.logger.debug("Trying to import '" + line + "'")
 
             if line.strip().startswith("#") or line == "":
-                logging.debug("Skipping line: " + line + "")
+                self.logger.debug("Skipping line: " + line + "")
                 continue
             else:
                 try:
@@ -257,11 +262,11 @@ class GlobalConfigHandler(object):
 
                     if issubclass(module, class_type):
                         modules.append(module)
-                        logging.info("Import " + line + " successful")
+                        self.logger.info("Import " + line + " successful")
                     else:
-                        logging.warning("Import " + line + " is not of type " + str(class_type))
+                        self.logger.warning("Import " + line + " is not of type " + str(class_type))
 
                 except ImportError:  # Ignore invalid imports
-                    logging.warning("Import " + line + " has failed")
+                    self.logger.warning("Import " + line + " has failed")
 
         return modules
