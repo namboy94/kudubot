@@ -98,27 +98,28 @@ class GlobalConfigHandler(object):
         """
 
         if delete_old and os.path.isdir(GlobalConfigHandler.config_location):
-            self.logger.info("Deleting old configuration files")
+            GlobalConfigHandler.logger.info("Deleting old configuration files")
             shutil.rmtree(GlobalConfigHandler.config_location)
 
         if not os.path.isdir(GlobalConfigHandler.config_location):
-            self.logger.info("Creating directory " + GlobalConfigHandler.config_location)
+            GlobalConfigHandler.logger.info("Creating directory " + GlobalConfigHandler.config_location)
             os.makedirs(GlobalConfigHandler.config_location)
 
         if not os.path.isfile(GlobalConfigHandler.global_connection_config_location):
-            self.logger.info("Creating file " + GlobalConfigHandler.global_connection_config_location)
+            GlobalConfigHandler.logger.info("Creating file " + GlobalConfigHandler.global_connection_config_location)
             open(GlobalConfigHandler.global_connection_config_location, "w").close()
 
         if not os.path.isfile(GlobalConfigHandler.services_config_location):
-            self.logger.info("Creating file " + GlobalConfigHandler.services_config_location)
+            GlobalConfigHandler.logger.info("Creating file " + GlobalConfigHandler.services_config_location)
             open(GlobalConfigHandler.services_config_location, "w").close()
 
         if not os.path.isdir(GlobalConfigHandler.data_location):
-            self.logger.info("Creating directory " + GlobalConfigHandler.data_location)
+            GlobalConfigHandler.logger.info("Creating directory " + GlobalConfigHandler.data_location)
             os.makedirs(GlobalConfigHandler.data_location)
 
         if not os.path.isdir(GlobalConfigHandler.specific_connection_config_location):
-            self.logger.info("Creating directory " + GlobalConfigHandler.specific_connection_config_location)
+            GlobalConfigHandler.logger.info("Creating directory " +
+                                            GlobalConfigHandler.specific_connection_config_location)
             os.makedirs(GlobalConfigHandler.specific_connection_config_location)
 
     def load_connections(self) -> List[type]:
