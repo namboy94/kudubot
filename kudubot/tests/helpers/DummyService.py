@@ -22,6 +22,7 @@ This file is part of kudubot.
 LICENSE
 """
 
+from typing import List
 from kudubot.services.Service import Service
 from kudubot.connections.Message import Message
 
@@ -31,9 +32,13 @@ class DummyService(Service):
     A class that implements a Service for use in unit tests
     """
 
-    identifier = "dummyservice"
+    @staticmethod
+    def define_requirements() -> List[Service]:
+        return []
 
-    requires = []
+    @staticmethod
+    def define_identifier() -> str:
+        return "dummyservice"
 
     def handle_message(self, message: Message):
         pass

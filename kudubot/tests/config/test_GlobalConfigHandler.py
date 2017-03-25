@@ -211,10 +211,15 @@ class UnitTests(unittest.TestCase):
         GlobalConfigHandler.generate_configuration(True)
         handler = GlobalConfigHandler()
 
+        # noinspection PyDecorator
+        def other():
+            return "other"
+
         second_dummy = DummyConnection([])
-        second_dummy.identifier = "other"
+        second_dummy.define_identifier = other
 
         connections = [second_dummy, DummyConnection, DummyConnection]
+        # noinspection PyTypeChecker
         new_connections = handler.__remove_duplicate_services_or_connections__(connections)
         self.assertEqual(new_connections, [second_dummy, DummyConnection])
 

@@ -46,12 +46,6 @@ class Connection(object):
     The Logger for this class
     """
 
-    identifier = "connection"
-    """
-    A unique identifier that is attributed to the connection. Must be overridden by
-    subclasses of the Connection class
-    """
-
     database_file_location = GlobalConfigHandler.data_location
     """
     The location of the connection's data location. Has to be adjusted by the __init__ method to point to the
@@ -70,17 +64,28 @@ class Connection(object):
 
         :param services: The services to use with the connection
         """
-        self.services = []
-        for service in services:
-            self.services.append(service(self))
+        self.identifier = self.define_identifier()
 
         self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
         self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
         self.db = sqlite3.connect(self.database_file_location)
-        self.address_book = AddressBook(self.db)
 
+        self.address_book = AddressBook(self.db)
         self.config = self.load_config()
         self.user_contact = self.define_user_contact()
+
+        self.services = []
+        for service in services:
+            self.services.append(service(self))
+
+    @staticmethod
+    def define_identifier() -> str:
+        """
+        Defines the connection's identifier
+
+        :return: The identifier for the Connection type
+        """
+        raise NotImplementedError()
 
     def apply_services(self, message: Message, break_on_match: bool = False):
         """

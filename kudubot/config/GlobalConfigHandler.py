@@ -162,13 +162,14 @@ class GlobalConfigHandler(object):
 
                 dependency_satisfied = False
                 for other_service in services:
-                    if other_service.identifier == dependency:
+                    if other_service.define_identifier() == dependency:
                         dependency_satisfied = True
                         break
 
                 if not dependency_satisfied:
                     self.logger.warning(
-                        "Dependency '" + dependency + "' for service '" + service.identifier + "' is not satisfied")
+                        "Dependency '" + dependency + "' for service '" +
+                        service.define_identifier() + "' is not satisfied")
                     services.remove(service)
                     i = -1
                     break
@@ -212,7 +213,7 @@ class GlobalConfigHandler(object):
             hitcount = 0
 
             for other in target:
-                if other.identifier == element.identifier:
+                if other.define_identifier() == element.define_identifier():
                     hitcount += 1
 
             if hitcount == 1:
@@ -222,7 +223,7 @@ class GlobalConfigHandler(object):
                 exists = False
 
                 for result in results:
-                    if result.identifier == element.identifier:
+                    if result.define_identifier() == element.define_identifier():
                         exists = True
                         break
 

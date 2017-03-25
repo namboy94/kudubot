@@ -33,7 +33,9 @@ class DummyConnection(Connection):
     A class that implements a Connection for use in unit tests
     """
 
-    identifier = "dummyconnection"
+    @staticmethod
+    def define_identifier() -> str:
+        return "dummyconnection"
 
     def listen(self):
         pass
