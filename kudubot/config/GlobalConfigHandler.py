@@ -158,7 +158,7 @@ class GlobalConfigHandler(object):
 
             service = services[i]
 
-            for dependency in service.requires:
+            for dependency in service.define_requirements():
 
                 dependency_satisfied = False
                 for other_service in services:
