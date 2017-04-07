@@ -106,3 +106,20 @@ class AddressBook(object):
         else:
             data = result[0]
             return Contact(int(data[0]), str(data[1]), str(data[2]))
+
+    def get_contact_for_id(self, user_id: int) -> Contact:
+        """
+        Generates a Contact object for a user ID in the address book table
+
+        :param user_id: The user's ID
+        :return: The user as a Contact object
+        """
+
+        result = self.db.execute("SELECT * FROM address_book WHERE id=?", (user_id,)).fetchall()
+
+        if len(result) != 1:
+            # noinspection PyTypeChecker
+            return None
+        else:
+            data = result[0]
+            return Contact(int(data[0]), str(data[1]), str(data[2]))
