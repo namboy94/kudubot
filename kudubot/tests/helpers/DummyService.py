@@ -33,7 +33,7 @@ class DummyService(Service):
     """
 
     @staticmethod
-    def define_requirements() -> List[Service]:
+    def define_requirements() -> List[str]:
         return []
 
     @staticmethod
@@ -45,3 +45,23 @@ class DummyService(Service):
 
     def is_applicable_to(self, message: Message) -> bool:
         pass
+
+
+class DummyServiceWithValidDependency(DummyService):
+    """
+    A Service that has itself (or DummyService) as its only dependency
+    """
+
+    @staticmethod
+    def define_requirements() -> List[str]:
+        return ["dummyservice"]
+
+
+class DummyServiceWithInvalidDependency(DummyService):
+    """
+    A service that has an invalid dependency
+    """
+
+    @staticmethod
+    def define_requirements() -> List[str]:
+        return ["otherservice"]

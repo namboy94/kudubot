@@ -28,7 +28,7 @@ import unittest
 from kudubot.exceptions import InvalidConfigException
 from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
-from kudubot.tests.helpers.DummyService import DummyService
+from kudubot.tests.helpers.DummyService import DummyService, DummyServiceWithValidDependency
 from kudubot.tests.helpers.DummyConnection import DummyConnection
 from kudubot.tests.helpers.backup_class_variables import backup_connection_variables
 from kudubot.tests.helpers.backup_class_variables import backup_global_config_handler_variables
@@ -182,33 +182,21 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        def dummy(x=None):
-            return ["dummyservice"]
-
-        def other(x=None):
-            return ["otherservice"]
-
-        def default(x=None):
-            return []
-
         # Setup
         GlobalConfigHandler.generate_configuration(True)
         handler = GlobalConfigHandler()
 
-        # First, test service having itself as dependency
-        DummyService.define_requirements = dummy
+        # First, test service having a valid dependency
         with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
-            f.write("from kudubot.tests.helpers.DummyService import DummyService")
+            f.write("from kudubot.tests.helpers.DummyService import DummyServiceWithValidDependency")
         services = handler.load_services()
-        self.assertEqual(services, [DummyService])
+        self.assertEqual(services, [DummyServiceWithValidDependency])
 
         # Now test unresolved dependency
-        DummyService.define_requirements = other
+        with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
+            f.write("from kudubot.tests.helpers.DummyService import DummyServiceWithInvalidDependency")
         services = handler.load_services()
         self.assertEqual(services, [])
-
-        # Reset
-        DummyService.define_requirements = default
 
     def test_duplicate_removal(self):
         """
