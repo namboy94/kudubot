@@ -55,55 +55,6 @@ run_unit_tests_windows:
   script:
     - python setup.py test
 
-install_on_linux:
-  stage: install
-  only:
-    - master
-  tags:
-    - linux-buildserver
-  script:
-    - python3 setup.py install --user
-
-install_on_windows:
-  stage: install
-  only:
-    - master
-  tags:
-    - buildserver_windows
-  script:
-    - python setup.py install
-
-pyinstaller_linux:
-  stage: build
-  only:
-    - master
-  tags:
-    - linux-buildserver
-  script:
-    - python3 setup.py install --user
-    - mkdir -p artifacts
-    - pyinstaller kudubot/main.py --onefile
-    - mv dist/main artifacts/kudubot-linux
-  artifacts:
-    paths:
-      - artifacts/*
-
-pyinstaller_windows:
-  stage: build
-  only:
-    - master
-  tags:
-    - buildserver_windows
-  script:
-    - python setup.py install
-    - mkdir artifacts
-    - pyinstaller kudubot/main.py --onefile --windowed --icon=kudubot/resources/logo/logo.ico
-    - dir
-    - move dist\main.exe artifacts\kudubot-windows.exe
-  artifacts:
-    paths:
-      - artifacts/*
-
 pypi_dist:
   stage: deploy
   only:
@@ -125,6 +76,7 @@ upload_release_to_github:
   tags:
     - linux-buildserver
   script:
+    - mkdir -p artifacts
     - git clone https://gitlab.namibsun.net/namboy94/github-release-uploader.git
     - git clone https://gitlab.namibsun.net/namboy94/changelog-reader.git
     - python changelog-reader/changelog-reader.py -c CHANGELOG -d current_changelog
@@ -138,6 +90,7 @@ upload_release_to_gitlab:
   tags:
     - linux-buildserver
   script:
+    - mkdir -p artifacts
     - git clone https://gitlab.namibsun.net/namboy94/gitlab-release-uploader.git
     - git clone https://gitlab.namibsun.net/namboy94/changelog-reader.git
     - python changelog-reader/changelog-reader.py -c CHANGELOG -d  current_changelog
