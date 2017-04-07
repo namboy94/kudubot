@@ -24,6 +24,7 @@ that would import your Connection class.
 
 For examples see:
 
+* [kudubot-cli](https://gitlab.namibsun.net/namboy94/kudubot-cli)
 * [kudubot-telegram](https://gitlab.namibsun.net/namboy94/kudubot-telegram)
 
 ## Implementing a Service
