@@ -59,6 +59,15 @@ class UnitTests(unittest.TestCase):
         except PermissionError:
             pass
 
+    def test_invalid_contact_fetches(self):
+        """
+        Tests if the contact fetch methods return a None object if they fail to find a result
+
+        :return: None
+        """
+        self.assertEqual(None, self.connection.address_book.get_contact_for_address("No_Address"))
+        self.assertEqual(None, self.connection.address_book.get_contact_for_id(100))
+
     def test_contact_operations(self):
         """
         Tests various contact operations in the addressbook.
@@ -71,6 +80,20 @@ class UnitTests(unittest.TestCase):
         self.assertEqual(contact.display_name, "ABC")
         self.assertEqual(contact.database_id, 1)
         self.assertEqual(contact.address, "DEF")
+        self.subtest_fetching_contacts()
+
+    def subtest_fetching_contacts(self):
+        """
+        Tests fetching the contact information from the database
+        To be used at the end of the test_contact_operations method
+
+        :return: None
+        """
+        address_contact = self.connection.address_book.get_contact_for_address("DEF")
+        id_contact = self.connection.address_book.get_contact_for_id(1)
+        self.assertEqual(id_contact.display_name, address_contact.display_name)
+        self.assertEqual(id_contact.database_id, address_contact.database_id)
+        self.assertEqual(id_contact.address, address_contact.address)
 
     def subtest_updating_contact(self):
         """
