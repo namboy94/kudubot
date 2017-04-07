@@ -182,25 +182,33 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
+        def dummy(x=None):
+            return ["dummyservice"]
+
+        def other(x=None):
+            return ["otherservice"]
+
+        def default(x=None):
+            return []
 
         # Setup
         GlobalConfigHandler.generate_configuration(True)
         handler = GlobalConfigHandler()
 
         # First, test service having itself as dependency
-        DummyService.requires = ["dummyservice"]
+        DummyService.define_requirements = dummy
         with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
             f.write("from kudubot.tests.helpers.DummyService import DummyService")
         services = handler.load_services()
         self.assertEqual(services, [DummyService])
 
         # Now test unresolved dependency
-        DummyService.requires = ["otherservice"]
+        DummyService.define_requirements = other
         services = handler.load_services()
         self.assertEqual(services, [])
 
         # Reset
-        DummyService.requires = []
+        DummyService.define_requirements = default
 
     def test_duplicate_removal(self):
         """
