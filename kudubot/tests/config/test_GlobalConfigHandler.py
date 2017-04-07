@@ -28,7 +28,7 @@ import unittest
 from kudubot.exceptions import InvalidConfigException
 from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
-from kudubot.tests.helpers.DummyService import DummyService
+from kudubot.tests.helpers.DummyService import DummyService, DummyServiceWithValidDependency
 from kudubot.tests.helpers.DummyConnection import DummyConnection
 from kudubot.tests.helpers.backup_class_variables import backup_connection_variables
 from kudubot.tests.helpers.backup_class_variables import backup_global_config_handler_variables
@@ -182,25 +182,21 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-
         # Setup
         GlobalConfigHandler.generate_configuration(True)
         handler = GlobalConfigHandler()
 
-        # First, test service having itself as dependency
-        DummyService.requires = ["dummyservice"]
+        # First, test service having a valid dependency
         with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
-            f.write("from kudubot.tests.helpers.DummyService import DummyService")
+            f.write("from kudubot.tests.helpers.DummyService import DummyServiceWithValidDependency")
         services = handler.load_services()
-        self.assertEqual(services, [DummyService])
+        self.assertEqual(services, [DummyServiceWithValidDependency])
 
         # Now test unresolved dependency
-        DummyService.requires = ["otherservice"]
+        with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
+            f.write("from kudubot.tests.helpers.DummyService import DummyServiceWithInvalidDependency")
         services = handler.load_services()
         self.assertEqual(services, [])
-
-        # Reset
-        DummyService.requires = []
 
     def test_duplicate_removal(self):
         """
@@ -211,10 +207,15 @@ class UnitTests(unittest.TestCase):
         GlobalConfigHandler.generate_configuration(True)
         handler = GlobalConfigHandler()
 
+        # noinspection PyDecorator
+        def other():
+            return "other"
+
         second_dummy = DummyConnection([])
-        second_dummy.identifier = "other"
+        second_dummy.define_identifier = other
 
         connections = [second_dummy, DummyConnection, DummyConnection]
+        # noinspection PyTypeChecker
         new_connections = handler.__remove_duplicate_services_or_connections__(connections)
         self.assertEqual(new_connections, [second_dummy, DummyConnection])
 

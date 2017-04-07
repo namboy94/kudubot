@@ -22,6 +22,7 @@ This file is part of kudubot.
 LICENSE
 """
 
+from typing import List
 from kudubot.services.Service import Service
 from kudubot.connections.Message import Message
 
@@ -31,12 +32,36 @@ class DummyService(Service):
     A class that implements a Service for use in unit tests
     """
 
-    identifier = "dummyservice"
+    @staticmethod
+    def define_requirements() -> List[str]:
+        return []
 
-    requires = []
+    @staticmethod
+    def define_identifier() -> str:
+        return "dummyservice"
 
     def handle_message(self, message: Message):
         pass
 
     def is_applicable_to(self, message: Message) -> bool:
         pass
+
+
+class DummyServiceWithValidDependency(DummyService):
+    """
+    A Service that has itself (or DummyService) as its only dependency
+    """
+
+    @staticmethod
+    def define_requirements() -> List[str]:
+        return ["dummyservice"]
+
+
+class DummyServiceWithInvalidDependency(DummyService):
+    """
+    A service that has an invalid dependency
+    """
+
+    @staticmethod
+    def define_requirements() -> List[str]:
+        return ["otherservice"]

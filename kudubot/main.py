@@ -79,7 +79,7 @@ def initialize_connection(identifier: str) -> Connection:  # pragma: no cover
     services = config_handler.load_services()
 
     try:
-        connection_type = list(filter(lambda x: x.identifier == identifier, connections))[0]
+        connection_type = list(filter(lambda x: x.define_identifier() == identifier, connections))[0]
         return connection_type(services)
     except IndexError:
         print("Connection Type " + identifier + " is not implemented or imported using the config file")

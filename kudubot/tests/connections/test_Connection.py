@@ -86,9 +86,12 @@ class UnitTests(unittest.TestCase):
                        (Connection.send_audio_message, 3),
                        (Connection.send_video_message, 3),
                        (Connection.generate_configuration, 0),
-                       (Connection.load_config, 0)]:
+                       (Connection.load_config, 0),
+                       (Connection.define_identifier, -1)]:
             try:
 
+                if method[1] == -1:
+                    method[0]()
                 if method[1] == 0:
                     method[0](dummy)
                 elif method[1] == 1:

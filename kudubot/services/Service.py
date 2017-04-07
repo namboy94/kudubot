@@ -22,22 +22,13 @@ This file is part of kudubot.
 LICENSE
 """
 
+from typing import List
 from kudubot.connections.Message import Message
 
 
 class Service(object):
     """
     A class that defines how a chat bot service integrates with a Connection
-    """
-
-    identifier = "service"
-    """
-    A unique identifier for a service. Must be overridden by subclasses
-    """
-
-    requires = []
-    """
-    A list of other services this Service may depend on being running
     """
 
     def __init__(self, connection  # Connection  (Can't import due to circular imports)
@@ -48,6 +39,8 @@ class Service(object):
         :param connection: The connection used by this service
         """
         self.connection = connection
+        self.identifier = self.define_identifier()
+        self.requires = self.define_requirements()
 
     def is_applicable_to(self, message: Message) -> bool:
         """
@@ -64,5 +57,23 @@ class Service(object):
 
         :param message: The message to process
         :return: None
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    def define_identifier() -> str:
+        """
+        Defines the unique identifier for the service
+
+        :return: The Service's identifier.
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    def define_requirements() -> List[str]:
+        """
+        Defines the requirements for the service
+
+        :return: The required services for this Service.
         """
         raise NotImplementedError()

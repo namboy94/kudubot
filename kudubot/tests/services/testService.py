@@ -52,11 +52,13 @@ class UnitTests(unittest.TestCase):
         dummy = DummyService([])
 
         for method in [(Service.handle_message, 1),
-                       (Service.is_applicable_to, 1)]:
+                       (Service.is_applicable_to, 1),
+                       (Service.define_identifier, -1),
+                       (Service.define_requirements, -1)]:
             try:
 
-                if method[1] == 0:
-                    method[0](dummy)
+                if method[1] == -1:
+                    method[0]()
                 elif method[1] == 1:
                     method[0](dummy, dummy)
                 self.fail()
