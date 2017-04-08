@@ -106,6 +106,13 @@ class Connection(object):
         :return: None
         """
 
+        self.logger.info("Received message " + message.message_body + ".")
+        self.logger.info("Checking for contact information")
+
+        message.sender = self.address_book.add_or_update_contact(message.sender)
+        if message.sender_group is not None:
+            message.sender_group = self.address_book.add_or_update_contact(message.sender_group)
+
         self.logger.debug("Applying services to " + repr(message.message_body) + ".")
 
         for service in self.services:
