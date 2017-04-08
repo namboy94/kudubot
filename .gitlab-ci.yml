@@ -1,8 +1,6 @@
 stages:
   - mirror
   - test
-  - install
-  - build
   - deploy
   - release
   - docstats
