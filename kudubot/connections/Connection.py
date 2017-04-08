@@ -30,6 +30,7 @@ from typing import List, Dict
 from kudubot.users.Contact import Contact
 from kudubot.connections.Message import Message
 from kudubot.users.AddressBook import AddressBook
+from kudubot.exceptions import InvalidConfigException
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
@@ -64,19 +65,24 @@ class Connection(object):
 
         :param services: The services to use with the connection
         """
-        self.identifier = self.define_identifier()
+        try:
+            self.identifier = self.define_identifier()
 
-        self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
-        self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
-        self.db = self.get_database_connection_copy()
+            self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
+            self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
+            self.db = self.get_database_connection_copy()
 
-        self.address_book = AddressBook(self.db)
-        self.config = self.load_config()
-        self.user_contact = self.define_user_contact()
+            self.address_book = AddressBook(self.db)
+            self.config = self.load_config()
+            self.user_contact = self.define_user_contact()
 
-        self.services = []
-        for service in services:
-            self.services.append(service(self))
+            self.services = []
+            for service in services:
+                self.services.append(service(self))
+
+        except InvalidConfigException as e:
+            self.generate_configuration()
+            raise e
 
     @staticmethod
     def define_identifier() -> str:
