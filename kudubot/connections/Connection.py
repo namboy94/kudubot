@@ -68,7 +68,7 @@ class Connection(object):
 
         self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
         self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
-        self.db = sqlite3.connect(self.database_file_location)
+        self.db = self.get_database_connection_copy()
 
         self.address_book = AddressBook(self.db)
         self.config = self.load_config()
@@ -198,3 +198,11 @@ class Connection(object):
         thread.daemon = True
         thread.start()
         return thread
+
+    def get_database_connection_copy(self) -> sqlite3.Connection:
+        """
+        Creates a new sqlite Connection to the kudubot Connection's database file
+
+        :return: The generated sqlite Connection
+        """
+        return sqlite3.connect(self.database_file_location)
