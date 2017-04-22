@@ -114,7 +114,7 @@ start_bot:
     - bash update.sh
     - rm update.sh
     - sudo systemctl restart kudubot-whatsapp.service
-    # - sudo systemctl restart kudubot-telegram.service
+    - sudo systemctl restart kudubot-telegram.service
 
 generate_sphinx_documentation:
   stage: docstats
