@@ -126,7 +126,7 @@ class UnitTests(unittest.TestCase):
 
         result = self.connection.address_book.add_or_update_contact(contact)
 
-        print(self.connection.db.execute("SELET * FROM users").fetchall())
+        print(self.connection.db.execute("SELEcT * FROM users").fetchall())
 
         self.assertEqual(1, result.database_id)
 
