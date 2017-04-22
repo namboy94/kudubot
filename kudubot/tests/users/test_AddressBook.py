@@ -112,7 +112,7 @@ class UnitTests(unittest.TestCase):
         new_inserted = self.connection.address_book.get_contact_for_address("DEF")
 
         self.assertEqual(new_inserted.display_name, "ABC")
-        self.assertEqual(new_inserted.database_id, 1)
+        self.assertEqual(new_inserted.database_id, contact.database_id)
         self.assertEqual(new_inserted.address, "DEF")
 
     def subtest_adding_contact_to_addressbook(self, contact: Contact):
@@ -125,7 +125,11 @@ class UnitTests(unittest.TestCase):
         self.assertEqual(-1, contact.database_id)
 
         result = self.connection.address_book.add_or_update_contact(contact)
+
+        print(self.connection.db.execute("SELET * FROM users").fetchall())
+
         self.assertEqual(1, result.database_id)
+
         self.assertEqual(contact.display_name, result.display_name)
         self.assertEqual(contact.address, result.address)
 
