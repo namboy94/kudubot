@@ -3,6 +3,7 @@ stages:
   - test
   - deploy
   - release
+  - botstart
   - docstats
   - finalize
 
@@ -94,6 +95,18 @@ upload_release_to_gitlab:
     - python changelog-reader/changelog-reader.py -c CHANGELOG -d  current_changelog
     - python gitlab-release-uploader/gitlab-release-uploader.py namboy94 kudubot $GITLAB_ACCESS_TOKEN
       $(python3 setup.py -V) current_changelog artifacts -b master -u https://gitlab.namibsun.net
+
+start_bot:
+  stage: botstart
+  only:
+    - master
+    - develop
+  tags:
+    - linux-buildserver
+  script:
+    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/16/raw -O start_bot.sh
+    - bash start_bot.sh
+    - rm start_bot.sh
 
 generate_sphinx_documentation:
   stage: docstats
