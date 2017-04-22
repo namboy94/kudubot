@@ -55,3 +55,11 @@ class Message(object):
         self.sender = sender
         self.sender_group = sender_group
         self.timestamp = timestamp if timestamp != -1.0 else time.time()
+
+    def get_direct_response_contact(self) -> Contact:
+        """
+        :return: The contact to which one can immediately respond to.
+                 I.e. if the message came from a group, this method will return the group contact,
+                 private chats however will return the individual sender
+        """
+        return self.sender if self.sender_group is None else self.sender_group

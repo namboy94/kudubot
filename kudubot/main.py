@@ -57,6 +57,8 @@ def main():  # pragma: no cover
         sentry = raven.Client(dsn=sentry_dsn, release=version)
         sentry.captureException()
         raise e
+    except KeyboardInterrupt:
+        print("\nBye")
 
 
 def initialize_connection(identifier: str) -> Connection:  # pragma: no cover

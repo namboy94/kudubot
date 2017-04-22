@@ -30,6 +30,7 @@ from typing import List, Dict
 from kudubot.users.Contact import Contact
 from kudubot.connections.Message import Message
 from kudubot.users.AddressBook import AddressBook
+from kudubot.exceptions import InvalidConfigException
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
@@ -64,19 +65,24 @@ class Connection(object):
 
         :param services: The services to use with the connection
         """
-        self.identifier = self.define_identifier()
+        try:
+            self.identifier = self.define_identifier()
 
-        self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
-        self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
-        self.db = sqlite3.connect(self.database_file_location)
+            self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
+            self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
+            self.db = self.get_database_connection_copy()
 
-        self.address_book = AddressBook(self.db)
-        self.config = self.load_config()
-        self.user_contact = self.define_user_contact()
+            self.address_book = AddressBook(self.db)
+            self.config = self.load_config()
+            self.user_contact = self.define_user_contact()
 
-        self.services = []
-        for service in services:
-            self.services.append(service(self))
+            self.services = []
+            for service in services:
+                self.services.append(service(self))
+
+        except InvalidConfigException as e:
+            self.generate_configuration()
+            raise e
 
     @staticmethod
     def define_identifier() -> str:
@@ -99,6 +105,13 @@ class Connection(object):
         :param break_on_match: Can be set to True to not allow more than one result
         :return: None
         """
+
+        self.logger.info("Received message " + message.message_body + ".")
+        self.logger.info("Checking for contact information")
+
+        message.sender = self.address_book.add_or_update_contact(message.sender)
+        if message.sender_group is not None:
+            message.sender_group = self.address_book.add_or_update_contact(message.sender_group)
 
         self.logger.debug("Applying services to " + repr(message.message_body) + ".")
 
@@ -198,3 +211,11 @@ class Connection(object):
         thread.daemon = True
         thread.start()
         return thread
+
+    def get_database_connection_copy(self) -> sqlite3.Connection:
+        """
+        Creates a new sqlite Connection to the kudubot Connection's database file
+
+        :return: The generated sqlite Connection
+        """
+        return sqlite3.connect(self.database_file_location)

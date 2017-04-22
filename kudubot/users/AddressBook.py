@@ -71,34 +71,32 @@ class AddressBook(object):
         :return: The contact, possibly with an altered id value (in case the contact was inserted, not updated)
         """
         # Check if the contact currently exists
-        old = self.db.execute("SELECT * FROM address_book WHERE id=? OR address=?",
+        old = self.db.execute("SELECT id FROM address_book WHERE id=? OR address=?",
                               (contact.database_id, contact.address)).fetchall()
 
-        if len(old) != 1:
-            # Increment the ID
-            self.logger.info("Address " + contact.address + " does not exist yet. Inserting into address book.")
-            max_id = self.db.execute("SELECT CASE WHEN COUNT(id) > 0 THEN MAX(id) ELSE 0 END AS max_id "
-                                     "FROM address_book").fetchall()[0][0]
-            contact.database_id = max_id + 1
-        elif contact.database_id == -1:
-            contact.database_id = self.db.execute("SELECT id FROM address_book WHERE address=?",
-                                                  (contact.address,)).fetchall()[0][0]
+        if len(old) > 0:
+            self.db.execute("UPDATE address_book SET display_name=?, address=? WHERE id=?",
+                            (contact.display_name, contact.address, old[0][0]))
+        else:
+            self.db.execute("INSERT INTO address_book (display_name, address) VALUES (?, ?)",
+                            (contact.display_name, contact.address))
 
-        # Insert into the database
-        self.db.execute("INSERT OR REPLACE INTO address_book VALUES (?, ?, ?)",
-                        (contact.database_id, contact.display_name, contact.address))
         self.db.commit()
+        contact.database_id = \
+            self.db.execute("SELECT id FROM address_book WHERE address=?", (contact.address,)).fetchall()[0][0]
         return contact
 
-    def get_contact_for_address(self, address: str) -> Contact:
+    def get_contact_for_address(self, address: str, database_override: sqlite3.Connection = None) -> Contact:
         """
         Generates a Contact object for an address in the address book table.
 
         :param address: The address to look for
+        :param database_override: Can be specified to use a different database connection,
+                                  useful for calling this method from a different thread
         :return: The Contact object, or None if no contact was found
         """
-
-        result = self.db.execute("SELECT * FROM address_book WHERE address=?", (address,)).fetchall()
+        db = self.db if database_override is None else database_override
+        result = db.execute("SELECT * FROM address_book WHERE address=?", (address,)).fetchall()
 
         if len(result) != 1:
             # noinspection PyTypeChecker
@@ -107,15 +105,17 @@ class AddressBook(object):
             data = result[0]
             return Contact(int(data[0]), str(data[1]), str(data[2]))
 
-    def get_contact_for_id(self, user_id: int) -> Contact:
+    def get_contact_for_id(self, user_id: int, database_override: sqlite3.Connection = None) -> Contact:
         """
         Generates a Contact object for a user ID in the address book table
 
         :param user_id: The user's ID
+        :param database_override: Can be specified to use a different database connection,
+                                  useful for calling this method from a different thread
         :return: The user as a Contact object
         """
-
-        result = self.db.execute("SELECT * FROM address_book WHERE id=?", (user_id,)).fetchall()
+        db = self.db if database_override is None else database_override
+        result = db.execute("SELECT * FROM address_book WHERE id=?", (user_id,)).fetchall()
 
         if len(result) != 1:
             # noinspection PyTypeChecker
