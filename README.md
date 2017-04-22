@@ -26,6 +26,7 @@ For examples see:
 
 * [kudubot-cli](https://gitlab.namibsun.net/namboy94/kudubot-cli)
 * [kudubot-telegram](https://gitlab.namibsun.net/namboy94/kudubot-telegram)
+* [kudubot-whatsapp](https://gitlab.namibsun.net/namboy94/kudubot-whatsapp)
 
 ## Implementing a Service
 
@@ -41,6 +42,9 @@ that would import your Service class.
 For examples see:
 
 * [kudubot-simple-responder](https://gitlab.namibsun.net/namboy94/kudubot-simple-responder)
+* [kudubot-reminder](https://gitlab.namibsun.net/namboy94/kudubot-reminder)
+* [kudubot-anime-reminder](https://gitlab.namibsun.net/namboy94/kudubot-anime-reminder)
+
 
 ## Further Information
 
