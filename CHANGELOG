@@ -1,3 +1,5 @@
+V 0.10.1:
+  - Implemented automatic bot starting in build
 V 0.10.0
   - Implemented database methods for access from other threads
   - Integrated sentry error logging
