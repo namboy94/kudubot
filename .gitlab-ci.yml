@@ -3,6 +3,7 @@ stages:
   - test
   - deploy
   - release
+  - botstart
   - docstats
   - finalize
 
@@ -94,6 +95,26 @@ upload_release_to_gitlab:
     - python changelog-reader/changelog-reader.py -c CHANGELOG -d  current_changelog
     - python gitlab-release-uploader/gitlab-release-uploader.py namboy94 kudubot $GITLAB_ACCESS_TOKEN
       $(python3 setup.py -V) current_changelog artifacts -b master -u https://gitlab.namibsun.net
+
+start_bot:
+  stage: botstart
+  only:
+    - master
+    - develop
+  tags:
+    - linux-buildserver
+  script:
+    - mkdir -p $HOME/.kudubot/data
+    - mkdir -p $HOME/.kudubot/connection_config
+    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/15/raw -O $HOME/.kudubot/services.conf
+    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/14/raw -O $HOME/.kudubot/connections.conf
+    - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
+    - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
+    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/13/raw -O update.sh
+    - bash update.sh
+    - rm update.sh
+    - sudo systemctl restart kudubot-whatsapp.service
+    # - sudo systemctl restart kudubot-telegram.service
 
 generate_sphinx_documentation:
   stage: docstats
