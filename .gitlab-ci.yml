@@ -104,17 +104,9 @@ start_bot:
   tags:
     - linux-buildserver
   script:
-    - mkdir -p $HOME/.kudubot/data
-    - mkdir -p $HOME/.kudubot/connection_config
-    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/15/raw -O $HOME/.kudubot/services.conf
-    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/14/raw -O $HOME/.kudubot/connections.conf
-    - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
-    - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
-    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/13/raw -O update.sh
-    - bash update.sh
-    - rm update.sh
-    - sudo systemctl restart kudubot-whatsapp.service
-    - sudo systemctl restart kudubot-telegram.service
+    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/16/raw -O start_bot.sh
+    - bash start_bot.sh
+    - rm start_bot.sh
 
 generate_sphinx_documentation:
   stage: docstats
