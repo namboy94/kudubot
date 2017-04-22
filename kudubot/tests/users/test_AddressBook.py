@@ -31,6 +31,7 @@ from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 from kudubot.tests.helpers.backup_class_variables import prepare_class_variables_for_use
 
 
+# noinspection SqlNoDataSourceInspection
 class UnitTests(unittest.TestCase):
     """
     Class that tests the AddressBook class
@@ -45,6 +46,8 @@ class UnitTests(unittest.TestCase):
         self.restore = prepare_class_variables_for_use()
         GlobalConfigHandler.generate_configuration(False)
         self.connection = DummyConnection([])
+        self.connection.db.execute("DELETE FROM address_book")
+        self.connection.db.commit()
 
     def tearDown(self):
         """
@@ -125,8 +128,6 @@ class UnitTests(unittest.TestCase):
         self.assertEqual(-1, contact.database_id)
 
         result = self.connection.address_book.add_or_update_contact(contact)
-
-        print(self.connection.db.execute("SELECT * FROM address_book").fetchall())
 
         self.assertEqual(1, result.database_id)
 
