@@ -90,15 +90,17 @@ class AddressBook(object):
         self.db.commit()
         return contact
 
-    def get_contact_for_address(self, address: str) -> Contact:
+    def get_contact_for_address(self, address: str, database_override: sqlite3.Connection = None) -> Contact:
         """
         Generates a Contact object for an address in the address book table.
 
         :param address: The address to look for
+        :param database_override: Can be specified to use a different database connection, 
+                                  useful for calling this method from a different thread
         :return: The Contact object, or None if no contact was found
         """
-
-        result = self.db.execute("SELECT * FROM address_book WHERE address=?", (address,)).fetchall()
+        db = self.db if database_override is None else database_override
+        result = db.execute("SELECT * FROM address_book WHERE address=?", (address,)).fetchall()
 
         if len(result) != 1:
             # noinspection PyTypeChecker
@@ -107,15 +109,17 @@ class AddressBook(object):
             data = result[0]
             return Contact(int(data[0]), str(data[1]), str(data[2]))
 
-    def get_contact_for_id(self, user_id: int) -> Contact:
+    def get_contact_for_id(self, user_id: int, database_override: sqlite3.Connection = None) -> Contact:
         """
         Generates a Contact object for a user ID in the address book table
 
         :param user_id: The user's ID
+        :param database_override: Can be specified to use a different database connection, 
+                                  useful for calling this method from a different thread
         :return: The user as a Contact object
         """
-
-        result = self.db.execute("SELECT * FROM address_book WHERE id=?", (user_id,)).fetchall()
+        db = self.db if database_override is None else database_override
+        result = db.execute("SELECT * FROM address_book WHERE id=?", (user_id,)).fetchall()
 
         if len(result) != 1:
             # noinspection PyTypeChecker
