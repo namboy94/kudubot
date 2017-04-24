@@ -22,19 +22,18 @@ This file is part of kudubot-whatsapp.
 LICENSE
 """
 
-import configparser
+
 import logging
+import configparser
 from typing import Dict, List
-
-from kudubot_whatsapp.EchoLayer import EchoLayer
 from yowsup.layers import YowLayerEvent
-from yowsup.layers.network import YowNetworkLayer
 from yowsup.stacks import YowStackBuilder
-
-from kudubot.connections.Connection import Connection
-from kudubot.entities.Message import Message
-from kudubot.exceptions import InvalidConfigException
 from kudubot.users.Contact import Contact
+from kudubot.entities.Message import Message
+from yowsup.layers.network import YowNetworkLayer
+from kudubot.connections.Connection import Connection
+from kudubot.exceptions import InvalidConfigException
+from kudubot.connections.whatsapp.EchoLayer import EchoLayer
 
 
 class WhatsappConnection(Connection):

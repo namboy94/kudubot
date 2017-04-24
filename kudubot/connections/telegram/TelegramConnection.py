@@ -22,18 +22,15 @@ This file is part of kudubot-telegram.
 LICENSE
 """
 
-import configparser
-import logging
 import time
-from typing import Dict, List
-
-# noinspection PyPackageRequirements
+import logging
 import telegram
-
-from kudubot.connections.Connection import Connection
-from kudubot.entities.Message import Message
-from kudubot.exceptions import InvalidConfigException
+import configparser
+from typing import Dict, List
 from kudubot.users.Contact import Contact
+from kudubot.entities.Message import Message
+from kudubot.connections.Connection import Connection
+from kudubot.exceptions import InvalidConfigException
 
 
 class TelegramConnection(Connection):

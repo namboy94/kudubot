@@ -24,10 +24,9 @@ LICENSE
 
 import logging
 from typing import Dict
-
-from kudubot.connections.Connection import Connection
 from kudubot.entities.Message import Message
 from kudubot.users.Contact import Contact
+from kudubot.connections.Connection import Connection
 
 
 class CliConnection(Connection):
