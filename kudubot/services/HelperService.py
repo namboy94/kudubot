@@ -51,8 +51,13 @@ class HelperService(MultiLanguageService):
         """
         raise NotImplementedError()
 
-    def define_command_name(self) -> str:
+    # noinspection PyUnusedLocal
+    def define_command_name(self, language: str) -> str:
         """
+        Defines the command name used to call this Service
+
+        :param language: The language for the command name, for supporting different command names for
+                         different languages
         :return: The command name for this service. Defaults to a forward slash and the Service's identifier
         """
         return "/" + self.define_identifier()
@@ -80,8 +85,8 @@ class HelperService(MultiLanguageService):
             "@syntax_message_title": {"en": "Syntax Message for " + self.identifier}
         }
 
-        if body.startswith(self.define_command_name()):
-            body = body.split(self.define_command_name(), 1)[1].strip()
+        if body.startswith(self.define_command_name(language)):
+            body = body.split(self.define_command_name(language), 1)[1].strip()
 
             if body == "help":
                 self.reply(self.translate("@help_message_title", language, dictionary),
@@ -91,3 +96,23 @@ class HelperService(MultiLanguageService):
                 self.reply(self.translate("@syntax_message_title", language, dictionary),
                            self.define_syntax_description(language), message)
                 return
+
+    def is_applicable_to(self, message: Message) -> bool:
+        """
+        Checks if the message is applicable to the service by checking if the command name is followed by
+        the terms 'help' or 'syntax'.
+
+        :param message: The message to analyze
+        :return: True if the message is applicable, False otherwise
+        """
+        language = self.determine_language(message)
+        command = self.define_command_name(language).lower()
+        dictionary = {
+            "@help_command": {"en": "help"},
+            "@syntax_command": {"en": "syntax"}
+        }
+
+        return message.message_body.lower() in [
+            command + self.translate(" @help_command", language, dictionary),
+            command + self.translate(" @syntax_command", language, dictionary)
+        ]
