@@ -173,7 +173,7 @@ class MultiLanguageService(Service):
         params = message.message_body.lower().split(" ")
         user_id = message.get_direct_response_contact().database_id
 
-        if len(params) == 1:
+        if len(params) == 1 and params[0] in command_keywords:
             language = self.get_language_preference(user_id, "en")
             self.reply(self.translate("@title", language, dictionary),
                        language, message)
