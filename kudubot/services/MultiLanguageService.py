@@ -41,20 +41,33 @@ class MultiLanguageService(Service):
         :param connection: The connection which is used to communicate
         """
         super().__init__(connection)
-        self.connection.db.execute("CREATE TABLE IF NOT EXISTS language_preferences "
-                                   "(user_id INTEGER NOT NULL, lang_pref VARCHAR(255) NOT NULL)")
+        self.connection.db.execute("CREATE TABLE IF NOT EXISTS language_preferences ("
+                                   "user_id INTEGER NOT NULL, "
+                                   "lang_pref VARCHAR(255) NOT NULL,"
+                                   "user_initiated INT NOT NULL"
+                                   ")")
         self.connection.db.commit()
 
-    def store_language_preference(self, user: int, language: str):
+    def store_language_preference(self, user: int, language: str, user_initiated: bool = False):
         """
         Stores the language preference for a user in the sqlite database
         :param user: The user for which to store the preference
         :param language: The language to store
+        :param user_initiated: Flag that should be set whenever the user manually requests a language store
         :return: None
         """
-        self.connection.db.execute("INSERT OR REPLACE INTO language_preferences (user_id, lang_pref) VALUES (?,?)",
-                                   (user, language))
-        self.connection.db.commit()
+        fetch = self.connection.db.execute("SELECT user_initiated FROM language_preferences WHERE user_id=?",
+                                           (user,)).fetchall()
+
+        was_user_initiated = len(fetch) > 0 and fetch[0][0]
+        if was_user_initiated and not user_initiated:
+            return  # Don't overwrite user defined language
+
+        else:
+            self.connection.db.execute("INSERT OR REPLACE INTO language_preferences "
+                                       "(user_id, lang_pref, user_initiated) VALUES (?,?,?)",
+                                       (user, language, user_initiated))
+            self.connection.db.commit()
 
     def get_language_preference(self, user: int, default: str = "en") -> str:
         """
@@ -139,7 +152,9 @@ class MultiLanguageService(Service):
     def handle_message(self, message: Message):
         """
         Analyzes a message for the language used and stores that language value in the database as a preference of
-        the user
+        the user.
+        Also implements the /language command which allows a user to view and change the current language
+
         :param message: The message to analyze
         :return: None
         """
@@ -165,7 +180,7 @@ class MultiLanguageService(Service):
                 for alias in aliases[key]:
                     if alias == params[1]:
                         found_language = True
-                        self.store_language_preference(user_id, key)
+                        self.store_language_preference(user_id, key, True)
                         break
 
             language = self.get_language_preference(user_id, "en")  # the new language will already be stored
