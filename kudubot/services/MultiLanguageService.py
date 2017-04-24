@@ -36,12 +36,19 @@ class MultiLanguageService(Service):
     def define_language_text(self) -> Dict[str, Dict[str, str]]:
         raise NotImplementedError
 
+    # noinspection PyMethodMayBeStatic
+    def define_fallback_language(self) -> str:
+        return "en"
+
     def translate(self, text: str, language: str) -> str:
 
         translated = text
         language_text = self.define_language_text()
 
         for key in language_text:
-            translated = translated.replace(key, language_text[key][language])
+            try:
+                translated = translated.replace(key, language_text[key][language])
+            except KeyError:
+                translated = translated.replace(key, language_text[key][self.define_fallback_language()])
 
         return translated

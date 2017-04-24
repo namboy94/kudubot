@@ -22,10 +22,44 @@ This file is part of kudubot.
 LICENSE
 """
 
-from kudubot.services.Service import Service
+from kudubot.connections.Message import Message
+from kudubot.services.MultiLanguageService import MultiLanguageService
 
 
 # noinspection PyAbstractClass
-class HelperService(Service):
+class HelperService(MultiLanguageService):
 
-    pass
+    def define_help_message(self) -> str:
+        raise NotImplementedError()
+
+    def define_syntax_description(self) -> str:
+        raise NotImplementedError()
+
+    def define_command_name(self) -> str:
+        return "/" + self.define_identifier()
+
+    def define_language_text(self):
+        return {
+            "@help_message_title": {"en": "Help Message for " + self.identifier},
+            "@syntax_message_title": {"en": "Syntax Message for " + self.identifier}
+        }
+
+    def determine_language(self, message: Message):
+        return "en"
+
+    def handle_message(self, message: Message):
+
+        body = message.message_body
+        language = self.determine_language(message)
+
+        if body.startswith(self.define_command_name()):
+            body = body.split(self.define_command_name(), 1)[1].strip()
+
+            if body == "help":
+                message.reply(self.translate("@help_message_title", language),
+                              self.define_help_message(), self.connection)
+                return
+            elif body == "syntax":
+                message.reply(self.translate("@syntax_message_title", language),
+                              self.define_syntax_description(), self.connection)
+                return

@@ -63,3 +63,16 @@ class Message(object):
                  private chats however will return the individual sender
         """
         return self.sender if self.sender_group is None else self.sender_group
+
+    def reply(self, title: str, body: str, connection):  # Connection
+        """
+        Provides a helper method that streamlines the process of replying to a message. Very useful
+        for Services that send a reply immediately to cut down on clutter in the code
+        
+        :param title: The title of the message to send 
+        :param body: The body of the message to send
+        :param connection: The connection over which the reply should be sent
+        :return: None
+        """
+        reply_message = Message(title, body, self.get_direct_response_contact(), connection.user_contact)
+        connection.send_message(reply_message)
