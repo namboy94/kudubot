@@ -1,0 +1,8 @@
+V 1.0.3:
+  - Implemented automatic bot starting in build
+V 1.0.2:
+  - Fixed error in build script
+V 1.0.1:
+  - Removed binary builds
+V 1.0.0:
+  - Created Kudubot CLI Connection
