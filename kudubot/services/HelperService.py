@@ -36,7 +36,7 @@ class HelperService(MultiLanguageService):
     def define_help_message(self, language: str) -> str:
         """
         Defines the help message for the Service
-        
+
         :param language: The language in which to get the help message in
         :return: The help message in the specified language
         """
@@ -45,15 +45,15 @@ class HelperService(MultiLanguageService):
     def define_syntax_description(self, language: str) -> str:
         """
         Defines the syntax description for this service.
-        
-        :param language: The language in which to get the syntax description in 
+
+        :param language: The language in which to get the syntax description in
         :return: The syntax description in the specified language
         """
         raise NotImplementedError()
 
     def define_command_name(self) -> str:
         """
-        :return: The command name for this service. Defaults to a forward slash and the Service's identifier 
+        :return: The command name for this service. Defaults to a forward slash and the Service's identifier
         """
         return "/" + self.define_identifier()
 
@@ -61,9 +61,9 @@ class HelperService(MultiLanguageService):
         """
         Handles the help message sending. Checks if a message qualifies for a help message and then sends
         messages accordingly.
-        
+
         Subclasses of the HelperService should call this method using super()
-        
+
         :param message: The message to handle
         :return: None
         """
