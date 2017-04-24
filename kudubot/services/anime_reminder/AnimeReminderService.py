@@ -76,7 +76,7 @@ class AnimeReminderService(HelperService):
         """
         :return: The service's identifier
         """
-        return "anime-reminder"
+        return "anime_reminder"
 
     def handle_message(self, message: Message):
         """
