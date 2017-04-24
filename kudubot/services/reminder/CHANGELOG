@@ -1,0 +1,8 @@
+V 0.1.3:
+  - Implemented automatic bot starting in build
+V 0.1.2:
+  - Fixed build script(github and gitlab uploading)
+V 0.1.1:
+  - Fixed build script
+V 0.1.0:
+  - First implementation of the service
