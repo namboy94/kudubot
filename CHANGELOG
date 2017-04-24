@@ -1,3 +1,8 @@
+V 0.11.0:
+  - Implemented more specialized Service classes
+  - Helper Service now implemented
+  - MultiLanguage Service now implemented
+  - Simpler reply method for cleaner code
 V 0.10.1:
   - Implemented automatic bot starting in build
 V 0.10.0
