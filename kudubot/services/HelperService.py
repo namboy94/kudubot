@@ -96,7 +96,7 @@ class HelperService(MultiLanguageService):
                 self.reply(self.translate("@help_message_title", language, dictionary),
                            self.define_help_message(language), message)
                 return
-            elif body == syntax_keywords:
+            elif body in syntax_keywords:
                 self.reply(self.translate("@syntax_message_title", language, dictionary),
                            self.define_syntax_description(language), message)
                 return
