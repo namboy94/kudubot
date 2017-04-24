@@ -23,7 +23,8 @@ LICENSE
 """
 
 from typing import List
-from kudubot.connections.Message import Message
+
+from kudubot.entities.Message import Message
 
 
 class Service(object):

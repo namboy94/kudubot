@@ -22,16 +22,17 @@ This file is part of kudubot.
 LICENSE
 """
 
+import logging
 import os
 import sqlite3
-import logging
 from threading import Thread
 from typing import List, Dict
-from kudubot.users.Contact import Contact
-from kudubot.connections.Message import Message
-from kudubot.users.AddressBook import AddressBook
-from kudubot.exceptions import InvalidConfigException
+
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
+from kudubot.entities.Message import Message
+from kudubot.exceptions import InvalidConfigException
+from kudubot.users.AddressBook import AddressBook
+from kudubot.users.Contact import Contact
 
 
 class Connection(object):

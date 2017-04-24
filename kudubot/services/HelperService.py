@@ -22,7 +22,7 @@ This file is part of kudubot.
 LICENSE
 """
 
-from kudubot.connections.Message import Message
+from kudubot.entities.Message import Message
 from kudubot.services.MultiLanguageService import MultiLanguageService
 
 

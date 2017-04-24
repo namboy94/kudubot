@@ -23,17 +23,18 @@ LICENSE
 """
 
 import os
-import time
 import shutil
+import time
 import unittest
-from kudubot.users.AddressBook import Contact
-from kudubot.connections.Message import Message
-from kudubot.connections.Connection import Connection
-from kudubot.tests.helpers.DummyService import DummyService
-from kudubot.tests.helpers.DummyConnection import DummyConnection
+
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
+from kudubot.connections.Connection import Connection
+from kudubot.entities.Message import Message
+from kudubot.tests.helpers.DummyConnection import DummyConnection
+from kudubot.tests.helpers.DummyService import DummyService
 from kudubot.tests.helpers.backup_class_variables import backup_connection_variables
 from kudubot.tests.helpers.backup_class_variables import backup_global_config_handler_variables
+from kudubot.users.AddressBook import Contact
 
 
 class UnitTests(unittest.TestCase):
