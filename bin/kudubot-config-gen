@@ -26,6 +26,7 @@ LICENSE
 import logging
 import argparse
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
+from kudubot.config.StandardConfigWriter import StandardConfigWriter
 
 if __name__ == "__main__":
 
@@ -34,6 +35,7 @@ if __name__ == "__main__":
                         help="Can be used to completely wipe theprevious configuration.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Activates verbose output")
     parser.add_argument("-b", "--debug", action="store_true", help="Activates debug-level logging output")
+    parser.add_argument("-s", "--standard-config", action="store_true", help="Generates the standard configuration")
 
     args = parser.parse_args()
 
@@ -42,4 +44,9 @@ if __name__ == "__main__":
     elif args.verbose:
         logging.basicConfig(level=logging.DEBUG)
 
-    GlobalConfigHandler.generate_configuration(parser.parse_args().delete_old)
+    args = parser.parse_args()
+    GlobalConfigHandler.generate_configuration(args.delete_old)
+
+    if args.standard_config:
+        StandardConfigWriter.write_standard_connection_config()
+        StandardConfigWriter.write_standard_service_config()
