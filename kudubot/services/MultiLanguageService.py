@@ -22,13 +22,14 @@ This file is part of kudubot.
 LICENSE
 """
 
+import sqlite3
 from typing import Dict, List
 from kudubot.services.Service import Service
 from kudubot.connections.Message import Message
 from kudubot.connections.Connection import Connection
 
 
-# noinspection PyAbstractClass,SqlNoDataSourceInspection,SqlDialectInspection
+# noinspection PyAbstractClass,SqlNoDataSourceInspection,SqlDialectInspection,SqlResolve
 class MultiLanguageService(Service):
     """
     Service Extension class that enables support for multiple languages
@@ -69,16 +70,17 @@ class MultiLanguageService(Service):
                                        (user, language, user_initiated))
             self.connection.db.commit()
 
-    def get_language_preference(self, user: int, default: str = "en") -> str:
+    def get_language_preference(self, user: int, default: str = "en", db: sqlite3.Connection=None) -> str:
         """
         Retrieves a language from the user's preferences in the database
 
         :param user: The user to check the language preference for
         :param default: A default language value used in case no entry was found
+        :param db: Optionally defines which database connection to use (necessary for access from other thread)
         :return: The language preferred by the user
         """
-        result = self.connection.db.execute("SELECT lang_pref FROM language_preferences WHERE user_id=?", (user,))\
-            .fetchall()
+        db = db if db is not None else self.connection.db
+        result = db.execute("SELECT lang_pref FROM language_preferences WHERE user_id=?", (user,)).fetchall()
         return default if len(result) == 0 else result[0][0]
 
     def determine_language(self, message: Message) -> str:
