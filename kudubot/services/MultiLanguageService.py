@@ -22,7 +22,7 @@ This file is part of kudubot.
 LICENSE
 """
 
-from typing import Dict
+from typing import Dict, List
 from kudubot.services.Service import Service
 from kudubot.connections.Message import Message
 from kudubot.connections.Connection import Connection
@@ -104,6 +104,20 @@ class MultiLanguageService(Service):
         """
         raise NotImplementedError
 
+    def supported_languages(self) -> List[str]:
+        """
+        :return: A list of languages supported by the Service
+        """
+
+        supported = []
+
+        dictionary = self.define_language_text()
+        for token in dictionary:
+            for language in dictionary[token]:
+                if language not in supported:
+                    supported.append(language)
+        return supported
+
     # noinspection PyMethodMayBeStatic
     def define_fallback_language(self) -> str:
         """
@@ -146,7 +160,7 @@ class MultiLanguageService(Service):
         :param message: The message to reply to
         :return: None
         """
-        language = self.determine_language(message)
+        language = self.get_language_preference(message.get_direct_response_contact().database_id)
         self.reply(self.translate(title, language), self.translate(body, language), message)
 
     def handle_message(self, message: Message):
