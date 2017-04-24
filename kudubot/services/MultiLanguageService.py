@@ -143,8 +143,40 @@ class MultiLanguageService(Service):
         :param message: The message to analyze
         :return: None
         """
-        try:
-            language = self.determine_language(message)
-            self.store_language_preference(message.get_direct_response_contact().database_id, language)
-        except NotImplementedError:
-            pass
+
+        dictionary = {"@title": {"en": "Language Change"},
+                      "@success_message": {"en": "Successfully changed language to"},
+                      "@fail_message": {"en": "Failed to switch to language"}}
+
+        command_keywords = ["/language"]
+        aliases = {"en": ["en", "english"]}
+
+        params = message.message_body.lower().split(" ")
+        user_id = message.get_direct_response_contact().database_id
+
+        if len(params) == 2 and params[0] in command_keywords:
+            found_language = False
+            for key in aliases:
+                for alias in aliases[key]:
+                    if alias == params[1]:
+                        found_language = True
+                        self.store_language_preference(user_id, key)
+                        break
+
+            language = self.get_language_preference(user_id, "en")  # the new language will already be stored
+            title = self.translate("@title", language, dictionary)
+
+            if found_language:
+                self.reply(title, self.translate("@success_message: " + language, language, dictionary), message)
+            else:
+                self.reply(title, self.translate("@fail_message: " + language, language, dictionary), message)
+
+            return
+
+        else:
+
+            try:
+                language = self.determine_language(message)
+                self.store_language_preference(message.get_direct_response_contact().database_id, language)
+            except NotImplementedError:
+                pass
