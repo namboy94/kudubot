@@ -24,9 +24,10 @@ LICENSE
 
 import sqlite3
 from typing import Dict, List
-from kudubot.services.Service import Service
-from kudubot.connections.Message import Message
+
 from kudubot.connections.Connection import Connection
+from kudubot.entities.Message import Message
+from kudubot.services.Service import Service
 
 
 # noinspection PyAbstractClass,SqlNoDataSourceInspection,SqlDialectInspection,SqlResolve

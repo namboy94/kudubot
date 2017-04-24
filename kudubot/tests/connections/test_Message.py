@@ -23,8 +23,9 @@ LICENSE
 """
 
 import unittest
+
+from kudubot.entities.Message import Message
 from kudubot.users.Contact import Contact
-from kudubot.connections.Message import Message
 
 
 class UnitTests(unittest.TestCase):

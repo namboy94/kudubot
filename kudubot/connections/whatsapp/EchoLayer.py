@@ -22,23 +22,25 @@ This file is part of kudubot-whatsapp.
 LICENSE
 """
 
-import re
 import os
+import re
 import sys
-from kudubot.users.Contact import Contact
-from kudubot.connections.Message import Message
-from yowsup.layers.interface import YowInterfaceLayer
+
 from yowsup.layers.interface import ProtocolEntityCallback
+from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
-from yowsup.layers.protocol_messages.protocolentities import MessageProtocolEntity
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+from yowsup.layers.protocol_media.protocolentities import AudioDownloadableMediaMessageProtocolEntity
+from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import ResultRequestUploadIqProtocolEntity
-from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
-from yowsup.layers.protocol_media.protocolentities import AudioDownloadableMediaMessageProtocolEntity
 from yowsup.layers.protocol_media.protocolentities import VideoDownloadableMediaMessageProtocolEntity
 from yowsup.layers.protocol_media.protocolentities.builder_message_media_downloadable \
     import DownloadableMediaMessageBuilder
+from yowsup.layers.protocol_messages.protocolentities import MessageProtocolEntity
+from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
+
+from kudubot.entities.Message import Message
+from kudubot.users.Contact import Contact
 
 
 class EchoLayer(YowInterfaceLayer):

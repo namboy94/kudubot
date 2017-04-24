@@ -23,17 +23,19 @@ This file is part of kudubot-anime-reminder.
 LICENSE
 """
 
+import logging
 import re
 import time
-import logging
 from threading import Thread
 from typing import List, Dict
-from kudubot.connections.Message import Message
-from kudubot.connections.Connection import Connection
-from kudubot.services.HelperService import HelperService
-from kudubot_anime_reminder.scraper import scrape_reddit_discussion_threads
+
 from kudubot_anime_reminder.database import initialize_database, store_subscription, delete_subscription, \
     get_subscriptions, thread_exists, store_thread
+from kudubot_anime_reminder.scraper import scrape_reddit_discussion_threads
+
+from kudubot.connections.Connection import Connection
+from kudubot.entities.Message import Message
+from kudubot.services.HelperService import HelperService
 
 
 class AnimeReminderService(HelperService):

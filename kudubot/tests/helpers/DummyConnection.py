@@ -23,9 +23,10 @@ LICENSE
 """
 
 from typing import Dict
-from kudubot.users.Contact import Contact
-from kudubot.connections.Message import Message
+
 from kudubot.connections.Connection import Connection
+from kudubot.entities.Message import Message
+from kudubot.users.Contact import Contact
 
 
 class DummyConnection(Connection):

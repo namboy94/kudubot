@@ -25,8 +25,9 @@ LICENSE
 
 import logging
 from typing import List
+
+from kudubot.entities.Message import Message
 from kudubot.services.Service import Service
-from kudubot.connections.Message import Message
 
 
 class SimpleResponderService(Service):

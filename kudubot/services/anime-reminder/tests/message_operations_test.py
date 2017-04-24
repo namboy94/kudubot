@@ -26,12 +26,14 @@ LICENSE
 import os
 import shutil
 import unittest
-from kudubot.users.Contact import Contact
-from kudubot.connections.Message import Message
-from kudubot.tests.helpers.DummyConnection import DummyConnection
-from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
-from kudubot.tests.helpers.backup_class_variables import prepare_class_variables_for_use
+
 from kudubot_anime_reminder.tests.helpers import DummyAnimeReminderService
+
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
+from kudubot.entities.Message import Message
+from kudubot.tests.helpers.DummyConnection import DummyConnection
+from kudubot.tests.helpers.backup_class_variables import prepare_class_variables_for_use
+from kudubot.users.Contact import Contact
 
 
 class UnitTests(unittest.TestCase):

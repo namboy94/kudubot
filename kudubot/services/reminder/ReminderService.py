@@ -22,16 +22,18 @@ This file is part of kudubot-reminder.
 LICENSE
 """
 
-import time
-import logging
 import datetime
-from typing import List
+import logging
+import time
 from threading import Thread
-from kudubot.services.Service import Service
-from kudubot.connections.Message import Message
-from kudubot.connections.Connection import Connection
-from kudubot_reminder.parsing import parse_message
+from typing import List
+
 from kudubot_reminder.database import initialize_database, store_reminder, get_unsent_reminders, mark_reminder_sent
+from kudubot_reminder.parsing import parse_message
+
+from kudubot.connections.Connection import Connection
+from kudubot.entities.Message import Message
+from kudubot.services.Service import Service
 
 
 class ReminderService(Service):
