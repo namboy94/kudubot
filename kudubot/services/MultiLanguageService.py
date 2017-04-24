@@ -29,21 +29,54 @@ from kudubot.connections.Message import Message
 
 # noinspection PyAbstractClass
 class MultiLanguageService(Service):
+    """
+    Service Extension class that enables support for multiple languages
+    """
 
     def determine_language(self, message: Message) -> str:
+        """
+        Checks a message object for any language indicators to determine
+        in which language to reply with
+        
+        :param message: The message to analyze
+        :return: The language key
+        """
         raise NotImplementedError()
 
     def define_language_text(self) -> Dict[str, Dict[str, str]]:
+        """
+        Defines the dictionary with which the text is translated in the translate() method.
+        This should be in the form of a dictionary like this:
+        
+        { key: {"language": "text_in_language", ...}, ... }
+        
+        Keep in mind that every instance of the 'key' value is replaced while translating
+        
+        :return: The dictionary to create translations with
+        """
         raise NotImplementedError
 
     # noinspection PyMethodMayBeStatic
     def define_fallback_language(self) -> str:
+        """
+        Defines a fallback language in case a language is not implemented for a key.
+        
+        :return: By default, the language "en" is returned
+        """
         return "en"
 
-    def translate(self, text: str, language: str) -> str:
+    def translate(self, text: str, language: str, translation_dict: Dict[str, Dict[str, str]] = None) -> str:
+        """
+        Translates text using the service's dictionary in the specified language
+        
+        :param text: The text to translate
+        :param language: The language to translate into
+        :param translation_dict: Can be specified to determine a custom dictionary
+        :return: The translated text
+        """
 
         translated = text
-        language_text = self.define_language_text()
+        language_text = self.define_language_text() if translation_dict is None else dict(translation_dict)
 
         for key in language_text:
             try:

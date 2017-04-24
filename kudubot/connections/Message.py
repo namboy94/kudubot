@@ -68,8 +68,8 @@ class Message(object):
         """
         Provides a helper method that streamlines the process of replying to a message. Very useful
         for Services that send a reply immediately to cut down on clutter in the code
-        
-        :param title: The title of the message to send 
+
+        :param title: The title of the message to send
         :param body: The body of the message to send
         :param connection: The connection over which the reply should be sent
         :return: None

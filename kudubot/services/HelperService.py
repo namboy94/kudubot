@@ -28,38 +28,66 @@ from kudubot.services.MultiLanguageService import MultiLanguageService
 
 # noinspection PyAbstractClass
 class HelperService(MultiLanguageService):
+    """
+    Service extension that allows for the automatic sending of help and syntax messages.
+    Provides support for multiple languages
+    """
 
-    def define_help_message(self) -> str:
+    def define_help_message(self, language: str) -> str:
+        """
+        Defines the help message for the Service
+        
+        :param language: The language in which to get the help message in
+        :return: The help message in the specified language
+        """
         raise NotImplementedError()
 
-    def define_syntax_description(self) -> str:
+    def define_syntax_description(self, language: str) -> str:
+        """
+        Defines the syntax description for this service.
+        
+        :param language: The language in which to get the syntax description in 
+        :return: The syntax description in the specified language
+        """
         raise NotImplementedError()
 
     def define_command_name(self) -> str:
+        """
+        :return: The command name for this service. Defaults to a forward slash and the Service's identifier 
+        """
         return "/" + self.define_identifier()
 
-    def define_language_text(self):
-        return {
+    def handle_message(self, message: Message):
+        """
+        Handles the help message sending. Checks if a message qualifies for a help message and then sends
+        messages accordingly.
+        
+        Subclasses of the HelperService should call this method using super()
+        
+        :param message: The message to handle
+        :return: None
+        """
+
+        body = message.message_body
+
+        try:
+            language = self.determine_language(message)
+        except NotImplementedError:
+            language = "en"
+
+        dictionary = {
             "@help_message_title": {"en": "Help Message for " + self.identifier},
             "@syntax_message_title": {"en": "Syntax Message for " + self.identifier}
         }
-
-    def determine_language(self, message: Message):
-        return "en"
-
-    def handle_message(self, message: Message):
-
-        body = message.message_body
-        language = self.determine_language(message)
 
         if body.startswith(self.define_command_name()):
             body = body.split(self.define_command_name(), 1)[1].strip()
 
             if body == "help":
-                message.reply(self.translate("@help_message_title", language),
-                              self.define_help_message(), self.connection)
+                message.reply(self.translate("@help_message_title", language, dictionary),
+                              self.define_help_message(language), self.connection)
                 return
             elif body == "syntax":
-                message.reply(self.translate("@syntax_message_title", language),
-                              self.define_syntax_description(), self.connection)
+                message.reply(self.translate("@syntax_message_title", language, dictionary),
+                              self.define_syntax_description(language), self.connection)
                 return
