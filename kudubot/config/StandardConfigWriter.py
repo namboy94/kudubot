@@ -24,18 +24,39 @@ LICENSE
 
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
+
 class StandardConfigWriter(object):
+    """
+    A config handler class that writes the standard configuration for connections
+    and services into the config.
+    """
 
     @staticmethod
     def write_standard_connection_config():
+        """
+        Writes the standard connection configuration file
+
+        :return: None
+        """
 
         with open(GlobalConfigHandler.global_connection_config_location, 'w') as config:
-            for connection in ["from kudubot.connections.cli.CliConnection import CliConnection"]:
+            for connection in \
+                    ["from kudubot.connections.cli.CliConnection import CliConnection",
+                     "from kudubot.connections.whatsapp.WhatsappConnection import WhatsappConnection",
+                     "from kudubot.connections.telegram.TelegramConnection import TelegramConnection"]:
                 config.write(connection + "\n")
 
     @staticmethod
     def write_standard_service_config():
+        """
+        Writes the standard service configuration file
+
+        :return: None
+        """
 
         with open(GlobalConfigHandler.services_config_location, 'w') as config:
-            for service in ["from kudubot.services.simple_responder.SimpleResponderService import SimpleResponderService"]:
+            for service in \
+                    ["from kudubot.services.simple_responder.SimpleResponderService import SimpleResponderService",
+                     "from kudubot.services.reminder.ReminderService import ReminderService",
+                     "from kudubot.services.anime_reminder.AnimeReminderService import AnimeReminderService"]:
                 config.write(service + "\n")
