@@ -25,7 +25,6 @@ LICENSE
 
 import logging
 from typing import List
-
 from kudubot.entities.Message import Message
 from kudubot.services.Service import Service
 
@@ -95,7 +94,7 @@ class SimpleResponderService(Service):
         self.logger.debug("Checking Rules")
 
         for rule in self.rules:
-            for sub_rule in rule[0]:
+            for sub_rule in dict(rule[0]):
                 if rule[1](message_text, sub_rule):
                     logging.debug("Match found for rule " + repr(sub_rule))
                     return rule[0][sub_rule]

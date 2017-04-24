@@ -24,8 +24,8 @@ LICENSE
 """
 
 from kudubot.services.HelperService import HelperService
-from kudubot_anime_reminder.database import initialize_database
-from kudubot_anime_reminder.AnimeReminderService import AnimeReminderService
+from kudubot.services.anime_reminder.database import initialize_database
+from kudubot.services.anime_reminder.AnimeReminderService import AnimeReminderService
 
 
 class DummyAnimeReminderService(AnimeReminderService):

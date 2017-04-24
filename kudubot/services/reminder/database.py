@@ -27,7 +27,7 @@ import logging
 from typing import Dict, List
 from datetime import datetime
 from kudubot.users.Contact import Contact
-from kudubot_reminder.timecalc import convert_datetime_to_string, convert_string_to_datetime
+from kudubot.services.reminder.timecalc import convert_datetime_to_string, convert_string_to_datetime
 
 
 logger = logging.getLogger("kudubot_reminder.database")

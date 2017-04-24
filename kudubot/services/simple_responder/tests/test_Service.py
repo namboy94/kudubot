@@ -26,14 +26,12 @@ LICENSE
 import os
 import shutil
 import unittest
-
-from kudubot_simple_responder.SimpleResponderService import SimpleResponderService
-
-from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
+from kudubot.users.Contact import Contact
 from kudubot.entities.Message import Message
 from kudubot.tests.helpers.DummyConnection import DummyConnection
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 from kudubot.tests.helpers.backup_class_variables import prepare_class_variables_for_use
-from kudubot.users.Contact import Contact
+from kudubot.services.simple_responder.SimpleResponderService import SimpleResponderService
 
 
 class UnitTests(unittest.TestCase):
