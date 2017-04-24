@@ -154,6 +154,11 @@ class MultiLanguageService(Service):
         params = message.message_body.lower().split(" ")
         user_id = message.get_direct_response_contact().database_id
 
+        if len(params) == 1:
+            language = self.get_language_preference(user_id, "en")
+            self.reply(self.translate("@title", language, dictionary),
+                       language, message)
+
         if len(params) == 2 and params[0] in command_keywords:
             found_language = False
             for key in aliases:
@@ -169,7 +174,7 @@ class MultiLanguageService(Service):
             if found_language:
                 self.reply(title, self.translate("@success_message: " + language, language, dictionary), message)
             else:
-                self.reply(title, self.translate("@fail_message: " + language, language, dictionary), message)
+                self.reply(title, self.translate("@fail_message: " + params[1], language, dictionary), message)
 
             return
 
