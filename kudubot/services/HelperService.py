@@ -105,6 +105,8 @@ class HelperService(MultiLanguageService):
         :param message: The message to analyze
         :return: True if the message is applicable, False otherwise
         """
+        super().handle_message(message)
+
         language = self.determine_language(message)
         command = self.define_command_name(language).lower()
         dictionary = {

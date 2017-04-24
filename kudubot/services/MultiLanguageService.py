@@ -25,13 +25,48 @@ LICENSE
 from typing import Dict
 from kudubot.services.Service import Service
 from kudubot.connections.Message import Message
+from kudubot.connections.Connection import Connection
 
 
-# noinspection PyAbstractClass
+# noinspection PyAbstractClass,SqlNoDataSourceInspection,SqlDialectInspection
 class MultiLanguageService(Service):
     """
     Service Extension class that enables support for multiple languages
     """
+
+    def __init__(self, connection: Connection):
+        """
+        In addition to the normal initialization of a Service, this service initializes
+        its database which stores information about a user's language preferences
+        :param connection: The connection which is used to communicate
+        """
+        super().__init__(connection)
+        self.connection.db.execute("CREATE TABLE IF NOT EXISTS language_preferences "
+                                   "(user_id INTEGER NOT NULL, lang_pref VARCHAR(255) NOT NULL)")
+        self.connection.db.commit()
+
+    def store_language_preference(self, user: int, language: str):
+        """
+        Stores the language preference for a user in the sqlite database
+        :param user: The user for which to store the preference
+        :param language: The language to store
+        :return: None
+        """
+        self.connection.db.execute("INSERT OR REPLACE INTO language_preferences (user_id, lang_pref) VALUES (?,?)",
+                                   (user, language))
+        self.connection.db.commit()
+
+    def get_language_preference(self, user: int, default: str = "en") -> str:
+        """
+        Retrieves a language from the user's preferences in the database
+
+        :param user: The user to check the language preference for
+        :param default: A default language value used in case no entry was found
+        :return: The language preferred by the user
+        """
+        result = self.connection.db.execute("SELECT lang_pref FROM language_preferences WHERE user_id=?", (user,))\
+            .fetchall()
+        return default if len(result) > 0 else result[0][0]
 
     def determine_language(self, message: Message) -> str:
         """
@@ -100,3 +135,16 @@ class MultiLanguageService(Service):
         """
         language = self.determine_language(message)
         self.reply(self.translate(title, language), self.translate(body, language), message)
+
+    def handle_message(self, message: Message):
+        """
+        Analyzes a message for the language used and stores that language value in the database as a preference of
+        the user
+        :param message: The message to analyze
+        :return: None
+        """
+        try:
+            language = self.determine_language(message)
+            self.store_language_preference(message.get_direct_response_contact().database_id, language)
+        except NotImplementedError:
+            pass
