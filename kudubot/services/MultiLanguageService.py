@@ -85,3 +85,18 @@ class MultiLanguageService(Service):
                 translated = translated.replace(key, language_text[key][self.define_fallback_language()])
 
         return translated
+
+    def reply_translated(self, title: str, body: str, message: Message):
+        """
+        Provides a helper method that streamlines the process of replying to a message. Very useful
+        for Services that send a reply immediately to cut down on clutter in the code
+
+        In addition to the standard reply method, this method translates the text prior to sending it
+
+        :param title: The title of the message to send
+        :param body: The body of the message to send
+        :param message: The message to reply to
+        :return: None
+        """
+        language = self.determine_language(message)
+        self.reply(self.translate(title, language), self.translate(body, language), message)

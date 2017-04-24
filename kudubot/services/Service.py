@@ -77,3 +77,16 @@ class Service(object):
         :return: The required services for this Service.
         """
         raise NotImplementedError()
+
+    def reply(self, title: str, body: str, message: Message):
+        """
+        Provides a helper method that streamlines the process of replying to a message. Very useful
+        for Services that send a reply immediately to cut down on clutter in the code
+
+        :param title: The title of the message to send
+        :param body: The body of the message to send
+        :param message: The message to reply to
+        :return: None
+        """
+        reply_message = Message(title, body, message.get_direct_response_contact(), self.connection.user_contact)
+        self.connection.send_message(reply_message)

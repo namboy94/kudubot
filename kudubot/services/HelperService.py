@@ -84,10 +84,10 @@ class HelperService(MultiLanguageService):
             body = body.split(self.define_command_name(), 1)[1].strip()
 
             if body == "help":
-                message.reply(self.translate("@help_message_title", language, dictionary),
-                              self.define_help_message(language), self.connection)
+                self.reply(self.translate("@help_message_title", language, dictionary),
+                           self.define_help_message(language), message)
                 return
             elif body == "syntax":
-                message.reply(self.translate("@syntax_message_title", language, dictionary),
-                              self.define_syntax_description(language), self.connection)
+                self.reply(self.translate("@syntax_message_title", language, dictionary),
+                           self.define_syntax_description(language), message)
                 return
