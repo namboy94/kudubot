@@ -81,18 +81,22 @@ class HelperService(MultiLanguageService):
             language = "en"
 
         dictionary = {
-            "@help_message_title": {"en": "Help Message for " + self.identifier},
-            "@syntax_message_title": {"en": "Syntax Message for " + self.identifier}
+            "@help_message_title": {"en": "Help Message for " + self.identifier,
+                                    "de": "Hilfnachricht für " + self.identifier},
+            "@syntax_message_title": {"en": "Syntax Message for " + self.identifier,
+                                      "de": "Syntaxnachricht für " + self.identifier}
         }
+        help_keywords = ["help", "hilfe"]
+        syntax_keywords = ["syntax"]
 
         if body.startswith(self.define_command_name(language)):
             body = body.split(self.define_command_name(language), 1)[1].strip()
 
-            if body == "help":
+            if body in help_keywords:
                 self.reply(self.translate("@help_message_title", language, dictionary),
                            self.define_help_message(language), message)
                 return
-            elif body == "syntax":
+            elif body == syntax_keywords:
                 self.reply(self.translate("@syntax_message_title", language, dictionary),
                            self.define_syntax_description(language), message)
                 return
@@ -110,8 +114,10 @@ class HelperService(MultiLanguageService):
         language = self.determine_language(message)
         command = self.define_command_name(language).lower()
         dictionary = {
-            "@help_command": {"en": "help"},
-            "@syntax_command": {"en": "syntax"}
+            "@help_command": {"en": "help",
+                              "de": "hilfe"},
+            "@syntax_command": {"en": "syntax",
+                                "de": "syntax"}
         }
 
         return message.message_body.lower() in [

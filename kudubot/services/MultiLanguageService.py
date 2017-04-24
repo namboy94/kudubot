@@ -42,7 +42,7 @@ class MultiLanguageService(Service):
         """
         super().__init__(connection)
         self.connection.db.execute("CREATE TABLE IF NOT EXISTS language_preferences ("
-                                   "user_id INTEGER NOT NULL, "
+                                   "user_id INTEGER CONSTRAINT constraint_name PRIMARY KEY, "
                                    "lang_pref VARCHAR(255) NOT NULL,"
                                    "user_initiated INT NOT NULL"
                                    ")")
@@ -79,7 +79,7 @@ class MultiLanguageService(Service):
         """
         result = self.connection.db.execute("SELECT lang_pref FROM language_preferences WHERE user_id=?", (user,))\
             .fetchall()
-        return default if len(result) > 0 else result[0][0]
+        return default if len(result) == 0 else result[0][0]
 
     def determine_language(self, message: Message) -> str:
         """
@@ -159,12 +159,16 @@ class MultiLanguageService(Service):
         :return: None
         """
 
-        dictionary = {"@title": {"en": "Language Change"},
-                      "@success_message": {"en": "Successfully changed language to"},
-                      "@fail_message": {"en": "Failed to switch to language"}}
+        dictionary = {"@title": {"en": "Language Change",
+                                 "de": "Sprachwechsel"},
+                      "@success_message": {"en": "Successfully changed language to",
+                                           "de": "Sprache erfolgreich geändert zu"},
+                      "@fail_message": {"en": "Failed to switch to language",
+                                        "de": "Konnte nicht Sprache wechseln zu"}}
 
-        command_keywords = ["/language"]
-        aliases = {"en": ["en", "english"]}
+        command_keywords = ["/language", "/sprache"]
+        aliases = {"en": ["en", "english", "englisch"],
+                   "de": ["de", "deutsch", "german"]}
 
         params = message.message_body.lower().split(" ")
         user_id = message.get_direct_response_contact().database_id
