@@ -22,8 +22,26 @@ This file is part of kudubot.
 LICENSE
 """
 
+from typing import Dict
 from kudubot.services.Service import Service
+from kudubot.connections.Message import Message
 
 
+# noinspection PyAbstractClass
 class MultiLanguageService(Service):
-    pass
+
+    def determine_language(self, message: Message) -> str:
+        raise NotImplementedError()
+
+    def define_language_text(self) -> Dict[str, Dict[str, str]]:
+        raise NotImplementedError
+
+    def translate(self, text: str, language: str) -> str:
+
+        translated = text
+        language_text = self.define_language_text()
+
+        for key in language_text:
+            translated = translated.replace(key, language_text[key][language])
+
+        return translated
