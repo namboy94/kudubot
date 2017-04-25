@@ -28,43 +28,96 @@ from kudubot.services.HelperService import HelperService
 
 
 class JokesService(HelperService):
+    """
+    A Service that tells jokes
+    """
+
+    @staticmethod
+    def define_identifier() -> str:
+        """
+        :return: The service's identifier
+        """
+        return "jokes"
+
+    @staticmethod
+    def define_requirements() -> List[str]:
+        """
+        :return: An empty list as this service has no requirements
+        """
+        return []
 
     def define_syntax_description(self, language: str) -> str:
+        """
+        :param language: The language to use
+        :return: The syntax description for this language
+        """
         return {"en": "/joke", "de": "/witz"}[language]
 
+    def define_help_message(self, language: str) -> str:
+        """
+        :param language: The language to use
+        :return: The help message for the specified language
+        """
+        return {"en": "Tells a joke", "de": "Erzählt einen Witz"}[language]
+
     def determine_language(self, message: Message) -> str:
+        """
+        Determines the language for a message
+        :param message: The message to analyze
+        :return: The language that this message was in
+        """
         if message.message_body.lower().strip() == "/witz":
             return "de"
         else:
             return "en"
 
-    @staticmethod
-    def define_requirements() -> List[str]:
-        return []
-
-    def define_help_message(self, language: str) -> str:
-        return {"en": "Tells a joke", "de": "Erzählt einen Witz"}[language]
-
     def define_language_text(self) -> Dict[str, Dict[str, str]]:
-        return {}
-
-    @staticmethod
-    def define_identifier() -> str:
-        return "jokes"
+        """
+        :return: A dictionary used for translations
+        """
+        return {"@response_title": {"en": "Joke", "de": "Witz"}}
 
     def is_applicable_to(self, message: Message):
-        return message.message_body.strip().lower() in ["/joke", "/witz"]
+        """
+        Checks if a message is applicable to this service
+        :param message: The message to analyze
+        :return: True if applicable, False otherwise
+        """
+        return message.message_body.strip().lower() in ["/joke", "/witz"] and super().is_applicable_to(message)
 
     def handle_message(self, message: Message):
+        """
+        Handles an incoming message
+        :param message: 
+        :return: 
+        """
+        super().handle_message(message)
+        if not self.is_applicable_to_without_help_or_syntax(message):
+            return
+
         language = self.determine_language(message)
 
         if language == "de":
-            pass
+            joke = self.load_german_joke()
         elif language == "en":
-            pass
+            joke = self.load_english_joke()
+        else:
+            joke = "ERROR_LANG_NOT_FOUND"
 
+        self.reply(self.translate("@response_title", language), joke, message)
+
+    # noinspection PyMethodMayBeStatic
     def load_german_joke(self) -> str:
+        """
+        Fetches a German joke from the internet
+        :return: The joke
+        """
         return "todo"
 
+    # noinspection PyMethodMayBeStatic
     def load_english_joke(self) -> str:
+        """
+        Fetches an English joke from the internet
+        :return: The joke
+        """
         return "todo"
