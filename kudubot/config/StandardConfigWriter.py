@@ -31,30 +31,37 @@ class StandardConfigWriter(object):
     and services into the config.
     """
 
-    @staticmethod
-    def write_standard_connection_config():
+    def __init__(self, config_location: str = GlobalConfigHandler().config_location):
+        """
+        Initializes the Standard Config Writer's configuration file locations
+        :param config_location: The location of the config directory
+        """
+        handler = GlobalConfigHandler(config_location)
+        self.connection_config = handler.global_connection_config_location
+        self.service_config = handler.services_config_location
+
+    def write_standard_connection_config(self):
         """
         Writes the standard connection configuration file
 
         :return: None
         """
 
-        with open(GlobalConfigHandler.global_connection_config_location, 'w') as config:
+        with open(self.connection_config, 'w') as config:
             for connection in \
                     ["from kudubot.connections.cli.CliConnection import CliConnection",
                      "from kudubot.connections.whatsapp.WhatsappConnection import WhatsappConnection",
                      "from kudubot.connections.telegram.TelegramConnection import TelegramConnection"]:
                 config.write(connection + "\n")
 
-    @staticmethod
-    def write_standard_service_config():
+    def write_standard_service_config(self):
         """
         Writes the standard service configuration file
 
         :return: None
         """
 
-        with open(GlobalConfigHandler.services_config_location, 'w') as config:
+        with open(self.service_config, 'w') as config:
             for service in \
                     ["from kudubot.services.simple_responder.SimpleResponderService import SimpleResponderService",
                      "from kudubot.services.reminder.ReminderService import ReminderService",

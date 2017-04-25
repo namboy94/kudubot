@@ -82,7 +82,7 @@ class GlobalConfigHandler(object):
             self.logger.warning("Configuration invalid: " + e.args[0])
             return False
 
-    def generate_configuration(self, delete_old):
+    def generate_configuration(self, delete_old=False):
         """
         Generates a new, empty config location.
 
@@ -111,8 +111,7 @@ class GlobalConfigHandler(object):
             os.makedirs(self.data_location)
 
         if not os.path.isdir(self.specific_connection_config_location):
-            self.logger.info("Creating directory " +
-                                            self.specific_connection_config_location)
+            self.logger.info("Creating directory " + self.specific_connection_config_location)
             os.makedirs(self.specific_connection_config_location)
 
     def load_connections(self) -> List[type]:
