@@ -23,41 +23,27 @@ LICENSE
 """
 
 import os
-from kudubot.connections.Connection import Connection
+import shutil
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
-def generate_test_environment() -> callable:
+def generate_test_environment() -> GlobalConfigHandler:
     """
     Generates the test environment
     
-    :return: A function that restores the original Program State
+    :return: The GlobalConfigHandler that points to the configuration
     """
 
-    config_location = GlobalConfigHandler.config_location
-    global_connection_config_location = GlobalConfigHandler.global_connection_config_location
-    services_config_location = GlobalConfigHandler.services_config_location
-    data_location = GlobalConfigHandler.data_location
-    specific_connection_config_location = GlobalConfigHandler.specific_connection_config_location
+    handler = GlobalConfigHandler("kudu-test")
+    handler.generate_configuration()
+    return handler
 
-    database_file_location = Connection.database_file_location
-    config_file_location = Connection.config_file_location
 
-    GlobalConfigHandler.config_location = "test-kudu"
-    GlobalConfigHandler.global_connection_config_location = os.path.join("test-kudu", "connections.conf")
-    GlobalConfigHandler.services_config_location = os.path.join("test-kudu", "services.conf")
-    GlobalConfigHandler.data_location = os.path.join("test-kudu", "data")
-    GlobalConfigHandler.specific_connection_config_location = os.path.join("test-kudu", "connection_config")
-    Connection.config_file_location = os.path.join("test-kudu", "connection_config")
-    Connection.database_file_location = os.path.join("test-kudu", "data")
-
-    def restore():
-        GlobalConfigHandler.config_location = config_location
-        GlobalConfigHandler.global_connection_config_location = global_connection_config_location
-        GlobalConfigHandler.services_config_location = services_config_location
-        GlobalConfigHandler.data_location = data_location
-        GlobalConfigHandler.specific_connection_config_location = specific_connection_config_location
-        Connection.database_file_location = database_file_location
-        Connection.config_file_location = config_file_location
-
-    return restore
+def clean_up_test_environment():
+    """
+    Deletes the test environment
+    
+    :return: None
+    """
+    if os.path.isdir("kudu-test"):
+        shutil.rmtree("kudu-test")

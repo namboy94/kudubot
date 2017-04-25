@@ -32,8 +32,7 @@ from kudubot.connections.Connection import Connection
 from kudubot.entities.Message import Message
 from kudubot.tests.helpers.DummyConnection import DummyConnection
 from kudubot.tests.helpers.DummyService import DummyService
-from kudubot.tests.helpers.backup_class_variables import backup_connection_variables
-from kudubot.tests.helpers.backup_class_variables import backup_global_config_handler_variables
+from kudubot.tests.helpers.test_config import generate_test_environment, clean_up_test_environment
 from kudubot.users.AddressBook import Contact
 
 
@@ -46,39 +45,20 @@ class UnitTests(unittest.TestCase):
         """
         :return: None
         """
-        self.restore_connection = backup_connection_variables()
-        self.restore_config = backup_global_config_handler_variables()
-
-        GlobalConfigHandler.config_location = "test-kudu"
-        GlobalConfigHandler.global_connection_config_location = os.path.join("test-kudu", "connections.conf")
-        GlobalConfigHandler.services_config_location = os.path.join("test-kudu", "services.conf")
-        GlobalConfigHandler.data_location = os.path.join("test-kudu", "data")
-        GlobalConfigHandler.specific_connection_config_location = os.path.join("test-kudu", "connection_config")
-        Connection.config_file_location = os.path.join("test-kudu", "connection_config")
-        Connection.database_file_location = os.path.join("test-kudu", "data")
-
-        GlobalConfigHandler.generate_configuration(True)
+        self.config_handler = generate_test_environment()
+        self.connection = DummyConnection([], self.config_handler)
 
     def tearDown(self):
         """
         :return: None
         """
-        self.restore_connection()
-        self.restore_config()
-        try:
-            if os.path.isdir("test-kudu"):
-                shutil.rmtree("test-kudu")
-        except PermissionError:
-            pass
+        clean_up_test_environment()
 
     def test_abstract_methods(self):
         """
         Tests if the methods of the connection class are abstract
         :return: None
         """
-
-        dummy = DummyConnection([])
-
         for method in [(Connection.define_user_contact, 0),
                        (Connection.define_user_contact, 0),
                        (Connection.listen, 0),
@@ -91,16 +71,17 @@ class UnitTests(unittest.TestCase):
                        (Connection.define_identifier, -1)]:
             try:
 
+                # The self.connection arguments emulate the self parameter
                 if method[1] == -1:
                     method[0]()
                 if method[1] == 0:
-                    method[0](dummy)
+                    method[0](self.connection)
                 elif method[1] == 1:
-                    method[0](dummy, dummy)
+                    method[0](self.connection, None)
                 elif method[1] == 2:
-                    method[0](dummy, dummy, dummy)
+                    method[0](self.connection, None, None)
                 elif method[1] == 3:
-                    method[0](dummy, dummy, dummy, dummy)
+                    method[0](self.connection, None, None, None)
                 self.fail()
             except NotImplementedError:
                 pass
@@ -110,9 +91,11 @@ class UnitTests(unittest.TestCase):
         Tests if the daemon thread is started correctly
         :return: None
         """
+        class ThreadLessDummyConnection(DummyConnection):
+            def listen(self):
+                time.sleep(1)
 
-        DummyConnection.listen = lambda x: time.sleep(1)
-        t = DummyConnection([]).listen_in_separate_thread()
+        t = ThreadLessDummyConnection([], self.config_handler).listen_in_separate_thread()
 
         self.assertTrue(t.is_alive())
         while t.is_alive():
@@ -125,17 +108,18 @@ class UnitTests(unittest.TestCase):
         Tests if the connection correctly processes a message using the services
         :return: None
         """
+
+        class AlwaysApplicableDummyService(DummyService):
+            def is_applicable_to(self, message: Message):
+                return True
+
         user = Contact(1, "1", "1")
 
-        connection = DummyConnection([DummyService])
+        connection = DummyConnection([DummyService], self.config_handler)
         connection.apply_services(Message("Test", "Body", user, user))
 
-        old = DummyService.is_applicable_to
-        DummyService.is_applicable_to = lambda x, y: True
-
-        connection = DummyConnection([DummyService])
+        connection = DummyConnection([AlwaysApplicableDummyService], self.config_handler)
         connection.apply_services(Message("Test", "Body", user, user), True)
         connection.apply_services(Message("Test", "Body", user, user), False)
 
-        DummyService.is_applicable_to = old
         connection.db.close()

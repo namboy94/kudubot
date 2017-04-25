@@ -47,12 +47,12 @@ run_unit_tests_python_3_with_coverage:
       --with-coverage --cover-package=kudubot --cover-branches --cover-erase --cover-html --cover-inclusive
     - rsync -av cover/ /var/www/coverage.namibsun.net/public_html/kudubot --delete-before
 
-#run_unit_tests_windows:
-#  stage: test
-#  tags:
-#    - buildserver_windows
-#  script:
-#    - python setup.py test
+run_unit_tests_windows:
+  stage: test
+  tags:
+    - buildserver_windows
+  script:
+    - python setup.py test
 
 pypi_dist:
   stage: deploy
