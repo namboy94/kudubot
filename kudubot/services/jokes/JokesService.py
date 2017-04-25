@@ -22,6 +22,8 @@ This file is part of kudubot.
 LICENSE
 """
 
+import requests
+from bs4 import BeautifulSoup
 from typing import Dict, List
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
@@ -112,7 +114,8 @@ class JokesService(HelperService):
         Fetches a German joke from the internet
         :return: The joke
         """
-        return "todo"
+        html = requests.get("http://witze.net/zuf%C3%A4llige-witze").text
+        return BeautifulSoup(html, "html.parser").select(".joke")[0].text
 
     # noinspection PyMethodMayBeStatic
     def load_english_joke(self) -> str:
@@ -120,4 +123,6 @@ class JokesService(HelperService):
         Fetches an English joke from the internet
         :return: The joke
         """
-        return "todo"
+        html = requests.get("https://www.ajokeaday.com/jokes/random")
+        soup = BeautifulSoup(html.text, "html.parser")
+        return soup.select("p")[1].text
