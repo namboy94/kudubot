@@ -73,7 +73,7 @@ setup(name="kudubot",
           "Natural Language :: English",
           "Intended Audience :: Developers",
           "Development Status :: 4 - Beta",
-          "Operating System :: OS Independent",
+          "Operating System :: POSIX :: Linux",
           "Topic :: Communications :: Chat",
           "Programming Language :: Python",
           "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
