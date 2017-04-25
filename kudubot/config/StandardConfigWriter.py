@@ -64,5 +64,6 @@ class StandardConfigWriter(object):
             for service in \
                     ["from kudubot.services.simple_responder.SimpleResponderService import SimpleResponderService",
                      "from kudubot.services.reminder.ReminderService import ReminderService",
-                     "from kudubot.services.anime_reminder.AnimeReminderService import AnimeReminderService"]:
+                     "from kudubot.services.anime_reminder.AnimeReminderService import AnimeReminderService",
+                     "from kudubot.services.jokes.JokesService import JokesService"]:
                 config.write(service + "\n")
