@@ -27,7 +27,6 @@ import logging
 from typing import Dict, List
 from datetime import datetime
 from kudubot.users.Contact import Contact
-from kudubot.services.reminder.timecalc import convert_datetime_to_string, convert_string_to_datetime
 
 
 logger = logging.getLogger("kudubot.services.reminder.database")
@@ -52,6 +51,26 @@ def initialize_database(database: sqlite3.Connection):
                      "    sent BOOLEAN NOT NULL"
                      ")")
     database.commit()
+
+
+def convert_datetime_to_string(to_convert: datetime) -> str:
+    """
+    Converts a datetime object to a string that can be stored in the database
+
+    :param to_convert: The datetime object to convert
+    :return: The datetime as a string
+    """
+    return to_convert.strftime("%Y-%m-%d:%H-%M-%S")
+
+
+def convert_string_to_datetime(to_convert: str) -> datetime:
+    """
+    Converts a string of the form '%Y-%m-%d:%H-%M-%S' to a datetime object
+
+    :param to_convert: The string to convert
+    :return: the resulting datetime object
+    """
+    return datetime.strptime(to_convert, "%Y-%m-%d:%H-%M-%S")
 
 
 def get_next_id(database: sqlite3.Connection):
