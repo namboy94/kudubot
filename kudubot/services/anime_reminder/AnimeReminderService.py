@@ -1,25 +1,24 @@
 """
 LICENSE:
-Copyright 2017 Hermann Krumrey
+Copyright 2015-2017 Hermann Krumrey
 
-This file is part of kudubot-anime-reminder.
+This file is part of kudubot.
 
-    kudubot-anime-reminder is an extension module for kudubot. It provides
-    a Service that can send messages whenever a newly aired anime episode
-    has aired.
+    kudubot is a chat bot framework. It allows developers to write
+    services for arbitrary chat services.
 
-    kudubot-reminder is free software: you can redistribute it and/or modify
+    kudubot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    kudubot-reminder is distributed in the hope that it will be useful,
+    kudubot is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with kudubot-reminder.  If not, see <http://www.gnu.org/licenses/>.
+    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE
 """
 
@@ -42,20 +41,16 @@ class AnimeReminderService(HelperService):
     The Kudubot Service that provides the anime reminder functionality
     """
 
-    logger = logging.getLogger("kudubot_anime_reminder.AnimeReminderService")
+    logger = logging.getLogger("kudubot.services.anime_reminder.AnimeReminderService")
     """
     The Logger for this class
     """
 
-    def __init__(self, connection: Connection):
+    def init(self):
         """
         In addition to the normal initialization of a Service, this service initializes
         its database and starts the background thread
-        :param connection: The connection which is used to communicate
         """
-        super().__init__(connection)
-        self.connection = connection
-
         initialize_database(self.connection.db)
 
         self.logger.info("Starting Anime Reminder Background Thread")
@@ -85,6 +80,9 @@ class AnimeReminderService(HelperService):
         :return: None
         """
         super().handle_message(message)
+        if not self.is_applicable_to_without_help_or_syntax(message):
+            return
+
         self.logger.debug("Handling message: " + message.message_body)
 
         mode = message.message_body.split(" ")[1].lower()

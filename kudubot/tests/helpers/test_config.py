@@ -22,18 +22,28 @@ This file is part of kudubot.
 LICENSE
 """
 
-"""
-The metadata is stored here. It can be used by any other module in this project this way, most
-notably by the setup.py file
-"""
+import os
+import shutil
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
-version = "0.13.0"  # pragma: no cover
-"""
-The current version of the program
-"""
 
-sentry_dsn = "https://f8dc6c1c49944cbdb5215e563e83cc78:" \
-             "703626a5a0714e58b8c60947b949c524@sentry.io/160743"  # pragma: no cover
-"""  # pragma: no cover
-The DSN used for Sentry Error Logging
-"""
+def generate_test_environment() -> GlobalConfigHandler:
+    """
+    Generates the test environment
+
+    :return: The GlobalConfigHandler that points to the configuration
+    """
+
+    handler = GlobalConfigHandler("kudu-test")
+    handler.generate_configuration()
+    return handler
+
+
+def clean_up_test_environment():
+    """
+    Deletes the test environment
+
+    :return: None
+    """
+    if os.path.isdir("kudu-test"):
+        shutil.rmtree("kudu-test")

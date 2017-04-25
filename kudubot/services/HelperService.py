@@ -72,6 +72,9 @@ class HelperService(MultiLanguageService):
         :param message: The message to handle
         :return: None
         """
+        super().handle_message(message)
+        if MultiLanguageService.is_applicable_to(self, message):
+            return
 
         body = message.message_body
 
@@ -109,7 +112,8 @@ class HelperService(MultiLanguageService):
         :param message: The message to analyze
         :return: True if the message is applicable, False otherwise
         """
-        super().handle_message(message)
+        if super().is_applicable_to(message):
+            return True
 
         language = self.determine_language(message)
         command = self.define_command_name(language).lower()
@@ -124,3 +128,12 @@ class HelperService(MultiLanguageService):
             command + self.translate(" @help_command", language, dictionary),
             command + self.translate(" @syntax_command", language, dictionary)
         ]
+
+    def is_applicable_to_without_help_or_syntax(self, message: Message) -> bool:
+        """
+        Checks if the message applies to anything beside the 'help' or 'syntax' commands
+
+        :param message: The message to analyze
+        :return: True if the message is applicable to something else, False otherwise
+        """
+        return self.is_applicable_to(message) and not HelperService.is_applicable_to(self, message)

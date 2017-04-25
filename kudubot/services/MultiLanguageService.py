@@ -166,6 +166,10 @@ class MultiLanguageService(Service):
         language = self.get_language_preference(message.get_direct_response_contact().database_id)
         self.reply(self.translate(title, language), self.translate(body, language), message)
 
+    def is_applicable_to(self, message: Message):
+        body = message.message_body.lower().strip()
+        return body.startswith("/language ") or body.startswith("/sprache ") or body in ["/language", "/sprache"]
+
     def handle_message(self, message: Message):
         """
         Analyzes a message for the language used and stores that language value in the database as a preference of
@@ -194,6 +198,7 @@ class MultiLanguageService(Service):
             language = self.get_language_preference(user_id, "en")
             self.reply(self.translate("@title", language, dictionary),
                        language, message)
+            return  # Important, makes overriding methods quit when help message is applicable
 
         if len(params) == 2 and params[0] in command_keywords:
             found_language = False
@@ -212,7 +217,7 @@ class MultiLanguageService(Service):
             else:
                 self.reply(title, self.translate("@fail_message: " + params[1], language, dictionary), message)
 
-            return
+            return  # Important, makes overriding methods quit when help message is applicable
 
         else:
 

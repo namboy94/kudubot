@@ -25,13 +25,10 @@ LICENSE
 import os
 import shutil
 import unittest
-from kudubot.exceptions import InvalidConfigException
-from kudubot.connections.Connection import Connection
+from kudubot.tests.helpers.DummyConnection import DummyConnection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 from kudubot.tests.helpers.DummyService import DummyService, DummyServiceWithValidDependency
-from kudubot.tests.helpers.DummyConnection import DummyConnection
-from kudubot.tests.helpers.backup_class_variables import backup_connection_variables
-from kudubot.tests.helpers.backup_class_variables import backup_global_config_handler_variables
+from kudubot.tests.helpers.test_config import generate_test_environment, clean_up_test_environment
 
 
 class UnitTests(unittest.TestCase):
@@ -45,39 +42,27 @@ class UnitTests(unittest.TestCase):
         to ones that make sense for the unit tests
         :return: None
         """
-        self.restore_config_handler = backup_global_config_handler_variables()
-        self.restore_connection = backup_connection_variables()
-
-        GlobalConfigHandler.config_location = "test-kudu"
-        GlobalConfigHandler.global_connection_config_location = os.path.join("test-kudu", "connections.conf")
-        GlobalConfigHandler.services_config_location = os.path.join("test-kudu", "services.conf")
-        GlobalConfigHandler.data_location = os.path.join("test-kudu", "data")
-        GlobalConfigHandler.specific_connection_config_location = os.path.join("test-kudu", "connection_config")
-
-        Connection.database_file_location = os.path.join("test-kudu", "data")
-        Connection.config_file_location = os.path.join("test-kudu", "connection_config")
+        self.config_handler = generate_test_environment()
 
     def tearDown(self):
         """
         Restores the class variables and deletes any temporary directories and files
         :return: None
         """
-        self.restore_config_handler()
-        self.restore_connection()
-
-        if os.path.isdir("test-kudu"):
-            shutil.rmtree("test-kudu")
+        clean_up_test_environment()
 
     def test_generating_new_config(self):
         """
         Tests if the configuration generation works as intended
         :return: None
         """
-        GlobalConfigHandler.generate_configuration(True)
+        clean_up_test_environment()
+
+        self.config_handler.generate_configuration(True)
         self.validate_config_directory()
-        GlobalConfigHandler.generate_configuration(True)
+        self.config_handler.generate_configuration(True)
         self.validate_config_directory()
-        GlobalConfigHandler.generate_configuration(False)
+        self.config_handler.generate_configuration(False)
         self.validate_config_directory()
 
     def validate_config_directory(self):
@@ -85,41 +70,33 @@ class UnitTests(unittest.TestCase):
         Validates a configuration directory
         :return: None
         """
-
-        try:
-            GlobalConfigHandler()
-        except InvalidConfigException:
-            self.fail()
-
-        self.assertTrue(os.path.isdir("test-kudu"))
-        self.assertTrue(os.path.isfile(os.path.join("test-kudu", "services.conf")))
-        self.assertTrue(os.path.isfile(os.path.join("test-kudu", "connections.conf")))
-        self.assertTrue(os.path.isdir(os.path.join("test-kudu", "connection_config")))
-        self.assertTrue(os.path.isdir(os.path.join("test-kudu", "data")))
+        self.assertTrue(self.config_handler.validate_config_directory())
+        self.assertTrue(os.path.isdir("kudu-test"))
+        self.assertTrue(os.path.isfile(os.path.join("kudu-test", "services.conf")))
+        self.assertTrue(os.path.isfile(os.path.join("kudu-test", "connections.conf")))
+        self.assertTrue(os.path.isdir(os.path.join("kudu-test", "connection_config")))
+        self.assertTrue(os.path.isdir(os.path.join("kudu-test", "data")))
 
     def assure_invalid_config_directory(self):
         """
         Makes sure that the current configuration directory is invalid
         :return: None
         """
-        try:
-            GlobalConfigHandler()
-            self.fail()
-        except InvalidConfigException:
-            pass
+        self.assertFalse(self.config_handler.validate_config_directory())
 
     def test_directory_validation(self):
         """
         Tests if the global config validation works correctly and finds errors in the config structure
         :return: None
         """
+        clean_up_test_environment()
 
         self.assure_invalid_config_directory()
 
         for element in ["services.conf", "connections.conf", "data", "connection_config"]:
 
-            GlobalConfigHandler.generate_configuration(True)
-            path = os.path.join("test-kudu", element)
+            self.config_handler.generate_configuration(True)
+            path = os.path.join("kudu-test", element)
 
             if os.path.isfile(path):
                 os.remove(path)
@@ -134,15 +111,13 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        GlobalConfigHandler.generate_configuration(True)
-        handler = GlobalConfigHandler()
-        connections = handler.load_connections()
+        connections = self.config_handler.load_connections()
         self.assertEqual([], connections)
 
-        with open(os.path.join("test-kudu", "connections.conf"), 'w') as f:
+        with open(os.path.join("kudu-test", "connections.conf"), 'w') as f:
             f.write("from kudubot.tests.helpers.DummyConnection import DummyConnection")
 
-        self.assertEqual(handler.load_connections()[0], DummyConnection)
+        self.assertEqual(self.config_handler.load_connections()[0], DummyConnection)
 
     def test_service_loading(self):
         """
@@ -150,16 +125,14 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        GlobalConfigHandler.generate_configuration(True)
-        handler = GlobalConfigHandler()
-        services = handler.load_services()
+        services = self.config_handler.load_services()
 
         self.assertEqual([], services)
 
-        with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
+        with open(os.path.join("kudu-test", "services.conf"), 'w') as f:
             f.write("from kudubot.tests.helpers.DummyService import DummyService")
 
-        self.assertEqual(handler.load_services()[0], DummyService)
+        self.assertEqual(self.config_handler.load_services()[0], DummyService)
 
     def test_importing(self):
         """
@@ -167,10 +140,8 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        GlobalConfigHandler.generate_configuration(True)
-        handler = GlobalConfigHandler()
-        os_import = handler.__handle_import_statement__("import os")
-        dict_import = handler.__handle_import_statement__("from typing import Dict")
+        os_import = self.config_handler.__handle_import_statement__("import os")
+        dict_import = self.config_handler.__handle_import_statement__("from typing import Dict")
         from typing import Dict
 
         self.assertEqual(os, os_import)
@@ -182,20 +153,16 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        # Setup
-        GlobalConfigHandler.generate_configuration(True)
-        handler = GlobalConfigHandler()
-
         # First, test service having a valid dependency
-        with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
+        with open(os.path.join("kudu-test", "services.conf"), 'w') as f:
             f.write("from kudubot.tests.helpers.DummyService import DummyServiceWithValidDependency")
-        services = handler.load_services()
+        services = self.config_handler.load_services()
         self.assertEqual(services, [DummyServiceWithValidDependency])
 
         # Now test unresolved dependency
-        with open(os.path.join("test-kudu", "services.conf"), 'w') as f:
+        with open(os.path.join("kudu-test", "services.conf"), 'w') as f:
             f.write("from kudubot.tests.helpers.DummyService import DummyServiceWithInvalidDependency")
-        services = handler.load_services()
+        services = self.config_handler.load_services()
         self.assertEqual(services, [])
 
     def test_duplicate_removal(self):
@@ -204,32 +171,26 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        GlobalConfigHandler.generate_configuration(True)
-        handler = GlobalConfigHandler()
-
         # noinspection PyDecorator
         def other():
             return "other"
 
-        second_dummy = DummyConnection([])
+        second_dummy = DummyConnection([], self.config_handler)
         second_dummy.define_identifier = other
 
         connections = [second_dummy, DummyConnection, DummyConnection]
         # noinspection PyTypeChecker
-        new_connections = handler.__remove_duplicate_services_or_connections__(connections)
+        new_connections = self.config_handler.__remove_duplicate_services_or_connections__(connections)
         self.assertEqual(new_connections, [second_dummy, DummyConnection])
 
     def test_loading_invalid_classes(self):
 
-        GlobalConfigHandler.generate_configuration(True)
-        handler = GlobalConfigHandler()
-
-        with open(os.path.join("test-kudu", "connections.conf"), 'w') as f:
+        with open(os.path.join("kudu-test", "connections.conf"), 'w') as f:
             f.write("from kudubot.tests.helpers.DummyService import DummyService")
 
-        self.assertEqual(handler.load_connections(), [])
+        self.assertEqual(self.config_handler.load_connections(), [])
 
-        with open(os.path.join("test-kudu", "connections.conf"), 'w') as f:
+        with open(os.path.join("kudu-test", "connections.conf"), 'w') as f:
             f.write("from kudubot.doesnotexists import AClass")
 
-        self.assertEqual(handler.load_connections(), [])
+        self.assertEqual(self.config_handler.load_connections(), [])

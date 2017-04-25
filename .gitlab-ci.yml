@@ -47,13 +47,6 @@ run_unit_tests_python_3_with_coverage:
       --with-coverage --cover-package=kudubot --cover-branches --cover-erase --cover-html --cover-inclusive
     - rsync -av cover/ /var/www/coverage.namibsun.net/public_html/kudubot --delete-before
 
-#run_unit_tests_windows:
-#  stage: test
-#  tags:
-#    - buildserver_windows
-#  script:
-#    - python setup.py test
-
 pypi_dist:
   stage: deploy
   only:
@@ -100,13 +93,17 @@ start_bot:
   stage: botstart
   only:
     - master
-    - develop
   tags:
     - linux-buildserver
   script:
-    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/16/raw -O start_bot.sh
-    - bash start_bot.sh
-    - rm start_bot.sh
+    - pip install --user --upgrade --upgrade-strategy only-if-needed kudubot
+    - kudubot-config-gen -s
+    - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
+    - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
+    - sudo systemctl restart kudubot-whatsapp.service
+    - sudo systemctl restart kudubot-telegram.service
+    - sudo systemctl status kudubot-whatsapp.service
+    - sudo systemctl status kudubot-telegram.service
 
 generate_sphinx_documentation:
   stage: docstats

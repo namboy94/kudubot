@@ -1,24 +1,24 @@
 """
 LICENSE:
-Copyright 2017 Hermann Krumrey
+Copyright 2015-2017 Hermann Krumrey
 
-This file is part of kudubot-telegram.
+This file is part of kudubot.
 
-    kudubot-telegram is an extension module for kudubot. It provides
-    a Connection to interface with the Telegram messaging service.
+    kudubot is a chat bot framework. It allows developers to write
+    services for arbitrary chat services.
 
-    kudubot-telegram is free software: you can redistribute it and/or modify
+    kudubot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    kudubot-telegram is distributed in the hope that it will be useful,
+    kudubot is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with kudubot-telegram.  If not, see <http://www.gnu.org/licenses/>.
+    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE
 """
 
@@ -31,6 +31,7 @@ from kudubot.users.Contact import Contact
 from kudubot.entities.Message import Message
 from kudubot.connections.Connection import Connection
 from kudubot.exceptions import InvalidConfigException
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 class TelegramConnection(Connection):
@@ -38,7 +39,7 @@ class TelegramConnection(Connection):
     A Connection class that connects to Telegram
     """
 
-    logger = logging.getLogger("kudubot_telegram.TelegramConnection")
+    logger = logging.getLogger("kudubot.connections.telegram.TelegramConnection")
     """
     The Logger for this class
     """
@@ -52,15 +53,16 @@ class TelegramConnection(Connection):
         """
         return "telegram"
 
-    def __init__(self, services: List[type]):
+    def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
         """
         Initializes the Telegram Connection.
         Additionally to the standard Connection, a telegram.Bot object is generated to
         interface with the Telegram API
 
         :param services: The services to include
+        :param config_handler: The GlobalConfigHandler that determines the location of the configuration files
         """
-        super().__init__(services)
+        super().__init__(services, config_handler)
         self.bot = telegram.Bot(self.config["api_key"])
 
     def load_config(self) -> Dict[str, object]:

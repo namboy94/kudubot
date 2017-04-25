@@ -1,24 +1,24 @@
 """
 LICENSE:
-Copyright 2017 Hermann Krumrey
+Copyright 2015-2017 Hermann Krumrey
 
-This file is part of kudubot-whatsapp.
+This file is part of kudubot.
 
-    kudubot-whatsapp is an extension module for kudubot. It provides
-    a Connection to interface with the Whatsapp messaging service.
+    kudubot is a chat bot framework. It allows developers to write
+    services for arbitrary chat services.
 
-    kudubot-whatsapp is free software: you can redistribute it and/or modify
+    kudubot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    kudubot-whatsapp is distributed in the hope that it will be useful,
+    kudubot is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with kudubot-whatsapp.  If not, see <http://www.gnu.org/licenses/>.
+    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE
 """
 
@@ -34,6 +34,7 @@ from yowsup.layers.network import YowNetworkLayer
 from kudubot.connections.Connection import Connection
 from kudubot.exceptions import InvalidConfigException
 from kudubot.connections.whatsapp.EchoLayer import EchoLayer
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 class WhatsappConnection(Connection):
@@ -41,18 +42,19 @@ class WhatsappConnection(Connection):
     Class that implements a kudubot connection for the Whatsapp Messaging Service
     """
 
-    logger = logging.getLogger("kudubot_whatsapp.WhatsappConnection")
+    logger = logging.getLogger("kudubot.connections.whatsapp.WhatsappConnection")
     """
     The Logger for this class
     """
 
-    def __init__(self, services: List[type]):
+    def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
         """
         Extends the default Connection constructor to create a yowsup stack
 
         :param services: The services to start
+        :param config_handler: The GlobalConfigHandler that determines the location of the configuration files
         """
-        super().__init__(services)
+        super().__init__(services, config_handler)
 
         stack_builder = YowStackBuilder()
         self.yowsup = EchoLayer(self)

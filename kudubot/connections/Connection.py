@@ -48,24 +48,17 @@ class Connection(object):
     The Logger for this class
     """
 
-    database_file_location = GlobalConfigHandler.data_location
-    """
-    The location of the connection's data location. Has to be adjusted by the __init__ method to point to the
-    correct database file for the connection's data
-    """
-
-    config_file_location = GlobalConfigHandler.specific_connection_config_location
-    """
-    The location of the connection's configuration file
-    """
-
-    def __init__(self, services: List[type]):
+    def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
         """
         Initializes the connection object using the specified services
         Starts the database connection
 
         :param services: The services to use with the connection
+        :param config_handler: The GlobalConfigHandler to determine config file locations
         """
+        self.database_file_location = config_handler.data_location
+        self.config_file_location = config_handler.specific_connection_config_location
+
         try:
             self.identifier = self.define_identifier()
 
@@ -94,7 +87,7 @@ class Connection(object):
         """
         raise NotImplementedError()
 
-    def apply_services(self, message: Message, break_on_match: bool = False):
+    def apply_services(self, message: Message, break_on_match: bool = True):
         """
         Applies the services to a Message
         First, the method checks if a service is applicable to a message.
@@ -103,7 +96,7 @@ class Connection(object):
         always end the loop.
 
         :param message: The message to process
-        :param break_on_match: Can be set to True to not allow more than one result
+        :param break_on_match: Can be set to False to allow more than one result
         :return: None
         """
 

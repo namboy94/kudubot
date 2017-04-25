@@ -22,13 +22,10 @@ This file is part of kudubot.
 LICENSE
 """
 
-import os
-import shutil
 import unittest
 from kudubot.users.Contact import Contact
 from kudubot.tests.helpers.DummyConnection import DummyConnection
-from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
-from kudubot.tests.helpers.backup_class_variables import prepare_class_variables_for_use
+from kudubot.tests.helpers.test_config import generate_test_environment, clean_up_test_environment
 
 
 # noinspection SqlNoDataSourceInspection
@@ -43,9 +40,8 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        self.restore = prepare_class_variables_for_use()
-        GlobalConfigHandler.generate_configuration(False)
-        self.connection = DummyConnection([])
+        self.config_handler = generate_test_environment()
+        self.connection = DummyConnection([], self.config_handler)
         self.connection.db.execute("DELETE FROM address_book")
         self.connection.db.commit()
 
@@ -55,12 +51,7 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        self.restore()
-        try:
-            if os.path.isdir("test-kudu"):
-                shutil.rmtree("test-kudu")
-        except PermissionError:
-            pass
+        clean_up_test_environment()
 
     def test_invalid_contact_fetches(self):
         """
