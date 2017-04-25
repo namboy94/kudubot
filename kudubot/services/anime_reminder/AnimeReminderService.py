@@ -46,15 +46,11 @@ class AnimeReminderService(HelperService):
     The Logger for this class
     """
 
-    def __init__(self, connection: Connection):
+    def init(self):
         """
         In addition to the normal initialization of a Service, this service initializes
         its database and starts the background thread
-        :param connection: The connection which is used to communicate
         """
-        super().__init__(connection)
-        self.connection = connection
-
         initialize_database(self.connection.db)
 
         self.logger.info("Starting Anime Reminder Background Thread")

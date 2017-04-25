@@ -42,6 +42,18 @@ class Service(object):
         self.connection = connection
         self.identifier = self.define_identifier()
         self.requires = self.define_requirements()
+        self.init()
+
+    # noinspection PyMethodMayBeStatic
+    def init(self):
+        """
+        Helper method that runs after the initialization of the Service object. Can be used for
+        anything, but normal use cases would include initializing a database table or
+        starting a background thread
+
+        :return: None
+        """
+        pass
 
     def is_applicable_to(self, message: Message) -> bool:
         """
