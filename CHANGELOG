@@ -1,3 +1,8 @@
+V 0.13.0:
+  - Implemented Jokes Service
+  - Converted ReminderService to a HelperService
+  - Made GlobalConfigHandler entirely object-based
+  - Removed official Windows Support, should still theoretically work though
 V 0.12.0:
   - Imported Whatsapp Connection
   - Imported Telegram Connection
