@@ -30,7 +30,7 @@ from kudubot.users.Contact import Contact
 from kudubot.services.reminder.timecalc import convert_datetime_to_string, convert_string_to_datetime
 
 
-logger = logging.getLogger("kudubot_reminder.database")
+logger = logging.getLogger("kudubot.services.reminder.database")
 """
 The logger for this module
 """

@@ -42,7 +42,7 @@ class WhatsappConnection(Connection):
     Class that implements a kudubot connection for the Whatsapp Messaging Service
     """
 
-    logger = logging.getLogger("kudubot_whatsapp.WhatsappConnection")
+    logger = logging.getLogger("kudubot.connections.whatsapp.WhatsappConnection")
     """
     The Logger for this class
     """

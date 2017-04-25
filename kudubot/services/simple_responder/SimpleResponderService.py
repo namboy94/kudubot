@@ -35,7 +35,7 @@ class SimpleResponderService(Service):
     using a relatively simple ruleset
     """
 
-    logger = logging.getLogger("kudubot_simple_responder.SimpleResponderService")
+    logger = logging.getLogger("kudubot.services.simple_responder.SimpleResponderService")
 
     rules = [
         # Case Insensitive Equals

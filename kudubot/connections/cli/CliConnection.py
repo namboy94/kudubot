@@ -34,7 +34,7 @@ class CliConnection(Connection):
     The CLI kudubot connection class.
     """
 
-    logger = logging.getLogger("kudubot_cli.CliConnection")
+    logger = logging.getLogger("kudubot.connections.cli.CliConnection")
     """
     The Logger for this class
     """

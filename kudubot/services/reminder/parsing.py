@@ -26,7 +26,7 @@ import logging
 from typing import Dict
 from datetime import datetime
 
-logger = logging.getLogger("kudubot_reminder.parsing")
+logger = logging.getLogger("kudubot.services.reminder.parsing")
 
 
 def parse_message(text: str) -> Dict[str, str or Dict[str, str or datetime]]:

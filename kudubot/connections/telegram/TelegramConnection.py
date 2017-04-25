@@ -39,7 +39,7 @@ class TelegramConnection(Connection):
     A Connection class that connects to Telegram
     """
 
-    logger = logging.getLogger("kudubot_telegram.TelegramConnection")
+    logger = logging.getLogger("kudubot.connections.telegram.TelegramConnection")
     """
     The Logger for this class
     """

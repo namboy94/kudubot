@@ -41,7 +41,7 @@ class ReminderService(Service):
     users to store reminder message that are then sent at a later time
     """
 
-    logger = logging.getLogger("kudubot_reminder.ReminderService")
+    logger = logging.getLogger("kudubot.services.reminder.ReminderService")
     """
     The logger for this class
     """
