@@ -93,7 +93,6 @@ start_bot:
   stage: botstart
   only:
     - master
-    - develop
   tags:
     - linux-buildserver
   script:
