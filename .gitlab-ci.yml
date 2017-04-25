@@ -97,9 +97,14 @@ start_bot:
   tags:
     - linux-buildserver
   script:
-    - wget https://gitlab.namibsun.net/namboy94/kudubot/snippets/16/raw -O start_bot.sh
-    - bash start_bot.sh
-    - rm start_bot.sh
+    - pip install --user --upgrade --upgrade-strategy only-if-needed kudubot
+    - kudubot-config-gen -s
+    - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
+    - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
+    - sudo systemctl restart kudubot-whatsapp.service
+    - sudo systemctl restart kudubot-telegram.service
+    - sudo systemctl status kudubot-whatsapp.service
+    - sudo systemctl status kudubot-telegram.service
 
 generate_sphinx_documentation:
   stage: docstats
