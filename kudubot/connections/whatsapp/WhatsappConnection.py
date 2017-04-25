@@ -34,6 +34,7 @@ from yowsup.layers.network import YowNetworkLayer
 from kudubot.connections.Connection import Connection
 from kudubot.exceptions import InvalidConfigException
 from kudubot.connections.whatsapp.EchoLayer import EchoLayer
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 class WhatsappConnection(Connection):
@@ -46,13 +47,14 @@ class WhatsappConnection(Connection):
     The Logger for this class
     """
 
-    def __init__(self, services: List[type]):
+    def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
         """
         Extends the default Connection constructor to create a yowsup stack
 
         :param services: The services to start
+        :param config_handler: The GlobalConfigHandler that determines the location of the configuration files
         """
-        super().__init__(services)
+        super().__init__(services, config_handler)
 
         stack_builder = YowStackBuilder()
         self.yowsup = EchoLayer(self)

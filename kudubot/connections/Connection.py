@@ -48,24 +48,17 @@ class Connection(object):
     The Logger for this class
     """
 
-    database_file_location = GlobalConfigHandler.data_location
-    """
-    The location of the connection's data location. Has to be adjusted by the __init__ method to point to the
-    correct database file for the connection's data
-    """
-
-    config_file_location = GlobalConfigHandler.specific_connection_config_location
-    """
-    The location of the connection's configuration file
-    """
-
-    def __init__(self, services: List[type]):
+    def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
         """
         Initializes the connection object using the specified services
         Starts the database connection
 
         :param services: The services to use with the connection
+        :param config_handler: The GlobalConfigHandler to determine config file locations
         """
+        self.database_file_location = config_handler.data_location
+        self.config_file_location = config_handler.specific_connection_config_location
+
         try:
             self.identifier = self.define_identifier()
 

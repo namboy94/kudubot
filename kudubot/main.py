@@ -50,7 +50,7 @@ def main():  # pragma: no cover
             logging.basicConfig(level=logging.INFO)
 
         # noinspection PyUnresolvedReferences
-        connection = initialize_connection(args.connection.lower())
+        connection = initialize_connection(args.connection.lower(), args.config)
 
         connection.listen()
     except Exception as e:
@@ -61,17 +61,20 @@ def main():  # pragma: no cover
         print("\nBye")
 
 
-def initialize_connection(identifier: str) -> Connection:  # pragma: no cover
+def initialize_connection(identifier: str, config_location: str or None) -> Connection:  # pragma: no cover
     """
     Loads the connection for the specified identifier
     If the connection was not found in the local configuration, the program exits.
 
     :param identifier: The identifier for the Connection
+    :param config_location: The config location to use. Will default to the default value if None is supplied
     :return: The Connection object
     """
 
+    config_handler = GlobalConfigHandler() if config_location is None else GlobalConfigHandler(config_location)
+
     try:
-        config_handler = GlobalConfigHandler()
+        config_handler.validate_config_directory()
     except InvalidConfigException as e:
         print("Loading configuration failed:")
         print(str(e))
@@ -104,5 +107,6 @@ def parse_args() -> argparse.Namespace:  # pragma: no cover
 
     parser.add_argument("-v", "--verbose", action="store_true", help="Activates verbose output")
     parser.add_argument("-d", "--debug", action="store_true", help="Activates debug-level logging output")
+    parser.add_argument("-c", "--config", nargs="?", help="Overrides the configuration directory location")
 
     return parser.parse_args()

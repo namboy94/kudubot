@@ -31,6 +31,7 @@ from kudubot.users.Contact import Contact
 from kudubot.entities.Message import Message
 from kudubot.connections.Connection import Connection
 from kudubot.exceptions import InvalidConfigException
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 class TelegramConnection(Connection):
@@ -52,15 +53,16 @@ class TelegramConnection(Connection):
         """
         return "telegram"
 
-    def __init__(self, services: List[type]):
+    def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
         """
         Initializes the Telegram Connection.
         Additionally to the standard Connection, a telegram.Bot object is generated to
         interface with the Telegram API
 
         :param services: The services to include
+        :param config_handler: The GlobalConfigHandler that determines the location of the configuration files
         """
-        super().__init__(services)
+        super().__init__(services, config_handler)
         self.bot = telegram.Bot(self.config["api_key"])
 
     def load_config(self) -> Dict[str, object]:

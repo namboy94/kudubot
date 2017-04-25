@@ -34,6 +34,11 @@ class CliConnection(Connection):
     The CLI kudubot connection class.
     """
 
+    logger = logging.getLogger("kudubot_cli.CliConnection")
+    """
+    The Logger for this class
+    """
+
     @staticmethod
     def define_identifier() -> str:
         """
@@ -42,8 +47,6 @@ class CliConnection(Connection):
         :return: None
         """
         return "cli"
-
-    logger = logging.getLogger("kudubot_cli.CliConnection")
 
     def send_video_message(self, receiver: Contact, video_file: str, caption: str = ""):
         """
