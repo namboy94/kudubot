@@ -41,55 +41,48 @@ class GlobalConfigHandler(object):
     The Logger for this class
     """
 
-    config_location = os.path.join(os.path.expanduser("~"), ".kudubot")
-    """
-    The Location of the global config directory. It is a subdirectory called .kudubot in the
-    user's home directory
-    """
-
-    global_connection_config_location = os.path.join(config_location, "connections.conf")
-    """
-    The location of the connections config file, which defines the available connection types
-    """
-
-    services_config_location = os.path.join(config_location, "services.conf")
-    """
-    The location of the services config file, which defines the various service modules available
-    """
-
-    data_location = os.path.join(config_location, "data")
-    """
-    The location of the data directory
-    """
-
-    specific_connection_config_location = os.path.join(config_location, "connection_config")
-    """
-    The location of the config directory for individual connections
-    """
-
-    def __init__(self):
+    def __init__(self, config_location: str = os.path.join(os.path.expanduser("~"), ".kudubot")):
         """
-        Initializes the ConfigHandler. A InvalidConfigException will be raised if the configuration
-        could not be read. The exception message will contain more information.
+        Initializes the ConfigHandler. Determines the config locations using the config_location
+        parameter which defaults to a .kudubot directory in the user's home directory.
+        The configuration may still be invalid once the object is initialized, call
+        validate_config_directory() to make sure that the configuration is correct.
+        
+        :param config_location: The location of the config directory
+        """
+        self.config_location = config_location
+        self.global_connection_config_location = os.path.join(self.config_location, "connections.conf")
+        self.services_config_location = os.path.join(self.config_location, "services.conf")
+        self.data_location = os.path.join(self.config_location, "data")
+        self.specific_connection_config_location = os.path.join(self.config_location, "connection_config")
 
-        After the __init__ method is run, it can be assumed that the configuration is valid
+    def validate_config_directory(self) -> bool:
+        """
+        Validates the configuration directory. As soon as a discrepancy is detected, the reason is logged
+        and False is returned. If the configuration is valid however, True is returned
+        :return: True if the config is valid, False otherwise
         """
 
-        if not os.path.isdir(self.config_location):
-            raise InvalidConfigException("Configuration directory " + self.config_location + " does not exist")
-        elif not os.path.isfile(self.global_connection_config_location):
-            raise InvalidConfigException("Connection config file does not exist")
-        elif not os.path.isfile(self.services_config_location):
-            raise InvalidConfigException("Services config file does not exist")
-        elif not os.path.isdir(self.data_location):
-            raise InvalidConfigException("Data Location directory does not exist")
-        elif not os.path.isdir(self.specific_connection_config_location):
-            raise InvalidConfigException("Connection Configuration directory does not exist")
+        try:
+            if not os.path.isdir(self.config_location):
+                raise InvalidConfigException("Configuration directory " + self.config_location + " does not exist")
+            elif not os.path.isfile(self.global_connection_config_location):
+                raise InvalidConfigException("Connection config file does not exist")
+            elif not os.path.isfile(self.services_config_location):
+                raise InvalidConfigException("Services config file does not exist")
+            elif not os.path.isdir(self.data_location):
+                raise InvalidConfigException("Data Location directory does not exist")
+            elif not os.path.isdir(self.specific_connection_config_location):
+                raise InvalidConfigException("Connection Configuration directory does not exist")
+            else:
+                self.logger.info("Configuration successfully checked")
+                return True
 
-        self.logger.info("Configuration successfully checked")
+        except InvalidConfigException as e:
+            self.logger.warning("Configuration invalid: " + e.args[0])
+            return False
 
-    @staticmethod
-    def generate_configuration(delete_old):
+    def generate_configuration(self, delete_old):
         """
         Generates a new, empty config location.
 
@@ -97,30 +90,30 @@ class GlobalConfigHandler(object):
         :return: None
         """
 
-        if delete_old and os.path.isdir(GlobalConfigHandler.config_location):
-            GlobalConfigHandler.logger.info("Deleting old configuration files")
-            shutil.rmtree(GlobalConfigHandler.config_location)
+        if delete_old and os.path.isdir(self.config_location):
+            self.logger.info("Deleting old configuration files")
+            shutil.rmtree(self.config_location)
 
-        if not os.path.isdir(GlobalConfigHandler.config_location):
-            GlobalConfigHandler.logger.info("Creating directory " + GlobalConfigHandler.config_location)
-            os.makedirs(GlobalConfigHandler.config_location)
+        if not os.path.isdir(self.config_location):
+            self.logger.info("Creating directory " + self.config_location)
+            os.makedirs(self.config_location)
 
-        if not os.path.isfile(GlobalConfigHandler.global_connection_config_location):
-            GlobalConfigHandler.logger.info("Creating file " + GlobalConfigHandler.global_connection_config_location)
-            open(GlobalConfigHandler.global_connection_config_location, "w").close()
+        if not os.path.isfile(self.global_connection_config_location):
+            self.logger.info("Creating file " + self.global_connection_config_location)
+            open(self.global_connection_config_location, "w").close()
 
-        if not os.path.isfile(GlobalConfigHandler.services_config_location):
-            GlobalConfigHandler.logger.info("Creating file " + GlobalConfigHandler.services_config_location)
-            open(GlobalConfigHandler.services_config_location, "w").close()
+        if not os.path.isfile(self.services_config_location):
+            self.logger.info("Creating file " + self.services_config_location)
+            open(self.services_config_location, "w").close()
 
-        if not os.path.isdir(GlobalConfigHandler.data_location):
-            GlobalConfigHandler.logger.info("Creating directory " + GlobalConfigHandler.data_location)
-            os.makedirs(GlobalConfigHandler.data_location)
+        if not os.path.isdir(self.data_location):
+            self.logger.info("Creating directory " + self.data_location)
+            os.makedirs(self.data_location)
 
-        if not os.path.isdir(GlobalConfigHandler.specific_connection_config_location):
-            GlobalConfigHandler.logger.info("Creating directory " +
-                                            GlobalConfigHandler.specific_connection_config_location)
-            os.makedirs(GlobalConfigHandler.specific_connection_config_location)
+        if not os.path.isdir(self.specific_connection_config_location):
+            self.logger.info("Creating directory " +
+                                            self.specific_connection_config_location)
+            os.makedirs(self.specific_connection_config_location)
 
     def load_connections(self) -> List[type]:
         """
@@ -260,10 +253,10 @@ class GlobalConfigHandler(object):
                 continue
             else:
                 try:
-                    module = self.__handle_import_statement__(line)
+                    _module = self.__handle_import_statement__(line)
 
-                    if issubclass(module, class_type):
-                        modules.append(module)
+                    if issubclass(_module, class_type):
+                        modules.append(_module)
                         self.logger.info("Import " + line + " successful")
                     else:
                         self.logger.warning("Import " + line + " is not of type " + str(class_type))
