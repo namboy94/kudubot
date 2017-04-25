@@ -22,13 +22,11 @@ This file is part of kudubot.
 LICENSE
 """
 
-import os
-import shutil
 import unittest
 from kudubot.users.Contact import Contact
 from kudubot.tests.helpers.DummyConnection import DummyConnection
-from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 from kudubot.tests.helpers.test_config import generate_test_environment, clean_up_test_environment
+
 
 # noinspection SqlNoDataSourceInspection
 class UnitTests(unittest.TestCase):

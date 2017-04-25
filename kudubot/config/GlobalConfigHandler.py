@@ -47,7 +47,7 @@ class GlobalConfigHandler(object):
         parameter which defaults to a .kudubot directory in the user's home directory.
         The configuration may still be invalid once the object is initialized, call
         validate_config_directory() to make sure that the configuration is correct.
-        
+
         :param config_location: The location of the config directory
         """
         self.config_location = config_location

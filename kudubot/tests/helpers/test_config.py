@@ -30,7 +30,7 @@ from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 def generate_test_environment() -> GlobalConfigHandler:
     """
     Generates the test environment
-    
+
     :return: The GlobalConfigHandler that points to the configuration
     """
 
@@ -42,7 +42,7 @@ def generate_test_environment() -> GlobalConfigHandler:
 def clean_up_test_environment():
     """
     Deletes the test environment
-    
+
     :return: None
     """
     if os.path.isdir("kudu-test"):
