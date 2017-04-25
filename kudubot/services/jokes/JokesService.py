@@ -90,8 +90,8 @@ class JokesService(HelperService):
     def handle_message(self, message: Message):
         """
         Handles an incoming message
-        :param message: 
-        :return: 
+        :param message:
+        :return:
         """
         super().handle_message(message)
         if not self.is_applicable_to_without_help_or_syntax(message):
