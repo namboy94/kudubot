@@ -166,6 +166,10 @@ class MultiLanguageService(Service):
         language = self.get_language_preference(message.get_direct_response_contact().database_id)
         self.reply(self.translate(title, language), self.translate(body, language), message)
 
+    def is_applicable_to(self, message: Message):
+        body = message.message_body.lower().strip()
+        return body.startswith("/language ") or body.startswith("/sprache ") or body in ["/language", "/sprache"]
+
     def handle_message(self, message: Message):
         """
         Analyzes a message for the language used and stores that language value in the database as a preference of

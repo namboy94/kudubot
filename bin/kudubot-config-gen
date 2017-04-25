@@ -45,8 +45,9 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.DEBUG)
 
     args = parser.parse_args()
-    GlobalConfigHandler.generate_configuration(args.delete_old)
+    config_handler = GlobalConfigHandler()
+    config_handler.generate_configuration(args.delete_old)
 
     if args.standard_config:
-        StandardConfigWriter.write_standard_connection_config()
-        StandardConfigWriter.write_standard_service_config()
+        StandardConfigWriter(config_handler).write_standard_connection_config()
+        StandardConfigWriter(config_handler).write_standard_service_config()

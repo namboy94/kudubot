@@ -85,7 +85,7 @@ def initialize_connection(identifier: str, config_location: str or None) -> Conn
 
     try:
         connection_type = list(filter(lambda x: x.define_identifier() == identifier, connections))[0]
-        return connection_type(services)
+        return connection_type(services, config_handler)
     except IndexError:
         print("Connection Type " + identifier + " is not implemented or imported using the config file")
         sys.exit(1)

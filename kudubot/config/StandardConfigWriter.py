@@ -31,14 +31,13 @@ class StandardConfigWriter(object):
     and services into the config.
     """
 
-    def __init__(self, config_location: str = GlobalConfigHandler().config_location):
+    def __init__(self, config_handler: GlobalConfigHandler = GlobalConfigHandler()):
         """
         Initializes the Standard Config Writer's configuration file locations
-        :param config_location: The location of the config directory
+        :param config_handler: The GlobalConfigHandler to use. Default to the default one.
         """
-        handler = GlobalConfigHandler(config_location)
-        self.connection_config = handler.global_connection_config_location
-        self.service_config = handler.services_config_location
+        self.connection_config = config_handler.global_connection_config_location
+        self.service_config = config_handler.services_config_location
 
     def write_standard_connection_config(self):
         """

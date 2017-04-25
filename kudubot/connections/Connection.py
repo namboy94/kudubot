@@ -87,7 +87,7 @@ class Connection(object):
         """
         raise NotImplementedError()
 
-    def apply_services(self, message: Message, break_on_match: bool = False):
+    def apply_services(self, message: Message, break_on_match: bool = True):
         """
         Applies the services to a Message
         First, the method checks if a service is applicable to a message.
@@ -96,7 +96,7 @@ class Connection(object):
         always end the loop.
 
         :param message: The message to process
-        :param break_on_match: Can be set to True to not allow more than one result
+        :param break_on_match: Can be set to False to allow more than one result
         :return: None
         """
 

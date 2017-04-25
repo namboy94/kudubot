@@ -76,6 +76,14 @@ class ReminderService(HelperService):
         """
         return "reminder"
 
+    def define_command_name(self, language: str):
+        """
+        Defines the command name for this service
+        :param language: the language in which to get the command name
+        :return: The command name in the specified language
+        """
+        return {"en": "/remind", "de": "/erinner"}[language]
+
     def define_language_text(self) -> Dict[str, Dict[str, str]]:
         """
         :return: A dictionary used to translate any user-facing messages
@@ -114,6 +122,8 @@ class ReminderService(HelperService):
         :return: None
         """
         super().handle_message(message)
+        if not self.is_applicable_to_without_help_or_syntax(message):
+            return
 
         target = message.get_direct_response_contact()
         command = self.parse_message(message.message_body.lower().strip(), self.determine_language(message))
@@ -171,7 +181,6 @@ class ReminderService(HelperService):
         """
         db = self.connection.get_database_connection_copy()
         while True:
-            self.logger.debug("Checking reminder status")
             unsent = get_unsent_reminders(db)
 
             for reminder in unsent:

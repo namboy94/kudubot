@@ -80,6 +80,9 @@ class AnimeReminderService(HelperService):
         :return: None
         """
         super().handle_message(message)
+        if not self.is_applicable_to_without_help_or_syntax(message):
+            return
+
         self.logger.debug("Handling message: " + message.message_body)
 
         mode = message.message_body.split(" ")[1].lower()
