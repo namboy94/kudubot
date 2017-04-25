@@ -103,7 +103,6 @@ class HelperService(MultiLanguageService):
                 self.reply(self.translate("@syntax_message_title", language, dictionary),
                            self.define_syntax_description(language), message)
                 return
-            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
     def is_applicable_to(self, message: Message) -> bool:
         """
@@ -133,7 +132,7 @@ class HelperService(MultiLanguageService):
     def is_applicable_to_without_help_or_syntax(self, message: Message) -> bool:
         """
         Checks if the message applies to anything beside the 'help' or 'syntax' commands
-        
+
         :param message: The message to analyze
         :return: True if the message is applicable to something else, False otherwise
         """

@@ -90,6 +90,7 @@ class ReminderService(HelperService):
         """
         return {
             "@remind_command": {"en": "/remind", "de": "/erinner"},
+            "@list_argument": {"en": "list", "de": "auflisten"},
             "@second_singular": {"en": "second", "de": "sekunde"},
             "@second_plural": {"en": "seconds", "de": "sekunden"},
             "@minute_singular": {"en": "minute", "de": "minute"},
@@ -136,7 +137,7 @@ class ReminderService(HelperService):
             self.reply_translated("@stored_reply_title", "@stored_confirmation_message", message)
 
         elif command["mode"] == "list":
-            reminders = list(filter(lambda x: x["receiver"] == target.address,
+            reminders = list(filter(lambda x: x["receiver"].database_id == target.database_id,
                                     get_unsent_reminders(self.connection.db)))
             text = "@list_stored_message_start:\n\n"
             for reminder in reminders:
@@ -160,8 +161,8 @@ class ReminderService(HelperService):
         body = message.message_body.lower().strip()
 
         regex = "^@remind_command ([0-9]+ (" \
-                "@second_singular|@second_plural|@second_singular|@second_plural@second_singular|@second_plural|" \
-                "@second_singular|@second_plural@second_singular|@second_plural@second_singular|@second_plural) )+" \
+                "@second_singular|@second_plural|@minute_singular|@minute_plural|@hour_singular|@hour_plural|" \
+                "@day_singular|@day_plural|@week_singular|@week_plural|@year_singular|@year_plural) )+" \
                 "\"[^\"]+\"$"
         lang_regex = re.compile(self.translate(regex, language))
 
@@ -170,7 +171,7 @@ class ReminderService(HelperService):
             return True
 
         else:
-            self.logger.debug("Message is not applicable")
+            self.logger.info("Message is not applicable")
             return False
 
     def background_loop(self):
