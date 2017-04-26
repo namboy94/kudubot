@@ -22,18 +22,16 @@ This file is part of kudubot.
 LICENSE
 """
 
-"""
-The metadata is stored here. It can be used by any other module in this project this way, most
-notably by the setup.py file
-"""
+import os
+import sys
+from kudubot.config.builder import build_external
 
-version = "0.14.0"  # pragma: no cover
-"""
-The current version of the program
-"""
 
-sentry_dsn = "https://f8dc6c1c49944cbdb5215e563e83cc78:" \
-             "703626a5a0714e58b8c60947b949c524@sentry.io/160743"  # pragma: no cover
-"""  # pragma: no cover
-The DSN used for Sentry Error Logging
-"""
+if __name__ == "__main__":
+
+    target_dir = sys.argv[1]
+
+    if not os.path.isdir(target_dir):
+        os.makedirs(target_dir)
+
+    build_external(move_to=target_dir)

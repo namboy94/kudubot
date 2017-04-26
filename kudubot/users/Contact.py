@@ -22,6 +22,8 @@ This file is part of kudubot.
 LICENSE
 """
 
+from typing import Dict
+
 
 class Contact(object):
     """
@@ -39,3 +41,27 @@ class Contact(object):
         self.database_id = database_id
         self.display_name = display_name
         self.address = address
+
+    def to_dict(self) -> Dict[str, str or int]:
+        """
+        :return: The contact as a dictionary, which can be used to store the contact in a JSON file
+        """
+        return {
+            "database_id": self.database_id,
+            "display_name": self.display_name,
+            "address": self.address
+        }
+
+
+def from_dict(data: Dict[str, str or int]) -> Contact:
+    """
+    Generates a Contact object from a dictionary
+
+    :param data: The data to turn into a Contact object
+    :return: The generated Contact object
+    """
+    return Contact(
+        data["database_id"],
+        data["display_name"],
+        data["address"]
+    )

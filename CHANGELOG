@@ -1,3 +1,7 @@
+V 0.14.0:
+  - Implemented external service framework for Services written in other languages
+  - Implemented the Hello Rust Service in rust
+  - Automatic build for external services
 V 0.13.0:
   - Implemented Jokes Service
   - Converted ReminderService to a HelperService
