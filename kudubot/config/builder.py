@@ -31,7 +31,7 @@ from subprocess import Popen
 def build(service_name: str, service_dir: str, source_file: str, destination_file: str):
     """
     Builds an executable file for an external service.
-    
+
     :param service_name: The name of the service
     :param service_dir: The root directory of the external service
     :param source_file: The main source file used for compilation
@@ -50,6 +50,12 @@ def build(service_name: str, service_dir: str, source_file: str, destination_fil
 
 
 def run_safe_popen(command):
+    """
+    Runs a Popen command and makes sure to catch any exceptions that may occur.
+
+    :param command: The command to run
+    :return: None
+    """
     try:
         Popen(command).wait()
     except BaseException as e:
@@ -57,6 +63,13 @@ def run_safe_popen(command):
 
 
 def safe_move(source: str, destination: str):
+    """
+    Moves a file to a new location, but makes sure that the move is even possible.
+
+    :param source: The source file
+    :param destination: The destination file
+    :return: None
+    """
     if os.path.isfile(source) and os.path.isdir(os.path.dirname(destination)):
         os.rename(source, destination)
 

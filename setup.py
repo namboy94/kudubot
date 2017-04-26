@@ -72,7 +72,7 @@ def run_setup():
     """
     Runs the setup method, taking care of all setuptools functionality
 
-    :return: 
+    :return: None
     """
 
     setup(name="kudubot",
