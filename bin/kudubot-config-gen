@@ -46,6 +46,8 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.INFO)
     elif args.verbose:
         logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.ERROR)
 
     args = parser.parse_args()
     config_handler = GlobalConfigHandler()
