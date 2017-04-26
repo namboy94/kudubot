@@ -23,48 +23,15 @@ LICENSE
 """
 
 import os
-from subprocess import Popen
+import sys
+from kudubot.config.builder import build_external
 
-
-def build(service_name: str, service_dir: str, source_file: str, destination_file: str):
-
-    current_dir = os.getcwd()
-
-    if source_file.endswith(".rs"):
-        os.chdir(service_dir)
-        Popen(["cargo", "build", "--release"]).wait()
-        os.rename(os.path.join("target", "release", service_name), os.path.join("build", service_name))
-
-    os.chdir(current_dir)
-
-
-def build_external():
-
-    external_dir = os.path.join("kudubot", "services", "external")
-    built_executables = []
-
-    for service in os.listdir(external_dir):
-
-        service_dir = os.path.join(external_dir, service)
-        if not os.path.isdir(service_dir):
-            continue
-
-        src = os.path.join(service_dir, "src")
-        build_dir = os.path.join(service_dir, "build")
-
-        if not os.path.isdir(build_dir):
-            os.makedirs(build_dir)
-
-        for source_file in os.listdir(src):
-
-            source_path = os.path.join(src, source_file)
-            destination_path = os.path.join(build_dir, service)
-
-            if os.path.isfile(source_path) and source_file.lower().startswith("main"):
-                build(service, service_dir, source_path, destination_path)
-                built_executables.append(destination_path)
-
-    print(built_executables)
 
 if __name__ == "__main__":
-    build_external()
+
+    target_dir = sys.argv[1]
+
+    if not os.path.isdir(target_dir):
+        os.makedirs(target_dir)
+
+    build_external(move_to=target_dir)

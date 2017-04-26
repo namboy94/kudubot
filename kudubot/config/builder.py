@@ -74,10 +74,11 @@ def safe_move(source: str, destination: str):
         os.rename(source, destination)
 
 
-def build_external() -> List[str]:
+def build_external(move_to: str = "") -> List[str]:
     """
     Builds all external services
 
+    :param move_to: If specified, all built files are moved to that directory
     :return: A list of all generated executable files
     """
 
@@ -106,5 +107,9 @@ def build_external() -> List[str]:
 
                 if os.path.isfile(destination_path):
                     built_executables.append(destination_path)
+
+    if move_to != "":
+        for executable in built_executables:
+            os.rename(executable, os.path.join(move_to, os.path.basename(executable)))
 
     return built_executables
