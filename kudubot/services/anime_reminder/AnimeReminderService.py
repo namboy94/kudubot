@@ -41,11 +41,6 @@ class AnimeReminderService(HelperService):
     The Kudubot Service that provides the anime reminder functionality
     """
 
-    logger = logging.getLogger("kudubot.services.anime_reminder.AnimeReminderService")
-    """
-    The Logger for this class
-    """
-
     def init(self):
         """
         In addition to the normal initialization of a Service, this service initializes
