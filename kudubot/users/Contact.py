@@ -51,3 +51,17 @@ class Contact(object):
             "display_name": self.display_name,
             "address": self.address
         }
+
+
+def from_dict(data: Dict[str, str or int]) -> Contact:
+    """
+    Generates a Contact object from a dictionary
+
+    :param data: The data to turn into a Contact object
+    :return: The generated Contact object
+    """
+    return Contact(
+        data["database_id"],
+        data["display_name"],
+        data["address"]
+    )

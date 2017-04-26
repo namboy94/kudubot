@@ -25,6 +25,7 @@ LICENSE
 import time
 from typing import Dict
 from kudubot.users.Contact import Contact
+from kudubot.users.Contact import from_dict as contact_from_dict
 
 
 class Message(object):
@@ -78,3 +79,21 @@ class Message(object):
             "receiver": self.receiver.to_dict(),
             "timestamp": self.timestamp,
         }
+
+
+def from_dict(data: Dict[str, str or float or Dict[str, str or int]]) -> Message:
+    """
+    Generates a Message object from a dictionary
+
+    :param data: The dictionary to turn into a Message
+    :return: The generates Message object
+    """
+
+    return Message(
+        data["message_title"],
+        data["message_body"],
+        contact_from_dict(data["receiver"]),
+        contact_from_dict(data["sender"]),
+        None if data["sender_group"] is None else contact_from_dict(data["sender_group"]),
+        data["timestamp"]
+    )
