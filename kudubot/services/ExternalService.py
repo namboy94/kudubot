@@ -85,7 +85,7 @@ class ExternalService(Service):
 
         Popen(self.define_executable_command() +
               [self.executable_file,
-               "handle_message", message_file,
+               "handle_message", message_file, response_file,
                self.connection.database_file_location]).wait()
 
         response = self.load_json(response_file)
@@ -108,12 +108,12 @@ class ExternalService(Service):
 
         Popen(self.define_executable_command() +
               [self.executable_file,
-               "is_applicable", message_file,
+               "is_applicable_to", message_file, response_file,
                self.connection.database_file_location]).wait()
 
         response = self.load_json(response_file)
 
-        return response["mode"] == "applicable_check" and response["value"]
+        return response["mode"] == "is_applicable" and response["applicable"]
 
     def store_message_in_file(self, message: Message) -> Tuple[str, str]:
         """
@@ -129,7 +129,7 @@ class ExternalService(Service):
         while True:  # Make sure that file does not exist
             message_file = os.path.join(self.message_dir, str(time.time()))
             if not os.path.isfile(message_file):
-                with open(message_file, 'w') as json_file:
+                with open(message_file + ".json", 'w') as json_file:
                     json.dump(json_data, json_file)
                 return message_file + ".json", message_file + "-response.json"
 
