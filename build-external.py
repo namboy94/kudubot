@@ -25,12 +25,13 @@ LICENSE
 import os
 import sys
 from kudubot.config.builder import build_external
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 if __name__ == "__main__":
 
     if len(sys.argv) < 2:
-        build_external()
+        build_external(GlobalConfigHandler().external_services_executables_directory)
     else:
 
         target_dir = sys.argv[1]
@@ -38,4 +39,4 @@ if __name__ == "__main__":
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
 
-        build_external(move_to=target_dir)
+        build_external(target_dir)
