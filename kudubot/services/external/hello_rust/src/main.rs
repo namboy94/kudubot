@@ -22,8 +22,35 @@ This file is part of kudubot.
 LICENSE
 */
 
+extern crate rustc_serialize;
+
+use std::env;
+
+/// The main method of the Service
 fn main() {
 
-    println!("Hello World!");
+    let args: Vec<_> = env::args().collect();
+
+    let mode = &args[1];
+    let message_file = &args[2];
+    let response_file = &args[3];
+    let database_file = &args[4];
+
+    if mode == "handle_message" {
+        println!("Hello World!");
+        handle_message(message_file, response_file, database_file);
+    }
+    else if mode == "is_applicable_to" {
+        println!("Hallo Welt!")
+    }
+
+    //println!("{} {} {} {}", mode, message_file, response_file, database_file)
+
+}
+
+
+fn handle_message(message_file: &str, response_file: &str, database_file: &str) {
+
+    println!("{} {} {}", message_file, response_file, database_file)
 
 }

@@ -26,10 +26,16 @@ import os
 from subprocess import Popen
 
 
-def build(source_file: str, destination_file: str):
+def build(service_name: str, service_dir: str, source_file: str, destination_file: str):
+
+    current_dir = os.getcwd()
 
     if source_file.endswith(".rs"):
-        Popen(["rustc", source_file, "-o", destination_file]).wait()
+        os.chdir(service_dir)
+        Popen(["cargo", "build", "--release"]).wait()
+        os.rename(os.path.join("target", "release", service_name), os.path.join("build", service_name))
+
+    os.chdir(current_dir)
 
 
 def build_external():
@@ -55,7 +61,7 @@ def build_external():
             destination_path = os.path.join(build_dir, service)
 
             if os.path.isfile(source_path) and source_file.lower().startswith("main"):
-                build(source_path, destination_path)
+                build(service, service_dir, source_path, destination_path)
                 built_executables.append(destination_path)
 
     print(built_executables)
