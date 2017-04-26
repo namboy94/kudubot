@@ -33,7 +33,7 @@ class HelloRustService(ExternalService):
     """
 
     def define_executable_file_url(self):
-        self.resolve_github_release_asset_url("namboy94", "kudubot", "hello-rust")
+        return self.resolve_github_release_asset_url("namboy94", "kudubot", "hello_rust")
 
     def define_executable_command(self) -> List[str]:
         return []

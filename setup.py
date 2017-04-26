@@ -100,7 +100,6 @@ def run_setup():
           test_suite="nose.collector",
           tests_require=["nose"],
           scripts=find_scripts(),
-          include_package_data=True,
           zip_safe=False)
 
 
@@ -111,23 +110,24 @@ def main():
     :return: None
     """
 
-    # noinspection PyBroadException
-    try:
-        if sys.argv[1] == "install":
-            handler = GlobalConfigHandler()
-            if not handler.validate_config_directory():
-                handler.generate_configuration(False)
-                StandardConfigWriter(handler).write_standard_connection_config()
-                StandardConfigWriter(handler).write_standard_service_config()
+    if sys.argv[1] == "install":
 
+        handler = GlobalConfigHandler()
+        if not handler.validate_config_directory():
+            handler.generate_configuration(False)
+            StandardConfigWriter(handler).write_standard_connection_config()
+            StandardConfigWriter(handler).write_standard_service_config()
+
+        # noinspection PyBroadException
+        try:
             executables = build_external()
             for executable in executables:
                 os.rename(
                     executable,
                     os.path.join(handler.external_services_executables_directory, os.path.basename(executable))
                 )
-    except:
-        pass
+        except BaseException as e:
+            print(str(e))
 
     run_setup()
 
