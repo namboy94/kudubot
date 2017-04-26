@@ -23,7 +23,9 @@ LICENSE
 """
 
 import time
+from typing import Dict
 from kudubot.users.Contact import Contact
+from kudubot.users.Contact import from_dict as contact_from_dict
 
 
 class Message(object):
@@ -63,3 +65,35 @@ class Message(object):
                  private chats however will return the individual sender
         """
         return self.sender if self.sender_group is None else self.sender_group
+
+    def to_dict(self) -> Dict[str, str or float or Dict[str, str or int]]:
+        """
+        :return: The message data as a dictionary which can be used to store a message as a JSON file
+        """
+
+        return {
+            "message_title": self.message_title,
+            "message_body": self.message_body,
+            "sender": self.sender.to_dict(),
+            "sender_group": None if self.sender_group is None else self.sender_group.to_dict(),
+            "receiver": self.receiver.to_dict(),
+            "timestamp": self.timestamp,
+        }
+
+
+def from_dict(data: Dict[str, str or float or Dict[str, str or int]]) -> Message:
+    """
+    Generates a Message object from a dictionary
+
+    :param data: The dictionary to turn into a Message
+    :return: The generates Message object
+    """
+
+    return Message(
+        data["message_title"],
+        data["message_body"],
+        contact_from_dict(data["receiver"]),
+        contact_from_dict(data["sender"]),
+        None if data["sender_group"] is None else contact_from_dict(data["sender_group"]),
+        data["timestamp"]
+    )

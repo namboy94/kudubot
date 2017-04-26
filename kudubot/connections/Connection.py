@@ -56,14 +56,20 @@ class Connection(object):
         :param services: The services to use with the connection
         :param config_handler: The GlobalConfigHandler to determine config file locations
         """
+        self.identifier = self.define_identifier()
+
         self.database_file_location = config_handler.data_location
         self.config_file_location = config_handler.specific_connection_config_location
+        self.external_services_directory = os.path.join(config_handler.external_services_directory, self.identifier)
+
+        if not os.path.isdir(self.external_services_directory):
+            os.makedirs(self.external_services_directory)
+
+        self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
+        self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
 
         try:
-            self.identifier = self.define_identifier()
 
-            self.database_file_location = os.path.join(self.database_file_location, self.identifier + ".db")
-            self.config_file_location = os.path.join(self.config_file_location, self.identifier + ".conf")
             self.db = self.get_database_connection_copy()
 
             self.address_book = AddressBook(self.db)

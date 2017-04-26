@@ -55,6 +55,7 @@ class GlobalConfigHandler(object):
         self.services_config_location = os.path.join(self.config_location, "services.conf")
         self.data_location = os.path.join(self.config_location, "data")
         self.specific_connection_config_location = os.path.join(self.config_location, "connection_config")
+        self.external_services_directory = os.path.join(self.config_location, "external")
 
     def validate_config_directory(self) -> bool:
         """
@@ -74,6 +75,8 @@ class GlobalConfigHandler(object):
                 raise InvalidConfigException("Data Location directory does not exist")
             elif not os.path.isdir(self.specific_connection_config_location):
                 raise InvalidConfigException("Connection Configuration directory does not exist")
+            elif not os.path.isdir(self.external_services_directory):
+                raise InvalidConfigException("External Service directory does not exist")
             else:
                 self.logger.info("Configuration successfully checked")
                 return True
@@ -113,6 +116,10 @@ class GlobalConfigHandler(object):
         if not os.path.isdir(self.specific_connection_config_location):
             self.logger.info("Creating directory " + self.specific_connection_config_location)
             os.makedirs(self.specific_connection_config_location)
+
+        if not os.path.isdir(self.external_services_directory):
+            self.logger.info("Creating directory " + self.external_services_directory)
+            os.makedirs(self.external_services_directory)
 
     def load_connections(self) -> List[type]:
         """
