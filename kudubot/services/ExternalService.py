@@ -25,6 +25,7 @@ LICENSE
 import os
 import json
 import time
+import stat
 import requests
 from subprocess import Popen
 from bs4 import BeautifulSoup
@@ -95,11 +96,19 @@ class ExternalService(Service):
         """
         # noinspection PyBroadException
         try:
+            self.logger.info("Downloading executable file")
             with open(self.executable_file, 'wb') as destination:
                 data = requests.get(self.define_executable_file_url()).content
                 destination.write(data)
-        except:
-            self.logger.info("Could not download executable. Disabling Service.")
+            self.logger.info("Download Complete")
+
+            # Set executable permissions
+            st = os.stat(self.executable_file)
+            os.chmod(self.executable_file, st.st_mode | stat.S_IEXEC)
+
+        except Exception as e:
+            print(str(e))
+            self.logger.error("Could not download executable. Disabling Service.")
             if os.path.isfile(self.executable_file):
                 os.remove(self.executable_file)
 
@@ -221,7 +230,7 @@ class ExternalService(Service):
         downloads = soup.select(".release-downloads")[0]
 
         for download in downloads.select("a"):
-            name = download.select("strong")[0]
+            name = download.select("strong")[0].text
 
             if name == filename:
                 return "https://github.com" + download["href"]

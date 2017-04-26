@@ -112,6 +112,7 @@ start_bot:
     - kudubot-config-gen -s
     - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
     - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
+    - python build-external.py
     - sudo systemctl restart kudubot-whatsapp.service
     - sudo systemctl restart kudubot-telegram.service
     - sudo systemctl status kudubot-whatsapp.service

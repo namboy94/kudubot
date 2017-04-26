@@ -23,6 +23,7 @@ LICENSE
 """
 
 import os
+import stat
 from typing import List
 from subprocess import Popen
 
@@ -88,7 +89,7 @@ def build_external(move_to: str = "") -> List[str]:
     for service in os.listdir(external_dir):
 
         service_dir = os.path.join(external_dir, service)
-        if not os.path.isdir(service_dir):
+        if not os.path.isdir(service_dir) or service == "__pycache__":
             continue
 
         src = os.path.join(service_dir, "src")
@@ -106,6 +107,8 @@ def build_external(move_to: str = "") -> List[str]:
                 build(service, service_dir, source_path, destination_path)
 
                 if os.path.isfile(destination_path):
+                    st = os.stat(destination_path)
+                    os.chmod(destination_path, st.st_mode | stat.S_IEXEC)  # Make executable
                     built_executables.append(destination_path)
 
     if move_to != "":
