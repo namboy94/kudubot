@@ -1,3 +1,7 @@
+V 0.14.3:
+  - Fixed another minor issue in build scripts
+V 0.14.2:
+  - Fixed issue with automatic bot stating build
 V 0.14.1:
   - Fixed issues with automatic download of executable files
 V 0.14.0:
