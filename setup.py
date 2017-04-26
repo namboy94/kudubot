@@ -100,7 +100,6 @@ def run_setup():
           test_suite="nose.collector",
           tests_require=["nose"],
           scripts=find_scripts(),
-          include_package_data=True,
           zip_safe=False)
 
 
