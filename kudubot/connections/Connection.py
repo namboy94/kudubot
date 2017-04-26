@@ -57,6 +57,7 @@ class Connection(object):
         :param config_handler: The GlobalConfigHandler to determine config file locations
         """
         self.identifier = self.define_identifier()
+        self.config_handler = config_handler
 
         self.database_file_location = config_handler.data_location
         self.config_file_location = config_handler.specific_connection_config_location

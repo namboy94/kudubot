@@ -36,6 +36,9 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", action="store_true", help="Activates verbose output")
     parser.add_argument("-b", "--debug", action="store_true", help="Activates debug-level logging output")
     parser.add_argument("-s", "--standard-config", action="store_true", help="Generates the standard configuration")
+    parser.add_argument("--remove-executable-service-files", action="store_true",
+                        help="Deletes all executable service files. "
+                             "They will be re-downloaded the next time the bot starts.")
 
     args = parser.parse_args()
 
@@ -51,3 +54,6 @@ if __name__ == "__main__":
     if args.standard_config:
         StandardConfigWriter(config_handler).write_standard_connection_config()
         StandardConfigWriter(config_handler).write_standard_service_config()
+
+    if args.remove_executable_service_files:
+        config_handler.delete_service_executables()

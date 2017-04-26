@@ -65,5 +65,6 @@ class StandardConfigWriter(object):
                     ["from kudubot.services.simple_responder.SimpleResponderService import SimpleResponderService",
                      "from kudubot.services.reminder.ReminderService import ReminderService",
                      "from kudubot.services.anime_reminder.AnimeReminderService import AnimeReminderService",
-                     "from kudubot.services.jokes.JokesService import JokesService"]:
+                     "from kudubot.services.jokes.JokesService import JokesService",
+                     "from kudubot.services.external.hello_rust.HelloRustService import HelloRustService"]:
                 config.write(service + "\n")

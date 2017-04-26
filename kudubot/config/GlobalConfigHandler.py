@@ -56,6 +56,7 @@ class GlobalConfigHandler(object):
         self.data_location = os.path.join(self.config_location, "data")
         self.specific_connection_config_location = os.path.join(self.config_location, "connection_config")
         self.external_services_directory = os.path.join(self.config_location, "external")
+        self.external_services_executables_directory = os.path.join(self.external_services_directory, "bin")
 
     def validate_config_directory(self) -> bool:
         """
@@ -77,6 +78,8 @@ class GlobalConfigHandler(object):
                 raise InvalidConfigException("Connection Configuration directory does not exist")
             elif not os.path.isdir(self.external_services_directory):
                 raise InvalidConfigException("External Service directory does not exist")
+            elif not os.path.isdir(self.external_services_executables_directory):
+                raise InvalidConfigException("External Service executable directory does not exist")
             else:
                 self.logger.info("Configuration successfully checked")
                 return True
@@ -120,6 +123,10 @@ class GlobalConfigHandler(object):
         if not os.path.isdir(self.external_services_directory):
             self.logger.info("Creating directory " + self.external_services_directory)
             os.makedirs(self.external_services_directory)
+
+        if not os.path.isdir(self.external_services_executables_directory):
+            self.logger.info("Creating directory " + self.external_services_executables_directory)
+            os.makedirs(self.external_services_executables_directory)
 
     def load_connections(self) -> List[type]:
         """
@@ -271,3 +278,12 @@ class GlobalConfigHandler(object):
                     self.logger.warning("Import " + line + " has failed")
 
         return modules
+
+    def delete_service_executables(self):
+        """
+        Deletes all executable service files
+
+        :return: None
+        """
+        shutil.rmtree(self.external_services_executables_directory)
+        os.makedirs(self.external_services_executables_directory)

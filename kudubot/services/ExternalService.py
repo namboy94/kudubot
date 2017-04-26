@@ -47,14 +47,13 @@ class ExternalService(Service):
         define_executable_file_url()
         :return: None
         """
-        self.external_dir = os.path.join(self.connection.external_services_directory, self.identifier)
-        if not os.path.isdir(self.external_dir):
-            os.makedirs(self.external_dir)
-        self.message_dir = os.path.join(self.external_dir, "messages")
+        self.message_dir = os.path.join(self.connection.external_services_directory, self.identifier)
         if not os.path.isdir(self.message_dir):
             os.makedirs(self.message_dir)
 
-        self.executable_file = os.path.join(self.external_dir, "executable")
+        self.executable_file = os.path.join(self.connection.config_handler.external_services_executables_directory,
+                                            self.identifier)
+
         if not os.path.isfile(self.executable_file):
             self.download_executable()
 
@@ -94,9 +93,15 @@ class ExternalService(Service):
 
         :return: None
         """
-        with open(self.executable_file, 'wb') as destination:
-            data = requests.get(self.define_executable_file_url()).content
-            destination.write(data)
+        # noinspection PyBroadException
+        try:
+            with open(self.executable_file, 'wb') as destination:
+                data = requests.get(self.define_executable_file_url()).content
+                destination.write(data)
+        except:
+            self.logger.info("Could not download executable. Disabling Service.")
+            if os.path.isfile(self.executable_file):
+                os.remove(self.executable_file)
 
     def handle_message(self, message: Message):
         """
@@ -105,6 +110,8 @@ class ExternalService(Service):
         :param message: The message to handle
         :return: None
         """
+        if not os.path.isfile(self.executable_file):
+            return
 
         message_file, response_file = self.store_message_in_file(message)
 
@@ -128,6 +135,8 @@ class ExternalService(Service):
         :param message: The message to analyze
         :return: None
         """
+        if not os.path.isfile(self.executable_file):
+            return False
 
         message_file, response_file = self.store_message_in_file(message)
 

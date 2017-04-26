@@ -22,8 +22,8 @@ This file is part of kudubot.
 LICENSE
 """
 
+import logging
 from typing import List
-
 from kudubot.entities.Message import Message
 
 
@@ -42,6 +42,7 @@ class Service(object):
         self.connection = connection
         self.identifier = self.define_identifier()
         self.requires = self.define_requirements()
+        self.logger = logging.getLogger("kudubot.services.Service." + self.identifier)
         self.init()
 
     # noinspection PyMethodMayBeStatic
