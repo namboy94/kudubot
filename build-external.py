@@ -29,7 +29,7 @@ from kudubot.config.builder import build_external
 
 if __name__ == "__main__":
 
-    target_dir = sys.argv[1]
+    target_dir = "" if len(sys.argv) < 2 else sys.argv[1]  # Default to default kudubot config directory
 
     if not os.path.isdir(target_dir):
         os.makedirs(target_dir)

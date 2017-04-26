@@ -109,7 +109,7 @@ start_bot:
     - linux-buildserver
   script:
     - pip install --user --upgrade --upgrade-strategy only-if-needed kudubot
-    - kudubot-config-gen -s
+    - kudubot-config-gen -s --remove-executable-service-files
     - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
     - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
     - python build-external.py
