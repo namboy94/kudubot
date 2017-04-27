@@ -105,9 +105,16 @@ def initialize_logging(verbose: bool, debug: bool, config_handler: GlobalConfigH
     :return: None
     """
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    stdout_handler = logging.StreamHandler(stream=sys.stdout)
 
-    handlers = []
+    if debug:
+        stdout_handler.setLevel(logging.DEBUG)
+    elif verbose:
+        stdout_handler.setLevel(logging.INFO)
+    else:
+        stdout_handler.setLevel(logging.WARNING)
+
+    handlers = [stdout_handler]
 
     for level in [(logging.ERROR, "error"),
                   (logging.WARNING, "warning"),
@@ -121,26 +128,10 @@ def initialize_logging(verbose: bool, debug: bool, config_handler: GlobalConfigH
                 os.rename(logfile, logfile + "." + str(time.time()))
 
         logfile_handler = logging.FileHandler(logfile)
-        logfile_handler.setFormatter(formatter)
         logfile_handler.setLevel(level[0])
         handlers.append(logfile_handler)
 
-    stdout_handler = logging.StreamHandler(stream=sys.stdout)
-    stderr_handler = logging.StreamHandler(stream=sys.stderr)
-    stderr_handler.setLevel(logging.WARNING)
-
-    if debug:
-        stdout_handler.setLevel(logging.DEBUG)
-    elif verbose:
-        stdout_handler.setLevel(logging.INFO)
-    else:
-        stdout_handler.setLevel(logging.WARNING)
-        stderr_handler.setLevel(logging.ERROR)
-
-    handlers.append(stdout_handler)
-    handlers.append(stderr_handler)
-
-    logging.basicConfig(level=logging.DEBUG, handlers=handlers, format=formatter)
+    logging.basicConfig(level=logging.DEBUG, handlers=handlers)
 
 
 def parse_args() -> argparse.Namespace:  # pragma: no cover

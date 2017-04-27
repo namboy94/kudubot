@@ -283,6 +283,8 @@ class GlobalConfigHandler(object):
 
                 except ImportError:  # Ignore invalid imports
                     self.logger.warning("Import " + line + " has failed")
+                except IndexError:  # Ignore failed parsing attempts
+                    self.logger.warning("Import " + line + " has failed due to an error in the config file.")
 
         return modules
 
