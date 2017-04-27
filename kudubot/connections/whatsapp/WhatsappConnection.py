@@ -42,11 +42,6 @@ class WhatsappConnection(Connection):
     Class that implements a kudubot connection for the Whatsapp Messaging Service
     """
 
-    logger = logging.getLogger("kudubot.connections.whatsapp.WhatsappConnection")
-    """
-    The Logger for this class
-    """
-
     def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
         """
         Extends the default Connection constructor to create a yowsup stack

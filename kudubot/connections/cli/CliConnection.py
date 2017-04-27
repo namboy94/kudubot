@@ -34,11 +34,6 @@ class CliConnection(Connection):
     The CLI kudubot connection class.
     """
 
-    logger = logging.getLogger("kudubot.connections.cli.CliConnection")
-    """
-    The Logger for this class
-    """
-
     @staticmethod
     def define_identifier() -> str:
         """

@@ -43,7 +43,7 @@ class Connection(object):
     service modules
     """
 
-    logger = logging.getLogger("kudubot.connections.Connection")
+    logger = logging.getLogger(__name__)
     """
     The Logger for this class
     """
