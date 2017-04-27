@@ -1,6 +1,6 @@
 [package]
 name = "kudubot-bindings"
-version = "0.1.1"
+version = "0.1.0"
 authors = ["Hermann Krumrey <hermann@krumreyh.com>"]
 description = "Rust Bindings for the kudubot framework"
 documentation = "https://docs.namibsun.net/html_docs/kudubot/index.html"

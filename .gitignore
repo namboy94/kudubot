@@ -48,6 +48,6 @@ venv/
 ENV/
 .spyderproject
 .ropeproject
-.idea
 doc/build
 .idea/
+Cargo.lock
