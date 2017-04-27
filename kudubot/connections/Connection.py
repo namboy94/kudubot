@@ -113,8 +113,8 @@ class Connection(object):
         self.logger.debug("Applying services to " + repr(message.message_body) + ".")
 
         for service in self.services:
-            if service.is_applicable_to(message):
-                service.handle_message(message)
+            if service.is_applicable_to_with_log(message):
+                service.handle_message_with_log(message)
                 if break_on_match:
                     break
 

@@ -24,9 +24,7 @@ LICENSE
 
 import re
 import time
-import logging
 import datetime
-from threading import Thread
 from typing import List, Dict
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
@@ -45,13 +43,8 @@ class ReminderService(HelperService):
         Initializes the database table and starts a background thread that perpetually
         searches for expired reminders
         """
-        self.logger.info("Initializing Reminder Database Table")
-        initialize_database(self.connection.db)
-
-        self.logger.info("Starting Reminder background thread")
-        background = Thread(target=self.background_loop)
-        background.daemon = True
-        background.start()
+        self.initialize_database_table(initializer=initialize_database)
+        self.start_daemon_thread(self.background_loop)
 
     @staticmethod
     def define_requirements() -> List[str]:
@@ -161,13 +154,7 @@ class ReminderService(HelperService):
                 "\"[^\"]+\"$"
         lang_regex = re.compile(self.translate(regex, language))
 
-        if re.match(lang_regex, body) or body == self.translate("@remind_command @list_argument", language):
-            self.logger.info("Message is applicable")
-            return True
-
-        else:
-            self.logger.info("Message is not applicable")
-            return False
+        return re.match(lang_regex, body) or body == self.translate("@remind_command @list_argument", language)
 
     def background_loop(self):
         """

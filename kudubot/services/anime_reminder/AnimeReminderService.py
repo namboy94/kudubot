@@ -25,11 +25,8 @@ LICENSE
 
 import re
 import time
-import logging
-from threading import Thread
 from typing import List, Dict
 from kudubot.entities.Message import Message
-from kudubot.connections.Connection import Connection
 from kudubot.services.HelperService import HelperService
 from kudubot.services.anime_reminder.scraper import scrape_reddit_discussion_threads
 from kudubot.services.anime_reminder.database import initialize_database, store_subscription, delete_subscription, \
@@ -46,12 +43,8 @@ class AnimeReminderService(HelperService):
         In addition to the normal initialization of a Service, this service initializes
         its database and starts the background thread
         """
-        initialize_database(self.connection.db)
-
-        self.logger.info("Starting Anime Reminder Background Thread")
-        background = Thread(target=self.background_loop)
-        background.daemon = True
-        background.start()
+        self.initialize_database_table(initializer=initialize_database)
+        self.start_daemon_thread(self.background_loop)
 
     @staticmethod
     def define_requirements() -> List[str]:
@@ -77,8 +70,6 @@ class AnimeReminderService(HelperService):
         super().handle_message(message)
         if not self.is_applicable_to_without_help_or_syntax(message):
             return
-
-        self.logger.debug("Handling message: " + message.message_body)
 
         mode = message.message_body.split(" ")[1].lower()
         user = message.get_direct_response_contact()
@@ -123,9 +114,6 @@ class AnimeReminderService(HelperService):
             regex = "^@command_name (@list_command|@sub_unsub_command \"[^\"]+\")$"
             regex = re.compile(self.translate(regex, language))
             applicable = bool(re.search(regex, message.message_body)) or applicable
-
-        self.logger.debug("Message " + message.message_body + " is" + ("" if applicable else "not") +
-                          " applicable to " + self.define_identifier())
 
         return applicable
 
