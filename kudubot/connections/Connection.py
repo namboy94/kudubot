@@ -43,11 +43,6 @@ class Connection(object):
     service modules
     """
 
-    logger = logging.getLogger(__name__)
-    """
-    The Logger for this class
-    """
-
     def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
         """
         Initializes the connection object using the specified services
@@ -58,6 +53,7 @@ class Connection(object):
         """
         self.identifier = self.define_identifier()
         self.config_handler = config_handler
+        self.logger = logging.getLogger(self.__class__.__module__)
 
         self.database_file_location = config_handler.data_location
         self.config_file_location = config_handler.specific_connection_config_location

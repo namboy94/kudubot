@@ -42,7 +42,7 @@ class Service(object):
         self.connection = connection
         self.identifier = self.define_identifier()
         self.requires = self.define_requirements()
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(self.__class__.__module__)
         self.init()
 
     # noinspection PyMethodMayBeStatic
