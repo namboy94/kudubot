@@ -74,6 +74,7 @@ class Message(object):
         return {
             "message_title": self.message_title,
             "message_body": self.message_body,
+
             "sender": self.sender.to_dict(),
             "sender_group": None if self.sender_group is None else self.sender_group.to_dict(),
             "receiver": self.receiver.to_dict(),
