@@ -31,4 +31,37 @@ extern crate serde_derive;
 mod files;
 mod structs;
 
+use structs::Message;
+
+
+/// Generates a reply Message struct for a given Message.
+/// For this, the receiver and sender are flipped and the body as well as
+/// the title are replaced.
+///
+/// # Arguments
+///
+/// * `message` - The Message to reply to
+/// * `title` - The message title to send
+/// * `body` - The message body to send
+///
+/// # Return value
+///
+/// Returns the generated reply message
+fn generate_reply(message: Message, title: &str, body: &str) -> Message {
+
+    // Check if we need to reply to a group or not
+    let receiver = match message.sender_group {
+        None => message.sender,
+        Some(x) => x
+    };
+
+    return Message {
+        message_title: String::from(title),
+        message_body: String::from(body),
+        receiver: receiver,
+        sender: message.receiver,
+        sender_group: None,
+        timestamp: message.timestamp,
+    }
+}
 

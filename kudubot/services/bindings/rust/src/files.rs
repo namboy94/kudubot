@@ -23,7 +23,7 @@ LICENSE
 */
 
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Write};
 
 
 /// Reads a file and returns the file's content as a String.

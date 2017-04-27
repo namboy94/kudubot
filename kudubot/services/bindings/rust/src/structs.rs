@@ -22,6 +22,8 @@ This file is part of kudubot.
 LICENSE
 */
 
+use serde_json;
+
 /// The Message struct models a Message as defined by the kudubot
 /// framework for easy use in rust.
 ///
@@ -41,6 +43,20 @@ pub struct Message {
     pub sender: Contact,
     pub sender_group: Option<Contact>,
     pub timestamp: f64
+}
+
+/// Implementation of methods for the Message struct
+impl Message{
+
+    /// Turns the Message into a String
+    ///
+    /// # Return value
+    ///
+    /// The Message in String representation
+    fn to_string(&self) -> String {
+        return serde_json::to_string(&self).unwrap();
+    }
+
 }
 
 /// The Contact struct models a contact inside a Message struct
