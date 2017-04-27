@@ -22,6 +22,17 @@ This file is part of kudubot.
 LICENSE
 */
 
+/// The Message struct models a Message as defined by the kudubot
+/// framework for easy use in rust.
+///
+/// # Arguments
+///
+/// * `message_title` - The title of the message
+/// * `message_body` - The body of the message
+/// * `receiver` - The recipient of the message
+/// * `sender` - The sender of the message
+/// * `sender_group` - The sender group of the message. May be None.
+/// * `timestamp` - The timestamp of the message
 #[derive(Serialize, Deserialize)]
 pub struct Message {
     pub message_title: String,
@@ -32,6 +43,13 @@ pub struct Message {
     pub timestamp: f64
 }
 
+/// The Contact struct models a contact inside a Message struct
+///
+/// # Argument
+///
+/// * `database_id` - The contact's ID in the database
+/// * `display_name` - The contact's human-readable name
+/// * `address` - The contact's address on the connection
 #[derive(Serialize, Deserialize)]
 pub struct Contact {
     pub database_id: i64,
