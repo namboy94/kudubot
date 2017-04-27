@@ -5,4 +5,5 @@ authors = ["Hermann Krumrey <hermann@krumreyh.com>"]
 
 [dependencies]
 serde_json = "1.0"
-kudubot-bindings = "0.1.1"
+# kudubot-bindings = "0.1.1"
+kudubot-bindings = { path = "../../bindings/rust/" }

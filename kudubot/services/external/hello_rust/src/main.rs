@@ -27,7 +27,12 @@ extern crate serde_json;
 extern crate kudubot_bindings;
 
 use serde_json::Value;
-use kudubot_bindings::{write_json_to_file, read_json_file};
+use kudubot_bindings::{write_json_to_file,
+                       read_json_file,
+                       Contact,
+                       Message,
+                       load_contact_from_json_data,
+                       read_message_from_file};
 
 use std::fs::File;
 use std::io::{Read, Write};
@@ -42,6 +47,28 @@ fn main() {
     let mode: &str = &args[1];
     let message_file: &str = &args[2];
     let response_file: &str = &args[3];
+
+    let message: Value = read_json_file(message_file);
+
+    /**
+    for i in ["message_title", "message_body", "receiver", "sender", "sender_group", "timestamp"].iter() {
+        println!("{}", message.get(i).unwrap());
+    }
+    println!("{}", message.get("timestamp").unwrap().as_f64().unwrap());
+    println!("OK");
+
+    for i in ["receiver", "sender", "sender_group"].iter() {
+        println!("{}", message.get(i).unwrap());
+        for j in ["database_id", "display_name", "address"].iter() {
+            println!("{}", message.get(i).unwrap().get(j).unwrap());
+        }
+    }
+
+    **/
+
+    let message_object: Message = read_message_from_file(message_file);
+    //println!("{}", message.message_body);
+
 
     let message: Value = read_json_file(message_file);
 

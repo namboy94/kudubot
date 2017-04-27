@@ -22,45 +22,6 @@ This file is part of kudubot.
 LICENSE
 */
 
-/*
-struct Message {
-    message_title: String,
-    message_body: String,
-    receiver: Contact,
-    sender: Contact,
-    sender_group: Contact,
-    timestamp: f64
-}
-
-struct Contact {
-    database_id: i32,
-    display_name: String,
-    address: String
-}
-
-
-fn read_message_from_file(message_file_path: &str) -> Message {
-    let json = read_json_file(message_file_path);
-    return Message {
-        message_title: json["message_title"],
-        message_body: json["message_body"],
-        receiver: load_contact_from_json_data(json["receiver"]),
-        sender: load_contact_from_json_data(json["sender"]),
-        sender_group: load_contact_from_json_data(json["sender_group"]),
-        timestamp: json["timestamp"]
-    };
-}
-
-fn load_contact_from_json_data(json_data: Value) -> Contact {
-    return Contact {
-        database_id: json_data["database_id"],
-        display_name: json_data["display_name"],
-        address: json_data["address"]
-    }
-}
-*/
-
-
 #[macro_use]
 extern crate serde_json;
 
@@ -69,6 +30,53 @@ use serde_json::Value;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::env;
+use serde_json::Value::Null;
+
+
+pub struct Message {
+    pub message_title: String,
+    pub message_body: String,
+    pub receiver: Contact,
+    pub sender: Contact,
+    pub sender_group: Option<Contact>,
+    pub timestamp: f64
+}
+
+pub struct Contact {
+    pub database_id: i64,
+    pub display_name: String,
+    pub address: String
+}
+
+pub fn read_message_from_file(message_file_path: &str) -> Message {
+
+    let json = read_json_file(message_file_path);
+
+    return Message {
+        message_title: json.get("message_title").unwrap().to_string(),
+        message_body: json.get("message_body").unwrap().to_string(),
+        receiver: load_contact_from_json_data(json.get("receiver").unwrap()).unwrap(),
+        sender: load_contact_from_json_data(json.get("sender").unwrap()).unwrap(),
+        sender_group: load_contact_from_json_data(json.get("sender_group").unwrap()),
+        timestamp: json.get("timestamp").unwrap().as_f64().unwrap()
+    };
+}
+
+pub fn load_contact_from_json_data(json_data: &Value) -> Option<Contact> {
+
+    if !json_data.is_null() {
+        return Some(Contact {
+            database_id: json_data.get("database_id").unwrap().as_i64().unwrap(),
+            display_name: json_data.get("display_name").unwrap().to_string(),
+            address: json_data.get("address").unwrap().to_string()
+        });
+    }
+    else {
+        return None;
+    }
+
+
+}
 
 
 /// Reads a JSON file and generate a serde_json::Value object from it.
