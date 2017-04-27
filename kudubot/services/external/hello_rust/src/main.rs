@@ -68,13 +68,13 @@ fn main() {
 /// * `response_file_path` - The path to the response file used to communicate with kudubot
 fn handle_message(message: Message, message_file_path: &str, response_file_path: &str) {
 
-    let return_message: Value = message.to_json();
+    //let return_message: Value = message.to_json();
 
     let response_json = json!({
-        "mode": "reply"
+        "mode": "xreply"
     });
 
-    write_json_to_file(return_message, message_file_path);
+    //write_json_to_file(return_message, message_file_path);
     write_json_to_file(response_json, response_file_path);
 
 }
