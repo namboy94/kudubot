@@ -24,8 +24,10 @@ LICENSE
 
 #[macro_use]
 extern crate serde_json;
+extern crate kudubot_bindings;
 
 use serde_json::Value;
+use kudubot_bindings::{write_json_to_file, read_json_file};
 
 use std::fs::File;
 use std::io::{Read, Write};
@@ -100,40 +102,5 @@ fn handle_message_applicable(message: Value, response_file_path: &str) {
     });
 
     write_json_to_file(json_response, response_file_path);
-
-}
-
-/// Reads a JSON file and generate a serde_json::Value object from it.
-///
-/// # Arguments
-///
-/// * `json_file_path` - The path to the JSON file to read
-///
-/// # Return value
-///
-/// Returns the parsed serde_json::Value object
-fn read_json_file(json_file_path: &str) -> Value {
-
-    // Read message file content
-    let mut json_file: File = File::open(json_file_path).unwrap();
-    let mut json_data: String = String::new();
-    json_file.read_to_string(&mut json_data).unwrap();
-
-    let json: Value = serde_json::from_str(json_data.as_str()).unwrap();
-
-    return json;
-
-}
-
-/// Writes a serde_json:Value object to a file.
-///
-/// # Arguments
-///
-/// * `json_data` - The JSON Data to write into the file
-/// * `json_file_location` - The destination file to write to
-fn write_json_to_file(json_data: Value, json_file_location: &str) {
-
-    let mut json_file: File = File::create(json_file_location).unwrap();
-    json_file.write_all(json_data.to_string().as_bytes()).unwrap();
 
 }

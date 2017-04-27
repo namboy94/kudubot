@@ -80,7 +80,7 @@ use std::env;
 /// # Return value
 ///
 /// Returns the parsed serde_json::Value object
-fn read_json_file(json_file_path: &str) -> Value {
+pub fn read_json_file(json_file_path: &str) -> Value {
 
     // Read message file content
     let mut json_file: File = File::open(json_file_path).unwrap();
@@ -99,7 +99,7 @@ fn read_json_file(json_file_path: &str) -> Value {
 ///
 /// * `json_data` - The JSON Data to write into the file
 /// * `json_file_location` - The destination file to write to
-fn write_json_to_file(json_data: Value, json_file_location: &str) {
+pub fn write_json_to_file(json_data: Value, json_file_location: &str) {
 
     let mut json_file: File = File::create(json_file_location).unwrap();
     json_file.write_all(json_data.to_string().as_bytes()).unwrap();
