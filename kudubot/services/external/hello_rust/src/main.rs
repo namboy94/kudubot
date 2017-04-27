@@ -68,14 +68,7 @@ fn main() {
 /// * `response_file_path` - The path to the response file used to communicate with kudubot
 fn handle_message(message: Message, message_file_path: &str, response_file_path: &str) {
 
-    let return_message = json!({
-        "message_title": "Hello Rust",
-        "message_body": "Hi!",
-        //"sender": message.receiver,
-        "sender_group": null,
-        //"receiver": message.sender,
-        "timestamp": message.timestamp
-    });
+    let return_message: Value = message.to_json();
 
     let response_json = json!({
         "mode": "reply"
@@ -97,10 +90,7 @@ fn handle_message(message: Message, message_file_path: &str, response_file_path:
 /// * `response_file_path` - The path to the response JSON file to write to
 fn handle_message_applicable(message: Message, response_file_path: &str) {
 
-    let body: String = message.message_body.as_str().to_lowercase();
-    println!("X:{}", String::from("ehls"));
-    let applicable: bool = body == "hello rust!";
-    println!("Y:{}", body);
+    let applicable: bool = message.message_body == "hello rust!";
 
     let json_response = json!({
         "mode": "is_applicable",

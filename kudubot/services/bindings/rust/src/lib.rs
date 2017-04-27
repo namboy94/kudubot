@@ -22,8 +22,11 @@ This file is part of kudubot.
 LICENSE
 */
 
+extern crate serde;
 #[macro_use]
 extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 
 use serde_json::Value;
 
@@ -40,6 +43,28 @@ pub struct Message {
     pub sender: Contact,
     pub sender_group: Option<Contact>,
     pub timestamp: f64
+}
+
+impl Message {
+    pub fn to_json(&self) -> Value {
+
+        return json!({
+            "message_title": self.message_title,
+            "message_body": self.message_body,
+            "sender": self.sender.to_json(),
+            "sender_group": null,
+            "receiver": self.receiver.to_json(),
+            "timestamp": self.timestamp
+        });
+    }
+}
+
+impl Contact {
+    fn to_json(&self) -> Value {
+        return json!({
+            "X": 1
+        })
+    }
 }
 
 pub struct Contact {
@@ -60,6 +85,7 @@ pub fn read_message_from_file(message_file_path: &str) -> Message {
         sender_group: load_contact_from_json_data(json.get("sender_group").unwrap()),
         timestamp: json.get("timestamp").unwrap().as_f64().unwrap()
     };
+
 }
 
 fn json_to_string(json_string: &Value) -> String {
