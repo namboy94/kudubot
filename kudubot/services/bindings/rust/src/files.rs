@@ -22,6 +22,7 @@ This file is part of kudubot.
 LICENSE
 */
 
+use serde_json::Value;
 use std::fs::File;
 use std::io::{Read, Write};
 
@@ -56,4 +57,16 @@ pub fn write_to_file(file_path: &str, content: &str) {
     let mut file: File = File::create(file_path).unwrap();
     file.write_all(content.as_bytes()).unwrap();
 
+}
+
+/// Directly writes a JSON Value struct to a file.
+///
+/// # Arguments
+///
+/// * `file_path` - The path to the file
+/// * `content` - The JSON Value struct to write into the file
+pub fn write_json_to_file(file_path: &str, content: Value) {
+
+    let data = content.as_str().unwrap();
+    write_to_file(file_path, data);
 }

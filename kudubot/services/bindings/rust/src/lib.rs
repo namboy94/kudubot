@@ -31,7 +31,7 @@ extern crate serde_derive;
 pub mod files;
 pub mod structs;
 
-use files::read_from_file;
+use files::{read_from_file, write_to_file, write_json_to_file};
 use structs::Message;
 
 
@@ -81,3 +81,10 @@ pub fn generate_reply(message: Message, title: &str, body: &str) -> Message {
     }
 }
 
+
+pub fn write_is_applicable_response(response_file: &str, value: bool) {
+    let json = json!({
+        "is_applicable": value
+    });
+    write_json_to_file(response_file, json);
+}

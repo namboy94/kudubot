@@ -23,27 +23,40 @@ LICENSE
 */
 
 extern crate kudubot_bindings;
-use kudubot_bindings::load_message;
+use kudubot_bindings::{load_message, write_is_applicable_response};
 use kudubot_bindings::structs::Message;
 use std::env;
 
-/// The main method of the Service
+/// The main method of the Service. Fetches the Command line arguments,
+/// loads the message from the JSON file and handles the message accordingly.
 fn main() {
 
-    // Fetch the command line arguments
     let args: Vec<_> = env::args().collect();
     let mode: &str = &args[1];
     let message_file: &str = &args[2];
     let response_file: &str = &args[3];
 
     let message: Message = load_message(message_file);
-    println!("{}", message.to_string());
 
-    /*
-    match mode {
-        "handle_message" => handle_message(message, message_file, response_file),
-        "is_applicable_to" => handle_message_applicable(message, response_file)
-    }*/
+    if mode == "handle_message" {
+        println!("A");
+    }
+    else if mode == "is_applicable_to" {
+        is_applicable_to(message, response_file);
+    }
+}
+
+/// Checks if the message is applicable to this service and writes the
+/// result of that analysis to the response JSON file.
+///
+/// # Arguments
+///
+/// * `message` - The message to analyze
+/// * `response_file` - The file into which the response should be written
+fn is_applicable_to(message: Message, response_file: &str) {
+
+    let applicable: bool = message.message_body.to_lowercase() == "hello rust!";
+    write_is_applicable_response(response_file, applicable);
 
 }
 
