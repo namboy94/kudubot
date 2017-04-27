@@ -67,6 +67,7 @@ pub fn write_to_file(file_path: &str, content: &str) {
 /// * `content` - The JSON Value struct to write into the file
 pub fn write_json_to_file(file_path: &str, content: Value) {
 
-    let data = content.as_str().unwrap();
-    write_to_file(file_path, data);
+    let mut json_file: File = File::create(file_path).unwrap();
+    json_file.write_all(content.to_string().as_bytes()).unwrap();
+
 }
