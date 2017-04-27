@@ -48,7 +48,7 @@ def main():  # pragma: no cover
         args = parse_args()
 
         config_handler = GlobalConfigHandler() if args.config is None else GlobalConfigHandler(args.config)
-        initialize_logging(args.quiet, args.verbose, args.debug, config_handler)
+        initialize_logging(args.quiet, args.verbose, args.debug, config_handler, args.connection.lower())
         connection = initialize_connection(args.connection.lower(), config_handler)
 
         connection.listen()
@@ -92,7 +92,8 @@ def initialize_connection(identifier: str, config_handler: GlobalConfigHandler) 
         sys.exit(1)
 
 
-def initialize_logging(quiet: bool, verbose: bool, debug: bool, config_handler: GlobalConfigHandler):
+def initialize_logging(quiet: bool, verbose: bool, debug: bool,
+                       config_handler: GlobalConfigHandler, connection_name: str):
     """
     Initializes the logging levels and files for the program. If neither the verbose or
     debug flags were provided, the logging level defaults to WARNING.
@@ -103,6 +104,7 @@ def initialize_logging(quiet: bool, verbose: bool, debug: bool, config_handler: 
     :param verbose: Flag that determines if the verbose mode is switched on ~ INFO
     :param debug: Flag that determines if the debug mode is on ~ DEBUG
     :param config_handler: The config handler used to determine the logging directory location
+    :param connection_name: The name of the connection to log
     :return: None
     """
 
@@ -117,24 +119,15 @@ def initialize_logging(quiet: bool, verbose: bool, debug: bool, config_handler: 
     else:
         stdout_handler.setLevel(logging.WARNING)
 
-    handlers = [stdout_handler]
+    logfile = os.path.join(config_handler.logfile_directory, connection_name + ".log")
+    if os.path.isfile(logfile):
+        if os.path.getsize(logfile) > 1000000:
+            os.rename(logfile, logfile + "." + str(time.time()))
 
-    for level in [(logging.ERROR, "error"),
-                  (logging.WARNING, "warning"),
-                  (logging.INFO, "info"),
-                  (logging.DEBUG, "debug")]:
+    logfile_handler = logging.FileHandler(logfile)
+    logfile_handler.setLevel(logging.DEBUG)
 
-        logfile = os.path.join(config_handler.logfile_directory, level[1] + ".log")
-
-        if os.path.isfile(logfile):
-            if os.path.getsize(logfile) > 1000000:
-                os.rename(logfile, logfile + "." + str(time.time()))
-
-        logfile_handler = logging.FileHandler(logfile)
-        logfile_handler.setLevel(level[0])
-        handlers.append(logfile_handler)
-
-    logging.basicConfig(level=logging.DEBUG, handlers=handlers)
+    logging.basicConfig(level=logging.DEBUG, handlers=[stdout_handler, logfile_handler])
 
 
 def parse_args() -> argparse.Namespace:  # pragma: no cover
