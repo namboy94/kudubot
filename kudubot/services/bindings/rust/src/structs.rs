@@ -22,38 +22,19 @@ This file is part of kudubot.
 LICENSE
 */
 
-use std::fs::File;
-use std::io::Read;
-
-
-/// Reads a file and returns the file's content as a String.
-///
-/// # Arguments
-///
-/// * `file_path` - The path to the file
-///
-/// # Return value
-///
-/// Returns the file's content
-fn read_from_file(file_path: &str) -> String {
-
-    let mut file: File = File::open(file_path).unwrap();
-    let mut data: String = String::new();
-    file.read_to_string(&mut data).unwrap();
-    return data;
-
+#[derive(Serialize, Deserialize)]
+pub struct Message {
+    pub message_title: String,
+    pub message_body: String,
+    pub receiver: Contact,
+    pub sender: Contact,
+    pub sender_group: Option<Contact>,
+    pub timestamp: f64
 }
 
-
-/// Writes a string to a file
-///
-/// # Arguments
-///
-/// * `file_path` - The path to the file
-/// * `content` - The String to write to the file
-fn write_to_file(file_path: &str, content: &str) {
-
-    let mut file: File = File::create(file_path).unwrap();
-    file.write_all(content.as_bytes()).unwrap();
-
+#[derive(Serialize, Deserialize)]
+pub struct Contact {
+    pub database_id: i64,
+    pub display_name: String,
+    pub address: String
 }
