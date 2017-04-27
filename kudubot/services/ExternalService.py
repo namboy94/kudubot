@@ -155,6 +155,7 @@ class ExternalService(Service):
                self.connection.database_file_location]).wait()
 
         response = self.load_json(response_file)
+        print(response)
 
         return response["mode"] == "is_applicable" and response["applicable"]
 

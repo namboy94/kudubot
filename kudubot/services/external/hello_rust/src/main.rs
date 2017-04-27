@@ -48,37 +48,14 @@ fn main() {
     let message_file: &str = &args[2];
     let response_file: &str = &args[3];
 
-    let message: Value = read_json_file(message_file);
+    let message: Message = read_message_from_file(message_file);
 
-    /**
-    for i in ["message_title", "message_body", "receiver", "sender", "sender_group", "timestamp"].iter() {
-        println!("{}", message.get(i).unwrap());
-    }
-    println!("{}", message.get("timestamp").unwrap().as_f64().unwrap());
-    println!("OK");
-
-    for i in ["receiver", "sender", "sender_group"].iter() {
-        println!("{}", message.get(i).unwrap());
-        for j in ["database_id", "display_name", "address"].iter() {
-            println!("{}", message.get(i).unwrap().get(j).unwrap());
-        }
+    match mode {
+        "handle_message" => handle_message(message, message_file, response_file),
+        "is_applicable_to" => handle_message_applicable(message, response_file),
+        _ => println!("Ain't special")
     }
 
-    **/
-
-    let message_object: Message = read_message_from_file(message_file);
-    //println!("{}", message.message_body);
-
-
-    let message: Value = read_json_file(message_file);
-
-    if mode == "handle_message" {
-        handle_message(message, message_file, response_file);
-    }
-
-    else if mode == "is_applicable_to" {
-        handle_message_applicable(message, response_file)
-    }
 }
 
 
@@ -89,15 +66,15 @@ fn main() {
 /// * `message` - The original message received via kudubot as a serde_json::Value object
 /// * `message_file_path` - The path to the message file to write the response to
 /// * `response_file_path` - The path to the response file used to communicate with kudubot
-fn handle_message(message: Value, message_file_path: &str, response_file_path: &str) {
+fn handle_message(message: Message, message_file_path: &str, response_file_path: &str) {
 
     let return_message = json!({
         "message_title": "Hello Rust",
         "message_body": "Hi!",
-        "sender": message["receiver"],
+        //"sender": message.receiver,
         "sender_group": null,
-        "receiver": message["sender"],
-        "timestamp": message["timestamp"]
+        //"receiver": message.sender,
+        "timestamp": message.timestamp
     });
 
     let response_json = json!({
@@ -118,10 +95,12 @@ fn handle_message(message: Value, message_file_path: &str, response_file_path: &
 ///
 /// * `message` - The parsed JSON file object which models the message received
 /// * `response_file_path` - The path to the response JSON file to write to
-fn handle_message_applicable(message: Value, response_file_path: &str) {
+fn handle_message_applicable(message: Message, response_file_path: &str) {
 
-    let body: String = message["message_body"].as_str().unwrap().to_lowercase();
+    let body: String = message.message_body.as_str().to_lowercase();
+    println!("X:{}", String::from("ehls"));
     let applicable: bool = body == "hello rust!";
+    println!("Y:{}", body);
 
     let json_response = json!({
         "mode": "is_applicable",

@@ -53,13 +53,17 @@ pub fn read_message_from_file(message_file_path: &str) -> Message {
     let json = read_json_file(message_file_path);
 
     return Message {
-        message_title: json.get("message_title").unwrap().to_string(),
-        message_body: json.get("message_body").unwrap().to_string(),
+        message_title: json_to_string(json.get("message_title").unwrap()),
+        message_body: json_to_string(json.get("message_body").unwrap()),
         receiver: load_contact_from_json_data(json.get("receiver").unwrap()).unwrap(),
         sender: load_contact_from_json_data(json.get("sender").unwrap()).unwrap(),
         sender_group: load_contact_from_json_data(json.get("sender_group").unwrap()),
         timestamp: json.get("timestamp").unwrap().as_f64().unwrap()
     };
+}
+
+fn json_to_string(json_string: &Value) -> String {
+    return String::from(json_string.as_str().unwrap());
 }
 
 pub fn load_contact_from_json_data(json_data: &Value) -> Option<Contact> {
