@@ -23,8 +23,11 @@ LICENSE
 */
 
 extern crate kudubot_bindings;
-use kudubot_bindings::{load_message, write_is_applicable_response};
 use kudubot_bindings::structs::Message;
+use kudubot_bindings::{load_message,
+                       write_is_applicable_response,
+                       generate_reply,
+                       write_reply_response};
 use std::env;
 
 /// The main method of the Service. Fetches the Command line arguments,
@@ -37,10 +40,9 @@ fn main() {
     let response_file: &str = &args[3];
 
     let message: Message = load_message(message_file);
-    println!("{}", message.to_string());
 
     if mode == "handle_message" {
-        println!("A");
+        handle_message(message, message_file, response_file);
     }
     else if mode == "is_applicable_to" {
         is_applicable_to(message, response_file);
@@ -61,49 +63,19 @@ fn is_applicable_to(message: Message, response_file: &str) {
 
 }
 
-/*
-/// Handles an incoming message. Responds with "Hi" to the original sender
+/// Handles a message. Replies to the sender with 'Hi!'
 ///
 /// # Arguments
 ///
-/// * `message` - The original message received via kudubot as a serde_json::Value object
-/// * `message_file_path` - The path to the message file to write the response to
-/// * `response_file_path` - The path to the response file used to communicate with kudubot
-//fn handle_message(message: Message, message_file_path: &str, response_file_path: &str) {
+/// * `message` - The incoming message
+/// * `message_file` - The file in which the message was originally stored in and which
+///                    will be the destination of the reply message
+/// * `response_file` - The file to which to write the response to,
+///                     so that kudubot knows how to proceed
+fn handle_message(message: Message, message_file: &str, response_file: &str) {
 
-    //let return_message: Value = message.to_json();
+    let reply: Message = generate_reply(message, "Hello Rust", "Hi!");
+    reply.write_to(message_file);
+    write_reply_response(response_file);
 
-    /*
-    let response_json = json!({
-        "mode": "xreply"
-    });
-
-    //write_json_to_file(return_message, message_file_path);
-    write_json_to_file(response_json, response_file_path);
-    */
-
-//}
-
-
-/// Checks if a message is applicable to the Hello Rust Service
-/// The result of this query is then written to a JSON file which can then be
-/// read by kudubot
-///
-/// # Arguments
-///
-/// * `message` - The parsed JSON file object which models the message received
-/// * `response_file_path` - The path to the response JSON file to write to
-//fn handle_message_applicable(message: Message, response_file_path: &str) {
-
-    /*
-    let applicable: bool = message.message_body == "hello rust!";
-
-    let json_response = json!({
-        "mode": "is_applicable",
-        "applicable": applicable
-    });
-
-    write_json_to_file(json_response, response_file_path);
-    */
-//}
-*/
+}

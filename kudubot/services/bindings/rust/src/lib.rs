@@ -31,7 +31,7 @@ extern crate serde_derive;
 pub mod files;
 pub mod structs;
 
-use files::{read_from_file, write_to_file, write_json_to_file};
+use files::{read_from_file, write_json_to_file};
 use structs::Message;
 
 
@@ -82,9 +82,21 @@ pub fn generate_reply(message: Message, title: &str, body: &str) -> Message {
 }
 
 
+/// Writes a response to the is_applicable_to query by kudubot.
+///
+/// # Arguments
+///
+/// * `response_file` - The file to which to write to
+/// * `value` - The value to write into the response
 pub fn write_is_applicable_response(response_file: &str, value: bool) {
-    let json = json!({
-        "is_applicable": value
-    });
-    write_json_to_file(response_file, json);
+    write_json_to_file(response_file, json!({ "is_applicable": value }))
+}
+
+/// Writes a reply response for the handle_message query by kudubot.
+///
+/// # Arguments
+///
+/// * `response_file` - The file to which to write to
+pub fn write_reply_response(response_file: &str) {
+    write_json_to_file(response_file, json!({ "mode": "reply" }))
 }
