@@ -22,7 +22,9 @@ This file is part of kudubot.
 LICENSE
 """
 
+import os
 import sys
+import time
 import raven
 import logging
 import argparse
@@ -32,6 +34,7 @@ from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
+# noinspection PyUnresolvedReferences
 def main():  # pragma: no cover
     """
     The Main Method of the Program that starts the Connection Listener in accordance with the
@@ -40,17 +43,13 @@ def main():  # pragma: no cover
     :return: None
     """
 
+    # noinspection PyUnresolvedReferences
     try:
         args = parse_args()
 
-        # noinspection PyUnresolvedReferences
-        if args.debug:
-            logging.basicConfig(level=logging.DEBUG)
-        elif args.verbose:
-            logging.basicConfig(level=logging.INFO)
-
-        # noinspection PyUnresolvedReferences
-        connection = initialize_connection(args.connection.lower(), args.config)
+        config_handler = GlobalConfigHandler() if args.config is None else GlobalConfigHandler(args.config)
+        initialize_logging(args.verbose, args.debug, config_handler)
+        connection = initialize_connection(args.connection.lower(), config_handler)
 
         connection.listen()
     except Exception as e:
@@ -61,17 +60,15 @@ def main():  # pragma: no cover
         print("\nBye")
 
 
-def initialize_connection(identifier: str, config_location: str or None) -> Connection:  # pragma: no cover
+def initialize_connection(identifier: str, config_handler: GlobalConfigHandler) -> Connection:  # pragma: no cover
     """
     Loads the connection for the specified identifier
     If the connection was not found in the local configuration, the program exits.
 
     :param identifier: The identifier for the Connection
-    :param config_location: The config location to use. Will default to the default value if None is supplied
+    :param config_handler: The config handler to use to determine file paths etc.
     :return: The Connection object
     """
-
-    config_handler = GlobalConfigHandler() if config_location is None else GlobalConfigHandler(config_location)
 
     try:
         config_handler.validate_config_directory()
@@ -93,6 +90,57 @@ def initialize_connection(identifier: str, config_location: str or None) -> Conn
         print("Connection Configuration failed:")
         print(str(e))
         sys.exit(1)
+
+
+def initialize_logging(verbose: bool, debug: bool, config_handler: GlobalConfigHandler):
+    """
+    Initializes the logging levels and files for the program. If neither the verbose or
+    debug flags were provided, the logging level defaults to WARNING.
+    Log files for ERROR, WARNING, DEBUG and INFO are always generated.
+    If the size of a previous log file exceeds 1MB, the file is renamed and a new one is created.
+
+    :param verbose: Flag that determines if the verbose mode is switched on ~ INFO
+    :param debug: Flag that determines if the debug mode is on ~ DEBUG
+    :param config_handler: The config handler used to determine the logging directory location
+    :return: None
+    """
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    handlers = []
+
+    for level in [(logging.ERROR, "error"),
+                  (logging.WARNING, "warning"),
+                  (logging.INFO, "info"),
+                  (logging.DEBUG, "debug")]:
+
+        logfile = os.path.join(config_handler.logfile_directory, level[1] + ".log")
+
+        if os.path.isfile(logfile):
+            if os.path.getsize(logfile) > 1000000:
+                os.rename(logfile, logfile + "." + str(time.time()))
+
+        logfile_handler = logging.FileHandler(logfile)
+        logfile_handler.setFormatter(formatter)
+        logfile_handler.setLevel(level[0])
+        handlers.append(logfile_handler)
+
+    stdout_handler = logging.StreamHandler(stream=sys.stdout)
+    stderr_handler = logging.StreamHandler(stream=sys.stderr)
+    stderr_handler.setLevel(logging.WARNING)
+
+    if debug:
+        stdout_handler.setLevel(logging.DEBUG)
+    elif verbose:
+        stdout_handler.setLevel(logging.INFO)
+    else:
+        stdout_handler.setLevel(logging.WARNING)
+        stderr_handler.setLevel(logging.ERROR)
+
+    handlers.append(stdout_handler)
+    handlers.append(stderr_handler)
+
+    logging.basicConfig(level=logging.DEBUG, handlers=handlers, format=formatter)
 
 
 def parse_args() -> argparse.Namespace:  # pragma: no cover
