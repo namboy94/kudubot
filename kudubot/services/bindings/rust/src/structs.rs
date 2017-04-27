@@ -23,6 +23,7 @@ LICENSE
 */
 
 use serde_json;
+use files::write_to_file;
 
 /// The Message struct models a Message as defined by the kudubot
 /// framework for easy use in rust.
@@ -53,8 +54,18 @@ impl Message{
     /// # Return value
     ///
     /// The Message in String representation
-    fn to_string(&self) -> String {
+    pub fn to_string(&self) -> String {
         return serde_json::to_string(&self).unwrap();
+    }
+
+    /// Writes the Message to a file
+    ///
+    /// # Arguments
+    ///
+    /// * `destination` - The destination file path to which will be written
+    pub fn write_to(&self, destination: &str) {
+        let data = self.to_string();
+        write_to_file(destination, data.as_str())
     }
 
 }

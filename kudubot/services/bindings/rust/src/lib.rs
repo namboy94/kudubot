@@ -28,10 +28,26 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-mod files;
-mod structs;
+pub mod files;
+pub mod structs;
 
+use files::read_from_file;
 use structs::Message;
+
+
+/// Loads a Message struct from a .json file
+///
+/// # Arguments
+///
+/// * `source` - The path to the source .json file
+///
+/// # Return value
+///
+/// Returns the generated Message struct
+pub fn load_message(source: &str) -> Message {
+    let data = read_from_file(source);
+    return serde_json::from_str(data.as_str()).unwrap()
+}
 
 
 /// Generates a reply Message struct for a given Message.
@@ -47,7 +63,7 @@ use structs::Message;
 /// # Return value
 ///
 /// Returns the generated reply message
-fn generate_reply(message: Message, title: &str, body: &str) -> Message {
+pub fn generate_reply(message: Message, title: &str, body: &str) -> Message {
 
     // Check if we need to reply to a group or not
     let receiver = match message.sender_group {

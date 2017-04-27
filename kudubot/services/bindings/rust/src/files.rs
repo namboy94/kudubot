@@ -35,7 +35,7 @@ use std::io::{Read, Write};
 /// # Return value
 ///
 /// Returns the file's content
-fn read_from_file(file_path: &str) -> String {
+pub fn read_from_file(file_path: &str) -> String {
 
     let mut file: File = File::open(file_path).unwrap();
     let mut data: String = String::new();
@@ -51,7 +51,7 @@ fn read_from_file(file_path: &str) -> String {
 ///
 /// * `file_path` - The path to the file
 /// * `content` - The String to write to the file
-fn write_to_file(file_path: &str, content: &str) {
+pub fn write_to_file(file_path: &str, content: &str) {
 
     let mut file: File = File::create(file_path).unwrap();
     file.write_all(content.as_bytes()).unwrap();
