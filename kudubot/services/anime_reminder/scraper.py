@@ -29,7 +29,7 @@ import requests
 from typing import List, Dict
 
 
-logger = logging.getLogger("kudubot.services.anime_reminder.scraper")
+logger = logging.getLogger(__name__)
 """
 The logger for this module
 """

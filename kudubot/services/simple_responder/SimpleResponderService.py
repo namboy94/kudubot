@@ -106,15 +106,7 @@ class SimpleResponderService(Service):
         :param message: The message to check
         :return: True if applicable, else False
         """
-        applicable = self.__check_rules__(message.message_body) != ""
-
-        if applicable:
-            self.logger.info("Service " + self.identifier + " is applicable to message " +
-                             repr(message.message_body) + ".")
-        else:
-            self.logger.debug("Service " + self.identifier + " is not applicable to message.")
-
-        return applicable
+        return self.__check_rules__(message.message_body) != ""
 
     def handle_message(self, message: Message):
         """
@@ -123,7 +115,6 @@ class SimpleResponderService(Service):
         :param message: The message to process
         :return: None
         """
-        self.logger.info("Handling message " + repr(message.message_body) + " from " + message.sender.address)
         response = self.__check_rules__(message.message_body)
 
         if response != "":

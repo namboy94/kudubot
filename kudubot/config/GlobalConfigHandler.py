@@ -36,7 +36,7 @@ class GlobalConfigHandler(object):
     Class that handles the global kudubot configuration files located in $HOME/.kudubot
     """
 
-    logger = logging.getLogger("kudubot.config.GlobalConfigHandler")
+    logger = logging.getLogger(__name__)
     """
     The Logger for this class
     """
@@ -57,6 +57,7 @@ class GlobalConfigHandler(object):
         self.specific_connection_config_location = os.path.join(self.config_location, "connection_config")
         self.external_services_directory = os.path.join(self.config_location, "external")
         self.external_services_executables_directory = os.path.join(self.external_services_directory, "bin")
+        self.logfile_directory = os.path.join(self.config_location, "logs")
 
     def validate_config_directory(self) -> bool:
         """
@@ -80,6 +81,8 @@ class GlobalConfigHandler(object):
                 raise InvalidConfigException("External Service directory does not exist")
             elif not os.path.isdir(self.external_services_executables_directory):
                 raise InvalidConfigException("External Service executable directory does not exist")
+            elif not os.path.isdir(self.logfile_directory):
+                raise InvalidConfigException("Log File Directory does not exist")
             else:
                 self.logger.info("Configuration successfully checked")
                 return True
@@ -127,6 +130,10 @@ class GlobalConfigHandler(object):
         if not os.path.isdir(self.external_services_executables_directory):
             self.logger.info("Creating directory " + self.external_services_executables_directory)
             os.makedirs(self.external_services_executables_directory)
+
+        if not os.path.isdir(self.logfile_directory):
+            self.logger.info("Creating directory " + self.logfile_directory)
+            os.makedirs(self.logfile_directory)
 
     def load_connections(self) -> List[type]:
         """
@@ -200,8 +207,8 @@ class GlobalConfigHandler(object):
         else:
             statement = statement.split("from ", 1)[1]
             statement = statement.split(" import ")
-            module = importlib.import_module(statement[0])
-            return getattr(module, statement[1])
+            _module = importlib.import_module(statement[0])
+            return getattr(_module, statement[1])
 
     # noinspection PyUnresolvedReferences,PyMethodMayBeStatic
     def __remove_duplicate_services_or_connections__(self, target: List[type]) -> List[type]:
@@ -276,6 +283,8 @@ class GlobalConfigHandler(object):
 
                 except ImportError:  # Ignore invalid imports
                     self.logger.warning("Import " + line + " has failed")
+                except IndexError:  # Ignore failed parsing attempts
+                    self.logger.warning("Import " + line + " has failed due to an error in the config file.")
 
         return modules
 

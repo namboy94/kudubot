@@ -25,6 +25,7 @@ LICENSE
 import logging
 from typing import List
 from kudubot.entities.Message import Message
+from threading import Thread
 
 
 class Service(object):
@@ -42,8 +43,9 @@ class Service(object):
         self.connection = connection
         self.identifier = self.define_identifier()
         self.requires = self.define_requirements()
-        self.logger = logging.getLogger("kudubot.services.Service." + self.identifier)
+        self.logger = logging.getLogger(self.__class__.__module__)
         self.init()
+        self.logger.debug(self.identifier + " Service initialized")
 
     # noinspection PyMethodMayBeStatic
     def init(self):
@@ -55,6 +57,59 @@ class Service(object):
         :return: None
         """
         pass
+
+    def is_applicable_to_with_log(self, message: Message) -> bool:
+        """
+        Wrapper around the is_applicable_to method, which enables logging the message easily
+        for all subclasses
+
+        :param message: The message to analyze
+        :return: True if the message is applicable, False otherwise
+        """
+        self.logger.debug("Checking if " + message.message_body + "is applicable")
+        result = self.is_applicable_to(message)
+        self.logger.debug("Message is " + ("" if result else "not") + " applicable")
+        return result
+
+    def handle_message_with_log(self, message: Message):
+        """
+        Wrapper around the handle_message method, which enables logging the message easily
+        for all subclasses
+
+        :param message: The message to handle
+        :return: None
+        """
+        self.logger.debug("Handling message " + message.message_body)
+        self.handle_message(message)
+
+    # noinspection PyMethodMayBeStatic
+    def start_daemon_thread(self, target: callable) -> Thread:
+        """
+        Starts a daemon/background thread
+        :param target: The target function to execute as a separate thread
+        :return: The thread
+        """
+        self.logger.debug("Starting background thread for " + self.identifier)
+
+        thread = Thread(target=target)
+        thread.daemon = True
+        thread.start()
+        return thread
+
+    # noinspection PyDefaultArgument
+    def initialize_database_table(self, sql: List[str] = [], initializer: callable=None):
+        """
+        Executes the provided SQL queries to create the database table(s).
+
+        :param sql: The SQL queries used to create the database tables
+        :param initializer: A method that initializes the database connection itself.
+        :return: None
+        """
+        self.logger.debug("Initializing Database table" + ("" if len(sql) < 2 else "s") + " for " + self.identifier)
+        for statement in sql:
+            self.connection.db.execute(statement)
+        if initializer is not None:
+            initializer(self.connection.db)
 
     def is_applicable_to(self, message: Message) -> bool:
         """

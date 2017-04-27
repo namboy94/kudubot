@@ -37,7 +37,7 @@ class AddressBook(object):
               | id | display_name | address | selected_language | is_admin | is_blacklisted |
     """
 
-    logger = logging.getLogger("kudubot.users.AddressBook")
+    logger = logging.getLogger(__name__)
     """
     The Logger for this class
     """

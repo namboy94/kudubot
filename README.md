@@ -45,6 +45,83 @@ For examples see:
 * [kudubot-reminder](kudubot/services/reminder)
 * [kudubot-anime-reminder](kudubot/services/anime_reminder)
 
+## Implementing an external Service
+
+Kudubot enables you to write a Service in any language you would like.
+For this to be possible, you first need to implement a very basic python
+class that inherits from `kudubot.services.ExternalService` and implement
+its abstract methods, which are:
+
+1. define_executable_file_url
+    
+   Defines a URL from which the Service's executable file can be downloaded
+   if necessary. there is a helper method called `resolve_github_release_asset_url`
+   which makes it easy to provide a Github release asset as the executable
+   file.
+     
+2. define_executable_command
+
+   Defines the commands *preceeding* the actual executable if called from the
+   command line.
+   
+   For example, for a `.jar` file to run, one would have to return `["java","-jar"].`
+
+3. define_identifier
+
+    Simply a unique string which acts as an identifier for a service.
+    
+
+Once that has been settled, you may start implementing the service in your
+preferred language. Your program needs to be runnable as a single executable.
+
+The kudubot framework will call your executable whenever it receives a message,
+then checks if the message is applicable to your service and then, if it is
+applicable, asks your executable to process the message.
+
+**In detail**:
+
+Your executable will be provided with 4 command line arguments:
+
+1. The mode in which your program should run. Can be either `is_applicable_to`
+   or `handle_message`. Your program must act accordingly.
+2. A file location containing the message information in JSON format. You will
+   need to parse this yourself if no bindings exist for your language.
+3. A file location which is used to tell the kudubot program the result of
+   your program's execution.
+   
+   For example, if the `is_applicable_to` query was successful, i.e. the Service
+   is aplicable to the message, the following JSON data should be written to
+   the file:
+   
+       {"is_applicable": true}
+   
+   or when your program handled a message sucessfully and want to reply
+   with a message of its own:
+   
+       {"mode": "reply"}
+    
+4. The location of the Connection's SQlite database file.
+
+
+Should you want to reply to a message, the original message file
+must be overwritten with a new Message JSON string, which needs to
+have the exact same attributes as the original, just different values.
+To actually make kudubot reply, `{"mode": "reply"}` must be written
+into the response file.
+
+Your executable file must be located in `.kudubot/external/bin` and
+have the exact same name as your service's identifier, including the
+file extension. If it is not there at runtime, kudubot will try to
+download the executable from the download URL specified in
+`define_executable_file_url`.
+
+**Bindings**
+
+There are common bindings available for the following languages:
+
+* [Rust](kudubot/services/bindings/rust/README.md)
+  ([crates.io](https://crates.io/crates/kudubot-bindings))
+
 
 ## Further Information
 

@@ -22,18 +22,33 @@ This file is part of kudubot.
 LICENSE
 """
 
-"""
-The metadata is stored here. It can be used by any other module in this project this way, most
-notably by the setup.py file
-"""
+import os
+from subprocess import Popen
+from kudubot.metadata import version
 
-version = "0.15.0"  # pragma: no cover
-"""
-The current version of the program
-"""
 
-sentry_dsn = "https://f8dc6c1c49944cbdb5215e563e83cc78:" \
-             "703626a5a0714e58b8c60947b949c524@sentry.io/160743"  # pragma: no cover
-"""  # pragma: no cover
-The DSN used for Sentry Error Logging
-"""
+def publish_rust():
+    """
+    Publishes the Rust Bindings
+
+    :return: None
+    """
+
+    cwd = os.getcwd()
+    os.chdir(os.path.join("kudubot", "services", "bindings", "rust"))
+
+    with open("Cargo.toml", 'r') as f:
+        cargo = f.read().replace("version = \"0.1.0\"", "version = \"" + str(version) + "\"")
+    with open("Cargo.toml", 'w') as f:
+        f.write(cargo)
+
+    api_token = os.environ["CRATES_API_TOKEN"]
+
+    Popen(["cargo", "login", api_token]).wait()
+    Popen(["cargo", "package", "--allow-dirty"]).wait()
+    Popen(["cargo", "publish", "--allow-dirty"]).wait()
+
+    os.chdir(cwd)
+
+if __name__ == "__main__":
+    publish_rust()

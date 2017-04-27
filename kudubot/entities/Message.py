@@ -34,7 +34,7 @@ class Message(object):
     """
 
     def __init__(self, message_title: str, message_body: str, receiver: Contact, sender: Contact,
-                 sender_group: Contact = None, timestamp: float = None):
+                 sender_group: Contact = None, timestamp: float = -1.0):
         """
         Initializes the Message object
 

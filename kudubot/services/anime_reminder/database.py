@@ -27,7 +27,7 @@ import sqlite3
 from typing import List, Dict
 
 
-logger = logging.getLogger("kudubot.services.anime_reminder.database")
+logger = logging.getLogger(__name__)
 """
 The logger for this module
 """

@@ -29,7 +29,7 @@ from datetime import datetime
 from kudubot.users.Contact import Contact
 
 
-logger = logging.getLogger("kudubot.services.reminder.database")
+logger = logging.getLogger(__name__)
 """
 The logger for this module
 """
