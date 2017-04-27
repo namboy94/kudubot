@@ -48,7 +48,7 @@ def main():  # pragma: no cover
         args = parse_args()
 
         config_handler = GlobalConfigHandler() if args.config is None else GlobalConfigHandler(args.config)
-        initialize_logging(args.verbose, args.debug, config_handler)
+        initialize_logging(args.quiet, args.verbose, args.debug, config_handler)
         connection = initialize_connection(args.connection.lower(), config_handler)
 
         connection.listen()
@@ -92,13 +92,14 @@ def initialize_connection(identifier: str, config_handler: GlobalConfigHandler) 
         sys.exit(1)
 
 
-def initialize_logging(verbose: bool, debug: bool, config_handler: GlobalConfigHandler):
+def initialize_logging(quiet: bool, verbose: bool, debug: bool, config_handler: GlobalConfigHandler):
     """
     Initializes the logging levels and files for the program. If neither the verbose or
     debug flags were provided, the logging level defaults to WARNING.
     Log files for ERROR, WARNING, DEBUG and INFO are always generated.
     If the size of a previous log file exceeds 1MB, the file is renamed and a new one is created.
 
+    :param quiet: Can be set to diable all logging to the console. Text logs are still done however.
     :param verbose: Flag that determines if the verbose mode is switched on ~ INFO
     :param debug: Flag that determines if the debug mode is on ~ DEBUG
     :param config_handler: The config handler used to determine the logging directory location
@@ -111,6 +112,8 @@ def initialize_logging(verbose: bool, debug: bool, config_handler: GlobalConfigH
         stdout_handler.setLevel(logging.DEBUG)
     elif verbose:
         stdout_handler.setLevel(logging.INFO)
+    elif quiet:
+        stdout_handler.setLevel(logging.CRITICAL)
     else:
         stdout_handler.setLevel(logging.WARNING)
 
@@ -146,6 +149,7 @@ def parse_args() -> argparse.Namespace:  # pragma: no cover
 
     parser.add_argument("-v", "--verbose", action="store_true", help="Activates verbose output")
     parser.add_argument("-d", "--debug", action="store_true", help="Activates debug-level logging output")
+    parser.add_argument("-q", "--quiet", action="store_true", help="Disables all text output")
     parser.add_argument("-c", "--config", nargs="?", help="Overrides the configuration directory location")
 
     return parser.parse_args()
