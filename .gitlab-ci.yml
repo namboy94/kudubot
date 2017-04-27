@@ -11,6 +11,9 @@ stages:
 variables:
   GITLAB_ACCESS_TOKEN: "$GITLAB_ACCESS_TOKEN"
   GITHUB_OAUTH_TOKEN: "$GITHUB_ACCESS_TOKEN"
+  CRATES_API_TOKEN: "$CRATES_API_TOKEN"
+  TELEGRAM_CONFIG: "$TELEGRAM_CONFIG"
+  WHATSAPP_CONFIG: "$WHATSAPP_CONFIG"
 
 github_mirror:
   stage: mirror
@@ -72,6 +75,15 @@ pypi_dist:
     - rm -rf dist
     - python2 setup.py bdist_wheel
     - twine upload dist/*
+
+distribute_bindings:
+  stage: deploy
+  only:
+    - master
+  tags:
+    - linux-buildserver
+  script:
+    - python publish-bindings.py
 
 upload_release_to_github:
   stage: release

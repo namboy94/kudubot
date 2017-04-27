@@ -156,7 +156,7 @@ class ExternalService(Service):
 
         response = self.load_json(response_file)
 
-        return response["mode"] == "is_applicable" and response["applicable"]
+        return bool(response["is_applicable"])
 
     def store_message_in_file(self, message: Message) -> Tuple[str, str]:
         """

@@ -22,118 +22,60 @@ This file is part of kudubot.
 LICENSE
 */
 
-#[macro_use]
-extern crate serde_json;
-
-use serde_json::Value;
-
-use std::fs::File;
-use std::io::{Read, Write};
+extern crate kudubot_bindings;
+use kudubot_bindings::structs::Message;
+use kudubot_bindings::{load_message,
+                       write_is_applicable_response,
+                       generate_reply,
+                       write_reply_response};
 use std::env;
 
-
-/// The main method of the Service
+/// The main method of the Service. Fetches the Command line arguments,
+/// loads the message from the JSON file and handles the message accordingly.
 fn main() {
 
-    // Fetch the command line arguments
     let args: Vec<_> = env::args().collect();
     let mode: &str = &args[1];
     let message_file: &str = &args[2];
     let response_file: &str = &args[3];
 
-    let message: Value = read_json_file(message_file);
+    let message: Message = load_message(message_file);
 
     if mode == "handle_message" {
         handle_message(message, message_file, response_file);
     }
-
     else if mode == "is_applicable_to" {
-        handle_message_applicable(message, response_file)
+        is_applicable_to(message, response_file);
     }
 }
 
-
-/// Handles an incoming message. Responds with "Hi" to the original sender
+/// Checks if the message is applicable to this service and writes the
+/// result of that analysis to the response JSON file.
 ///
 /// # Arguments
 ///
-/// * `message` - The original message received via kudubot as a serde_json::Value object
-/// * `message_file_path` - The path to the message file to write the response to
-/// * `response_file_path` - The path to the response file used to communicate with kudubot
-fn handle_message(message: Value, message_file_path: &str, response_file_path: &str) {
+/// * `message` - The message to analyze
+/// * `response_file` - The file into which the response should be written
+fn is_applicable_to(message: Message, response_file: &str) {
 
-    let return_message = json!({
-        "message_title": "Hello Rust",
-        "message_body": "Hi!",
-        "sender": message["receiver"],
-        "sender_group": null,
-        "receiver": message["sender"],
-        "timestamp": message["timestamp"]
-    });
-
-    let response_json = json!({
-        "mode": "reply"
-    });
-
-    write_json_to_file(return_message, message_file_path);
-    write_json_to_file(response_json, response_file_path);
+    let applicable: bool = message.message_body.to_lowercase() == "hello rust!";
+    write_is_applicable_response(response_file, applicable);
 
 }
 
-
-/// Checks if a message is applicable to the Hello Rust Service
-/// The result of this query is then written to a JSON file which can then be
-/// read by kudubot
+/// Handles a message. Replies to the sender with 'Hi!'
 ///
 /// # Arguments
 ///
-/// * `message` - The parsed JSON file object which models the message received
-/// * `response_file_path` - The path to the response JSON file to write to
-fn handle_message_applicable(message: Value, response_file_path: &str) {
+/// * `message` - The incoming message
+/// * `message_file` - The file in which the message was originally stored in and which
+///                    will be the destination of the reply message
+/// * `response_file` - The file to which to write the response to,
+///                     so that kudubot knows how to proceed
+fn handle_message(message: Message, message_file: &str, response_file: &str) {
 
-    let body: String = message["message_body"].as_str().unwrap().to_lowercase();
-    let applicable: bool = body == "hello rust!";
-
-    let json_response = json!({
-        "mode": "is_applicable",
-        "applicable": applicable
-    });
-
-    write_json_to_file(json_response, response_file_path);
-
-}
-
-/// Reads a JSON file and generate a serde_json::Value object from it.
-///
-/// # Arguments
-///
-/// * `json_file_path` - The path to the JSON file to read
-///
-/// # Return value
-///
-/// Returns the parsed serde_json::Value object
-fn read_json_file(json_file_path: &str) -> Value {
-
-    // Read message file content
-    let mut json_file: File = File::open(json_file_path).unwrap();
-    let mut json_data: String = String::new();
-    json_file.read_to_string(&mut json_data).unwrap();
-
-    let json: Value = serde_json::from_str(json_data.as_str()).unwrap();
-
-    return json;
-
-}
-
-/// Writes a serde_json:Value object to a file.
-///
-/// # Arguments
-///
-/// * `json_data` - The JSON Data to write into the file
-/// * `json_file_location` - The destination file to write to
-fn write_json_to_file(json_data: Value, json_file_location: &str) {
-
-    let mut json_file: File = File::create(json_file_location).unwrap();
-    json_file.write_all(json_data.to_string().as_bytes()).unwrap();
+    let reply: Message = generate_reply(message, "Hello Rust", "Hi!");
+    reply.write_to(message_file);
+    write_reply_response(response_file);
 
 }
