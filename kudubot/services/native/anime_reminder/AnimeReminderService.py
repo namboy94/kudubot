@@ -27,10 +27,9 @@ import re
 import time
 from typing import List, Dict
 
-from kudubot.services.anime_reminder.scraper import scrape_reddit_discussion_threads
-
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
+from kudubot.services.native.anime_reminder.scraper import scrape_reddit_discussion_threads
 from kudubot.services.native.anime_reminder.database import initialize_database, store_subscription, \
     delete_subscription, get_subscriptions, thread_exists, store_thread
 
