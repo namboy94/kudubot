@@ -98,7 +98,12 @@ fn generate_reply_text(message: &Message) -> &str {
     let language = split_text.next().unwrap();
 
     return match language {
-        "python" => "print(\"Hello World\")",
+        "python" => "print(\"Hello World!\")",
+        "rust" => "fn main() {\n    println!(\"Hello World!\"); \n}",
+        "bash" => "echo \"Hello World!\"",
+        "java" => "public class Main {\n    \
+                       public static void main(String[] args) {\n        \
+                           System.out.println(\"Hello World!\");\n    }\n}",
         _ => "No hello world snippet for this language available"
     };
 }
