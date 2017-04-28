@@ -13,4 +13,6 @@ fun main(args: Array<String>) {
     val message: Message = messageFromFile(message_path)
     println(message.messageBody)
 
+    message.writeToFile("/home/hermann/tesssssss.json")
+
 }
