@@ -69,5 +69,6 @@ class StandardConfigWriter(object):
                      native + "reminder.ReminderService import ReminderService",
                      native + "anime_reminder.AnimeReminderService import AnimeReminderService",
                      native + "jokes.JokesService import JokesService",
-                     external + "helloworld_rust.HelloWorldService import HelloWorldService"]:
+                     external + "helloworld_rust.HelloWorldService import HelloWorldService",
+                     external + "hello_kotlin.HelloKotlinService import HelloKotlinService"]:
                 config.write(service + "\n")

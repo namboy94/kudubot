@@ -39,4 +39,4 @@ class HelloWorldService(ExternalService):
 
     @staticmethod
     def define_identifier() -> str:
-        return "helloworld"
+        return "helloworld_rust"
