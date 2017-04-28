@@ -1,18 +1,23 @@
 package net.namibsun.hello_kotlin
 
-import net.namibsun.kudubot_bindings.Message
-import net.namibsun.kudubot_bindings.messageFromFile
+import net.namibsun.kudubot_bindings.KudubotCommunicationHandler
+import net.namibsun.kudubot_bindings.Modes
 
+
+/**
+ * The main method that starts the execution of the program
+ *
+ * @param args The command line arguments passed to this program
+ */
 fun main(args: Array<String>) {
 
-    val mode = args[0]
-    val message_path = args[1]
-    val response_path = args[2]
-    val database_path = args[3]
+    val communicator = KudubotCommunicationHandler(args)
 
-    val message: Message = messageFromFile(message_path)
-    println(message.messageBody)
+    when (communicator.mode) {
 
-    message.writeToFile("/home/hermann/tesssssss.json")
+        Modes.IS_APPLICABLE_TO -> communicator.setApplicable(
+                communicator.incomingMessage.messageBody.toLowerCase() == "hello kotlin!")
+        Modes.HANDLE_MESSAGE -> communicator.reply("Hello Kotlin", "Hi!")
+    }
 
 }

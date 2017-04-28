@@ -1,7 +1,6 @@
 package net.namibsun.kudubot_bindings
 
 import com.github.salomonbrys.kotson.jsonObject
-import com.sun.org.apache.xpath.internal.operations.Bool
 import java.io.File
 
 /**
@@ -63,7 +62,7 @@ class KudubotCommunicationHandler(args: Array<String>) {
      *
      * @param isApplicable Indicates if the message is applicable to this service or not.
      */
-    fun setApplicable(isApplicable: Bool) {
+    fun setApplicable(isApplicable: Boolean) {
         val json = jsonObject("is_applicable" to isApplicable).toString()
         File(this.responseFilePath).writeText(json)
         System.exit(0)
