@@ -22,13 +22,14 @@ This file is part of kudubot.
 LICENSE
 """
 
+import datetime
 import re
 import time
-import datetime
 from typing import List, Dict
+
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
-from kudubot.services.reminder.database import initialize_database, store_reminder, get_unsent_reminders,\
+from kudubot.services.native.reminder.database import initialize_database, store_reminder, get_unsent_reminders, \
     mark_reminder_sent, convert_datetime_to_string
 
 

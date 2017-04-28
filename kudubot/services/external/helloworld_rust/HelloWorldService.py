@@ -26,18 +26,17 @@ from typing import List
 from kudubot.services.ExternalService import ExternalService
 
 
-class HelloRustService(ExternalService):
+class HelloWorldService(ExternalService):
     """
-    A service that responds with 'Hello!' if you send it 'Hello Rust!'
-    More a proof of concept than anything.
+    A service that responds with a 'Hello World!' snippet in various languages.
     """
 
     def define_executable_file_url(self):
-        return self.resolve_github_release_asset_url("namboy94", "kudubot", "hello_rust")
+        return self.resolve_github_release_asset_url("namboy94", "kudubot", "helloworld_rust")
 
     def define_executable_command(self) -> List[str]:
         return []
 
     @staticmethod
     def define_identifier() -> str:
-        return "hello_rust"
+        return "helloworld_rust"

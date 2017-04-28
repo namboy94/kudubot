@@ -107,8 +107,8 @@ class ExternalService(Service):
             os.chmod(self.executable_file, st.st_mode | stat.S_IEXEC)
 
         except Exception as e:
-            print(str(e))
             self.logger.error("Could not download executable. Disabling Service.")
+            self.logger.debug("Cause of download failure: " + str(e))
             if os.path.isfile(self.executable_file):
                 os.remove(self.executable_file)
 
@@ -120,19 +120,24 @@ class ExternalService(Service):
         :return: None
         """
         if not os.path.isfile(self.executable_file):
+            self.logger.debug("Service is disabled")
             return
 
         message_file, response_file = self.store_message_in_file(message)
 
-        Popen(self.define_executable_command() +
-              [self.executable_file,
-               "handle_message", message_file, response_file,
-               self.connection.database_file_location]).wait()
+        try:
+            Popen(self.define_executable_command() +
+                  [self.executable_file,
+                   "handle_message", message_file, response_file,
+                   self.connection.database_file_location]).wait()
 
-        response = self.load_json(response_file)
+            response = self.load_json(response_file)
 
-        if response["mode"] == "reply":
-            self.connection.send_message(self.retrieve_message_from_file(message_file))
+            if response["mode"] == "reply":
+                self.connection.send_message(self.retrieve_message_from_file(message_file))
+
+        except BaseException as e:
+            self.logger.error("Execution of external Service failed: " + str(e))
 
         self.cleanup(message_file, response_file)
 
@@ -145,18 +150,27 @@ class ExternalService(Service):
         :return: None
         """
         if not os.path.isfile(self.executable_file):
+            self.logger.debug("Service is disabled")
             return False
 
         message_file, response_file = self.store_message_in_file(message)
+        applicable = False
 
-        Popen(self.define_executable_command() +
-              [self.executable_file,
-               "is_applicable_to", message_file, response_file,
-               self.connection.database_file_location]).wait()
+        try:
+            Popen(self.define_executable_command() +
+                  [self.executable_file,
+                   "is_applicable_to", message_file, response_file,
+                   self.connection.database_file_location]).wait()
 
-        response = self.load_json(response_file)
+            response = self.load_json(response_file)
 
-        return bool(response["is_applicable"])
+            applicable = bool(response["is_applicable"])
+
+        except BaseException as e:
+            self.logger.error("Execution of external Service failed: " + str(e))
+
+        self.cleanup(message_file, response_file)
+        return applicable
 
     def store_message_in_file(self, message: Message) -> Tuple[str, str]:
         """

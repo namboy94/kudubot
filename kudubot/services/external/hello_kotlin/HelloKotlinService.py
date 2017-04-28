@@ -22,18 +22,22 @@ This file is part of kudubot.
 LICENSE
 """
 
-"""
-The metadata is stored here. It can be used by any other module in this project this way, most
-notably by the setup.py file
-"""
+from typing import List
+from kudubot.services.ExternalService import ExternalService
 
-version = "0.16.0"  # pragma: no cover
-"""
-The current version of the program
-"""
 
-sentry_dsn = "https://f8dc6c1c49944cbdb5215e563e83cc78:" \
-             "703626a5a0714e58b8c60947b949c524@sentry.io/160743"  # pragma: no cover
-"""  # pragma: no cover
-The DSN used for Sentry Error Logging
-"""
+class HelloKotlinService(ExternalService):
+    """
+    A service that responds with 'Hello!' if you send it 'Hello Kotlin!'
+    More a proof of concept than anything.
+    """
+
+    def define_executable_file_url(self):
+        return self.resolve_github_release_asset_url("namboy94", "kudubot", "hello_kotlin")
+
+    def define_executable_command(self) -> List[str]:
+        return ["java", "-jar"]
+
+    @staticmethod
+    def define_identifier() -> str:
+        return "hello_kotlin"

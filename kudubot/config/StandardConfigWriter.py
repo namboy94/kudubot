@@ -60,11 +60,15 @@ class StandardConfigWriter(object):
         :return: None
         """
 
+        native = "from kudubot.services.native."
+        external = "from kudubot.services.external."
+
         with open(self.service_config, 'w') as config:
             for service in \
-                    ["from kudubot.services.simple_responder.SimpleResponderService import SimpleResponderService",
-                     "from kudubot.services.reminder.ReminderService import ReminderService",
-                     "from kudubot.services.anime_reminder.AnimeReminderService import AnimeReminderService",
-                     "from kudubot.services.jokes.JokesService import JokesService",
-                     "from kudubot.services.external.hello_rust.HelloRustService import HelloRustService"]:
+                    [native + "simple_responder.SimpleResponderService import SimpleResponderService",
+                     native + "reminder.ReminderService import ReminderService",
+                     native + "anime_reminder.AnimeReminderService import AnimeReminderService",
+                     native + "jokes.JokesService import JokesService",
+                     external + "helloworld_rust.HelloWorldService import HelloWorldService",
+                     external + "hello_kotlin.HelloKotlinService import HelloKotlinService"]:
                 config.write(service + "\n")

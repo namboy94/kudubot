@@ -29,6 +29,7 @@ use kudubot_bindings::{load_message,
                        generate_reply,
                        write_reply_response};
 use std::env;
+use std::str::SplitWhitespace;
 
 /// The main method of the Service. Fetches the Command line arguments,
 /// loads the message from the JSON file and handles the message accordingly.
@@ -58,8 +59,17 @@ fn main() {
 /// * `response_file` - The file into which the response should be written
 fn is_applicable_to(message: Message, response_file: &str) {
 
-    let applicable: bool = message.message_body.to_lowercase() == "hello rust!";
-    write_is_applicable_response(response_file, applicable);
+    let mut is_applicable: bool = false;
+    let slice_message: &str = message.message_body.as_str();
+
+    if slice_message.starts_with("/helloworld ") {
+
+        let split: SplitWhitespace = slice_message.split_whitespace();
+        is_applicable = split.count() == 2;
+
+    }
+
+    write_is_applicable_response(response_file, is_applicable);
 
 }
 
@@ -74,8 +84,26 @@ fn is_applicable_to(message: Message, response_file: &str) {
 ///                     so that kudubot knows how to proceed
 fn handle_message(message: Message, message_file: &str, response_file: &str) {
 
-    let reply: Message = generate_reply(message, "Hello Rust", "Hi!");
+    let reply_text = generate_reply_text(&message);
+    let reply: Message = generate_reply(&message, "Hello World", reply_text);
     reply.write_to(message_file);
     write_reply_response(response_file);
 
+}
+
+fn generate_reply_text(message: &Message) -> &str {
+
+    let mut split_text: SplitWhitespace = message.message_body.split_whitespace();
+    split_text.next();
+    let language = split_text.next().unwrap();
+
+    return match language {
+        "python" => "print(\"Hello World!\")",
+        "rust" => "fn main() {\n    println!(\"Hello World!\"); \n}",
+        "bash" => "echo \"Hello World!\"",
+        "java" => "public class Main {\n    \
+                       public static void main(String[] args) {\n        \
+                           System.out.println(\"Hello World!\");\n    }\n}",
+        _ => "No hello world snippet for this language available"
+    };
 }

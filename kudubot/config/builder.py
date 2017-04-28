@@ -24,55 +24,44 @@ LICENSE
 
 import os
 import stat
+import json
 from typing import List
 from subprocess import Popen
 
 
 # noinspection PyUnusedLocal
-def build(service_name: str, service_dir: str, source_file: str, destination_file: str):
+def build(service_directory):
     """
-    Builds an executable file for an external service.
+    Builds a Service using the service configuration inside the service directory.
 
-    :param service_name: The name of the service
-    :param service_dir: The root directory of the external service
-    :param source_file: The main source file used for compilation
-    :param destination_file: The destination executable file
-    :return: None
+    :param service_directory: The location of the service directory
+    :return: The path to the generated executable file
     """
 
+    service_name = os.path.basename(service_directory)
     current_dir = os.getcwd()
+    os.chdir(service_directory)
 
-    if source_file.endswith(".rs"):  # Rust
-        os.chdir(service_dir)
-        run_safe_popen(["cargo", "build", "--release"])
-        safe_move(os.path.join("target", "release", service_name), os.path.join("build", service_name))
+    with open("service.json", 'r') as f:
+        config = json.load(f)
 
-    os.chdir(current_dir)
-
-
-def run_safe_popen(command):
-    """
-    Runs a Popen command and makes sure to catch any exceptions that may occur.
-
-    :param command: The command to run
-    :return: None
-    """
     try:
-        Popen(command).wait()
+        Popen(config["build_commands"]).wait()
     except BaseException as e:
         print(e)
 
+    output = config["output_file"]
+    st = os.stat(output)
+    os.chmod(output, st.st_mode | stat.S_IEXEC)  # Make executable
 
-def safe_move(source: str, destination: str):
-    """
-    Moves a file to a new location, but makes sure that the move is even possible.
+    if os.path.basename(output) != service_name:
+        new_output = os.path.join(os.path.dirname(output), service_name)
+        os.rename(output, new_output)
+        output = new_output
 
-    :param source: The source file
-    :param destination: The destination file
-    :return: None
-    """
-    if os.path.isfile(source) and os.path.isdir(os.path.dirname(destination)):
-        os.rename(source, destination)
+    os.chdir(current_dir)
+
+    return os.path.join(service_directory, output)
 
 
 def build_external(move_to: str = "") -> List[str]:
@@ -92,27 +81,14 @@ def build_external(move_to: str = "") -> List[str]:
         if not os.path.isdir(service_dir) or service == "__pycache__":
             continue
 
-        src = os.path.join(service_dir, "src")
-        build_dir = os.path.join(service_dir, "build")
+        result = build(service_dir)
 
-        if not os.path.isdir(build_dir):
-            os.makedirs(build_dir)
+        if move_to != "" and os.path.isfile(result):
+            destination = os.path.join(move_to, service)
+            os.rename(result, destination)
+            built_executables.append(destination)
 
-        for source_file in os.listdir(src):
-
-            source_path = os.path.join(src, source_file)
-            destination_path = os.path.join(build_dir, service)
-
-            if os.path.isfile(source_path) and source_file.lower().startswith("main"):
-                build(service, service_dir, source_path, destination_path)
-
-                if os.path.isfile(destination_path):
-                    st = os.stat(destination_path)
-                    os.chmod(destination_path, st.st_mode | stat.S_IEXEC)  # Make executable
-                    built_executables.append(destination_path)
-
-    if move_to != "":
-        for executable in built_executables:
-            os.rename(executable, os.path.join(move_to, os.path.basename(executable)))
+        elif os.path.isfile(result):
+            built_executables.append(result)
 
     return built_executables

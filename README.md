@@ -41,9 +41,9 @@ that would import your Service class.
 
 For examples see:
 
-* [kudubot-simple-responder](kudubot/services/simple_responder)
-* [kudubot-reminder](kudubot/services/reminder)
-* [kudubot-anime-reminder](kudubot/services/anime_reminder)
+* [kudubot-simple-responder](kudubot/services/native/simple_responder)
+* [kudubot-reminder](kudubot/services/native/reminder)
+* [kudubot-anime-reminder](kudubot/services/native/anime_reminder)
 
 ## Implementing an external Service
 

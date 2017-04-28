@@ -1,3 +1,8 @@
+V 0.16.0:
+  - Implemented JVM bindings for the external service in kotlin
+  - Converted the Hello Rust service into a "Hello World!" snippet Service
+  - Wrote a proof of concept kotlin Service
+  - Made external Services build process config based
 V 0.15.0:
   - Improved documentation on external Services
   - Implemented Rust Bindings
