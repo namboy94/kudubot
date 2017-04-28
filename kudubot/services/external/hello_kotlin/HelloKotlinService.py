@@ -26,17 +26,18 @@ from typing import List
 from kudubot.services.ExternalService import ExternalService
 
 
-class HelloWorldService(ExternalService):
+class HelloKotlinService(ExternalService):
     """
-    A service that responds with a 'Hello World!' snippet in various languages.
+    A service that responds with 'Hello!' if you send it 'Hello Kotlin!'
+    More a proof of concept than anything.
     """
 
     def define_executable_file_url(self):
-        return self.resolve_github_release_asset_url("namboy94", "kudubot", "helloworld_rust")
+        return self.resolve_github_release_asset_url("namboy94", "kudubot", "hello_kotlin")
 
     def define_executable_command(self) -> List[str]:
-        return []
+        return ["java", "-jar"]
 
     @staticmethod
     def define_identifier() -> str:
-        return "helloworld"
+        return "hello_kotlin"
