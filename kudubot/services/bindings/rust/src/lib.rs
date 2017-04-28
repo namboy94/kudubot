@@ -63,19 +63,19 @@ pub fn load_message(source: &str) -> Message {
 /// # Return value
 ///
 /// Returns the generated reply message
-pub fn generate_reply(message: Message, title: &str, body: &str) -> Message {
+pub fn generate_reply(message: &Message, title: &str, body: &str) -> Message {
 
     // Check if we need to reply to a group or not
-    let receiver = match message.sender_group {
-        None => message.sender,
+    let receiver = match message.sender_group.clone() {
+        None => message.sender.clone(),
         Some(x) => x
     };
 
     return Message {
         message_title: String::from(title),
         message_body: String::from(body),
-        receiver: receiver,
-        sender: message.receiver,
+        receiver: receiver.clone(),
+        sender: message.receiver.clone(),
         sender_group: None,
         timestamp: message.timestamp,
     }

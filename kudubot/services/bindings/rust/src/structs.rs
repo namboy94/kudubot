@@ -77,7 +77,7 @@ impl Message{
 /// * `database_id` - The contact's ID in the database
 /// * `display_name` - The contact's human-readable name
 /// * `address` - The contact's address on the connection
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Contact {
     pub database_id: i64,
     pub display_name: String,
