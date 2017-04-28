@@ -1,0 +1,4 @@
+{
+    "build_commands": ["cargo", "build", "--release"],
+    "output_file": "target/release/helloworld_rust"
+}
