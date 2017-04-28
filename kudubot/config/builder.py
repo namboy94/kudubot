@@ -25,37 +25,43 @@ LICENSE
 import os
 import stat
 import json
+from typing import List
 from subprocess import Popen
-from typing import List, Dict
 
 
 # noinspection PyUnusedLocal
-def build(service_directory, config: Dict[str, List[str] or str]):
+def build(service_directory):
+    """
+    Builds a Service using the service configuration inside the service directory.
 
+    :param service_directory: The location of the service directory
+    :return: The path to the generated executable file
+    """
+
+    service_name = os.path.basename(service_directory)
     current_dir = os.getcwd()
     os.chdir(service_directory)
 
-    Popen(config["build_commands"]).wait()
+    with open("service.json", 'r') as f:
+        config = json.load(f)
 
-    st = os.stat(config["output_file"])
-    os.chmod(config["output_file"], st.st_mode | stat.S_IEXEC)  # Make executable
+    try:
+        Popen(config["build_commands"]).wait()
+    except BaseException as e:
+        print(e)
+
+    output = config["output_file"]
+    st = os.stat(output)
+    os.chmod(output, st.st_mode | stat.S_IEXEC)  # Make executable
+
+    if os.path.basename(output) != service_name:
+        new_output = os.path.join(os.path.dirname(output), service_name)
+        os.rename(output, new_output)
+        output = new_output
 
     os.chdir(current_dir)
 
-    return os.path.join(service_directory, config["output_file"])
-
-
-def run_safe_popen(command):
-    """
-    Runs a Popen command and makes sure to catch any exceptions that may occur.
-
-    :param command: The command to run
-    :return: None
-    """
-    try:
-        Popen(command).wait()
-    except BaseException as e:
-        print(e)
+    return os.path.join(service_directory, output)
 
 
 def build_external(move_to: str = "") -> List[str]:
@@ -75,10 +81,7 @@ def build_external(move_to: str = "") -> List[str]:
         if not os.path.isdir(service_dir) or service == "__pycache__":
             continue
 
-        with open(os.path.join(service_dir, "service.json"), 'r') as f:
-            service_info = json.load(f)
-
-        result = build(service_dir, service_info)
+        result = build(service_dir)
 
         if move_to != "" and os.path.isfile(result):
             destination = os.path.join(move_to, service)
