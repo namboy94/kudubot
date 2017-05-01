@@ -22,17 +22,17 @@ This file is part of kudubot.
 LICENSE
 """
 
-import logging
 import os
+import logging
 import sqlite3
+import traceback
 from threading import Thread
 from typing import List, Dict
-
-from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
-from kudubot.entities.Message import Message
-from kudubot.exceptions import InvalidConfigException
-from kudubot.users.AddressBook import AddressBook
 from kudubot.users.Contact import Contact
+from kudubot.entities.Message import Message
+from kudubot.users.AddressBook import AddressBook
+from kudubot.exceptions import InvalidConfigException
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 class Connection(object):
@@ -77,10 +77,10 @@ class Connection(object):
             for service in services:
                 try:
                     self.services.append(service(self))
-                except BaseException as e:
+                except Exception as e:
                     # noinspection PyUnresolvedReferences
-                    self.logger.error("Service " + service.define_identifier() +
-                                      " failed to load due to error:" + e.args + "/" + str(e))
+                    self.logger.error("Service " + service.define_identifier() + " failed to load due to error:" +
+                                      str(e.args) + ", traceback:" + traceback.format_exc())
 
         except InvalidConfigException as e:
             self.generate_configuration()
@@ -123,9 +123,10 @@ class Connection(object):
                     service.handle_message_with_log(message)
                     if break_on_match:
                         break
-            except BaseException as e:
+            except Exception as e:
                 self.logger.error("Service " + service.identifier + " failed in executing message " +
-                                  message.message_body + " with exception " + e.args + "/" + str(e))
+                                  message.message_body + " with exception " + str(e.args) +
+                                  ", traceback:" + traceback.format_exc())
 
     def load_config(self) -> Dict[str, object]:
         """
