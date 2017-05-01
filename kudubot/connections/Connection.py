@@ -75,7 +75,12 @@ class Connection(object):
 
             self.services = []
             for service in services:
-                self.services.append(service(self))
+                try:
+                    self.services.append(service(self))
+                except BaseException as e:
+                    # noinspection PyUnresolvedReferences
+                    self.logger.error("Service " + service.define_identifier() +
+                                      " failed to load due to error:" + e.args + "/" + str(e))
 
         except InvalidConfigException as e:
             self.generate_configuration()
@@ -113,10 +118,14 @@ class Connection(object):
         self.logger.debug("Applying services to " + repr(message.message_body) + ".")
 
         for service in self.services:
-            if service.is_applicable_to_with_log(message):
-                service.handle_message_with_log(message)
-                if break_on_match:
-                    break
+            try:
+                if service.is_applicable_to_with_log(message):
+                    service.handle_message_with_log(message)
+                    if break_on_match:
+                        break
+            except BaseException as e:
+                self.logger.error("Service " + service.identifier + " failed in executing message " +
+                                  message.message_body + " with exception " + e.args + "/" + str(e))
 
     def load_config(self) -> Dict[str, object]:
         """
