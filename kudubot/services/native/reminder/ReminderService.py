@@ -116,7 +116,7 @@ class ReminderService(HelperService):
             return
 
         target = message.get_direct_response_contact()
-        command = self.parse_message(message.message_body.lower().strip(), self.determine_language(message))
+        command = self.parse_message(message.message_body.strip(), self.determine_language(message))
 
         if command["mode"] == "store":
             store_reminder(self.connection.db,
@@ -250,11 +250,11 @@ class ReminderService(HelperService):
         """
         self.logger.debug("Parsing message")
 
-        if self.translate("@remind_command @list_argument", language) == text:
+        if self.translate("@remind_command @list_argument", language) == text.lower():
             return {"mode": "list"}
         else:
 
-            time_string = text.split(" \"")[0].split(self.translate("@remind_command ", language))[1]
+            time_string = text.lower().split(" \"")[0].split(self.translate("@remind_command ", language))[1]
             reminder_message = text.split("\"")[1]
 
             usertime = self.parse_time_string(time_string.strip(), language)
