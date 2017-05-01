@@ -37,19 +37,13 @@ def readme():
 
     :return: the readme file as a string
     """
-    # noinspection PyBroadException
-    try:
-        # noinspection PyPackageRequirements
-        import pypandoc
-        with open('README.md') as f:
-            # Convert markdown file to rst
-            markdown = f.read()
-            rst = pypandoc.convert(markdown, 'rst', format='md')
-            return rst
-    except:
-        # If pandoc is not installed, just return the raw markdown text
-        with open('README.md') as f:
-            return f.read()
+    # noinspection PyPackageRequirements
+    import pypandoc
+    with open('README.md') as f:
+        # Convert markdown file to rst
+        markdown = f.read()
+        rst = pypandoc.convert(markdown, 'rst', format='md')
+        return rst
 
 
 def find_scripts():
