@@ -311,5 +311,5 @@ class ReminderService(HelperService):
 
             return now
 
-        except ValueError:  # Datetime exception
+        except (ValueError, OverflowError):  # Datetime exception, too high date values
             return None
