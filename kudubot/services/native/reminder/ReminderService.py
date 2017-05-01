@@ -294,19 +294,19 @@ class ReminderService(HelperService):
                 key = parsed[i + 1]
 
                 if key == "year":
-                    now = now.replace(year=now.year + value)
-                elif key == "month":
-                    now = now.replace(month=now.month + value)
+                    now += datetime.timedelta(days=value * 365)
+                elif key == "week":
+                    now += datetime.timedelta(weeks=value)
                 elif key == "day":
-                    now = now.replace(day=now.day + value)
+                    now += datetime.timedelta(days=value)
                 elif key == "hour":
-                    now = now.replace(hour=now.hour + value)
+                    now += datetime.timedelta(hours=value)
                 elif key == "minute":
-                    now = now.replace(minute=now.minute + value)
+                    now += datetime.timedelta(minutes=value)
                 elif key == "second":
-                    now = now.replace(second=now.second + value)
+                    now += datetime.timedelta(seconds=value)
                 else:
-                    self.logger.debug("Invalid time keyword used")
+                    self.logger.debug("Invalid time keyword " + key + " used")
                     return None
 
             return now
