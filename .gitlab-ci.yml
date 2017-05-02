@@ -53,6 +53,8 @@ run_unit_tests_python_3_with_coverage:
 
 build_external_services:
   stage: build
+  only:
+    - master
   tags:
     - linux-buildserver
   script:

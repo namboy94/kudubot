@@ -116,7 +116,7 @@ class ReminderService(HelperService):
             return
 
         target = message.get_direct_response_contact()
-        command = self.parse_message(message.message_body.lower().strip(), self.determine_language(message))
+        command = self.parse_message(message.message_body.strip(), self.determine_language(message))
 
         if command["mode"] == "store":
             store_reminder(self.connection.db,
@@ -250,11 +250,11 @@ class ReminderService(HelperService):
         """
         self.logger.debug("Parsing message")
 
-        if self.translate("@remind_command @list_argument", language) == text:
+        if self.translate("@remind_command @list_argument", language) == text.lower():
             return {"mode": "list"}
         else:
 
-            time_string = text.split(" \"")[0].split(self.translate("@remind_command ", language))[1]
+            time_string = text.lower().split(" \"")[0].split(self.translate("@remind_command ", language))[1]
             reminder_message = text.split("\"")[1]
 
             usertime = self.parse_time_string(time_string.strip(), language)
@@ -294,22 +294,22 @@ class ReminderService(HelperService):
                 key = parsed[i + 1]
 
                 if key == "year":
-                    now = now.replace(year=now.year + value)
-                elif key == "month":
-                    now = now.replace(month=now.month + value)
+                    now += datetime.timedelta(days=value * 365)
+                elif key == "week":
+                    now += datetime.timedelta(weeks=value)
                 elif key == "day":
-                    now = now.replace(day=now.day + value)
+                    now += datetime.timedelta(days=value)
                 elif key == "hour":
-                    now = now.replace(hour=now.hour + value)
+                    now += datetime.timedelta(hours=value)
                 elif key == "minute":
-                    now = now.replace(minute=now.minute + value)
+                    now += datetime.timedelta(minutes=value)
                 elif key == "second":
-                    now = now.replace(second=now.second + value)
+                    now += datetime.timedelta(seconds=value)
                 else:
-                    self.logger.debug("Invalid time keyword used")
+                    self.logger.debug("Invalid time keyword " + key + " used")
                     return None
 
             return now
 
-        except ValueError:  # Datetime exception
+        except (ValueError, OverflowError):  # Datetime exception, too high date values
             return None

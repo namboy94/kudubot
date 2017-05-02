@@ -22,17 +22,17 @@ This file is part of kudubot.
 LICENSE
 """
 
-import logging
 import os
+import logging
 import sqlite3
+import traceback
 from threading import Thread
 from typing import List, Dict
-
-from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
-from kudubot.entities.Message import Message
-from kudubot.exceptions import InvalidConfigException
-from kudubot.users.AddressBook import AddressBook
 from kudubot.users.Contact import Contact
+from kudubot.entities.Message import Message
+from kudubot.users.AddressBook import AddressBook
+from kudubot.exceptions import InvalidConfigException
+from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 
 class Connection(object):
@@ -75,7 +75,12 @@ class Connection(object):
 
             self.services = []
             for service in services:
-                self.services.append(service(self))
+                try:
+                    self.services.append(service(self))
+                except Exception as e:
+                    # noinspection PyUnresolvedReferences
+                    self.logger.error("Service " + service.define_identifier() + " failed to load due to error:" +
+                                      str(e.args) + ", traceback:" + traceback.format_exc())
 
         except InvalidConfigException as e:
             self.generate_configuration()
@@ -113,10 +118,15 @@ class Connection(object):
         self.logger.debug("Applying services to " + repr(message.message_body) + ".")
 
         for service in self.services:
-            if service.is_applicable_to_with_log(message):
-                service.handle_message_with_log(message)
-                if break_on_match:
-                    break
+            try:
+                if service.is_applicable_to_with_log(message):
+                    service.handle_message_with_log(message)
+                    if break_on_match:
+                        break
+            except Exception as e:
+                self.logger.error("Service " + service.identifier + " failed in executing message " +
+                                  message.message_body + " with exception " + str(e.args) +
+                                  ", traceback:" + traceback.format_exc())
 
     def load_config(self) -> Dict[str, object]:
         """
