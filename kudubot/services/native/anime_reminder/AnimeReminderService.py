@@ -25,8 +25,8 @@ LICENSE
 
 import re
 import time
+import requests
 from typing import List, Dict
-
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
 from kudubot.services.native.anime_reminder.scraper import scrape_reddit_discussion_threads
@@ -224,7 +224,13 @@ class AnimeReminderService(HelperService):
         """
         db = self.connection.get_database_connection_copy()
         while True:
-            new_threads = scrape_reddit_discussion_threads()
+
+            try:
+                new_threads = scrape_reddit_discussion_threads()
+            except requests.exceptions.ConnectionError:
+                self.logger.error("Failed to connect")
+                time.sleep(60)
+                continue
 
             self.logger.info("Checking for due subscriptions")
 
