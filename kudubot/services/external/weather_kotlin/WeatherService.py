@@ -26,18 +26,17 @@ from typing import List
 from kudubot.services.ExternalService import ExternalService
 
 
-class HelloKotlinService(ExternalService):
+class WeatherService(ExternalService):
     """
-    A service that responds with 'Hello!' if you send it 'Hello Kotlin!'
-    More a proof of concept than anything.
+    A service that responds with weather information for a specified location
     """
 
     def define_executable_file_url(self):
-        return self.resolve_github_release_asset_url("namboy94", "kudubot", "hello_kotlin")
+        return self.resolve_github_release_asset_url("namboy94", "kudubot", "weather_kotlin")
 
     def define_executable_command(self) -> List[str]:
         return ["java", "-jar"]
 
     @staticmethod
     def define_identifier() -> str:
-        return "hello_kotlin"
+        return "weather_kotlin"

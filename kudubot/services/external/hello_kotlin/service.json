@@ -1,4 +1,0 @@
-{
-    "build_commands": ["gradle", "build"],
-    "output_file": "build/libs/hello_kotlin.jar"
-}
