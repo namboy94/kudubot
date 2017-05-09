@@ -28,6 +28,7 @@ import time
 import raven
 import logging
 import argparse
+import traceback
 from kudubot.metadata import version, sentry_dsn
 from kudubot.exceptions import InvalidConfigException
 from kudubot.connections.Connection import Connection
@@ -52,12 +53,19 @@ def main():  # pragma: no cover
         connection = initialize_connection(args.connection.lower(), config_handler)
 
         connection.listen()
-    except Exception as e:
-        sentry = raven.Client(dsn=sentry_dsn, release=version)
-        sentry.captureException()
-        raise e
+
     except KeyboardInterrupt:
         print("\nBye")
+
+    except BaseException as e:
+        sentry = raven.Client(dsn=sentry_dsn, release=version)
+        sentry.captureException()
+
+        with open(os.path.join(GlobalConfigHandler().logfile_directory(), "crashes"), 'a') as crashlog:
+            crashlog.write("Crash@" + time.time() + ": " + str(e))
+            crashlog.write(traceback.format_exc())
+
+        raise e
 
 
 def initialize_connection(identifier: str, config_handler: GlobalConfigHandler) -> Connection:  # pragma: no cover
