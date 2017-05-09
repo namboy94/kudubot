@@ -14,24 +14,33 @@ import com.github.fedy2.weather.data.unit.DegreeUnit
  */
 fun main(args: Array<String>) {
 
-    /*
+    /**
+     * Syntax:
+     *
+     * /weather city
+     * /weather city, country, region
+     *
+     * /wetter *
+     *
+     *
+     */
+
+
     val communicator = KudubotCommunicationHandler(args)
 
     when (communicator.mode) {
 
-        Modes.IS_APPLICABLE_TO -> communicator.setApplicable(
+        Modes.IS_APPLICABLE_TO -> communicator.setApplicable(isApplicable()
                 communicator.incomingMessage.messageBody.toLowerCase() == "hello kotlin!")
         Modes.HANDLE_MESSAGE -> communicator.reply("Hello Kotlin", "Hi!")
     }
-    */
 
     val weather = YahooWeatherService()
-    val results = weather.getForecastForLocation("Windhoek", DegreeUnit.CELSIUS).all()
+    val results = weather.getForecastForLocation("Cape Town", DegreeUnit.CELSIUS).all()
 
-    println(results[0].image)
-    println(results[0].units)
-    println(results[0].astronomy)
-    println(results[0].ttl)
-    println(results[0].wind)
-    println(results[0].item.condition)
+    for (x in results) {
+
+        println(x.title)
+        println(x.item.condition)
+    }
 }
