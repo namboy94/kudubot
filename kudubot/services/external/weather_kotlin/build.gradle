@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'kotlin'
 apply plugin: 'application'
 
-mainClassName = 'net.namibsun.hello_kotlin.MainKt'
+mainClassName = 'net.namibsun.weather_kotlin.MainKt'
 
 defaultTasks 'run'
 
@@ -33,7 +33,7 @@ task wrapper(type: Wrapper) {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'net.namibsun.hello_kotlin.MainKt'
+        attributes 'Main-Class': 'net.namibsun.weather_kotlin.MainKt'
     }
     from { //noinspection GroovyAssignabilityCheck
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
