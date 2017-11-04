@@ -1,31 +1,26 @@
 """
-LICENSE:
 Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot is a chat bot framework. It allows developers to write
-    services for arbitrary chat services.
+kudubot is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    kudubot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+kudubot is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    kudubot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-LICENSE
+You should have received a copy of the GNU General Public License
+along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
 from typing import List
-from kudubot.entities.Message import Message
 from threading import Thread
+from kudubot.entities.Message import Message
 
 
 class Service(object):
@@ -33,7 +28,7 @@ class Service(object):
     A class that defines how a chat bot service integrates with a Connection
     """
 
-    def __init__(self, connection  # Connection  (Can't import due to circular imports)
+    def __init__(self, connection  # Connection
                  ):
         """
         Initializes the Service using a specified Connection
@@ -50,9 +45,9 @@ class Service(object):
     # noinspection PyMethodMayBeStatic
     def init(self):
         """
-        Helper method that runs after the initialization of the Service object. Can be used for
-        anything, but normal use cases would include initializing a database table or
-        starting a background thread
+        Helper method that runs after the initialization of the Service object.
+        Can be used for anything, but normal use cases would include
+        initializing a database table or starting a background thread
 
         :return: None
         """
@@ -60,20 +55,24 @@ class Service(object):
 
     def is_applicable_to_with_log(self, message: Message) -> bool:
         """
-        Wrapper around the is_applicable_to method, which enables logging the message easily
+        Wrapper around the is_applicable_to method,
+        which enables logging the message easily
         for all subclasses
 
         :param message: The message to analyze
         :return: True if the message is applicable, False otherwise
         """
-        self.logger.debug("Checking if " + message.message_body + "is applicable")
+        self.logger.debug("Checking if " + message.message_body +
+                          " is applicable")
         result = self.is_applicable_to(message)
-        self.logger.debug("Message is " + ("" if result else "not") + " applicable")
+        self.logger.debug("Message is " + ("" if result else "not") +
+                          " applicable")
         return result
 
     def handle_message_with_log(self, message: Message):
         """
-        Wrapper around the handle_message method, which enables logging the message easily
+        Wrapper around the handle_message method,
+        which enables logging the message easily
         for all subclasses
 
         :param message: The message to handle
@@ -97,15 +96,19 @@ class Service(object):
         return thread
 
     # noinspection PyDefaultArgument
-    def initialize_database_table(self, sql: List[str] = [], initializer: callable=None):
+    def initialize_database_table(self, sql: List[str] = [],
+                                  initializer: callable=None):
         """
         Executes the provided SQL queries to create the database table(s).
 
         :param sql: The SQL queries used to create the database tables
-        :param initializer: A method that initializes the database connection itself.
+        :param initializer: A method that initializes
+                            the database connection itself.
         :return: None
         """
-        self.logger.debug("Initializing Database table" + ("" if len(sql) < 2 else "s") + " for " + self.identifier)
+        self.logger.debug("Initializing Database table" +
+                          ("" if len(sql) < 2 else "s") +
+                          " for " + self.identifier)
         for statement in sql:
             self.connection.db.execute(statement)
         if initializer is not None:
@@ -149,13 +152,18 @@ class Service(object):
 
     def reply(self, title: str, body: str, message: Message):
         """
-        Provides a helper method that streamlines the process of replying to a message. Very useful
-        for Services that send a reply immediately to cut down on clutter in the code
+        Provides a helper method that streamlines the process
+        of replying to a message.
+        Very useful for Services that send a reply immediately
+        to cut down on clutter in the code
 
         :param title: The title of the message to send
         :param body: The body of the message to send
         :param message: The message to reply to
         :return: None
         """
-        reply_message = Message(title, body, message.get_direct_response_contact(), self.connection.user_contact)
+        reply_message = Message(
+            title, body, message.get_direct_response_contact(),
+            self.connection.user_contact
+        )
         self.connection.send_message(reply_message)

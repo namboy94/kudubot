@@ -24,7 +24,7 @@ LICENSE
 
 import os
 import sys
-from kudubot.metadata import version
+from kudubot import version
 from setuptools import setup, find_packages
 from kudubot.config.builder import build_external
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
@@ -105,7 +105,6 @@ def run_setup():
           packages=find_packages(),
           install_requires=[
               "typing",
-              "raven",
               "python-telegram-bot",
               "yowsup2",
               "requests",

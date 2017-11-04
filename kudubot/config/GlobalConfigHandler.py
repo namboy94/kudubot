@@ -1,25 +1,20 @@
 """
-LICENSE:
 Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot is a chat bot framework. It allows developers to write
-    services for arbitrary chat services.
+kudubot is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    kudubot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+kudubot is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    kudubot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-LICENSE
+You should have received a copy of the GNU General Public License
+along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
@@ -33,7 +28,8 @@ from kudubot.exceptions import InvalidConfigException
 
 class GlobalConfigHandler(object):
     """
-    Class that handles the global kudubot configuration files located in $HOME/.kudubot
+    Class that handles the global kudubot configuration
+    files located in $HOME/.kudubot
     """
 
     logger = logging.getLogger(__name__)
@@ -41,48 +37,71 @@ class GlobalConfigHandler(object):
     The Logger for this class
     """
 
-    def __init__(self, config_location: str = os.path.join(os.path.expanduser("~"), ".kudubot")):
+    def __init__(self,
+                 config_location: str = os.path.join(
+                     os.path.expanduser("~"), ".kudubot")
+                 ):
         """
-        Initializes the ConfigHandler. Determines the config locations using the config_location
-        parameter which defaults to a .kudubot directory in the user's home directory.
-        The configuration may still be invalid once the object is initialized, call
-        validate_config_directory() to make sure that the configuration is correct.
+        Initializes the ConfigHandler.
+        Determines the config locations using the config_location
+        parameter which defaults to a .kudubot directory in the
+        user's home directory.
+        The configuration may still be invalid once the object is initialized,
+        call validate_config_directory() to make sure
+        that the configuration is correct.
 
         :param config_location: The location of the config directory
         """
         self.config_location = config_location
-        self.global_connection_config_location = os.path.join(self.config_location, "connections.conf")
-        self.services_config_location = os.path.join(self.config_location, "services.conf")
+        self.global_connection_config_location = \
+            os.path.join(self.config_location, "connections.conf")
+        self.services_config_location = \
+            os.path.join(self.config_location, "services.conf")
         self.data_location = os.path.join(self.config_location, "data")
-        self.specific_connection_config_location = os.path.join(self.config_location, "connection_config")
-        self.external_services_directory = os.path.join(self.config_location, "external")
-        self.external_services_executables_directory = os.path.join(self.external_services_directory, "bin")
+        self.specific_connection_config_location = \
+            os.path.join(self.config_location, "connection_config")
+        self.external_services_directory = \
+            os.path.join(self.config_location, "external")
+        self.external_services_executables_directory = \
+            os.path.join(self.external_services_directory, "bin")
         self.logfile_directory = os.path.join(self.config_location, "logs")
 
     def validate_config_directory(self) -> bool:
         """
-        Validates the configuration directory. As soon as a discrepancy is detected, the reason is logged
-        and False is returned. If the configuration is valid however, True is returned
+        Validates the configuration directory.
+        As soon as a discrepancy is detected, the reason is logged
+        and False is returned. If the configuration is valid however,
+        True is returned
         :return: True if the config is valid, False otherwise
         """
 
         try:
             if not os.path.isdir(self.config_location):
-                raise InvalidConfigException("Configuration directory " + self.config_location + " does not exist")
+                raise InvalidConfigException(
+                    "Configuration directory " + self.config_location +
+                    " does not exist")
             elif not os.path.isfile(self.global_connection_config_location):
-                raise InvalidConfigException("Connection config file does not exist")
+                raise InvalidConfigException(
+                    "Connection config file does not exist")
             elif not os.path.isfile(self.services_config_location):
-                raise InvalidConfigException("Services config file does not exist")
+                raise InvalidConfigException(
+                    "Services config file does not exist")
             elif not os.path.isdir(self.data_location):
-                raise InvalidConfigException("Data Location directory does not exist")
+                raise InvalidConfigException(
+                    "Data Location directory does not exist")
             elif not os.path.isdir(self.specific_connection_config_location):
-                raise InvalidConfigException("Connection Configuration directory does not exist")
+                raise InvalidConfigException(
+                    "Connection Configuration directory does not exist")
             elif not os.path.isdir(self.external_services_directory):
-                raise InvalidConfigException("External Service directory does not exist")
-            elif not os.path.isdir(self.external_services_executables_directory):
-                raise InvalidConfigException("External Service executable directory does not exist")
+                raise InvalidConfigException(
+                    "External Service directory does not exist")
+            elif not os.path.isdir(
+                    self.external_services_executables_directory):
+                raise InvalidConfigException(
+                    "External Service executable directory does not exist")
             elif not os.path.isdir(self.logfile_directory):
-                raise InvalidConfigException("Log File Directory does not exist")
+                raise InvalidConfigException(
+                    "Log File Directory does not exist")
             else:
                 self.logger.info("Configuration successfully checked")
                 return True
@@ -95,7 +114,8 @@ class GlobalConfigHandler(object):
         """
         Generates a new, empty config location.
 
-        :param delete_old: If set, all old config files that may exist are overwritten
+        :param delete_old: If set, all old config files
+                           that may exist are overwritten
         :return: None
         """
 
@@ -108,7 +128,8 @@ class GlobalConfigHandler(object):
             os.makedirs(self.config_location)
 
         if not os.path.isfile(self.global_connection_config_location):
-            self.logger.info("Creating file " + self.global_connection_config_location)
+            self.logger.info(
+                "Creating file " + self.global_connection_config_location)
             open(self.global_connection_config_location, "w").close()
 
         if not os.path.isfile(self.services_config_location):
@@ -120,15 +141,20 @@ class GlobalConfigHandler(object):
             os.makedirs(self.data_location)
 
         if not os.path.isdir(self.specific_connection_config_location):
-            self.logger.info("Creating directory " + self.specific_connection_config_location)
+            self.logger.info(
+                "Creating directory " +
+                self.specific_connection_config_location)
             os.makedirs(self.specific_connection_config_location)
 
         if not os.path.isdir(self.external_services_directory):
-            self.logger.info("Creating directory " + self.external_services_directory)
+            self.logger.info(
+                "Creating directory " + self.external_services_directory)
             os.makedirs(self.external_services_directory)
 
         if not os.path.isdir(self.external_services_executables_directory):
-            self.logger.info("Creating directory " + self.external_services_executables_directory)
+            self.logger.info(
+                "Creating directory " +
+                self.external_services_executables_directory)
             os.makedirs(self.external_services_executables_directory)
 
         if not os.path.isdir(self.logfile_directory):
@@ -144,7 +170,8 @@ class GlobalConfigHandler(object):
         from kudubot.connections.Connection import Connection
 
         self.logger.info("Loading connections")
-        connections = self.__load_import_config__(self.global_connection_config_location, Connection)
+        connections = self.__load_import_config__(
+            self.global_connection_config_location, Connection)
 
         if len(connections) == 0:
             self.logger.warning("No connections loaded")
@@ -159,11 +186,15 @@ class GlobalConfigHandler(object):
         :return: A list of successfully imported Service subclasses
         """
         self.logger.info("Loading Services")
-        services = self.__load_import_config__(self.services_config_location, Service)
+        services = self.__load_import_config__(
+            self.services_config_location, Service
+        )
 
         # Check if dependencies for each service are satisfied
-        # This loop structure is admittedly a bit weird, but there's a valid reason!
-        # Since we are removing Services with unsatisfied dependencies, we need to re-check all
+        # This loop structure is admittedly a bit weird,
+        # but there's a valid reason!
+        # Since we are removing Services with unsatisfied dependencies,
+        # we need to re-check all
         # previous Services again if a Service is removed.
         # This is done by directly modifying the index variable i
         i = 0
@@ -211,7 +242,8 @@ class GlobalConfigHandler(object):
             return getattr(_module, statement[1])
 
     # noinspection PyUnresolvedReferences,PyMethodMayBeStatic
-    def __remove_duplicate_services_or_connections__(self, target: List[type]) -> List[type]:
+    def __remove_duplicate_services_or_connections__(self, target: List[type])\
+            -> List[type]:
         """
         Removes any duplicate Connections or Services from a list
 
@@ -236,7 +268,8 @@ class GlobalConfigHandler(object):
                 exists = False
 
                 for result in results:
-                    if result.define_identifier() == element.define_identifier():
+                    if result.define_identifier() ==\
+                            element.define_identifier():
                         exists = True
                         break
 
@@ -246,13 +279,16 @@ class GlobalConfigHandler(object):
         return results
 
     # noinspection PyMethodMayBeStatic
-    def __load_import_config__(self, file_location: str, class_type: type) -> List[type]:
+    def __load_import_config__(self, file_location: str, class_type: type) \
+            -> List[type]:
         """
-        Reads an import config file (A file containing only python import statements)
+        Reads an import config file
+        (A file containing only python import statements)
         and returns a list of the successful imports.
 
-        Imports that fail are simply ignored, as well as those that do not return
-        subclasses of the class_type parameter.
+        Imports that fail are simply ignored,
+        as well as those that do not return subclasses
+        of the class_type parameter.
 
         :param file_location: The import config file's location
         :param class_type: The class type all imports must subclass
@@ -279,12 +315,18 @@ class GlobalConfigHandler(object):
                         modules.append(_module)
                         self.logger.info("Import " + line + " successful")
                     else:
-                        self.logger.warning("Import " + line + " is not of type " + str(class_type))
+                        self.logger.warning(
+                            "Import " + line + " is not of type "
+                            + str(class_type)
+                        )
 
                 except ImportError:  # Ignore invalid imports
                     self.logger.warning("Import " + line + " has failed")
                 except IndexError:  # Ignore failed parsing attempts
-                    self.logger.warning("Import " + line + " has failed due to an error in the config file.")
+                    self.logger.warning(
+                        "Import " + line +
+                        " has failed due to an error in the config file."
+                    )
 
         return modules
 
