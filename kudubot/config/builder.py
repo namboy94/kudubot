@@ -49,6 +49,8 @@ def build(service_directory):
         Popen(config["build_commands"]).wait()
     except BaseException as e:
         print(e)
+        os.chdir(current_dir)
+        return
 
     output = config["output_file"]
     st = os.stat(output)

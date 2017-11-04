@@ -33,39 +33,51 @@ from kudubot.config.StandardConfigWriter import StandardConfigWriter
 
 def readme():
     """
-    Reads the readme file.
-
+    Reads the readme file and converts it to RST if pypandoc is
+    installed. If not, the raw markdown text is returned
     :return: the readme file as a string
     """
-    # noinspection PyPackageRequirements
-    import pypandoc
-    with open('README.md') as f:
-        # Convert markdown file to rst
-        markdown = f.read()
-        rst = pypandoc.convert(markdown, 'rst', format='md')
-        return rst
+    # noinspection PyBroadException
+    try:
+        print("WHAT")
+        # noinspection PyPackageRequirements,PyUnresolvedReferences
+        import pypandoc
+        with open("README.md") as f:
+            # Convert markdown file to rst
+            markdown = f.read()
+            rst = pypandoc.convert(markdown, "rst", format="md")
+            return rst
+
+    except ModuleNotFoundError:
+        # If pandoc is not installed, just return the raw markdown text
+        print(os.listdir("."))
+        with open("README.md") as f:
+            return f.read()
 
 
 def find_scripts():
     """
     Returns a list of scripts in the bin directory
-
     :return: the list of scripts
     """
-    try:
-        scripts = []
-        for file_name in os.listdir("bin"):
-            if not file_name == "__init__.py" and os.path.isfile(os.path.join("bin", file_name)):
-                scripts.append(os.path.join("bin", file_name))
-        return scripts
-    except OSError:
-        return []
+    scripts = []
+
+    for file_name in os.listdir("bin"):
+
+        path = os.path.join("bin", file_name)
+        if file_name == "__init__.py":
+            continue
+        elif not os.path.isfile(path):
+            continue
+        else:
+            scripts.append(os.path.join("bin", file_name))
+
+    return scripts
 
 
 def run_setup():
     """
     Runs the setup method, taking care of all setuptools functionality
-
     :return: None
     """
 
@@ -81,15 +93,23 @@ def run_setup():
               "Operating System :: POSIX :: Linux",
               "Topic :: Communications :: Chat",
               "Programming Language :: Python",
-              "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+              "License :: OSI Approved :: "
+              "GNU General Public License v3 (GPLv3)"
           ],
           url="https://gitlab.namibsun.net/namboy94/kudubot",
-          download_url="https://gitlab.namibsun.net/namboy94/kudubot/repository/archive.zip?ref=master",
+          download_url="https://gitlab.namibsun.net/namboy94/kudubot/"
+                       "repository/archive.zip?ref=master",
           author="Hermann Krumrey",
           author_email="hermann@krumreyh.com",
           license="GNU GPL3",
           packages=find_packages(),
-          install_requires=["typing", "raven", "python-telegram-bot", "yowsup2", 'requests', 'bs4'],
+          install_requires=[
+              "typing",
+              "raven",
+              "python-telegram-bot",
+              "yowsup2",
+              "requests",
+              "bs4"],
           dependency_links=[],
           test_suite="nose.collector",
           tests_require=["nose"],
@@ -100,7 +120,8 @@ def run_setup():
 def main():
     """
     Starts the setup.py script
-
+    Writes standard config files if none exist yet
+    Also attempts to build and install external services
     :return: None
     """
 
@@ -118,7 +139,10 @@ def main():
             for executable in executables:
                 os.rename(
                     executable,
-                    os.path.join(handler.external_services_executables_directory, os.path.basename(executable))
+                    os.path.join(
+                        handler.external_services_executables_directory,
+                        os.path.basename(executable)
+                    )
                 )
         except BaseException as e:
             print(str(e))
