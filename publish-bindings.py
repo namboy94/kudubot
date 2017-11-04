@@ -24,7 +24,7 @@ LICENSE
 
 import os
 from subprocess import Popen
-from kudubot.metadata import version
+from kudubot import version
 
 
 def publish_rust():
@@ -38,7 +38,8 @@ def publish_rust():
     os.chdir(os.path.join("kudubot", "services", "bindings", "rust"))
 
     with open("Cargo.toml", 'r') as f:
-        cargo = f.read().replace("version = \"0.1.0\"", "version = \"" + str(version) + "\"")
+        cargo = f.read().replace(
+            "version = \"0.1.0\"", "version = \"" + str(version) + "\"")
     with open("Cargo.toml", 'w') as f:
         f.write(cargo)
 
@@ -49,6 +50,7 @@ def publish_rust():
     Popen(["cargo", "publish", "--allow-dirty"]).wait()
 
     os.chdir(cwd)
+
 
 if __name__ == "__main__":
     publish_rust()

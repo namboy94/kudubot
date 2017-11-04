@@ -30,11 +30,12 @@ from kudubot.users.Contact import Contact
 # noinspection SqlDialectInspection,SqlNoDataSourceInspection,SqlResolve
 class AddressBook(object):
     """
-    Class that tracks and provides user information in the connection's database
+    Class that tracks and provides user information
+    in the connection's database.
 
     The address book uses the following database schema:
 
-              | id | display_name | address | selected_language | is_admin | is_blacklisted |
+    |id|display_name|address|selected_language|is_admin|is_blacklisted|
     """
 
     logger = logging.getLogger(__name__)
@@ -53,8 +54,8 @@ class AddressBook(object):
 
     def __init__(self, database: sqlite3.Connection):
         """
-        Initializes the address book. Makes sure that the address book's database table exists
-        and has the correct schema
+        Initializes the address book. Makes sure that the
+        address book's database table exists and has the correct schema
 
         :param database: The database connection to use
         """
@@ -68,35 +69,46 @@ class AddressBook(object):
         Adds or updates a contact in the address book
 
         :param contact: The contact to insert/update
-        :return: The contact, possibly with an altered id value (in case the contact was inserted, not updated)
+        :return: The contact, possibly with an altered id value
+                 (in case the contact was inserted, not updated)
         """
         # Check if the contact currently exists
-        old = self.db.execute("SELECT id FROM address_book WHERE id=? OR address=?",
-                              (contact.database_id, contact.address)).fetchall()
+        old = self.db.execute(
+            "SELECT id FROM address_book WHERE id=? OR address=?",
+            (contact.database_id, contact.address)).fetchall()
 
         if len(old) > 0:
-            self.db.execute("UPDATE address_book SET display_name=?, address=? WHERE id=?",
-                            (contact.display_name, contact.address, old[0][0]))
+            self.db.execute(
+                "UPDATE address_book SET display_name=?, address=? WHERE id=?",
+                (contact.display_name, contact.address, old[0][0]))
         else:
-            self.db.execute("INSERT INTO address_book (display_name, address) VALUES (?, ?)",
-                            (contact.display_name, contact.address))
+            self.db.execute(
+                "INSERT INTO address_book "
+                "(display_name, address) VALUES (?, ?)",
+                (contact.display_name, contact.address))
 
         self.db.commit()
         contact.database_id = \
-            self.db.execute("SELECT id FROM address_book WHERE address=?", (contact.address,)).fetchall()[0][0]
+            self.db.execute("SELECT id FROM address_book WHERE address=?",
+                            (contact.address,)).fetchall()[0][0]
         return contact
 
-    def get_contact_for_address(self, address: str, database_override: sqlite3.Connection = None) -> Contact:
+    def get_contact_for_address(self, address: str,
+                                database_override: sqlite3.Connection = None) \
+            -> Contact:
         """
         Generates a Contact object for an address in the address book table.
 
         :param address: The address to look for
-        :param database_override: Can be specified to use a different database connection,
-                                  useful for calling this method from a different thread
+        :param database_override: Can be specified to use a different
+                                  database connection,
+                                  useful for calling this method from
+                                  a different thread
         :return: The Contact object, or None if no contact was found
         """
         db = self.db if database_override is None else database_override
-        result = db.execute("SELECT * FROM address_book WHERE address=?", (address,)).fetchall()
+        result = db.execute("SELECT * FROM address_book WHERE address=?",
+                            (address,)).fetchall()
 
         if len(result) != 1:
             # noinspection PyTypeChecker
@@ -105,17 +117,22 @@ class AddressBook(object):
             data = result[0]
             return Contact(int(data[0]), str(data[1]), str(data[2]))
 
-    def get_contact_for_id(self, user_id: int, database_override: sqlite3.Connection = None) -> Contact:
+    def get_contact_for_id(self, user_id: int,
+                           database_override: sqlite3.Connection = None) \
+            -> Contact:
         """
         Generates a Contact object for a user ID in the address book table
 
         :param user_id: The user's ID
-        :param database_override: Can be specified to use a different database connection,
-                                  useful for calling this method from a different thread
+        :param database_override: Can be specified to use a different
+                                  database connection,
+                                  useful for calling this method from a
+                                  different thread
         :return: The user as a Contact object
         """
         db = self.db if database_override is None else database_override
-        result = db.execute("SELECT * FROM address_book WHERE id=?", (user_id,)).fetchall()
+        result = db.execute("SELECT * FROM address_book WHERE id=?",
+                            (user_id,)).fetchall()
 
         if len(result) != 1:
             # noinspection PyTypeChecker

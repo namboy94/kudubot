@@ -70,7 +70,7 @@ def main():  # pragma: no cover
             "crashes"
         )
         with open(crashfile, 'a') as crashlog:
-            crashlog.write("Crash@" + time.time() + ": " + str(e))
+            crashlog.write("Crash@" + str(time.time()) + ": " + str(e))
             crashlog.write(traceback.format_exc())
         raise e
 

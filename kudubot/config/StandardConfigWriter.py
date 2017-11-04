@@ -22,8 +22,8 @@ from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 class StandardConfigWriter(object):
     """
-    A config handler class that writes the standard configuration for connections
-    and services into the config.
+    A config handler class that writes the standard configuration
+    for connections and services into the config.
     """
 
     def __init__(self,
@@ -47,10 +47,10 @@ class StandardConfigWriter(object):
 
         with open(self.connection_config, 'w') as config:
             for connection in \
-                    ["from kudubot.connections.cli.CliConnection"
+                    ["from kudubot.connections.cli.CliConnection "
                      "import CliConnection",
 
-                     "from kudubot.connections.whatsapp.WhatsappConnection"
+                     "from kudubot.connections.whatsapp.WhatsappConnection "
                      "import WhatsappConnection",
 
                      "from kudubot.connections.telegram.TelegramConnection "
@@ -76,6 +76,8 @@ class StandardConfigWriter(object):
                      native + "anime_reminder.AnimeReminderService "
                               "import AnimeReminderService",
                      native + "jokes.JokesService import JokesService",
+                     native + "service_lister.ServiceListerService "
+                              "import ServiceListerService",
                      external + "helloworld_rust.HelloWorldService "
                                 "import HelloWorldService",
                      external + "weather_kotlin.WeatherService "

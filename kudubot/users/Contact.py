@@ -44,7 +44,8 @@ class Contact(object):
 
     def to_dict(self) -> Dict[str, str or int]:
         """
-        :return: The contact as a dictionary, which can be used to store the contact in a JSON file
+        :return: The contact as a dictionary,
+                 which can be used to store the contact in a JSON file
         """
         return {
             "database_id": self.database_id,

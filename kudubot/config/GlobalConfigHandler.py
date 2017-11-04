@@ -320,7 +320,7 @@ class GlobalConfigHandler(object):
                             + str(class_type)
                         )
 
-                except ImportError:  # Ignore invalid imports
+                except (ImportError, AttributeError):  # Ignore invalid imports
                     self.logger.warning("Import " + line + " has failed")
                 except IndexError:  # Ignore failed parsing attempts
                     self.logger.warning(
