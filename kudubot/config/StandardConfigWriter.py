@@ -46,15 +46,11 @@ class StandardConfigWriter(object):
         """
 
         with open(self.connection_config, 'w') as config:
-            for connection in \
-                    ["from kudubot.connections.cli.CliConnection "
-                     "import CliConnection",
-
-                     "from kudubot.connections.whatsapp.WhatsappConnection "
-                     "import WhatsappConnection",
-
-                     "from kudubot.connections.telegram.TelegramConnection "
-                     "import TelegramConnection"]:
+            for connection in [
+                "@CONNECTION cli::CliConnection",
+                "@CONNECTION whatsapp::WhatsappConnection",
+                "@CONNECTION telegram::TelegramConnection"
+            ]:
                 config.write(connection + "\n")
 
     def write_standard_service_config(self):
@@ -64,22 +60,15 @@ class StandardConfigWriter(object):
         :return: None
         """
 
-        native = "from kudubot.services.native."
-        external = "from kudubot.services.external."
-
         with open(self.service_config, 'w') as config:
-            for service in \
-                    [native + "simple_responder.SimpleResponderService "
-                              "import SimpleResponderService",
-                     native + "reminder.ReminderService "
-                              "import ReminderService",
-                     native + "anime_reminder.AnimeReminderService "
-                              "import AnimeReminderService",
-                     native + "jokes.JokesService import JokesService",
-                     native + "service_lister.ServiceListerService "
-                              "import ServiceListerService",
-                     external + "helloworld_rust.HelloWorldService "
-                                "import HelloWorldService",
-                     external + "weather_kotlin.WeatherService "
-                                "import WeatherService"]:
+            for service in [
+                "@NATIVE simple_responder::SimpleResponderService",
+                "@NATIVE reminder::ReminderService",
+                "@NATIVE anime_reminder::AnimeReminderService",
+                "@NATIVE jokes::JokesService",
+                "@NATIVE service_lister::ServiceListerService",
+                "@EXTERNAL helloworld_rust::HelloWorldService",
+                "@EXTERNAL weather_kotlin::HelloKotlinService"
+            ]:
+
                 config.write(service + "\n")
