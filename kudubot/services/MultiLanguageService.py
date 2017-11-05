@@ -255,19 +255,15 @@ class MultiLanguageService(Service):
 
             if found_language:
                 self.reply(
-                    title,
-                    self.translate(
+                    title, self.translate(
                         "@success_message: " + language, language, dictionary
-                    ),
-                    message
+                    ), message
                 )
             else:
                 self.reply(
-                    title,
-                    self.translate(
+                    title, self.translate(
                         "@fail_message: " + params[1], language, dictionary
-                    ),
-                    message
+                    ), message
                 )
 
             return  # Important, makes overriding methods quit

@@ -23,22 +23,44 @@ from kudubot.services.Service import Service
 
 
 class ServiceListerService(Service):
-    def is_applicable_to(self, message: Message) -> bool:
-        return message.message_body == "/list"
+    """
+    This Service lists all currently active services
+    """
 
     @staticmethod
     def define_requirements() -> List[str]:
+        """
+        Defines the dependencies for the Service
+
+        :return: A list of dependencies
+        """
         return []
 
     @staticmethod
     def define_identifier() -> str:
+        """
+        Defines the identifier for this service
+
+        :return: The Service's identifier
+        """
         return "service_lister"
 
+    def is_applicable_to(self, message: Message) -> bool:
+        """
+        Checks if the message is applicable to this service
+
+        :param message: The message to check
+        :return: True if the message equals '/list'
+        """
+        return message.message_body == "/list"
+
     def handle_message(self, message: Message):
-        self.reply("A", "B", message)
+        """
+        Sends a list of active services
 
-        reply = "List of active Services:"
-
-        services = self.connection.services # type: List[Service]
-        for service in services:
-            self.reply("Service", service.define_identifier(), message)
+        :param message: The sender message
+        """
+        reply = "List of active Services:\n\n"
+        for service in self.connection.services:
+            reply += service.define_identifier() + "\n"
+        self.reply("Service List", reply, message)
