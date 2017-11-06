@@ -17,82 +17,17 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import sqlite3
 from typing import Dict, List
 from kudubot.entities.Message import Message
-from kudubot.services.Service import Service
-from kudubot.connections.Connection import Connection
+from kudubot.services.BaseService import BaseService
 
 
 # noinspection PyAbstractClass,SqlNoDataSourceInspection
 # noinspection SqlDialectInspection,SqlResolve
-class MultiLanguageService(Service):
+class MultiLanguageService(BaseService):
     """
     Service Extension class that enables support for multiple languages
     """
-
-    def __init__(self, connection: Connection):
-        """
-        In addition to the normal initialization of a Service,
-        this service initializes its database which stores information
-        about a user's language preferences
-
-        :param connection: The connection which is used to communicate
-        """
-        super().__init__(connection)
-        self.connection.db.execute(
-            "CREATE TABLE IF NOT EXISTS language_preferences ("
-            "user_id INTEGER CONSTRAINT constraint_name PRIMARY KEY, "
-            "lang_pref VARCHAR(255) NOT NULL,"
-            "user_initiated INT NOT NULL"
-            ")")
-        self.connection.db.commit()
-
-    def store_language_preference(self, user: int, language: str,
-                                  user_initiated: bool = False):
-        """
-        Stores the language preference for a user in the sqlite database
-        :param user: The user for which to store the preference
-        :param language: The language to store
-        :param user_initiated: Flag that should be set whenever the user
-                               manually requests a language store
-        :return: None
-        """
-        fetch = self.connection.db.execute(
-            "SELECT user_initiated FROM language_preferences WHERE user_id=?",
-            (user,)
-        ).fetchall()
-
-        was_user_initiated = len(fetch) > 0 and fetch[0][0]
-        if was_user_initiated and not user_initiated:
-            return  # Don't overwrite user defined language
-
-        else:
-            self.connection.db.execute(
-                "INSERT OR REPLACE INTO language_preferences "
-                "(user_id, lang_pref, user_initiated) VALUES (?,?,?)",
-                (user, language, user_initiated)
-            )
-            self.connection.db.commit()
-
-    def get_language_preference(self, user: int, default: str = "en",
-                                db: sqlite3.Connection=None) -> str:
-        """
-        Retrieves a language from the user's preferences in the database
-
-        :param user: The user to check the language preference for
-        :param default: A default language value used
-                        in case no entry was found
-        :param db: Optionally defines which database connection to use
-                   (necessary for access from other thread)
-        :return: The language preferred by the user
-        """
-        db = db if db is not None else self.connection.db
-        result = db.execute(
-            "SELECT lang_pref FROM language_preferences WHERE user_id=?",
-            (user,)
-        ).fetchall()
-        return default if len(result) == 0 else result[0][0]
 
     def determine_language(self, message: Message) -> str:
         """
@@ -189,8 +124,8 @@ class MultiLanguageService(Service):
         :param message: The message to reply to
         :return: None
         """
-        language = self.get_language_preference(
-            message.get_direct_response_contact().database_id
+        language = self.connection.language_selector.get_language_preference(
+            message.get_direct_response_contact()
         )
         self.reply(
             self.translate(title, language),
@@ -231,10 +166,13 @@ class MultiLanguageService(Service):
                    "de": ["de", "deutsch", "german"]}
 
         params = message.message_body.lower().split(" ")
-        user_id = message.get_direct_response_contact().database_id
+        contact = message.get_direct_response_contact()
 
         if len(params) == 1 and params[0] in command_keywords:
-            language = self.get_language_preference(user_id, "en")
+            language = \
+                self.connection.language_selector.get_language_preference(
+                    contact, "en"
+                )
             self.reply(self.translate("@title", language, dictionary),
                        language, message)
             return  # Important, makes overriding methods
@@ -246,10 +184,12 @@ class MultiLanguageService(Service):
                 for alias in aliases[key]:
                     if alias == params[1]:
                         found_language = True
-                        self.store_language_preference(user_id, key, True)
+                        self.connection.language_selector.\
+                            store_language_preference(contact, key, True)
                         break
 
-            language = self.get_language_preference(user_id, "en")
+            language = self.connection.language_selector.\
+                get_language_preference(contact, "en")
             # the new language will already be stored
             title = self.translate("@title", language, dictionary)
 
@@ -273,8 +213,8 @@ class MultiLanguageService(Service):
 
             try:
                 language = self.determine_language(message)
-                self.store_language_preference(
-                    message.get_direct_response_contact().database_id,
+                self.connection.language_selector.store_language_preference(
+                    message.get_direct_response_contact(),
                     language
                 )
             except NotImplementedError:

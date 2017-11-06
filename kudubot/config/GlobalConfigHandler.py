@@ -22,7 +22,7 @@ import shutil
 import logging
 import importlib
 from typing import List
-from kudubot.services.Service import Service
+from kudubot.services.BaseService import BaseService
 from kudubot.exceptions import InvalidConfigException
 
 
@@ -187,7 +187,7 @@ class GlobalConfigHandler(object):
         """
         self.logger.info("Loading Services")
         services = self.__load_import_config__(
-            self.services_config_location, Service
+            self.services_config_location, BaseService
         )
 
         # Check if dependencies for each service are satisfied

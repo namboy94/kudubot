@@ -23,13 +23,31 @@ from threading import Thread
 from kudubot.entities.Message import Message
 
 
-class Service(object):
+class BaseService(object):
     """
-    A class that defines how a chat bot service integrates with a Connection
+    A class that defines how a chat bot service integrates with a Connection.
+    Includes various helper methods.
     """
 
-    def __init__(self, connection  # Connection
-                 ):
+    @staticmethod
+    def define_identifier() -> str:
+        """
+        Defines the unique identifier for the service
+
+        :return: The Service's identifier.
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    def define_requirements() -> List[str]:
+        """
+        Defines the requirements for the service
+
+        :return: The required services for this Service.
+        """
+        raise NotImplementedError()
+
+    def __init__(self, connection):
         """
         Initializes the Service using a specified Connection
 
@@ -129,24 +147,6 @@ class Service(object):
 
         :param message: The message to process
         :return: None
-        """
-        raise NotImplementedError()
-
-    @staticmethod
-    def define_identifier() -> str:
-        """
-        Defines the unique identifier for the service
-
-        :return: The Service's identifier.
-        """
-        raise NotImplementedError()
-
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        Defines the requirements for the service
-
-        :return: The required services for this Service.
         """
         raise NotImplementedError()
 

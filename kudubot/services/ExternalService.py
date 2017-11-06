@@ -25,11 +25,12 @@ import requests
 from subprocess import Popen
 from bs4 import BeautifulSoup
 from typing import List, Tuple, Dict
-from kudubot.services.Service import Service
+from kudubot.services.BaseService import BaseService
 from kudubot.entities.Message import Message, from_dict as message_from_dict
 
 
-class ExternalService(Service):
+# noinspection PyAbstractClass
+class ExternalService(BaseService):
     """
     A Service which allows the use of executable files written in other
     programming languages to be used in conjunction with the kudubot framework
@@ -56,13 +57,6 @@ class ExternalService(Service):
 
         if not os.path.isfile(self.executable_file):
             self.download_executable()
-
-    @staticmethod
-    def define_identifier() -> str:
-        """
-        :return: The identifier for this service
-        """
-        raise NotImplementedError()
 
     @staticmethod
     def define_requirements() -> List[str]:

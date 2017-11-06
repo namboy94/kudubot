@@ -26,6 +26,8 @@ from typing import List, Dict
 from kudubot.users.Contact import Contact
 from kudubot.entities.Message import Message
 from kudubot.users.AddressBook import AddressBook
+from kudubot.users.Authenticator import Authenticator
+from kudubot.users.LanguageSelector import LanguageSelector
 from kudubot.exceptions import InvalidConfigException
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
@@ -72,6 +74,8 @@ class Connection(object):
             self.db = self.get_database_connection_copy()
 
             self.address_book = AddressBook(self.db)
+            self.authenticator = Authenticator(self.db)
+            self.language_selector = LanguageSelector(self.db)
             self.config = self.load_config()
             self.user_contact = self.define_user_contact()
 
@@ -121,6 +125,10 @@ class Connection(object):
         if message.sender_group is not None:
             message.sender_group = \
                 self.address_book.add_or_update_contact(message.sender_group)
+
+        if self.authenticator.is_blacklisted(message.sender) \
+                or self.authenticator.is_blacklisted(message.sender_group):
+            self.logger.info("Contact is blacklisted. Not applying services")
 
         self.logger.debug(
             "Applying services to " + repr(message.message_body) + "."

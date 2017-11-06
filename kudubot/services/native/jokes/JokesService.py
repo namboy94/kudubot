@@ -85,7 +85,8 @@ class JokesService(HelperService):
         :param message: The message to analyze
         :return: True if applicable, False otherwise
         """
-        return message.message_body.strip().lower() in ["/joke", "/witz"] or super().is_applicable_to(message)
+        return message.message_body.strip().lower() in ["/joke", "/witz"] or\
+            super().is_applicable_to(message)
 
     def handle_message(self, message: Message):
         """

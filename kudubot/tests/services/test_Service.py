@@ -18,7 +18,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import unittest
-from kudubot.services.Service import Service
+from kudubot.services.BaseService import Service
 from kudubot.tests.helpers.DummyService import DummyService
 
 
