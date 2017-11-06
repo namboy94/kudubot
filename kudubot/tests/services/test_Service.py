@@ -46,10 +46,10 @@ class UnitTests(unittest.TestCase):
         """
         dummy = DummyService([])
 
-        for method in [(Service.handle_message, 1),
-                       (Service.is_applicable_to, 1),
-                       (Service.define_identifier, -1),
-                       (Service.define_requirements, -1)]:
+        for method in [(BaseService.handle_message, 1),
+                       (BaseService.is_applicable_to, 1),
+                       (BaseService.define_identifier, -1),
+                       (BaseService.define_requirements, -1)]:
             try:
 
                 if method[1] == -1:

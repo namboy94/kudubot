@@ -23,7 +23,7 @@ from kudubot.entities.Message import Message
 from kudubot.services.BaseService import BaseService
 
 
-class DummyService(Service):
+class DummyService(BaseService):
     """
     A class that implements a Service for use in unit tests
     """
