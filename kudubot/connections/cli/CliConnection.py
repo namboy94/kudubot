@@ -22,7 +22,6 @@ This file is part of kudubot.
 LICENSE
 """
 
-import logging
 from typing import Dict
 from kudubot.entities.Message import Message
 from kudubot.users.Contact import Contact
@@ -43,7 +42,8 @@ class CliConnection(Connection):
         """
         return "cli"
 
-    def send_video_message(self, receiver: Contact, video_file: str, caption: str = ""):
+    def send_video_message(self, receiver: Contact, video_file: str,
+                           caption: str = ""):
         """
         Sending videos is not supported in the CLI
 
@@ -54,7 +54,8 @@ class CliConnection(Connection):
         """
         self.logger.debug("Video messages are not supported")
 
-    def send_audio_message(self, receiver: Contact, audio_file: str, caption: str = ""):
+    def send_audio_message(self, receiver: Contact, audio_file: str,
+                           caption: str = ""):
         """
         Sending audio files is not supported in the CLI
         :param receiver: The recipient of the file
@@ -64,7 +65,8 @@ class CliConnection(Connection):
         """
         self.logger.debug("Audio messages are not supported")
 
-    def send_image_message(self, receiver: Contact, image_file: str, caption: str = ""):
+    def send_image_message(self, receiver: Contact, image_file: str,
+                           caption: str = ""):
         """
         Sending image files is not supported in the CLI
 
@@ -77,7 +79,8 @@ class CliConnection(Connection):
 
     def define_user_contact(self) -> Contact:
         """
-        Specifies the User Contact, which is of no importance for the CLI Connection
+        Specifies the User Contact, which is of no importance
+        for the CLI Connection
 
         :return: The CLI's user Contact
         """
@@ -116,4 +119,6 @@ class CliConnection(Connection):
         :return: None
         """
         while True:
-            self.apply_services(Message("", input(), self.user_contact, self.user_contact))
+            self.apply_services(
+                Message("", input(), self.user_contact, self.user_contact)
+            )

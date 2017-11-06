@@ -1,25 +1,20 @@
 """
-LICENSE:
 Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot is a chat bot framework. It allows developers to write
-    services for arbitrary chat services.
+kudubot is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    kudubot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+kudubot is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    kudubot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-LICENSE
+You should have received a copy of the GNU General Public License
+along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import datetime
@@ -29,7 +24,8 @@ from typing import List, Dict
 
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
-from kudubot.services.native.reminder.database import initialize_database, store_reminder, get_unsent_reminders, \
+from kudubot.services.native.reminder.database import initialize_database, \
+    store_reminder, get_unsent_reminders, \
     mark_reminder_sent, convert_datetime_to_string
 
 
@@ -41,8 +37,8 @@ class ReminderService(HelperService):
 
     def init(self):
         """
-        Initializes the database table and starts a background thread that perpetually
-        searches for expired reminders
+        Initializes the database table and starts a background thread that
+        perpetually searches for expired reminders
         """
         self.initialize_database_table(initializer=initialize_database)
         self.start_daemon_thread(self.background_loop)
@@ -92,16 +88,30 @@ class ReminderService(HelperService):
             "@week_plural": {"en": "weeks", "de": "wochen"},
             "@year_singular": {"en": "year", "de": "jahr"},
             "@year_plural": {"en": "years", "de": "jahre"},
-            "@stored_reply_title": {"en": "Message Stored", "de": "Nachricht gespeichert"},
-            "@stored_confirmation_message": {"en": "The reminder message has successfully been stored.",
-                                             "de": "Die Erinnerungsnachricht wurde erfolgreich gespeichert"},
-            "@list_stored_message_start": {"en": "The following reminders are pending",
-                                           "de": "Die folgenden Erinnerungen stehen noch aus"},
-            "@list_response_title": {"en": "List of Reminders", "de": "Liste der Erinnerungen"},
-            "@invalid_title": {"en": "Invalid Reminder", "de": "Ungültige Erinnerung"},
-            "@invalid_message": {"en": "The reminder is invalid. Please consult /remind syntax for more information.",
-                                 "de": "Die Erinnerung ist fehlerhaft. Sehe dir /erinner syntax an, und versuch es "
-                                       "dann noch einmal."}
+            "@stored_reply_title": {
+                "en": "Message Stored", "de": "Nachricht gespeichert"
+            },
+            "@stored_confirmation_message": {
+                "en": "The reminder message has successfully been stored.",
+                "de": "Die Erinnerungsnachricht wurde erfolgreich gespeichert"
+            },
+            "@list_stored_message_start": {
+                "en": "The following reminders are pending",
+                "de": "Die folgenden Erinnerungen stehen noch aus"
+            },
+            "@list_response_title": {
+                "en": "List of Reminders", "de": "Liste der Erinnerungen"
+            },
+            "@invalid_title": {
+                "en": "Invalid Reminder", "de": "Ungültige Erinnerung"
+            },
+            "@invalid_message": {
+                "en": "The reminder is invalid. "
+                      "Please consult /remind syntax for more information.",
+                "de": "Die Erinnerung ist fehlerhaft."
+                      "Sehe dir die /erinner syntax an, "
+                      "und versuch es dann noch einmal."
+            }
         }
 
     def handle_message(self, message: Message):
@@ -111,30 +121,32 @@ class ReminderService(HelperService):
         :param message: The message to handle
         :return: None
         """
-        super().handle_message(message)
-        if not self.is_applicable_to_without_help_or_syntax(message):
-            return
-
         target = message.get_direct_response_contact()
-        command = self.parse_message(message.message_body.strip(), self.determine_language(message))
+        command = self.parse_message(message.message_body.strip(),
+                                     self.determine_language(message))
 
         if command["mode"] == "store":
             store_reminder(self.connection.db,
                            command["data"]["message"],
                            command["data"]["due_time"],
                            target.database_id)
-            self.reply_translated("@stored_reply_title", "@stored_confirmation_message", message)
+            self.reply_translated("@stored_reply_title",
+                                  "@stored_confirmation_message", message)
 
         elif command["mode"] == "list":
-            reminders = list(filter(lambda x: x["receiver"].database_id == target.database_id,
-                                    get_unsent_reminders(self.connection.db)))
+            reminders = list(filter(
+                lambda x: x["receiver"].database_id == target.database_id,
+                get_unsent_reminders(self.connection.db)
+            ))
             text = "@list_stored_message_start:\n\n"
             for reminder in reminders:
-                text += convert_datetime_to_string(reminder["due_time"]) + ":" + reminder["message"] + "\n"
+                text += convert_datetime_to_string(reminder["due_time"])
+                text += ":" + reminder["message"] + "\n"
             self.reply_translated("@list_response_title", text, message)
 
         elif command["mode"] == "invalid":
-            self.reply_translated("@invalid_title", "@invalid_message", message)
+            self.reply_translated(
+                "@invalid_title", "@invalid_message", message)
 
     def is_applicable_to(self, message: Message) -> bool:
         """
@@ -143,19 +155,20 @@ class ReminderService(HelperService):
         :param message: The message to check
         :return: True if the Service is applicable, otherwise False
         """
-        if super().is_applicable_to(message):
-            return True
-
         language = self.determine_language(message)
         body = message.message_body.lower().strip()
 
         regex = "^@remind_command ([0-9]+ (" \
-                "@second_singular|@second_plural|@minute_singular|@minute_plural|@hour_singular|@hour_plural|" \
-                "@day_singular|@day_plural|@week_singular|@week_plural|@year_singular|@year_plural) )+" \
+                "@second_singular|@second_plural|@minute_singular|" \
+                "@minute_plural|@hour_singular|@hour_plural|" \
+                "@day_singular|@day_plural|@week_singular|@week_plural" \
+                "|@year_singular|@year_plural) )+" \
                 "\"[^\"]+\"$"
         lang_regex = re.compile(self.translate(regex, language))
 
-        return re.match(lang_regex, body) or body == self.translate("@remind_command @list_argument", language)
+        return re.match(lang_regex, body) \
+            or body == self.translate(
+                "@remind_command @list_argument", language)
 
     def background_loop(self):
         """
@@ -168,9 +181,17 @@ class ReminderService(HelperService):
             unsent = get_unsent_reminders(db)
 
             for reminder in unsent:
-                if reminder["due_time"].timestamp() < datetime.datetime.utcnow().timestamp():
-                    self.connection.send_message(Message("Reminder", reminder["message"],
-                                                         reminder["receiver"], self.connection.user_contact))
+
+                due_time = reminder["due_time"].timestamp()
+                now = datetime.datetime.utcnow().timestamp()
+                if due_time < now:
+
+                    self.connection.send_message(Message(
+                        "Reminder",
+                        reminder["message"],
+                        reminder["receiver"],
+                        self.connection.user_contact)
+                    )
                     mark_reminder_sent(db, reminder["id"])
 
             time.sleep(1)
@@ -228,33 +249,41 @@ class ReminderService(HelperService):
         :return: The help description in the specified language
         """
         return {
-            "en": "The reminder service allows you to store a reminder on the server to be "
-                  "sent back to you at a specified time. See /remind syntax for possible ways "
+            "en": "The reminder service allows you to store a reminder "
+                  "on the server to be sent back to you at a specified time. "
+                  "See /remind syntax for possible ways "
                   "to use the reminder service.",
-            "de": "Der Erinnerungsdienst erlaubt es einem Nutzer eine Erinnerung auf dem Server "
-                  "zu speicher, welcher dann zu einem spezifizierten Zeitpunkt zurückgesendet wird. "
-                  "Sehe dir /erinner syntax an, um dir ein Bild davon zu machen wie man den Erinnerungsdienst "
-                  "verwendet."
+            "de": "Der Erinnerungsdienst erlaubt es einem Nutzer eine "
+                  "Erinnerung auf dem Server zu speichern, welcher dann zu"
+                  "einem spezifizierten Zeitpunkt zurückgesendet wird. "
+                  "Sehe dir /erinner syntax an, um dir ein Bild davon zu "
+                  "machen wie man den Erinnerungsdienst verwendet."
         }[language]
 
-    def parse_message(self, text: str, language: str) -> Dict[str, str or Dict[str, str or datetime]]:
+    def parse_message(self, text: str, language: str) \
+            -> Dict[str, str or Dict[str, str or datetime]]:
         """
         Parses the message and determines the mode of operation
 
         :param text: The text to parse
         :param language: The language in which to parse the text
-        :return: A dictionary with at least the key 'status' with three different possible states:
+        :return: A dictionary with at least the key 'status' with three
+                 different possible states:
                  - no-match: The message does not match the command syntax
-                 - help:     A query for the help message. Will result in the help message being sent to the sender
+                 - help:     A query for the help message.
+                             Will result in the help message being
+                             sent to the sender
                  - store:    Command to store a new reminder
         """
         self.logger.debug("Parsing message")
 
-        if self.translate("@remind_command @list_argument", language) == text.lower():
+        if self.translate("@remind_command @list_argument", language) \
+                == text.lower():
             return {"mode": "list"}
         else:
 
-            time_string = text.lower().split(" \"")[0].split(self.translate("@remind_command ", language))[1]
+            time_string = text.lower().split(" \"")[0].split(
+                self.translate("@remind_command ", language))[1]
             reminder_message = text.split("\"")[1]
 
             usertime = self.parse_time_string(time_string.strip(), language)
@@ -264,12 +293,20 @@ class ReminderService(HelperService):
                 return {"mode": "invalid"}
             else:
                 self.logger.debug("Will store reminder")
-                return {"mode": "store", "data": {"message": reminder_message, "due_time": usertime}}
+                return {
+                    "mode": "store",
+                    "data": {
+                        "message": reminder_message,
+                        "due_time": usertime
+                    }
+                }
 
-    def parse_time_string(self, time_string: str, language: str) -> datetime or None:
+    def parse_time_string(self, time_string: str, language: str) \
+            -> datetime or None:
         """
         Parses a time string like '1 week' or '2 weeks 1 day' etc. and returns
-        a datetime object with the specified time difference to the current time.
+        a datetime object with the specified time difference to the current
+        time.
 
         :param time_string: The time string to parse
         :param language: In which language the string should be parsed
@@ -278,7 +315,9 @@ class ReminderService(HelperService):
 
         # turn all units into english singular units
         for unit in ["second", "minute", "hour", "day", "week", "year"]:
-            for mode in ["plural", "singular"]:  # The order is very important here!
+
+            # The order is very important here!
+            for mode in ["plural", "singular"]:
 
                 key = "@" + unit + "_" + mode
                 text = self.translate(key, language)
@@ -311,5 +350,6 @@ class ReminderService(HelperService):
 
             return now
 
-        except (ValueError, OverflowError):  # Datetime exception, too high date values
+        # Datetime exception, too high date values
+        except (ValueError, OverflowError):
             return None

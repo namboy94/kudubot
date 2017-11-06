@@ -22,8 +22,6 @@ This file is part of kudubot.
 LICENSE
 """
 
-
-import logging
 import configparser
 from typing import Dict, List
 from yowsup.layers import YowLayerEvent
@@ -39,21 +37,25 @@ from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 
 class WhatsappConnection(Connection):
     """
-    Class that implements a kudubot connection for the Whatsapp Messaging Service
+    Class that implements a kudubot connection for
+    the Whatsapp Messaging Service
     """
 
-    def __init__(self, services: List[type], config_handler: GlobalConfigHandler):
+    def __init__(self, services: List[type],
+                 config_handler: GlobalConfigHandler):
         """
         Extends the default Connection constructor to create a yowsup stack
 
         :param services: The services to start
-        :param config_handler: The GlobalConfigHandler that determines the location of the configuration files
+        :param config_handler: The GlobalConfigHandler that determines the
+                               location of the configuration files
         """
         super().__init__(services, config_handler)
 
         stack_builder = YowStackBuilder()
         self.yowsup = EchoLayer(self)
-        self.stack = stack_builder.pushDefaultLayers(True).push(self.yowsup).build()
+        self.stack = \
+            stack_builder.pushDefaultLayers(True).push(self.yowsup).build()
         self.stack.setCredentials((self.config["number"], self.config["pass"]))
 
     @staticmethod
@@ -78,14 +80,18 @@ class WhatsappConnection(Connection):
         :return: None
         """
         with open(self.config_file_location, 'w') as config:
-            config.write("[credentials]\nnumber=YourNumberHere\npass=YourPassHere\n")
-            self.logger.info("Wrote new Configuration file at " + self.config_file_location)
+            config.write(
+                "[credentials]\nnumber=YourNumberHere\npass=YourPassHere\n")
+            self.logger.info(
+                "Wrote new Configuration file at " + self.config_file_location)
 
     def load_config(self) -> Dict[str, str]:
         """
-        Loads the configuration for the Whatsapp Connection from the config file
+        Loads the configuration for the Whatsapp Connection
+        from the config file
 
-        :return: The parsed configuration, consisting of a dictionary with a number and pass key
+        :return: The parsed configuration,
+                 consisting of a dictionary with a number and pass key
         """
         try:
 
@@ -96,22 +102,33 @@ class WhatsappConnection(Connection):
             parsed_config = dict(config.items("credentials"))
 
             if parsed_config["number"] == "":
-                self.logger.warning("Config Parsing Failed. No number supplied.")
-                raise InvalidConfigException("Invalid Whatsapp Configuration File - Missing number detected")
+                self.logger.warning(
+                    "Config Parsing Failed. No number supplied.")
+                raise InvalidConfigException(
+                    "Invalid Whatsapp Configuration File - "
+                    "Missing number detected")
             elif parsed_config["pass"] == "":
-                self.logger.warning("Config Parsing Failed. No password supplied.")
-                raise InvalidConfigException("Invalid Whatsapp Configuration File - Missing password detected")
+                self.logger.warning(
+                    "Config Parsing Failed. No password supplied.")
+                raise InvalidConfigException(
+                    "Invalid Whatsapp Configuration File - "
+                    "Missing password detected")
 
             self.logger.info("Config successfully loaded")
 
             return parsed_config
 
         except configparser.NoSectionError:
-            self.logger.warning("Config Parsing Failed. No credentials section in config file.")
-            raise InvalidConfigException("Invalid Whatsapp Configuration File - No credentials section")
+            self.logger.warning("Config Parsing Failed. "
+                                "No credentials section in config file.")
+            raise InvalidConfigException("Invalid Whatsapp Configuration File "
+                                         "- No credentials section")
         except KeyError as e:
-            self.logger.warning("Config Parsing Failed. No attribute " + str(e) + " found.")
-            raise InvalidConfigException("Invalid Whatsapp Configuration File - No '" + str(e) + "' attribute found")
+            self.logger.warning(
+                "Config Parsing Failed. No attribute " + str(e) + " found.")
+            raise InvalidConfigException(
+                "Invalid Whatsapp Configuration File - No '" + str(e) +
+                "' attribute found")
 
     def send_message(self, message: Message):
         """
@@ -120,9 +137,11 @@ class WhatsappConnection(Connection):
         :param message: The message to send
         :return: None
         """
-        self.yowsup.send_text_message(message.message_body, message.receiver.address)
+        self.yowsup.send_text_message(
+            message.message_body, message.receiver.address)
 
-    def send_audio_message(self, receiver: Contact, audio_file: str, caption: str = ""):
+    def send_audio_message(self, receiver: Contact, audio_file: str,
+                           caption: str = ""):
         """
         Sends an audio message using the Whatsapp Connection
 
@@ -133,7 +152,8 @@ class WhatsappConnection(Connection):
         """
         self.yowsup.send_audio_message(audio_file, receiver.address, caption)
 
-    def send_video_message(self, receiver: Contact, video_file: str, caption: str = ""):
+    def send_video_message(self, receiver: Contact, video_file: str,
+                           caption: str = ""):
         """
         Sends a video message using the Whatsapp Connection
 
@@ -144,7 +164,8 @@ class WhatsappConnection(Connection):
         """
         self.yowsup.send_video_message(video_file, receiver.address, caption)
 
-    def send_image_message(self, receiver: Contact, image_file: str, caption: str = ""):
+    def send_image_message(self, receiver: Contact, image_file: str,
+                           caption: str = ""):
         """
         Sends an image message using the Whatsapp Connection
 
@@ -161,5 +182,7 @@ class WhatsappConnection(Connection):
 
         :return: None
         """
-        self.stack.broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT))
+        self.stack.broadcastEvent(
+            YowLayerEvent(YowNetworkLayer.EVENT_STATE_CONNECT)
+        )
         self.stack.loop()

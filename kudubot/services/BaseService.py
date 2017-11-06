@@ -21,6 +21,7 @@ import logging
 from typing import List
 from threading import Thread
 from kudubot.entities.Message import Message
+from kudubot.connections.Connection import Connection
 
 
 class BaseService(object):
@@ -65,7 +66,7 @@ class BaseService(object):
         """
         raise NotImplementedError()
 
-    def __init__(self, connection):
+    def __init__(self, connection: Connection):
         """
         Initializes the Service using a specified Connection
 
