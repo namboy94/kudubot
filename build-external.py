@@ -31,7 +31,8 @@ from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
 if __name__ == "__main__":
 
     if len(sys.argv) < 2:
-        build_external(GlobalConfigHandler().external_services_executables_directory)
+        build_external(
+            GlobalConfigHandler().external_services_executables_directory)
     else:
 
         target_dir = sys.argv[1]
