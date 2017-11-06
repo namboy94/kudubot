@@ -1,3 +1,6 @@
+V 0.17.0:
+  - Redo Service Structure
+  - Implement Authenticated Service
 V 0.16.1:
   - Fixed Reminder Service not accepting valid time values
   - Fixed Reminder Service converting reminder messages to lower-case
