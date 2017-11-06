@@ -79,11 +79,6 @@ class HelperService(MultiLanguageService):
         """
         body = message.message_body
 
-        try:
-            language = self.determine_language(message)
-        except NotImplementedError:
-            language = "en"
-
         dictionary = {
             "@help_message_title":
                 {"en": "Help Message for " + self.identifier,
@@ -94,6 +89,24 @@ class HelperService(MultiLanguageService):
         }
         help_keywords = ["help", "hilfe"]
         syntax_keywords = ["syntax"]
+
+        try:
+            language = self.determine_language(message)
+        except NotImplementedError:
+            language = self.define_fallback_language()
+        command_keyword = self.define_command_name(language)
+
+        # Checks if the /help or /syntax commands were used
+        # If that's the case, adjust the message text.
+        for keyword in help_keywords + syntax_keywords:
+            if body.lower().split(" ")[0] == "/" + keyword:
+                for service in self.connection.services:
+                    identifier = body.lower().split(" ")[1].strip()
+                    if service.identifier == identifier:
+                        if service.identifier != self.identifier:
+                            return
+                        else:
+                            body = command_keyword + " " + keyword
 
         if body.startswith(self.define_command_name(language)):
             body = body.split(self.define_command_name(language), 1)[1].strip()
@@ -134,6 +147,13 @@ class HelperService(MultiLanguageService):
         """
         language = self.determine_language(message)
         command = self.define_command_name(language).lower()
+        params = message.message_body.lower().split(" ")
+        identifier = self.identifier
+
+        # Needs at least 2 parameters. Command or identifier + help
+        if len(params) < 2:
+            return False
+
         dictionary = {
             "@help_command": {"en": "help",
                               "de": "hilfe"},
@@ -141,7 +161,32 @@ class HelperService(MultiLanguageService):
                                 "de": "syntax"}
         }
 
-        return message.message_body.lower() in [
-            command + self.translate(" @help_command", language, dictionary),
-            command + self.translate(" @syntax_command", language, dictionary)
-        ]
+        # Check if help or syntax keyword in message text.
+        # Change language accordingly
+        for entry, values in dictionary.items():
+            for lang, keyword in values.items():
+                if params[0] == "/" + keyword:
+                    language = lang
+                elif params[1] == keyword:
+                    language = lang
+
+        help_command = self.translate("@help_command", language, dictionary)
+        syntax_command = self.translate("@syntax_command", language,
+                                        dictionary)
+
+        if len(params) == 2 and "/" + help_command == params[0] \
+                and params[1] == identifier:
+            # /help identifier
+            return True
+
+        elif len(params) == 2 and "/" + syntax_command == params[0] \
+                and params[1] == identifier:
+            # /syntax identifier
+            return True
+
+        else:
+            # /command help
+            return message.message_body.lower() in [
+                command + " " + help_command,
+                command + " " + syntax_command
+            ]
