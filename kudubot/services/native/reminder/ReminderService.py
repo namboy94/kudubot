@@ -204,7 +204,8 @@ class ReminderService(HelperService):
         :return: The syntax description in the specified language
         """
         return {
-            "en": "/remind X second(s) \"Message\"\n"
+            "en": "Set a reminder:\n"
+                  "/remind X second(s) \"Message\"\n"
                   "/remind X minute(s) \"Message\"\n"
                   "/remind X hour(s) \"Message\"\n"
                   "/remind X day(s) \"Message\"\n"
@@ -214,8 +215,11 @@ class ReminderService(HelperService):
                   "/remind next week \"Message\"\n"
                   "/remind next year \"Message\"\n\n"
                   "Combinations:\n"
-                  "/remind X hours Y minutes Z seconds \"Message\"\n",
-            "de": "/erinner X sekunde(n) \"Message\"\n"
+                  "/remind X hours Y minutes Z seconds \"Message\"\n\n"
+                  "List pending reminders:\n"
+                  "/remind list",
+            "de": "Erinnerung setzen:\n"
+                  "/erinner X sekunde(n) \"Message\"\n"
                   "/erinner X minute(n) \"Message\"\n"
                   "/erinner X stunde(n) \"Message\"\n"
                   "/erinner X tag(e) \"Message\"\n"
@@ -223,9 +227,11 @@ class ReminderService(HelperService):
                   "/erinner X jahr(e) \"Message\"\n"
                   "/erinner morgen \"Message\"\n"
                   "/erinner nächste woche \"Message\"\n"
-                  "/erinner nächstes jahr \"Message\"\n"
+                  "/erinner nächstes jahr \"Message\"\n\n"
                   "Kombinationen:\n"
-                  "/erinner X stunden Y minuten Z sekunden \"Message\"\n"
+                  "/erinner X stunden Y minuten Z sekunden \"Message\"\n\n"
+                  "Gespeicherte Erinnerungen auflisten:\n"
+                  "/erinner auflisten"
         }[language]
 
     def determine_language(self, message: Message) -> str:

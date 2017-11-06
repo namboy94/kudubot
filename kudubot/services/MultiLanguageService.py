@@ -148,9 +148,13 @@ class MultiLanguageService(BaseService):
         :param message: The message to reply to
         :return: None
         """
-        language = self.connection.language_selector.get_language_preference(
-            message.get_direct_response_contact()
-        )
+        try:
+            language = self.determine_language(message)
+        except NotImplementedError:
+            language = self.connection.language_selector.\
+                get_language_preference(
+                    message.get_direct_response_contact()
+                )
         self.reply(
             self.translate(title, language),
             self.translate(body, language),

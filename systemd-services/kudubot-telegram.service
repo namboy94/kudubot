@@ -1,0 +1,11 @@
+[Unit]
+Description=TelegramKudubot
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python {PATH_TO_kudubot} telegram
+User={USER}
+
+[Install]
+WantedBy=multi-user.target

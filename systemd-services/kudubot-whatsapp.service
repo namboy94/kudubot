@@ -1,0 +1,11 @@
+[Unit]
+Description=WhatsappKudubot
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python {PATH_TO_kudubot} whatsapp
+User={USER}
+
+[Install]
+WantedBy=multi-user.target
