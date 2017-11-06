@@ -97,8 +97,8 @@ class TelegramConnection(Connection):
             raise InvalidConfigException("Invalid Telegram Configuration File "
                                          "- No credentials section")
         except KeyError as e:
-            self.logger.warning("Config Parsing Failed. No attribute "
-                                + str(e) + " found.")
+            self.logger.warning("Config Parsing Failed. No attribute " +
+                                str(e) + " found.")
             raise InvalidConfigException(
                 "Invalid Telegram Configuration File - No '" + str(e) +
                 "' attribute found")

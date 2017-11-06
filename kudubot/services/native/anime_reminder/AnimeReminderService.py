@@ -88,8 +88,9 @@ class AnimeReminderService(HelperService):
             result = "@successful_remove_message" \
                 if delete_subscription(user_id, show, self.connection.db) \
                 else "@does_not_exist_message"
-            self.reply_translated("@reply_title", "@unsubscribe_message_start "
-                                  + show + " " + result + ".", message)
+            self.reply_translated("@reply_title",
+                                  "@unsubscribe_message_start " + show +
+                                  " " + result + ".", message)
 
         elif mode in [self.translate("@list_command", x)
                       for x in self.supported_languages()]:

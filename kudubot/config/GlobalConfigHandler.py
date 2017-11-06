@@ -334,8 +334,8 @@ class GlobalConfigHandler(object):
                         self.logger.info("Import " + line + " successful")
                     else:
                         self.logger.warning(
-                            "Import " + line + " is not of type "
-                            + str(class_type)
+                            "Import " + line + " is not of type " +
+                            str(class_type)
                         )
 
                 except (ImportError, AttributeError):  # Ignore invalid imports

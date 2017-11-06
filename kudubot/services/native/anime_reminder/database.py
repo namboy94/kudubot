@@ -90,8 +90,8 @@ def store_subscription(user: int, show_name: str, db: sqlite3.Connection) \
                    "(user_id, show_name) VALUES (?, ?)", (user, show_name))
         db.commit()
     else:
-        logger.debug("Subscription for user " + str(user) + " and show "
-                     + show_name + " already exists")
+        logger.debug("Subscription for user " + str(user) + " and show " +
+                     show_name + " already exists")
 
     return not exists
 
