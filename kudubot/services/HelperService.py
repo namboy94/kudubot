@@ -190,3 +190,22 @@ class HelperService(MultiLanguageService):
                 command + " " + help_command,
                 command + " " + syntax_command
             ]
+
+    def starts_with_command_keyword(self, message: Message, language: str,
+                                    case_sensitive: bool = False) -> bool:
+        """
+        Checks if a message text starts with the command keyword
+        defined by define_command_name()
+
+        :param message: The message to check
+        :param language: The language for which to check
+        :param case_sensitive: Can be set to True to do a case-sensitive check
+        :return: True if the message starts with the command name, else False
+        """
+        if case_sensitive:
+            return message.message_body.\
+                startswith(self.define_command_name(language))
+
+        else:
+            return message.message_body.lower(). \
+                startswith(self.define_command_name(language).lower())

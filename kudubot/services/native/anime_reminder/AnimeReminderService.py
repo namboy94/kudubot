@@ -253,7 +253,7 @@ class AnimeReminderService(HelperService):
                 time.sleep(60)
                 continue
 
-            self.logger.info("Checking for due subscriptions")
+            self.logger.debug("Checking for due subscriptions")
 
             for thread in new_threads:
 

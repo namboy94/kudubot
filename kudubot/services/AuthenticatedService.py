@@ -44,5 +44,6 @@ class AuthenticatedService(BaseService):
         """
         is_admin = self.connection.authenticator.is_admin(message.sender)
         if not is_admin:
-            self.logger.info("Authorizaton denied for " + message.sender)
+            self.logger.info("Authorizaton denied for " +
+                             message.sender.address)
         return is_admin

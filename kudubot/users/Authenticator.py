@@ -46,7 +46,7 @@ class Authenticator(object):
         self.db.commit()
         self.logger.info("Authenticator initialized")
 
-    def make_admin(self, contact: Contact,
+    def make_admin(self, contact: Contact or int,
                    database_override: sqlite3.Connection = None):
         """
         Grants admin privileges to a contact
@@ -54,14 +54,15 @@ class Authenticator(object):
         :param database_override: Provides a different database connection.
                                   Required for use in other threads.
         """
+        user_id = contact if isinstance(contact, int) else contact.database_id
         db = self.db if database_override is None else database_override
         db.execute(
             "INSERT OR REPLACE INTO authenticator "
             "(user_id, is_admin, is_blacklisted) VALUES (?, ?, ?)",
-            (contact.database_id, True, False)
+            (user_id, True, False)
         )
 
-    def blacklist(self, contact: Contact,
+    def blacklist(self, contact: Contact or int,
                   database_override: sqlite3.Connection = None):
         """
         Blacklists a contact
@@ -69,14 +70,15 @@ class Authenticator(object):
         :param database_override: Provides a different database connection.
                                   Required for use in other threads.
         """
+        user_id = contact if isinstance(contact, int) else contact.database_id
         db = self.db if database_override is None else database_override
         db.execute(
             "INSERT OR REPLACE INTO authenticator "
             "(user_id, is_admin, is_blacklisted) VALUES (?, ?, ?)",
-            (contact.database_id, False, True)
+            (user_id, False, True)
         )
 
-    def is_admin(self, contact: Contact,
+    def is_admin(self, contact: Contact or int,
                  database_override: sqlite3.Connection = None) -> bool:
         """
         Checks if a contact has admin privileges
@@ -88,13 +90,14 @@ class Authenticator(object):
         if contact is None:
             return False
 
+        user_id = contact if isinstance(contact, int) else contact.database_id
         db = self.db if database_override is None else database_override
         result = db.execute(
             "SELECT * FROM authenticator WHERE user_id=? AND is_admin=1",
-            (contact.database_id,)).fetchall()
+            (user_id,)).fetchall()
         return len(result) == 1
 
-    def is_blacklisted(self, contact: Contact,
+    def is_blacklisted(self, contact: Contact or int,
                        database_override: sqlite3.Connection = None) -> bool:
         """
         Checks if a contact is blacklisted
@@ -106,8 +109,9 @@ class Authenticator(object):
         if contact is None:
             return False
 
+        user_id = contact if isinstance(contact, int) else contact.database_id
         db = self.db if database_override is None else database_override
         result = db.execute(
             "SELECT * FROM authenticator WHERE user_id=? AND is_blacklisted=1",
-            (contact.database_id,)).fetchall()
+            (user_id,)).fetchall()
         return len(result) == 1

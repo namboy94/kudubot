@@ -37,8 +37,8 @@ def scrape_reddit_discussion_threads() -> List[Dict[str, str or int]]:
              descriptive keys
     """
 
-    logger.info("Fetching last 25 submitted reddit threads "
-                "from /u/Holo_of_Yoitsu")
+    logger.debug("Fetching last 25 submitted reddit threads "
+                 "from /u/Holo_of_Yoitsu")
 
     html = requests.get("https://www.reddit.com/user/Holo_of_Yoitsu.json")
     while html.status_code != 200:  # Circumvent rate limiting if we're unlucky
@@ -64,6 +64,6 @@ def scrape_reddit_discussion_threads() -> List[Dict[str, str or int]]:
 
         logger.debug("Found thread: " + str(threads[-1]))
 
-    logger.info("Finished retrieving data from reddit")
+    logger.debug("Finished retrieving data from reddit")
 
     return threads

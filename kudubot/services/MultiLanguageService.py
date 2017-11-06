@@ -18,6 +18,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from typing import Dict, List
+from kudubot.users.Contact import Contact
 from kudubot.entities.Message import Message
 from kudubot.services.BaseService import BaseService
 
@@ -63,13 +64,13 @@ class MultiLanguageService(BaseService):
         """
         return "en"
 
-    # -------------------------------------------------------------------------
-    #                  _,-'/-'/                                Here be dragons!
-    #  .      __,-; ,'( '/
-    #   \.    `-.__`-._`:_,-._       _ , . ``
-    #    `:-._,------' ` _,`--` -: `_ , ` ,' :
-    #       `---..__,,--'            ` -'. -'
-    # Everything below this should not be overridden by subclasses
+    # ----------------------------------------------------------------------- #
+    #                  _,-'/-'/                              Here be dragons! #
+    #  .      __,-; ,'( '/                                                    #
+    #   \.    `-.__`-._`:_,-._       _ , . ``                                 #
+    #    `:-._,------' ` _,`--` -: `_ , ` ,' :                                #
+    #       `---..__,,--'            ` -'. -'                                 #
+    # Everything below this should not be overridden by subclasses            #
     # -------------------------------------------------------------------------
 
     lang_switch_command_keywords = ["/language", "/sprache"]
@@ -148,13 +149,7 @@ class MultiLanguageService(BaseService):
         :param message: The message to reply to
         :return: None
         """
-        try:
-            language = self.determine_language(message)
-        except NotImplementedError:
-            language = self.connection.language_selector.\
-                get_language_preference(
-                    message.get_direct_response_contact()
-                )
+        language = self.determine_language(message)
         self.reply(
             self.translate(title, language),
             self.translate(body, language),
@@ -206,8 +201,7 @@ class MultiLanguageService(BaseService):
 
         # Example Message: '/language'
         if len(params) == 1 and params[0] in self.lang_switch_command_keywords:
-            language = self.connection.language_selector.\
-                get_language_preference(contact, "en")
+            language = self.get_stored_language_preference(contact)
 
             self.reply(self.translate("@{title}", language, lang_switch_dict),
                        language, message)
@@ -227,8 +221,7 @@ class MultiLanguageService(BaseService):
                             store_language_preference(contact, key, True)
                         break
 
-            language = self.connection.language_selector.\
-                get_language_preference(contact, "en")
+            language = self.get_stored_language_preference(contact)
             # the new language will already be stored
             title = self.translate("@{title}", language, lang_switch_dict)
 
@@ -246,3 +239,13 @@ class MultiLanguageService(BaseService):
             self.connection.language_selector.store_language_preference(
                 message.get_direct_response_contact(), language
             )
+
+    def get_stored_language_preference(self, contact: Contact) -> str:
+        """
+        Gets the stored language preference of a contact
+        :param contact: The contact to get the stored language preference for
+        :return: The language
+        """
+        return self.connection.language_selector.get_language_preference(
+            contact, "en"
+        )

@@ -66,7 +66,8 @@ class StandardConfigWriter(object):
                  "@NATIVE reminder::ReminderService",
                  "@NATIVE anime_reminder::AnimeReminderService",
                  "@NATIVE jokes::JokesService",
-                 "@NATIVE service_lister::ServiceListerService"
+                 "@NATIVE service_lister::ServiceListerService",
+                 "@NATIVE authentication_manager::AuthenticationManagerService"
                  # "@EXTERNAL helloworld_rust::HelloWorldService",
                  # "@EXTERNAL weather_kotlin::HelloKotlinService"
             ]:
