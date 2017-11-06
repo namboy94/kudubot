@@ -22,8 +22,7 @@ from kudubot.entities.Message import Message
 from kudubot.services.BaseService import BaseService
 
 
-# noinspection PyAbstractClass,SqlNoDataSourceInspection
-# noinspection SqlDialectInspection,SqlResolve
+# noinspection PyAbstractClass
 class MultiLanguageService(BaseService):
     """
     Service Extension class that enables support for multiple languages
@@ -54,20 +53,6 @@ class MultiLanguageService(BaseService):
         """
         raise NotImplementedError
 
-    def supported_languages(self) -> List[str]:
-        """
-        :return: A list of languages supported by the Service
-        """
-
-        supported = []
-
-        dictionary = self.define_language_text()
-        for token in dictionary:
-            for language in dictionary[token]:
-                if language not in supported:
-                    supported.append(language)
-        return supported
-
     # noinspection PyMethodMayBeStatic
     def define_fallback_language(self) -> str:
         """
@@ -77,6 +62,41 @@ class MultiLanguageService(BaseService):
         :return: By default, the language "en" is returned
         """
         return "en"
+
+    # -------------------------------------------------------------------------
+    #                  _,-'/-'/                                Here be dragons!
+    #  .      __,-; ,'( '/
+    #   \.    `-.__`-._`:_,-._       _ , . ``
+    #    `:-._,------' ` _,`--` -: `_ , ` ,' :
+    #       `---..__,,--'            ` -'. -'
+    # Everything below this should not be overridden by subclasses
+    # -------------------------------------------------------------------------
+
+    lang_switch_command_keywords = ["/language", "/sprache"]
+    """
+    List of command triggers that can be used to list or change the language
+    """
+
+    lang_switch_aliases = {
+        "en": ["en", "english", "englisch"],
+        "de": ["de", "deutsch", "german"]
+    }
+    """
+    Aliases for language names in other languages
+    """
+
+    def supported_languages(self) -> List[str]:
+        """
+        :return: A list of languages supported by the Service
+        """
+        supported = []
+
+        dictionary = self.define_language_text()
+        for token in dictionary:
+            for language in dictionary[token]:
+                if language not in supported:
+                    supported.append(language)
+        return supported
 
     def translate(self, text: str, language: str,
                   translation_dict: Dict[str, Dict[str, str]]=None) -> str:
@@ -133,14 +153,21 @@ class MultiLanguageService(BaseService):
             message
         )
 
-    def is_applicable_to(self, message: Message):
-        body = message.message_body.lower().strip()
-        return \
-            body.startswith("/language ") or \
-            body.startswith("/sprache ") or \
-            body in ["/language", "/sprache"]
+    # noinspection PyMethodMayBeStatic
+    def is_applicable_to_multi_language(self, message: Message):
+        """
+        Checks if a message is applicable for a language list or change
+        :param message:
+        :return:
+        """
 
-    def handle_message(self, message: Message):
+        body = message.message_body.lower().strip()
+        for keyword in self.lang_switch_command_keywords:
+            if body.startswith(keyword + " ") or body == keyword:
+                return True
+        return False
+
+    def handle_message_multi_language(self, message: Message):
         """
         Analyzes a message for the language used and stores that language
         value in the database as a preference of the user.
@@ -151,37 +178,41 @@ class MultiLanguageService(BaseService):
         :return: None
         """
 
-        dictionary = {"@title": {"en": "Language Change",
-                                 "de": "Sprachwechsel"},
-                      "@success_message":
-                          {"en": "Successfully changed language to",
-                           "de": "Sprache erfolgreich geändert zu"},
-                      "@fail_message":
-                          {"en": "Failed to switch to language",
-                           "de": "Konnte nicht Sprache wechseln zu"}
-                      }
-
-        command_keywords = ["/language", "/sprache"]
-        aliases = {"en": ["en", "english", "englisch"],
-                   "de": ["de", "deutsch", "german"]}
+        lang_switch_dict = {
+            "@{title}": {
+                "en": "Language Change",
+                "de": "Sprachwechsel"
+            },
+            "@{success_message}": {
+                "en": "Successfully changed language to",
+                "de": "Sprache erfolgreich geändert zu"
+            },
+            "@{fail_message}": {
+                "en": "Failed to switch to language",
+                "de": "Konnte nicht Sprache wechseln zu"
+            }
+        }
 
         params = message.message_body.lower().split(" ")
         contact = message.get_direct_response_contact()
 
-        if len(params) == 1 and params[0] in command_keywords:
-            language = \
-                self.connection.language_selector.get_language_preference(
-                    contact, "en"
-                )
-            self.reply(self.translate("@title", language, dictionary),
-                       language, message)
-            return  # Important, makes overriding methods
-            #         quit when help message is applicable
+        # Example Message: '/language'
+        if len(params) == 1 and params[0] in self.lang_switch_command_keywords:
+            language = self.connection.language_selector.\
+                get_language_preference(contact, "en")
 
-        if len(params) == 2 and params[0] in command_keywords:
+            self.reply(self.translate("@{title}", language, lang_switch_dict),
+                       language, message)
+
+        # Example Message: '/language english'
+        elif len(params) == 2 \
+                and params[0] in self.lang_switch_command_keywords:
+
             found_language = False
-            for key in aliases:
-                for alias in aliases[key]:
+            for key in self.lang_switch_aliases:
+
+                for alias in self.lang_switch_aliases[key]:
+
                     if alias == params[1]:
                         found_language = True
                         self.connection.language_selector.\
@@ -191,31 +222,19 @@ class MultiLanguageService(BaseService):
             language = self.connection.language_selector.\
                 get_language_preference(contact, "en")
             # the new language will already be stored
-            title = self.translate("@title", language, dictionary)
+            title = self.translate("@{title}", language, lang_switch_dict)
 
             if found_language:
-                self.reply(
-                    title, self.translate(
-                        "@success_message: " + language, language, dictionary
-                    ), message
-                )
+                self.reply(title, self.translate("@{success_message}: " +
+                                                 language, language,
+                                                 lang_switch_dict), message)
             else:
-                self.reply(
-                    title, self.translate(
-                        "@fail_message: " + params[1], language, dictionary
-                    ), message
-                )
-
-            return  # Important, makes overriding methods quit
-            #         when help message is applicable
+                self.reply(title, self.translate("@{fail_message}: " +
+                                                 params[1], language,
+                                                 lang_switch_dict), message)
 
         else:
-
-            try:
-                language = self.determine_language(message)
-                self.connection.language_selector.store_language_preference(
-                    message.get_direct_response_contact(),
-                    language
-                )
-            except NotImplementedError:
-                pass
+            language = self.determine_language(message)
+            self.connection.language_selector.store_language_preference(
+                message.get_direct_response_contact(), language
+            )

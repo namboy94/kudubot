@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# TODO Redo the external service class
+
 import os
 import json
 import time

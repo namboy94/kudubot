@@ -47,6 +47,24 @@ class BaseService(object):
         """
         raise NotImplementedError()
 
+    def is_applicable_to(self, message: Message) -> bool:
+        """
+        Checks if the Service is applicable to a given message
+
+        :param message: The message to check
+        :return: True if applicable, else False
+        """
+        raise NotImplementedError()
+
+    def handle_message(self, message: Message):
+        """
+        Handles the message, provided this service is applicable to it
+
+        :param message: The message to process
+        :return: None
+        """
+        raise NotImplementedError()
+
     def __init__(self, connection):
         """
         Initializes the Service using a specified Connection
@@ -71,6 +89,33 @@ class BaseService(object):
         """
         pass
 
+    # -------------------------------------------------------------------------
+    #                  _,-'/-'/                                Here be dragons!
+    #  .      __,-; ,'( '/
+    #   \.    `-.__`-._`:_,-._       _ , . ``
+    #    `:-._,------' ` _,`--` -: `_ , ` ,' :
+    #       `---..__,,--'            ` -'. -'
+    # Everything below this should not be overridden by subclasses
+    # -------------------------------------------------------------------------
+
+    def reply(self, title: str, body: str, message: Message):
+        """
+        Provides a helper method that streamlines the process
+        of replying to a message.
+        Very useful for Services that send a reply immediately
+        to cut down on clutter in the code
+
+        :param title: The title of the message to send
+        :param body: The body of the message to send
+        :param message: The message to reply to
+        :return: None
+        """
+        reply_message = Message(
+            title, body, message.get_direct_response_contact(),
+            self.connection.user_contact
+        )
+        self.connection.send_message(reply_message)
+
     def is_applicable_to_with_log(self, message: Message) -> bool:
         """
         Wrapper around the is_applicable_to method,
@@ -82,9 +127,24 @@ class BaseService(object):
         """
         self.logger.debug("Checking if " + message.message_body +
                           " is applicable")
+
+        # Check if a subclass is_applicable fits here
+        # This construct is required to avoid having to call super()
+        # in implemented service classes, which can not be enforced or
+        # hinted at via an IDE
+        for subclass in [
+            "multi_language", "authenticated", "helper", "external"
+        ]:
+            is_applicable_method = \
+                getattr(self, "is_applicable_to_" + subclass, None)
+            if callable(is_applicable_method):
+                if is_applicable_method(self, message):
+                    self.logger.debug("Message is applicable")
+                    return True
+
         result = self.is_applicable_to(message)
-        self.logger.debug("Message is " + ("" if result else "not") +
-                          " applicable")
+        not_word = "" if result else "not"
+        self.logger.debug("Message is " + not_word + " applicable")
         return result
 
     def handle_message_with_log(self, message: Message):
@@ -97,6 +157,22 @@ class BaseService(object):
         :return: None
         """
         self.logger.debug("Handling message " + message.message_body)
+
+        # Checks if a parent class of the service is applicable, if yes,
+        # Runs their handle_message method
+        for subclass in [
+            "multi_language", "authenticated", "helper", "external"
+        ]:
+            is_applicable_method = \
+                getattr(self, "is_applicable_to_" + subclass, None)
+            handle_method = getattr(self, "handle_message_" + subclass, None)
+
+            if callable(is_applicable_method) and callable(handle_method):
+
+                if is_applicable_method(self, message):
+                    handle_method(self, message)
+                    return
+
         self.handle_message(message)
 
     # noinspection PyMethodMayBeStatic
@@ -131,39 +207,3 @@ class BaseService(object):
             self.connection.db.execute(statement)
         if initializer is not None:
             initializer(self.connection.db)
-
-    def is_applicable_to(self, message: Message) -> bool:
-        """
-        Checks if the Service is applicable to a given message
-
-        :param message: The message to check
-        :return: True if applicable, else False
-        """
-        raise NotImplementedError()
-
-    def handle_message(self, message: Message):
-        """
-        Handles the message, provided this service is applicable to it
-
-        :param message: The message to process
-        :return: None
-        """
-        raise NotImplementedError()
-
-    def reply(self, title: str, body: str, message: Message):
-        """
-        Provides a helper method that streamlines the process
-        of replying to a message.
-        Very useful for Services that send a reply immediately
-        to cut down on clutter in the code
-
-        :param title: The title of the message to send
-        :param body: The body of the message to send
-        :param message: The message to reply to
-        :return: None
-        """
-        reply_message = Message(
-            title, body, message.get_direct_response_contact(),
-            self.connection.user_contact
-        )
-        self.connection.send_message(reply_message)

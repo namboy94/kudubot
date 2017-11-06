@@ -62,13 +62,13 @@ class StandardConfigWriter(object):
 
         with open(self.service_config, 'w') as config:
             for service in [
-                "@NATIVE simple_responder::SimpleResponderService",
-                "@NATIVE reminder::ReminderService",
-                "@NATIVE anime_reminder::AnimeReminderService",
-                "@NATIVE jokes::JokesService",
-                "@NATIVE service_lister::ServiceListerService",
-                "@EXTERNAL helloworld_rust::HelloWorldService",
-                "@EXTERNAL weather_kotlin::HelloKotlinService"
+                # "@NATIVE simple_responder::SimpleResponderService",
+                # "@NATIVE reminder::ReminderService",
+                # "@NATIVE anime_reminder::AnimeReminderService",
+                # "@NATIVE jokes::JokesService",
+                # "@NATIVE service_lister::ServiceListerService",
+                # "@EXTERNAL helloworld_rust::HelloWorldService",
+                # "@EXTERNAL weather_kotlin::HelloKotlinService"
             ]:
 
                 config.write(service + "\n")

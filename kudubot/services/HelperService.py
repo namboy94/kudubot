@@ -59,7 +59,16 @@ class HelperService(MultiLanguageService):
         """
         return "/" + self.define_identifier()
 
-    def handle_message(self, message: Message):
+    # -------------------------------------------------------------------------
+    #                  _,-'/-'/                                Here be dragons!
+    #  .      __,-; ,'( '/
+    #   \.    `-.__`-._`:_,-._       _ , . ``
+    #    `:-._,------' ` _,`--` -: `_ , ` ,' :
+    #       `---..__,,--'            ` -'. -'
+    # Everything below this should not be overridden by subclasses
+    # -------------------------------------------------------------------------
+
+    def handle_message_helper(self, message: Message):
         """
         Handles the help message sending.
         Checks if a message qualifies for a help message and then sends
@@ -70,7 +79,6 @@ class HelperService(MultiLanguageService):
         :param message: The message to handle
         :return: None
         """
-        super().handle_message(message)
         if MultiLanguageService.is_applicable_to(self, message):
             return
 
@@ -112,7 +120,7 @@ class HelperService(MultiLanguageService):
                            self.define_syntax_description(language), message)
                 return
 
-    def is_applicable_to(self, message: Message) -> bool:
+    def is_applicable_to_helper(self, message: Message) -> bool:
         """
         Checks if the message is applicable to the service by checking
         if the command name is followed by the terms 'help' or 'syntax'.
@@ -136,16 +144,3 @@ class HelperService(MultiLanguageService):
             command + self.translate(" @help_command", language, dictionary),
             command + self.translate(" @syntax_command", language, dictionary)
         ]
-
-    def is_applicable_to_without_help_or_syntax(self, message: Message)\
-            -> bool:
-        """
-        Checks if the message applies to anything beside the
-        'help' or 'syntax' commands
-
-        :param message: The message to analyze
-        :return: True if the message is applicable to something else,
-        False otherwise
-        """
-        return self.is_applicable_to(message) and \
-            not HelperService.is_applicable_to(self, message)

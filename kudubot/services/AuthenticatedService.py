@@ -27,7 +27,16 @@ class AuthenticatedService(BaseService):
     Service that can only be used by admin users
     """
 
-    def is_applicable_to(self, message: Message) -> bool:
+    # -------------------------------------------------------------------------
+    #                  _,-'/-'/                                Here be dragons!
+    #  .      __,-; ,'( '/
+    #   \.    `-.__`-._`:_,-._       _ , . ``
+    #    `:-._,------' ` _,`--` -: `_ , ` ,' :
+    #       `---..__,,--'            ` -'. -'
+    # Everything below this should not be overridden by subclasses
+    # -------------------------------------------------------------------------
+
+    def is_applicable_to_authenticated(self, message: Message) -> bool:
         """
         Checks if the sender of the message has administrative privileges
         :param message: The message to check
