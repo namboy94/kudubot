@@ -123,9 +123,13 @@ class MultiLanguageService(BaseService):
                     key, language_text[key][language]
                 )
             except KeyError:
-                translated = translated.replace(
-                    key, language_text[key][self.define_fallback_language()]
-                )
+                try:
+                    translated = translated.replace(
+                        key,
+                        language_text[key][self.define_fallback_language()]
+                    )
+                except KeyError:  # No English language defined
+                    return text
 
         return translated
 

@@ -22,9 +22,10 @@ from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
 
 
-class ServiceListerService(HelperService):
+class TemplateService(HelperService):
     """
-    This Service lists all currently active services
+    This is a Template for a Service class.
+    # TODO Change this description
     """
 
     @staticmethod
@@ -34,7 +35,8 @@ class ServiceListerService(HelperService):
 
         :return: The service's identifier
         """
-        return "service_lister"
+        # TODO Implement
+        return "todo"
 
     def define_command_name(self, language: str) -> str:
         """
@@ -45,9 +47,10 @@ class ServiceListerService(HelperService):
         :param language: The language in which to define the command name
         :return: The command name in the specified language
         """
+        # TODO Remove or Implement
         return {
-            "en": "/services",
-            "de": "/dienste"
+            "en": "/todo",
+            "de": "/todo"
         }[language]
 
     @staticmethod
@@ -57,6 +60,7 @@ class ServiceListerService(HelperService):
 
         :return: The list of required services
         """
+        # TODO Implement
         return []
 
     def determine_language(self, message: Message) -> str:
@@ -66,12 +70,8 @@ class ServiceListerService(HelperService):
         :param message: The message to check for the language
         :return: The language of the message
         """
-        try:
-            return {
-                "/services": "en", "/dienste": "de"
-            }[message.message_body.strip().split(" ")[0]]
-        except KeyError:
-            return "en"
+        # TODO Implement
+        return "en"
 
     def define_language_text(self) -> Dict[str, Dict[str, str]]:
         """
@@ -84,9 +84,9 @@ class ServiceListerService(HelperService):
 
         :return: The dictionary for use in translating
         """
+        # TODO Implement
         return {
-            "@{Title}": {"en": "Service List", "de": "Dienstliste"},
-            "@{BodyTitle}": {"en": "Active Services", "de": "Aktive Dienste"}
+            "@{Example}": {"en": "Example", "de": "Beispiel"}
         }
 
     def define_help_message(self, language: str) -> str:
@@ -96,11 +96,10 @@ class ServiceListerService(HelperService):
         :param language: The language to use
         :return: The help message in the language
         """
+        # TODO Implement
         return {
-            "en": "Use the `/services` command to get a list of active "
-                  "services on this kudubot instance",
-            "de": "Benutze den `/dienste` Befehl um eine Liste aktiver "
-                  "Dienste auf dieser kudubot Instanz zugesendet zu bekommen."
+            "en": "Example",
+            "de": "Beispiel"
         }[language]
 
     def define_syntax_description(self, language: str) -> str:
@@ -110,31 +109,29 @@ class ServiceListerService(HelperService):
         :param language: The language in which to return the syntax message
         :return: The syntax message
         """
+        # TODO Implement
         return {
-            "en": "/services",
-            "de": "/dienste"
+            "en": "Example",
+            "de": "Beispiel"
         }[language]
 
     def handle_message(self, message: Message):
         """
-        Handles an applicable message.
-        Sends a message containing the identifiers of all active services
+        Handles an applicable message
+        # TODO Describe what this Service does
 
         :param message: The message to handle
         """
-        reply_msg = "@{BodyTitle}:\n\n"
-        for service in self.connection.services:
-            reply_msg += service.identifier + "\n"
-        self.reply_translated("@{TITLE}", reply_msg.strip(), message)
+        # TODO Implement
+        pass
 
     def is_applicable_to(self, message: Message) -> bool:
         """
         Checks if a Message is applicable to this Service
-        Checks if the
+        # TODO Describe what this Service checks for
 
         :param message: The message to check
         :return: True if the Message is applicable, False otherwise
         """
-        return message.message_body.strip() in [
-            "/dienste", "/services"
-        ]
+        # TODO Implement
+        return False

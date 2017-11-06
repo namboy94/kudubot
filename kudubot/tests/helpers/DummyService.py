@@ -20,7 +20,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 from typing import List
 
 from kudubot.entities.Message import Message
-from kudubot.services.BaseService import Service
+from kudubot.services.BaseService import BaseService
 
 
 class DummyService(Service):

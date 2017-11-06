@@ -138,7 +138,7 @@ class BaseService(object):
             is_applicable_method = \
                 getattr(self, "is_applicable_to_" + subclass, None)
             if callable(is_applicable_method):
-                if is_applicable_method(self, message):
+                if is_applicable_method(message):
                     self.logger.debug("Message is applicable")
                     return True
 
@@ -169,8 +169,8 @@ class BaseService(object):
 
             if callable(is_applicable_method) and callable(handle_method):
 
-                if is_applicable_method(self, message):
-                    handle_method(self, message)
+                if is_applicable_method(message):
+                    handle_method(message)
                     return
 
         self.handle_message(message)

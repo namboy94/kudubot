@@ -68,7 +68,8 @@ class StandardConfigWriter(object):
                 # "@NATIVE jokes::JokesService",
                 # "@NATIVE service_lister::ServiceListerService",
                 # "@EXTERNAL helloworld_rust::HelloWorldService",
-                # "@EXTERNAL weather_kotlin::HelloKotlinService"
+                # "@EXTERNAL weather_kotlin::HelloKotlinService",
+                "@NATIVE service_lister::ServiceListerService"
             ]:
 
                 config.write(service + "\n")

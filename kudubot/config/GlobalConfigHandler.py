@@ -235,7 +235,7 @@ class GlobalConfigHandler(object):
 
         for special_import, import_path in {
             "NATIVE": "from kudubot.services.native.",
-            "CONNECTION": "from.kudubot.connections."
+            "CONNECTION": "from kudubot.connections."
         }.items():
 
             if statement.startswith("@" + special_import):
@@ -245,11 +245,11 @@ class GlobalConfigHandler(object):
                     module_name = statement.split("::")[0].strip()
                     class_name = statement.split("::")[1].strip()
                 except IndexError:
-                    raise ImportError("Failed to import native module")
+                    raise ImportError("Failed to import " + special_import +
+                                      " module")
 
                 statement = import_path + module_name + "."
                 statement += class_name + " import " + class_name
-                print(statement)
 
         if statement.startswith("import"):
             return importlib.import_module(statement.split("import ", 1)[1])

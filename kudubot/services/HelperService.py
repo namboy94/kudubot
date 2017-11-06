@@ -74,14 +74,9 @@ class HelperService(MultiLanguageService):
         Checks if a message qualifies for a help message and then sends
         messages accordingly.
 
-        Subclasses of the HelperService should call this method using super()
-
         :param message: The message to handle
         :return: None
         """
-        if MultiLanguageService.is_applicable_to(self, message):
-            return
-
         body = message.message_body
 
         try:
@@ -104,21 +99,30 @@ class HelperService(MultiLanguageService):
             body = body.split(self.define_command_name(language), 1)[1].strip()
 
             if body in help_keywords:
-                self.reply(self.translate(
-                               "@help_message_title",
-                               language,
-                               dictionary
-                           ),
-                           self.define_help_message(language), message)
-                return
+
+                title = self.translate("@help_message_title",
+                                       language, dictionary)
+                try:
+                    body = self.define_help_message(language)
+                except KeyError:
+                    body = "NOT_DEFINED_FOR_LANG"
+                    self.logger.error("Missing language definition: " +
+                                      language)
+
+                self.reply(title, body, message)
+
             elif body in syntax_keywords:
-                self.reply(self.translate(
-                               "@syntax_message_title",
-                               language,
-                               dictionary
-                           ),
-                           self.define_syntax_description(language), message)
-                return
+
+                title = self.translate("@syntax_message_title",
+                                       language, dictionary)
+                try:
+                    body = self.define_syntax_description(language)
+                except KeyError:
+                    body = "NOT_DEFINED_FOR_LANG"
+                    self.logger.error("Missing language definition: " +
+                                      language)
+
+                self.reply(title, body, message)
 
     def is_applicable_to_helper(self, message: Message) -> bool:
         """
@@ -128,9 +132,6 @@ class HelperService(MultiLanguageService):
         :param message: The message to analyze
         :return: True if the message is applicable, False otherwise
         """
-        if super().is_applicable_to(message):
-            return True
-
         language = self.determine_language(message)
         command = self.define_command_name(language).lower()
         dictionary = {
