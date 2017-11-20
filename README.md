@@ -119,11 +119,13 @@ There are common bindings available for the following languages:
 ## Further Information
 
 * [Changelog](https://gitlab.namibsun.net/namboy94/kudubot/raw/master/CHANGELOG)
+* [License (GPLv3)](https://gitlab.namibsun.net/namboy94/kudubot/raw/master/LICENSE)
 * [Gitlab](https://gitlab.namibsun.net/namboy94/kudubot)
 * [Github](https://github.com/namboy94/kudubot)
-* [Python Package Index Site](https://pypi.python.org/pypi/kudubot)
 * [Documentation(HTML)](https://docs.namibsun.net/html_docs/kudubot/index.html)
 * [Documentation(PDF)](https://docs.namibsun.net/pdf_docs/kudubot.pdf)
 * [Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/kudubot/index.html)
 * [Git Statistics (git_stats)](https://gitstats.namibsun.net/git_stats/kudubot/index.html)
 * [Test Coverage](https://coverage.namibsun.net/kudubot/index.html)
+* [Python Package Index Site](https://pypi.python.org/pypi/kudubot)
+
