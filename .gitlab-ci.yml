@@ -6,7 +6,7 @@ stages:
   - release
   - botstart
   - docstats
-  - finalize
+
 
 github_mirror:
   stage: mirror
@@ -112,7 +112,7 @@ upload_release_to_gitlab:
     - python ci-scripts/src/gitlab-release-uploader/gitlab-release-uploader.py namboy94 kudubot $GITLAB_ACCESS_TOKEN
       $(python3 setup.py -V) current_changelog artifacts -b master -u https://gitlab.namibsun.net
 
-start_bot:
+start_whatsapp_and_telegram:
   stage: botstart
   only:
     - master
@@ -135,6 +135,7 @@ generate_sphinx_documentation:
   tags:
     - sphinx
     - latex
+    - docs
   script:
     - cd doc
     - make buildsource
