@@ -34,7 +34,6 @@ def readme():
     """
     # noinspection PyBroadException
     try:
-        print("WHAT")
         # noinspection PyPackageRequirements,PyUnresolvedReferences
         import pypandoc
         with open("README.md") as f:
@@ -45,7 +44,6 @@ def readme():
 
     except ModuleNotFoundError:
         # If pandoc is not installed, just return the raw markdown text
-        print(os.listdir("."))
         with open("README.md") as f:
             return f.read()
 
