@@ -4,7 +4,7 @@
 |:----:|:-----:|
 |[![build status](https://gitlab.namibsun.net/namboy94/kudubot/badges/master/build.svg)](https://gitlab.namibsun.net/namboy94/kudubot/commits/master)|[![build status](https://gitlab.namibsun.net/namboy94/kudubot/badges/develop/build.svg)](https://gitlab.namibsun.net/namboy94/kudubot/commits/develop)|
 
-![Logo](kudubot/resources/logo/logo-readme.png)
+![Logo](resources/logo/logo-readme.png)
 
 Kudubot is a chat bot framework designed to work with arbitrary messaging
 services, be it Whatsapp, Telegram, IRC or even Email. The framework is
@@ -22,11 +22,8 @@ your system's python path (i.e. importable) and add an import statement
 to the config file located at ```$HOME/.kudubot/connections.conf``` 
 that would import your Connection class.
 
-For examples see:
-
-* [kudubot-cli](kudubot/connections/cli)
-* [kudubot-telegram](kudubot/connections/telegram)
-* [kudubot-whatsapp](kudubot/connections/whatsapp)
+For examples look at the implemented connections in
+[services](kudubot/connections).
 
 ## Implementing a Service
 
@@ -39,11 +36,8 @@ your system's python path (i.e. importable) and add an import statement
 to the config file located at ```$HOME/.kudubot/services.conf``` 
 that would import your Service class.
 
-For examples see:
-
-* [kudubot-simple-responder](kudubot/services/native/simple_responder)
-* [kudubot-reminder](kudubot/services/native/reminder)
-* [kudubot-anime-reminder](kudubot/services/native/anime_reminder)
+For examples look at the implemented services in
+[services](kudubot/services/native).
 
 ## Implementing an external Service
 
@@ -119,8 +113,7 @@ download the executable from the download URL specified in
 
 There are common bindings available for the following languages:
 
-* [Rust](kudubot/services/bindings/rust/README.md)
-  ([crates.io](https://crates.io/crates/kudubot-bindings))
+* Rust ([crates.io](https://crates.io/crates/kudubot-bindings))
 
 
 ## Further Information

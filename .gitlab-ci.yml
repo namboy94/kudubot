@@ -8,13 +8,6 @@ stages:
   - docstats
   - finalize
 
-variables:
-  GITLAB_ACCESS_TOKEN: "$GITLAB_ACCESS_TOKEN"
-  GITHUB_OAUTH_TOKEN: "$GITHUB_ACCESS_TOKEN"
-  CRATES_API_TOKEN: "$CRATES_API_TOKEN"
-  TELEGRAM_CONFIG: "$TELEGRAM_CONFIG"
-  WHATSAPP_CONFIG: "$WHATSAPP_CONFIG"
-
 github_mirror:
   stage: mirror
   tags:
@@ -59,6 +52,7 @@ build_external_services:
   tags:
     - gradle
     - cargo
+    - python
   script:
     - mkdir -p artifacts
     - python build-external.py artifacts
@@ -71,6 +65,8 @@ pypi_dist:
   only:
     - master
   tags:
+    - python2
+    - python3
     - pypi
   script:
     - python3 setup.py register sdist upload
@@ -86,6 +82,7 @@ distribute_bindings:
     - master
   tags:
     - cargo
+    - python
   script:
     - python publish-bindings.py
 
@@ -97,10 +94,9 @@ upload_release_to_github:
     - python
   script:
     - mkdir -p artifacts
-    - git clone https://gitlab.namibsun.net/namboy94/github-release-uploader.git
-    - git clone https://gitlab.namibsun.net/namboy94/changelog-reader.git
-    - python changelog-reader/changelog-reader.py -c CHANGELOG -d current_changelog
-    - python github-release-uploader/github-release-uploader.py namboy94 kudubot $GITHUB_ACCESS_TOKEN
+    - git clone https://gitlab.namibsun.net/namboy94/ci-scripts.git
+    - python ci-scripts/src/changelog-reader/changelog-reader.py -c CHANGELOG -d current_changelog
+    - python ci-scripts/src/github-release-uploader/github-release-uploader.py namboy94 kudubot $GITHUB_ACCESS_TOKEN
       $(python3 setup.py -V) current_changelog artifacts -b master
 
 upload_release_to_gitlab:
@@ -111,10 +107,9 @@ upload_release_to_gitlab:
     - python
   script:
     - mkdir -p artifacts
-    - git clone https://gitlab.namibsun.net/namboy94/gitlab-release-uploader.git
-    - git clone https://gitlab.namibsun.net/namboy94/changelog-reader.git
-    - python changelog-reader/changelog-reader.py -c CHANGELOG -d  current_changelog
-    - python gitlab-release-uploader/gitlab-release-uploader.py namboy94 kudubot $GITLAB_ACCESS_TOKEN
+    - git clone https://gitlab.namibsun.net/namboy94/ci-scripts.git
+    - python ci-scripts/src/changelog-reader/changelog-reader.py -c CHANGELOG -d  current_changelog
+    - python ci-scripts/src/gitlab-release-uploader/gitlab-release-uploader.py namboy94 kudubot $GITLAB_ACCESS_TOKEN
       $(python3 setup.py -V) current_changelog artifacts -b master -u https://gitlab.namibsun.net
 
 start_bot:
@@ -131,8 +126,6 @@ start_bot:
     - python build-external.py
     - sudo systemctl restart kudubot-whatsapp.service
     - sudo systemctl restart kudubot-telegram.service
-    - sudo systemctl status kudubot-whatsapp.service
-    - sudo systemctl status kudubot-telegram.service
 
 generate_sphinx_documentation:
   stage: docstats
@@ -150,33 +143,3 @@ generate_sphinx_documentation:
     - rsync -av build/latex/kudubot.pdf /var/www/docs.namibsun.net/public_html/pdf_docs/kudubot.pdf --delete-before
     - rsync -av build/html/ /var/www/docs.namibsun.net/public_html/html_docs/kudubot --delete-before
     - cd ..
-
-gitstats:
-  stage: docstats
-  only:
-    - master
-    - develop
-  tags:
-    - docs
-  script:
-    - gitstats . gitstats
-    - rsync -av gitstats/ /var/www/gitstats.namibsun.net/public_html/gitstats/kudubot --delete-before
-    - git_stats generate
-    - rsync -av git_stats/ /var/www/gitstats.namibsun.net/public_html/git_stats/kudubot --delete-before
-
-update_html_pages:
-  stage: finalize
-  when: always
-  tags:
-    - docs
-    - gitstats
-    - coverage
-  script:
-    - git clone https://gitlab.namibsun.net/namboy94/html-index-generator.git
-    - cd html-index-generator
-    - python html-index-generator.py /var/www/coverage.namibsun.net/public_html
-      /var/www/coverage.namibsun.net/public_html/index.html
-    - python html-index-generator.py /var/www/docs.namibsun.net/public_html
-      /var/www/docs.namibsun.net/public_html/index.html
-    - python html-index-generator.py /var/www/gitstats.namibsun.net/public_html
-      /var/www/gitstats.namibsun.net/public_html/index.html
