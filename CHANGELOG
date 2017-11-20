@@ -1,3 +1,5 @@
+V 0.17.1:
+  - Fix printing in setup file
 V 0.17.0:
   - Redo Service Structure
   - Implement Authenticated Service
