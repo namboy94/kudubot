@@ -9,7 +9,7 @@ from sphinx.ext.autodoc import between
 
 project_version = ""
 sys.path.insert(0, os.path.abspath("../.."))
-exec("from kudubot.metadata import version as project_version")
+exec("from kudubot import version as project_version")
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -76,6 +76,9 @@ def setup(app) -> None:
     :param app: The sphinx app
     :return:    None
     """
-    app.connect('autodoc-process-docstring', between('^.*LICENSE.*$', exclude=True))
-    app.connect("autodoc-skip-member", lambda a, b, name, d, skipper, f: False if name == "__init__" else skipper)
+    app.connect(
+        'autodoc-process-docstring', between('^.*LICENSE.*$', exclude=True))
+    app.connect("autodoc-skip-member",
+                lambda a, b, name, d, skipper, f: False
+                if name == "__init__" else skipper)
     return app

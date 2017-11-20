@@ -1,31 +1,27 @@
 """
-LICENSE:
 Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot is a chat bot framework. It allows developers to write
-    services for arbitrary chat services.
+kudubot is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    kudubot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+kudubot is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    kudubot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-LICENSE
+You should have received a copy of the GNU General Public License
+along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import unittest
 from kudubot.users.Contact import Contact
 from kudubot.tests.helpers.DummyConnection import DummyConnection
-from kudubot.tests.helpers.test_config import generate_test_environment, clean_up_test_environment
+from kudubot.tests.helpers.test_config import generate_test_environment,\
+    clean_up_test_environment
 
 
 # noinspection SqlNoDataSourceInspection
@@ -36,7 +32,8 @@ class UnitTests(unittest.TestCase):
 
     def setUp(self):
         """
-        Changes the class variables for testing and creates the testing directory
+        Changes the class variables for testing and
+        creates the testing directory
 
         :return: None
         """
@@ -55,12 +52,18 @@ class UnitTests(unittest.TestCase):
 
     def test_invalid_contact_fetches(self):
         """
-        Tests if the contact fetch methods return a None object if they fail to find a result
+        Tests if the contact fetch methods return a None object
+        if they fail to find a result
 
         :return: None
         """
-        self.assertEqual(None, self.connection.address_book.get_contact_for_address("No_Address"))
-        self.assertEqual(None, self.connection.address_book.get_contact_for_id(100))
+        self.assertEqual(
+            None,
+            self.connection.address_book.get_contact_for_address("No_Address")
+        )
+        self.assertEqual(
+            None, self.connection.address_book.get_contact_for_id(100)
+        )
 
     def test_contact_operations(self):
         """
@@ -70,7 +73,9 @@ class UnitTests(unittest.TestCase):
         :return: None
         """
         self.subtest_updating_contact()
-        contact = self.connection.address_book.add_or_update_contact(Contact(-1, "ABC", "DEF"))
+        contact = self.connection.address_book.add_or_update_contact(
+            Contact(-1, "ABC", "DEF")
+        )
         self.assertEqual(contact.display_name, "ABC")
         self.assertEqual(contact.database_id, 1)
         self.assertEqual(contact.address, "DEF")
@@ -83,7 +88,8 @@ class UnitTests(unittest.TestCase):
 
         :return: None
         """
-        address_contact = self.connection.address_book.get_contact_for_address("DEF")
+        address_contact = \
+            self.connection.address_book.get_contact_for_address("DEF")
         id_contact = self.connection.address_book.get_contact_for_id(1)
         self.assertEqual(id_contact.display_name, address_contact.display_name)
         self.assertEqual(id_contact.database_id, address_contact.database_id)
@@ -102,8 +108,12 @@ class UnitTests(unittest.TestCase):
         new_contact = Contact(1, "ABC", "DEF")
         self.connection.address_book.add_or_update_contact(new_contact)
 
-        self.assertEqual(self.connection.address_book.get_contact_for_address("B"), None)
-        new_inserted = self.connection.address_book.get_contact_for_address("DEF")
+        self.assertEqual(
+            self.connection.address_book.get_contact_for_address("B"),
+            None
+        )
+        new_inserted = \
+            self.connection.address_book.get_contact_for_address("DEF")
 
         self.assertEqual(new_inserted.display_name, "ABC")
         self.assertEqual(new_inserted.database_id, contact.database_id)

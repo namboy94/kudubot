@@ -1,25 +1,20 @@
 """
-LICENSE:
 Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot is a chat bot framework. It allows developers to write
-    services for arbitrary chat services.
+kudubot is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    kudubot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+kudubot is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    kudubot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-LICENSE
+You should have received a copy of the GNU General Public License
+along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from kudubot.entities.Message import Message
@@ -29,8 +24,8 @@ from kudubot.services.MultiLanguageService import MultiLanguageService
 # noinspection PyAbstractClass
 class HelperService(MultiLanguageService):
     """
-    Service extension that allows for the automatic sending of help and syntax messages.
-    Provides support for multiple languages
+    Service extension that allows for the automatic sending of
+    help and syntax messages. Provides support for multiple languages
     """
 
     def define_help_message(self, language: str) -> str:
@@ -56,67 +51,109 @@ class HelperService(MultiLanguageService):
         """
         Defines the command name used to call this Service
 
-        :param language: The language for the command name, for supporting different command names for
+        :param language: The language for the command name,
+                         for supporting different command names for
                          different languages
-        :return: The command name for this service. Defaults to a forward slash and the Service's identifier
+        :return: The command name for this service.
+                 Defaults to a forward slash and the Service's identifier
         """
         return "/" + self.define_identifier()
 
-    def handle_message(self, message: Message):
-        """
-        Handles the help message sending. Checks if a message qualifies for a help message and then sends
-        messages accordingly.
+    # -------------------------------------------------------------------------
+    #                  _,-'/-'/                                Here be dragons!
+    #  .      __,-; ,'( '/
+    #   \.    `-.__`-._`:_,-._       _ , . ``
+    #    `:-._,------' ` _,`--` -: `_ , ` ,' :
+    #       `---..__,,--'            ` -'. -'
+    # Everything below this should not be overridden by subclasses
+    # -------------------------------------------------------------------------
 
-        Subclasses of the HelperService should call this method using super()
+    def handle_message_helper(self, message: Message):
+        """
+        Handles the help message sending.
+        Checks if a message qualifies for a help message and then sends
+        messages accordingly.
 
         :param message: The message to handle
         :return: None
         """
-        super().handle_message(message)
-        if MultiLanguageService.is_applicable_to(self, message):
-            return
-
         body = message.message_body
+
+        dictionary = {
+            "@help_message_title":
+                {"en": "Help Message for " + self.identifier,
+                 "de": "Hilfnachricht für " + self.identifier},
+            "@syntax_message_title":
+                {"en": "Syntax Message for " + self.identifier,
+                 "de": "Syntaxnachricht für " + self.identifier}
+        }
+        help_keywords = ["help", "hilfe"]
+        syntax_keywords = ["syntax"]
 
         try:
             language = self.determine_language(message)
         except NotImplementedError:
-            language = "en"
+            language = self.define_fallback_language()
+        command_keyword = self.define_command_name(language)
 
-        dictionary = {
-            "@help_message_title": {"en": "Help Message for " + self.identifier,
-                                    "de": "Hilfnachricht für " + self.identifier},
-            "@syntax_message_title": {"en": "Syntax Message for " + self.identifier,
-                                      "de": "Syntaxnachricht für " + self.identifier}
-        }
-        help_keywords = ["help", "hilfe"]
-        syntax_keywords = ["syntax"]
+        # Checks if the /help or /syntax commands were used
+        # If that's the case, adjust the message text.
+        for keyword in help_keywords + syntax_keywords:
+            if body.lower().split(" ")[0] == "/" + keyword:
+                for service in self.connection.services:
+                    identifier = body.lower().split(" ")[1].strip()
+                    if service.identifier == identifier:
+                        if service.identifier != self.identifier:
+                            return
+                        else:
+                            body = command_keyword + " " + keyword
 
         if body.startswith(self.define_command_name(language)):
             body = body.split(self.define_command_name(language), 1)[1].strip()
 
             if body in help_keywords:
-                self.reply(self.translate("@help_message_title", language, dictionary),
-                           self.define_help_message(language), message)
-                return
-            elif body in syntax_keywords:
-                self.reply(self.translate("@syntax_message_title", language, dictionary),
-                           self.define_syntax_description(language), message)
-                return
 
-    def is_applicable_to(self, message: Message) -> bool:
+                title = self.translate("@help_message_title",
+                                       language, dictionary)
+                try:
+                    body = self.define_help_message(language)
+                except KeyError:
+                    body = "NOT_DEFINED_FOR_LANG"
+                    self.logger.error("Missing language definition: " +
+                                      language)
+
+                self.reply(title, body, message)
+
+            elif body in syntax_keywords:
+
+                title = self.translate("@syntax_message_title",
+                                       language, dictionary)
+                try:
+                    body = self.define_syntax_description(language)
+                except KeyError:
+                    body = "NOT_DEFINED_FOR_LANG"
+                    self.logger.error("Missing language definition: " +
+                                      language)
+
+                self.reply(title, body, message)
+
+    def is_applicable_to_helper(self, message: Message) -> bool:
         """
-        Checks if the message is applicable to the service by checking if the command name is followed by
-        the terms 'help' or 'syntax'.
+        Checks if the message is applicable to the service by checking
+        if the command name is followed by the terms 'help' or 'syntax'.
 
         :param message: The message to analyze
         :return: True if the message is applicable, False otherwise
         """
-        if super().is_applicable_to(message):
-            return True
-
         language = self.determine_language(message)
         command = self.define_command_name(language).lower()
+        params = message.message_body.lower().split(" ")
+        identifier = self.identifier
+
+        # Needs at least 2 parameters. Command or identifier + help
+        if len(params) < 2:
+            return False
+
         dictionary = {
             "@help_command": {"en": "help",
                               "de": "hilfe"},
@@ -124,16 +161,51 @@ class HelperService(MultiLanguageService):
                                 "de": "syntax"}
         }
 
-        return message.message_body.lower() in [
-            command + self.translate(" @help_command", language, dictionary),
-            command + self.translate(" @syntax_command", language, dictionary)
-        ]
+        # Check if help or syntax keyword in message text.
+        # Change language accordingly
+        for entry, values in dictionary.items():
+            for lang, keyword in values.items():
+                if params[0] == "/" + keyword:
+                    language = lang
+                elif params[1] == keyword:
+                    language = lang
 
-    def is_applicable_to_without_help_or_syntax(self, message: Message) -> bool:
-        """
-        Checks if the message applies to anything beside the 'help' or 'syntax' commands
+        help_command = self.translate("@help_command", language, dictionary)
+        syntax_command = self.translate("@syntax_command", language,
+                                        dictionary)
 
-        :param message: The message to analyze
-        :return: True if the message is applicable to something else, False otherwise
+        if len(params) == 2 and "/" + help_command == params[0] \
+                and params[1] == identifier:
+            # /help identifier
+            return True
+
+        elif len(params) == 2 and "/" + syntax_command == params[0] \
+                and params[1] == identifier:
+            # /syntax identifier
+            return True
+
+        else:
+            # /command help
+            return message.message_body.lower() in [
+                command + " " + help_command,
+                command + " " + syntax_command
+            ]
+
+    def starts_with_command_keyword(self, message: Message, language: str,
+                                    case_sensitive: bool = False) -> bool:
         """
-        return self.is_applicable_to(message) and not HelperService.is_applicable_to(self, message)
+        Checks if a message text starts with the command keyword
+        defined by define_command_name()
+
+        :param message: The message to check
+        :param language: The language for which to check
+        :param case_sensitive: Can be set to True to do a case-sensitive check
+        :return: True if the message starts with the command name, else False
+        """
+        if case_sensitive:
+            return message.message_body.\
+                startswith(self.define_command_name(language))
+
+        else:
+            return message.message_body.lower(). \
+                startswith(self.define_command_name(language).lower())

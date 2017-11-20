@@ -1,38 +1,32 @@
-# -*- coding: utf-8 -*-
 """
-LICENSE:
 Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot is a chat bot framework. It allows developers to write
-    services for arbitrary chat services.
+kudubot is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    kudubot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+kudubot is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    kudubot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-LICENSE
+You should have received a copy of the GNU General Public License
+along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
 from typing import List
 from kudubot.entities.Message import Message
-from kudubot.services.Service import Service
+from kudubot.services.BaseService import BaseService
 
 
-class SimpleResponderService(Service):
+class SimpleResponderService(BaseService):
     """
-    Class that implements a kudubot service that analyzes Strings and responds to them
-    using a relatively simple ruleset
+    Class that implements a kudubot service that analyzes Strings and responds
+    to them using a relatively simple ruleset
     """
 
     rules = [
@@ -41,8 +35,9 @@ class SimpleResponderService(Service):
          lambda incoming, key: incoming.lower() == key.lower()),
 
         # Case Sensitive Equals
-        ({"Hello World!": "01001000 01100101 01101100 01101100 01101111 00100000 "
-                          "01010111 01101111 01110010 01101100 01100100 00100001",
+        ({"Hello World!": "01001000 01100101 01101100 01101100 01101111 "
+                          "00100000 01010111 01101111 01110010 01101100 "
+                          "01100100 00100001",
           "Ping": "Pong",
           "ping": "pong"},
          lambda incoming, key: incoming == key),
@@ -58,9 +53,10 @@ class SimpleResponderService(Service):
     """
     These are the rule-based responses for the Simple Responder Service
 
-    The consist of a Tuple of a dictionary mapping strings to each other, as well as a
-    lambda expression that return a boolean value. If that lambda expression returns true,
-    the pattern matches and the dictionary value is returned as a response
+    The consist of a Tuple of a dictionary mapping strings to each other,
+    as well as a lambda expression that return a boolean value.
+    If that lambda expression returns true, the pattern matches and the
+    dictionary value is returned as a response
     """
 
     @staticmethod
@@ -116,9 +112,5 @@ class SimpleResponderService(Service):
         :return: None
         """
         response = self.__check_rules__(message.message_body)
-
         if response != "":
-            target = message.sender if message.sender_group is None else message.sender_group
-            self.connection.send_message(
-                Message("Simple Response", response, target, self.connection.user_contact)
-            )
+            self.reply("Simple Response", response, message)

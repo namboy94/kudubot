@@ -1,25 +1,20 @@
 """
-LICENSE:
 Copyright 2015-2017 Hermann Krumrey
 
 This file is part of kudubot.
 
-    kudubot is a chat bot framework. It allows developers to write
-    services for arbitrary chat services.
+kudubot is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    kudubot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+kudubot is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    kudubot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-LICENSE
+You should have received a copy of the GNU General Public License
+along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
@@ -30,15 +25,15 @@ from kudubot.entities.Message import Message
 from yowsup.layers.interface import YowInterfaceLayer
 from yowsup.layers.interface import ProtocolEntityCallback
 from yowsup.layers.protocol_media.mediauploader import MediaUploader
-from yowsup.layers.protocol_messages.protocolentities import MessageProtocolEntity
-from yowsup.layers.protocol_messages.protocolentities import TextMessageProtocolEntity
-from yowsup.layers.protocol_media.protocolentities import RequestUploadIqProtocolEntity
-from yowsup.layers.protocol_media.protocolentities import ResultRequestUploadIqProtocolEntity
-from yowsup.layers.protocol_media.protocolentities import VideoDownloadableMediaMessageProtocolEntity
-from yowsup.layers.protocol_media.protocolentities import AudioDownloadableMediaMessageProtocolEntity
-from yowsup.layers.protocol_media.protocolentities import ImageDownloadableMediaMessageProtocolEntity
-from yowsup.layers.protocol_media.protocolentities.builder_message_media_downloadable \
-    import DownloadableMediaMessageBuilder
+from yowsup.layers.protocol_messages.protocolentities import \
+    MessageProtocolEntity, TextMessageProtocolEntity
+from yowsup.layers.protocol_media.protocolentities import \
+    RequestUploadIqProtocolEntity, ResultRequestUploadIqProtocolEntity, \
+    VideoDownloadableMediaMessageProtocolEntity, \
+    AudioDownloadableMediaMessageProtocolEntity, \
+    ImageDownloadableMediaMessageProtocolEntity
+from yowsup.layers.protocol_media.protocolentities.\
+    builder_message_media_downloadable import DownloadableMediaMessageBuilder
 
 
 class EchoLayer(YowInterfaceLayer):
@@ -46,9 +41,11 @@ class EchoLayer(YowInterfaceLayer):
     The Yowsup Echo Layer used to communicate with the Whatsapp Servers
     """
 
-    def __init__(self, connection):  # connection: kudubot_whatsapp.WhatsappConnection.WhatsappConnection
+    # connection: kudubot_whatsapp.WhatsappConnection.WhatsappConnection
+    def __init__(self, connection):
         """
-        Custom constructor used to pass the WhatsappConnection class to the layer
+        Custom constructor used to pass the WhatsappConnection
+        class to the layer
 
         :param connection: The Whatsapp connection object that calls this layer
         """
@@ -84,7 +81,8 @@ class EchoLayer(YowInterfaceLayer):
         :param caption: A caption to be displayed with the image
         :return: None
         """
-        self.send_media(image_file, receiver, caption, RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE)
+        self.send_media(image_file, receiver, caption,
+                        RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE)
 
     def send_audio_message(self, audio_file: str, receiver: str, caption: str):
         """
@@ -95,7 +93,8 @@ class EchoLayer(YowInterfaceLayer):
         :param caption: A caption to be displayed with the audio file
         :return: None
         """
-        self.send_media(audio_file, receiver, caption, RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO)
+        self.send_media(audio_file, receiver, caption,
+                        RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO)
 
     def send_video_message(self, video_file: str, receiver: str, caption: str):
         """
@@ -106,7 +105,8 @@ class EchoLayer(YowInterfaceLayer):
         :param caption: A caption to be displayed with the video file
         :return: None
         """
-        self.send_media(video_file, receiver, caption, RequestUploadIqProtocolEntity.MEDIA_TYPE_VIDEO)
+        self.send_media(video_file, receiver, caption,
+                        RequestUploadIqProtocolEntity.MEDIA_TYPE_VIDEO)
 
     @ProtocolEntityCallback("receipt")
     def on_receipt(self, entity: MessageProtocolEntity):
@@ -123,7 +123,8 @@ class EchoLayer(YowInterfaceLayer):
         """
         Sends the whatsapp servers that the message was received
 
-        :param message_protocol_entity: the message protocol entity that was received
+        :param message_protocol_entity: the message protocol entity
+                                        that was received
         :return: None
         """
         self.toLower(message_protocol_entity.ack())
@@ -146,14 +147,21 @@ class EchoLayer(YowInterfaceLayer):
             body = message_protocol_entity.getBody()
             timestamp = float(message_protocol_entity.getTimestamp())
 
-            if re.search(r"[0-9]+-[0-9]+", message_protocol_entity.getFrom(False)):  # If group
-                sender = Contact(-1, message_protocol_entity.getNotify(), message_protocol_entity.getParticipant(True))
-                group = Contact(-1, message_protocol_entity.getNotify(), message_protocol_entity.getFrom(True))
+            if re.search(
+                    r"[0-9]+-[0-9]+",
+                    message_protocol_entity.getFrom(False)
+            ):  # If group
+                sender = Contact(-1, message_protocol_entity.getNotify(),
+                                 message_protocol_entity.getParticipant(True))
+                group = Contact(-1, message_protocol_entity.getNotify(),
+                                message_protocol_entity.getFrom(True))
             else:
-                sender = Contact(-1, message_protocol_entity.getNotify(), message_protocol_entity.getFrom(True))
+                sender = Contact(-1, message_protocol_entity.getNotify(),
+                                 message_protocol_entity.getFrom(True))
                 group = None
 
-            message = Message("", body, self.connection.user_contact, sender, group, timestamp)
+            message = Message("", body, self.connection.user_contact,
+                              sender, group, timestamp)
             self.connection.apply_services(message, True)
 
     @staticmethod
@@ -184,7 +192,8 @@ class EchoLayer(YowInterfaceLayer):
 
         return EchoLayer.normalize_jid(c_alias)
 
-    def send_media(self, path: str, number: str, caption: str, media_type: RequestUploadIqProtocolEntity.TYPES_MEDIA):
+    def send_media(self, path: str, number: str, caption: str,
+                   media_type: RequestUploadIqProtocolEntity.TYPES_MEDIA):
         """
         Sends a media file
 
@@ -197,7 +206,8 @@ class EchoLayer(YowInterfaceLayer):
         jid = self.alias_to_jid(number)
         entity = RequestUploadIqProtocolEntity(media_type, filePath=path)
 
-        def success_fn(success_entity: TextMessageProtocolEntity, original_entity: MessageProtocolEntity):
+        def success_fn(success_entity: TextMessageProtocolEntity,
+                       original_entity: MessageProtocolEntity):
             """
             Function called on successful media upload
 
@@ -206,9 +216,12 @@ class EchoLayer(YowInterfaceLayer):
             :return: None
             """
             # noinspection PyTypeChecker
-            self.on_request_upload_result(jid, media_type, path, success_entity, original_entity, caption)
+            self.on_request_upload_result(jid, media_type, path,
+                                          success_entity, original_entity,
+                                          caption)
 
-        def error_fn(error_entity: MessageProtocolEntity, original_entity: RequestUploadIqProtocolEntity):
+        def error_fn(error_entity: MessageProtocolEntity,
+                     original_entity: RequestUploadIqProtocolEntity):
             """
             Function called on failed media upload
 
@@ -216,12 +229,16 @@ class EchoLayer(YowInterfaceLayer):
             :param original_entity: the original entity
             :return: None
             """
-            EchoLayer.on_request_upload_error(jid, path, error_entity, original_entity)
+            EchoLayer.on_request_upload_error(
+                jid, path, error_entity, original_entity
+            )
 
         self._sendIq(entity, success_fn, error_fn)
 
-    def do_send_media(self, media_type: RequestUploadIqProtocolEntity.TYPES_MEDIA,
-                      file_path: str, url: str, to: str, ip: str = None, caption: str = None):
+    def do_send_media(self,
+                      media_type: RequestUploadIqProtocolEntity.TYPES_MEDIA,
+                      file_path: str, url: str, to: str, ip: str = None,
+                      caption: str = None):
         """
         Sends a media file
 
@@ -230,23 +247,27 @@ class EchoLayer(YowInterfaceLayer):
         :param url: the whatsapp upload url
         :param to: the receiver
         :param ip: the ip of the receiver
-        :param caption: the caption to be displayed together with the media file
+        :param caption: the caption to be displayed together
+                        with the media file
         :return: None
         """
         entity = None
         if media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE:
-            entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
+            entity = ImageDownloadableMediaMessageProtocolEntity.fromFilePath(
+                file_path, url, ip, to, caption=caption)
         elif media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_AUDIO:
             entity = self.create_audio_media(file_path, url, to, ip)
         elif media_type == RequestUploadIqProtocolEntity.MEDIA_TYPE_VIDEO:
-            entity = VideoDownloadableMediaMessageProtocolEntity.fromFilePath(file_path, url, ip, to, caption=caption)
+            entity = VideoDownloadableMediaMessageProtocolEntity.fromFilePath(
+                file_path, url, ip, to, caption=caption)
         self.toLower(entity)
 
     @staticmethod
     def create_audio_media(file_path: str, url: str, to: str, ip: str = None) \
             -> AudioDownloadableMediaMessageProtocolEntity:
         """
-        Creates an Audio Message Entity as a workaround for the missing fromFilePath method in
+        Creates an Audio Message Entity as a workaround for the missing
+        fromFilePath method in
         AudioDownloadableMediaMessageProtocolEntity's parent class
 
         :param file_path: the path to the file
@@ -256,14 +277,20 @@ class EchoLayer(YowInterfaceLayer):
         :return: None
         :return: the generatd audio entity
         """
-        builder = DownloadableMediaMessageBuilder(AudioDownloadableMediaMessageProtocolEntity, to, file_path)
+        builder = DownloadableMediaMessageBuilder(
+            AudioDownloadableMediaMessageProtocolEntity, to, file_path)
         builder.set("url", url)
         builder.set("ip", ip)
         return AudioDownloadableMediaMessageProtocolEntity.fromBuilder(builder)
 
-    def on_request_upload_result(self, jid: str, media_type: RequestUploadIqProtocolEntity.TYPES_MEDIA, file_path: str,
-                                 result_request_upload_iq_protocol_entity: ResultRequestUploadIqProtocolEntity,
-                                 request_upload_iq_protocol_entity: RequestUploadIqProtocolEntity,
+    def on_request_upload_result(self, jid: str,
+                                 media_type:
+                                     RequestUploadIqProtocolEntity.TYPES_MEDIA,
+                                 file_path: str,
+                                 result_request_upload_iq_protocol_entity:
+                                     ResultRequestUploadIqProtocolEntity,
+                                 request_upload_iq_protocol_entity:
+                                     RequestUploadIqProtocolEntity,
                                  caption: str = None):
         """
         Method run when a media upload result is positive
@@ -278,8 +305,10 @@ class EchoLayer(YowInterfaceLayer):
         """
         str(request_upload_iq_protocol_entity)
         if result_request_upload_iq_protocol_entity.isDuplicate():
-            self.do_send_media(media_type, file_path, result_request_upload_iq_protocol_entity.getUrl(), jid,
-                               result_request_upload_iq_protocol_entity.getIp(), caption)
+            self.do_send_media(
+                media_type, file_path,
+                result_request_upload_iq_protocol_entity.getUrl(),
+                jid, result_request_upload_iq_protocol_entity.getIp(), caption)
         else:
 
             def success_fn(inner_file_path: str, inner_jid: str, url: str):
@@ -291,19 +320,26 @@ class EchoLayer(YowInterfaceLayer):
                 :param url: the whatsapp media url
                 :return: None
                 """
-                self.do_send_media(media_type, inner_file_path, url, inner_jid,
-                                   result_request_upload_iq_protocol_entity.getIp(), caption)
+                self.do_send_media(
+                    media_type, inner_file_path, url, inner_jid,
+                    result_request_upload_iq_protocol_entity.getIp(), caption)
 
-            media_uploader = MediaUploader(jid, self.getOwnJid(), file_path,
-                                           result_request_upload_iq_protocol_entity.getUrl(),
-                                           result_request_upload_iq_protocol_entity.getResumeOffset(), success_fn,
-                                           EchoLayer.on_upload_error, EchoLayer.on_upload_progress,
-                                           async=False)
+            media_uploader = MediaUploader(
+                jid, self.getOwnJid(), file_path,
+                result_request_upload_iq_protocol_entity.getUrl(),
+                result_request_upload_iq_protocol_entity.getResumeOffset(),
+                success_fn,
+                EchoLayer.on_upload_error, EchoLayer.on_upload_progress,
+                async=False
+            )
             media_uploader.start()
 
     @staticmethod
-    def on_request_upload_error(jid: str, path: str, error_request_upload_iq_protocol_entity: MessageProtocolEntity,
-                                request_upload_iq_protocol_entity: RequestUploadIqProtocolEntity):
+    def on_request_upload_error(jid: str, path: str,
+                                error_request_upload_iq_protocol_entity:
+                                    MessageProtocolEntity,
+                                request_upload_iq_protocol_entity:
+                                    RequestUploadIqProtocolEntity):
         """
         Method run when a media upload result is negative
 
@@ -313,7 +349,8 @@ class EchoLayer(YowInterfaceLayer):
         :param request_upload_iq_protocol_entity: the request entity
         :return: None
         """
-        if error_request_upload_iq_protocol_entity and request_upload_iq_protocol_entity:
+        if error_request_upload_iq_protocol_entity \
+                and request_upload_iq_protocol_entity:
             str(jid + path)
 
     @staticmethod
@@ -329,7 +366,8 @@ class EchoLayer(YowInterfaceLayer):
         pass
 
     @staticmethod
-    def on_upload_progress(file_path: str, jid: str, url: str, progress: float):
+    def on_upload_progress(file_path: str, jid: str, url: str,
+                           progress: float):
         """
         Method that keeps track of the upload process
 
@@ -340,5 +378,6 @@ class EchoLayer(YowInterfaceLayer):
         :return:None
         """
         if url:
-            sys.stdout.write("%s => %s, %d%% \r" % (os.path.basename(file_path), jid, progress))
+            sys.stdout.write("%s => %s, %d%% \r" % (
+                os.path.basename(file_path), jid, progress))
             sys.stdout.flush()

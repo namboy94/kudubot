@@ -1,0 +1,4 @@
+{
+    "build_commands": ["gradle", "build"],
+    "output_file": "build/libs/weather_kotlin.jar"
+}
