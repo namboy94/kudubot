@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Copyright 2015-2017 Hermann Krumrey
 
