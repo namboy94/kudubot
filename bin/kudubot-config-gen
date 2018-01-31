@@ -26,14 +26,31 @@ from kudubot.config.StandardConfigWriter import StandardConfigWriter
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--delete-old", action="store_true",
-                        help="Can be used to completely wipe theprevious configuration.")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Activates verbose output")
-    parser.add_argument("-b", "--debug", action="store_true", help="Activates debug-level logging output")
-    parser.add_argument("-s", "--standard-config", action="store_true", help="Generates the standard configuration")
-    parser.add_argument("--remove-executable-service-files", action="store_true",
+    parser.add_argument("--verbose", action="store_true",
+                        help="Activates verbose output")
+    parser.add_argument("--debug", action="store_true",
+                        help="Activates debug-level logging output")
+
+    parser.add_argument("--delete-old", action="store_true",
+                        help="Can be used to completely wipe the "
+                             "previous configuration.")
+    parser.add_argument("--standard-services", action="store_true",
+                        help="Generates the standard services configuration")
+    parser.add_argument("--standard-connections", action="store_true",
+                        help="Generates the standard connection configuration")
+    parser.add_argument("--remove-executable-service-files",
+                        action="store_true",
                         help="Deletes all executable service files. "
-                             "They will be re-downloaded the next time the bot starts.")
+                             "They will be re-downloaded the next time "
+                             "the bot starts.")
+    parser.add_argument("--destination",
+                        help="Specifies the location in which to create the "
+                             "configuration")
+    parser.add_argument("--services",
+                        help="A comma-separated list of services to include")
+    parser.add_argument("--connections",
+                        help="A comma-separated list of"
+                             "connections to include")
 
     args = parser.parse_args()
 
@@ -45,12 +62,45 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.ERROR)
 
     args = parser.parse_args()
-    config_handler = GlobalConfigHandler()
+
+    if args.destination is not None:
+        config_handler = GlobalConfigHandler(args.destination)
+    else:
+        config_handler = GlobalConfigHandler()
+
     config_handler.generate_configuration(args.delete_old)
 
-    if args.standard_config:
-        StandardConfigWriter(config_handler).write_standard_connection_config()
+    if args.standard_services:
         StandardConfigWriter(config_handler).write_standard_service_config()
+
+    if args.standard_connections:
+        StandardConfigWriter(config_handler).write_standard_connection_config()
 
     if args.remove_executable_service_files:
         config_handler.delete_service_executables()
+
+    if args.services is not None:
+        services = args.services.split(",")
+
+        service_config = ""
+        for service in services:
+            if service.startswith("import ") and "from" in service:
+                service_config += service
+            else:
+                service_config += "@NATIVE " + service
+
+        with open(config_handler.services_config_location, "a") as f:
+            f.write(service_config)
+
+    if args.connections:
+        connections = args.connections.split(",")
+
+        connections_config = ""
+        for connection in connections:
+            if connection.startswith("import ") and "from" in connection:
+                connections_config += connection
+            else:
+                connections_config += "@CONNECTION" + connection
+
+        with open(config_handler.global_connection_config_location, "a") as f:
+            f.write(connections_config)

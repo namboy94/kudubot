@@ -161,6 +161,15 @@ class GlobalConfigHandler(object):
             self.logger.info("Creating directory " + self.logfile_directory)
             os.makedirs(self.logfile_directory)
 
+    def delete_service_executables(self):
+        """
+        Deletes all executable service files
+
+        :return: None
+        """
+        shutil.rmtree(self.external_services_executables_directory)
+        os.makedirs(self.external_services_executables_directory)
+
     def load_connections(self) -> List[type]:
         """
         Loads all connections from the connections configuration file
@@ -241,15 +250,26 @@ class GlobalConfigHandler(object):
             if statement.startswith("@" + special_import):
 
                 try:
-                    statement = statement.split("@" + special_import + " ")[1]
-                    module_name = statement.split("::")[0].strip()
-                    class_name = statement.split("::")[1].strip()
+                    class_name = statement.split("@" + special_import + " ")[1]
                 except IndexError:
                     raise ImportError("Failed to import " + special_import +
                                       " module")
 
-                statement = import_path + module_name + "."
-                statement += class_name + " import " + class_name
+                module_name = class_name.rsplit("Service", 1)[0]
+                module_name = module_name.rsplit("Connection", 1)[0]
+                snake_case = ""
+
+                first = True
+                for char in module_name:
+                    if char.isupper() and not first:
+                        snake_case += "_"
+                        snake_case += char.lower()
+                    else:
+                        snake_case += char.lower()
+                        first = False
+
+                statement = import_path + snake_case + "." + class_name
+                statement += " import " + class_name
 
         if statement.startswith("import"):
             return importlib.import_module(statement.split("import ", 1)[1])
@@ -347,12 +367,3 @@ class GlobalConfigHandler(object):
                     )
 
         return modules
-
-    def delete_service_executables(self):
-        """
-        Deletes all executable service files
-
-        :return: None
-        """
-        shutil.rmtree(self.external_services_executables_directory)
-        os.makedirs(self.external_services_executables_directory)

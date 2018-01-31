@@ -13,7 +13,7 @@ and services.
 
 ## Implementing a Connection.
 
-To implement a new Connection, you will have to create a subclass
+To implement a new Connection, you will have to create a subclass of
 the ```kudubot.connections.Connection.Connection``` class and implement the
 various abstract methods.
 
@@ -122,10 +122,6 @@ There are common bindings available for the following languages:
 * [License (GPLv3)](https://gitlab.namibsun.net/namboy94/kudubot/raw/master/LICENSE)
 * [Gitlab](https://gitlab.namibsun.net/namboy94/kudubot)
 * [Github](https://github.com/namboy94/kudubot)
-* [Documentation(HTML)](https://docs.namibsun.net/html_docs/kudubot/index.html)
-* [Documentation(PDF)](https://docs.namibsun.net/pdf_docs/kudubot.pdf)
-* [Git Statistics (gitstats)](https://gitstats.namibsun.net/gitstats/kudubot/index.html)
-* [Git Statistics (git_stats)](https://gitstats.namibsun.net/git_stats/kudubot/index.html)
-* [Test Coverage](https://coverage.namibsun.net/kudubot/index.html)
 * [Python Package Index Site](https://pypi.python.org/pypi/kudubot)
+* [progstats](https://progstats.namibsun.net/project.py?name=kudubot)
 

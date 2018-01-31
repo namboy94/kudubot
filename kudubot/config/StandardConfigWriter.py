@@ -47,9 +47,9 @@ class StandardConfigWriter(object):
 
         with open(self.connection_config, 'w') as config:
             for connection in [
-                "@CONNECTION cli::CliConnection",
-                "@CONNECTION whatsapp::WhatsappConnection",
-                "@CONNECTION telegram::TelegramConnection"
+                "@CONNECTION CliConnection",
+                "@CONNECTION WhatsappConnection",
+                "@CONNECTION TelegramConnection"
             ]:
                 config.write(connection + "\n")
 
@@ -62,12 +62,12 @@ class StandardConfigWriter(object):
 
         with open(self.service_config, 'w') as config:
             for service in [
-                 "@NATIVE simple_responder::SimpleResponderService",
-                 "@NATIVE reminder::ReminderService",
-                 "@NATIVE anime_reminder::AnimeReminderService",
-                 "@NATIVE jokes::JokesService",
-                 "@NATIVE service_lister::ServiceListerService",
-                 "@NATIVE authentication_manager::AuthenticationManagerService"
+                 "@NATIVE SimpleResponderService",
+                 "@NATIVE ReminderService",
+                 "@NATIVE AnimeReminderService",
+                 "@NATIVE JokesService",
+                 "@NATIVE ServiceListerService",
+                 "@NATIVE AuthenticationManagerService"
                  # "@EXTERNAL helloworld_rust::HelloWorldService",
                  # "@EXTERNAL weather_kotlin::HelloKotlinService"
             ]:
