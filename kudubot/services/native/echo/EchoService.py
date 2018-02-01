@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import List
 from kudubot.entities.Message import Message
 from kudubot.services.BaseService import BaseService
 
@@ -35,14 +34,6 @@ class EchoService(BaseService):
         :return: True
         """
         return True
-
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        This Service does not depend on another service
-        :return: []
-        """
-        return []
 
     @staticmethod
     def define_identifier() -> str:

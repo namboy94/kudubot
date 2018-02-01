@@ -19,7 +19,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 
 import requests
 from bs4 import BeautifulSoup
-from typing import Dict, List
+from typing import Dict
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
 
@@ -35,13 +35,6 @@ class JokesService(HelperService):
         :return: The service's identifier
         """
         return "jokes"
-
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        :return: An empty list as this service has no requirements
-        """
-        return []
 
     def define_syntax_description(self, language: str) -> str:
         """

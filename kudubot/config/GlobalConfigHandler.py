@@ -199,35 +199,6 @@ class GlobalConfigHandler(object):
             self.services_config_location, BaseService
         )
 
-        # Check if dependencies for each service are satisfied
-        # This loop structure is admittedly a bit weird,
-        # but there's a valid reason!
-        # Since we are removing Services with unsatisfied dependencies,
-        # we need to re-check all
-        # previous Services again if a Service is removed.
-        # This is done by directly modifying the index variable i
-        i = 0
-        while i < len(services):
-
-            service = services[i]
-
-            for dependency in service.define_requirements():
-
-                dependency_satisfied = False
-                for other_service in services:
-                    if other_service.define_identifier() == dependency:
-                        dependency_satisfied = True
-                        break
-
-                if not dependency_satisfied:
-                    self.logger.warning(
-                        "Dependency '" + dependency + "' for service '" +
-                        service.define_identifier() + "' is not satisfied")
-                    services.remove(service)
-                    i = -1
-                    break
-            i += 1
-
         if len(services) == 0:
             self.logger.warning("No services loaded")
 

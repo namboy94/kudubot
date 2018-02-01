@@ -53,16 +53,6 @@ class TemplateService(HelperService):
             "de": "/todo"
         }[language]
 
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        Defines required Services for this Service
-
-        :return: The list of required services
-        """
-        # TODO Implement
-        return []
-
     def determine_language(self, message: Message) -> str:
         """
         Determines the language of a message
