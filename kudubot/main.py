@@ -24,6 +24,7 @@ import logging
 import argparse
 import traceback
 from kudubot import version
+from kudubot.exceptions import ControlledShutdownException
 from kudubot.exceptions import InvalidConfigException
 from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
@@ -64,6 +65,9 @@ def main():  # pragma: no cover
     except KeyboardInterrupt:
         print("\nBye")
 
+    except ControlledShutdownException:
+        sys.exit(1)
+
     except BaseException as e:
         crashfile = os.path.join(
             GlobalConfigHandler().logfile_directory,
@@ -94,7 +98,7 @@ def initialize_connection(identifier: str,
     except InvalidConfigException as e:
         print("Loading configuration for service failed:")
         print(str(e))
-        sys.exit(1)
+        raise ControlledShutdownException("Config Loading Failed")
 
     connections = config_handler.load_connections()
     services = config_handler.load_services()
@@ -113,7 +117,7 @@ def initialize_connection(identifier: str,
     except InvalidConfigException as e:
         print("Connection Configuration failed:")
         print(str(e))
-        sys.exit(1)
+        raise ControlledShutdownException("Connection Config Failed")
 
 
 def initialize_logging(quiet: bool, verbose: bool, debug: bool,

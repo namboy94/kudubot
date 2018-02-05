@@ -43,7 +43,6 @@ run_unit_tests_python_3_with_coverage:
   script:
     - python3 setup.py nosetests
       --with-coverage --cover-package=kudubot --cover-branches --cover-erase --cover-html --cover-inclusive
-    - rsync -av cover/ /var/www/coverage.namibsun.net/public_html/kudubot --delete-before
 
 build_external_services:
   stage: build

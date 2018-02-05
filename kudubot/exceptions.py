@@ -23,3 +23,10 @@ class InvalidConfigException(Exception):
     An Exception that is raised whenever an invalid configuration is detected.
     """
     pass
+
+
+class ControlledShutdownException(Exception):
+    """
+    An Exception that is thrown whenever the program should be shut down
+    without writing to the crash log file
+    """

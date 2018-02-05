@@ -21,8 +21,7 @@ import os
 import shutil
 import unittest
 from kudubot.tests.helpers.DummyConnection import DummyConnection
-from kudubot.tests.helpers.DummyService import DummyService, \
-    DummyServiceWithValidDependency
+from kudubot.tests.helpers.DummyService import DummyService
 from kudubot.tests.helpers.test_config import generate_test_environment, \
     clean_up_test_environment
 
