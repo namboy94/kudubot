@@ -48,8 +48,7 @@ class UnitTests(unittest.TestCase):
 
         for method in [(BaseService.handle_message, 1),
                        (BaseService.is_applicable_to, 1),
-                       (BaseService.define_identifier, -1),
-                       (BaseService.define_requirements, -1)]:
+                       (BaseService.define_identifier, -1)]:
             try:
 
                 if method[1] == -1:

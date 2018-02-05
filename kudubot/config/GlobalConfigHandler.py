@@ -18,6 +18,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import sys
 import shutil
 import logging
 import importlib
@@ -65,6 +66,7 @@ class GlobalConfigHandler(object):
         self.external_services_executables_directory = \
             os.path.join(self.external_services_directory, "bin")
         self.logfile_directory = os.path.join(self.config_location, "logs")
+        self.modules_directory = os.path.join(self.config_location, "modules")
 
     def validate_config_directory(self) -> bool:
         """
@@ -102,6 +104,9 @@ class GlobalConfigHandler(object):
             elif not os.path.isdir(self.logfile_directory):
                 raise InvalidConfigException(
                     "Log File Directory does not exist")
+            elif not os.path.isdir(self.modules_directory):
+                raise InvalidConfigException(
+                    "Modules Directory does not exist")
             else:
                 self.logger.info("Configuration successfully checked")
                 return True
@@ -161,6 +166,10 @@ class GlobalConfigHandler(object):
             self.logger.info("Creating directory " + self.logfile_directory)
             os.makedirs(self.logfile_directory)
 
+        if not os.path.isdir(self.modules_directory):
+            self.logger.info("Creating directory " + self.modules_directory)
+            os.makedirs(self.modules_directory)
+
     def delete_service_executables(self):
         """
         Deletes all executable service files
@@ -176,6 +185,7 @@ class GlobalConfigHandler(object):
 
         :return: A list of successfully imported Connection subclasses
         """
+        sys.path.append(self.modules_directory)
         from kudubot.connections.Connection import Connection
 
         self.logger.info("Loading connections")
@@ -194,6 +204,7 @@ class GlobalConfigHandler(object):
 
         :return: A list of successfully imported Service subclasses
         """
+        sys.path.append(self.modules_directory)
         self.logger.info("Loading Services")
         services = self.__load_import_config__(
             self.services_config_location, BaseService

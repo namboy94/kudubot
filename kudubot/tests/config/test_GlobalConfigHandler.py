@@ -158,26 +158,6 @@ class UnitTests(unittest.TestCase):
         self.assertEqual(os, os_import)
         self.assertEqual(dict_import, Dict)
 
-    def test_service_dependency_imports(self):
-        """
-        Tests the dependency resolution of the services.
-
-        :return: None
-        """
-        # First, test service having a valid dependency
-        with open(os.path.join("kudu-test", "services.conf"), 'w') as f:
-            f.write("from kudubot.tests.helpers.DummyService "
-                    "import DummyServiceWithValidDependency")
-        services = self.config_handler.load_services()
-        self.assertEqual(services, [DummyServiceWithValidDependency])
-
-        # Now test unresolved dependency
-        with open(os.path.join("kudu-test", "services.conf"), 'w') as f:
-            f.write("from kudubot.tests.helpers.DummyService "
-                    "import DummyServiceWithInvalidDependency")
-        services = self.config_handler.load_services()
-        self.assertEqual(services, [])
-
     def test_duplicate_removal(self):
         """
         Tests the duplicate removal method
