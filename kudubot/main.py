@@ -113,7 +113,7 @@ def initialize_connection(identifier: str,
     except IndexError:
         print("Connection Type " + identifier +
               " is not implemented or imported using the config file")
-        sys.exit(1)
+        raise ControlledShutdownException("Connection not implemented")
     except InvalidConfigException as e:
         print("Connection Configuration failed:")
         print(str(e))
