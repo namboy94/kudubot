@@ -235,3 +235,6 @@ class TelegramConnection(Connection):
                 # The self.bot.get_update method may cause an
                 # Unauthorized Error if the bot is blocked by the user
                 update_id += 1
+
+            except telegram.error.TimedOut:
+                pass
