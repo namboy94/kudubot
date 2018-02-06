@@ -86,7 +86,8 @@ class TelegramConnection(Connection):
 
             return parsed_config
 
-        except configparser.NoSectionError:
+        except (configparser.NoSectionError,
+                configparser.MissingSectionHeaderError):
             self.logger.warning("Config Parsing Failed. "
                                 "No credentials section in config file.")
             raise InvalidConfigException("Invalid Telegram Configuration File "
