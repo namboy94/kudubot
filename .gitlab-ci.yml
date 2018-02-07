@@ -134,7 +134,6 @@ generate_sphinx_documentation:
   tags:
     - sphinx
     - latex
-    - docs
   script:
     - cd doc
     - make buildsource
