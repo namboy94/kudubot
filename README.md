@@ -11,6 +11,25 @@ services, be it Whatsapp, Telegram, IRC or even Email. The framework is
 completely modular and can be extended with other connection types
 and services.
 
+## Usage
+
+Kudubot can be used using the ```kudubot``` command once it's installed using
+the setup.py file or pip. To do so, run one of the following commands, 
+optionally with the ```--user``` flag to install it for the current user as
+opposed to system-wide:
+
+    python setup.py install
+    
+    pip install kudubot
+    
+To use kudubot, a configuration directory must exist in ```~/.kudubot``` or
+be provided to the ```kudubot```-command using the ```--config``` option.
+A configuration directory can be generated using ```kudubot-config-gen```.
+Run ```kudubot-config-gen --help``` to explore the options that tool provides
+you.
+
+Sample connection configurations can be found [here](resources/connection-configs)
+
 ## Implementing a Connection.
 
 To implement a new Connection, you will have to create a subclass of
@@ -114,6 +133,13 @@ download the executable from the download URL specified in
 There are common bindings available for the following languages:
 
 * Rust ([crates.io](https://crates.io/crates/kudubot-bindings))
+
+## Creating a standalone Bot Service
+
+To see how to create a single-purpose bot, take a look at the echobot:
+
+* [starter script](bin/echobot)
+* [service](kudubot/services/native/echo)
 
 
 ## Further Information
