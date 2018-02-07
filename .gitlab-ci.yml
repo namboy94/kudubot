@@ -48,12 +48,11 @@ build_external_services:
   only:
     - master
   tags:
-    - gradle
     - cargo
-    - python
+    - python3
   script:
     - mkdir -p artifacts
-    - python build-external.py artifacts
+    - python3 build-external.py artifacts
   artifacts:
     paths:
       - artifacts/*
@@ -65,8 +64,9 @@ pypi_dist:
   tags:
     - python2
     - python3
-    - pypi
+    - 3to2
   script:
+    - pip2 install twine --user
     - python3 setup.py register sdist upload
     - python3 setup.py bdist_wheel upload
     - 3to2 . --write
