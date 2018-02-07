@@ -47,6 +47,7 @@ build_external_services:
   stage: build
   only:
     - master
+    - develop
   tags:
     - cargo
     - python3
