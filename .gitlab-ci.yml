@@ -66,6 +66,7 @@ pypi_dist:
     - python3
     - 3to2
   script:
+    - echo $PYPI_CREDENTIALS > ~/.pypirc
     - pip2 install twine --user
     - python3 setup.py register sdist upload
     - python3 setup.py bdist_wheel upload
