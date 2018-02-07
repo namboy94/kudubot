@@ -111,20 +111,20 @@ upload_release_to_gitlab:
     - python ci-scripts/src/gitlab-release-uploader/gitlab-release-uploader.py namboy94 kudubot $GITLAB_ACCESS_TOKEN
       $(python3 setup.py -V) current_changelog artifacts -b master -u https://gitlab.namibsun.net
 
-start_whatsapp_and_telegram:
-  stage: botstart
-  only:
-    - master
-  tags:
-    - kudubot-systemd
-  script:
-    - pip install --user --upgrade --upgrade-strategy only-if-needed kudubot
-    - kudubot-config-gen -s --remove-executable-service-files
-    - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
-    - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
-    - python build-external.py
-    - sudo systemctl restart kudubot-whatsapp.service
-    - sudo systemctl restart kudubot-telegram.service
+#start_whatsapp_and_telegram:
+#  stage: botstart
+#  only:
+#    - master
+#  tags:
+#    - kudubot-systemd
+#  script:
+#    - pip install --user --upgrade --upgrade-strategy only-if-needed kudubot
+#    - kudubot-config-gen -s --remove-executable-service-files
+#    - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
+#    - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
+#    - python build-external.py
+#    - sudo systemctl restart kudubot-whatsapp.service
+#    - sudo systemctl restart kudubot-telegram.service
 
 generate_sphinx_documentation:
   stage: docstats
@@ -140,6 +140,3 @@ generate_sphinx_documentation:
     - make buildsource
     - make latexpdf
     - make html
-    - rsync -av build/latex/kudubot.pdf /var/www/docs.namibsun.net/public_html/pdf_docs/kudubot.pdf --delete-before
-    - rsync -av build/html/ /var/www/docs.namibsun.net/public_html/html_docs/kudubot --delete-before
-    - cd ..
