@@ -20,7 +20,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 import datetime
 import re
 import time
-from typing import List, Dict
+from typing import Dict
 
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
@@ -42,15 +42,6 @@ class ReminderService(HelperService):
         """
         self.initialize_database_table(initializer=initialize_database)
         self.start_daemon_thread(self.background_loop)
-
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        Defines the dependencies for the Service
-
-        :return: A list of dependencies
-        """
-        return []
 
     @staticmethod
     def define_identifier() -> str:

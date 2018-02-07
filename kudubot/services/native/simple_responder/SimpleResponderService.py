@@ -18,7 +18,6 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-from typing import List
 from kudubot.entities.Message import Message
 from kudubot.services.BaseService import BaseService
 
@@ -67,15 +66,6 @@ class SimpleResponderService(BaseService):
         :return: The unique identifier
         """
         return "simple_responder"
-
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        Defines the Service's dependency Services
-
-        :return: A list of dependency Services for this Service
-        """
-        return []
 
     def __check_rules__(self, message_text) -> str:
         """

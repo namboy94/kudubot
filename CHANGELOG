@@ -1,3 +1,8 @@
+V 0.18.0:
+  - Added Echobot example
+  - Updated Readme
+  - Removed inter-service dependencies
+  - Enabled a 'modules' directory that supports importing directly from the config directory
 V 0.17.2:
   - Added links to readme
 V 0.17.1:

@@ -39,15 +39,6 @@ class BaseService(object):
         """
         raise NotImplementedError()
 
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        Defines the requirements for the service
-
-        :return: The required services for this Service.
-        """
-        raise NotImplementedError()
-
     def is_applicable_to(self, message: Message) -> bool:
         """
         Checks if the Service is applicable to a given message
@@ -74,7 +65,6 @@ class BaseService(object):
         """
         self.connection = connection
         self.identifier = self.define_identifier()
-        self.requires = self.define_requirements()
         self.logger = logging.getLogger(self.__class__.__module__)
         self.init()
         self.logger.debug(self.identifier + " Service initialized")

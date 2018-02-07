@@ -38,6 +38,7 @@ def main():  # pragma: no cover
     print("Kudubot Version " + version)
 
     args = parse_args()
+    config_handler = GlobalConfigHandler(args.config)
     if not os.path.isdir(args.config):
         print(args.config)
         print("Config directory does not exist")
@@ -46,7 +47,6 @@ def main():  # pragma: no cover
     # noinspection PyUnresolvedReferences
     try:
 
-        config_handler = GlobalConfigHandler(args.config)
         initialize_logging(
             args.quiet,
             args.verbose,
@@ -66,7 +66,7 @@ def main():  # pragma: no cover
 
     except BaseException as e:
         crashfile = os.path.join(
-            GlobalConfigHandler().logfile_directory,
+            config_handler.logfile_directory,
             "crashes"
         )
         with open(crashfile, 'a') as crashlog:

@@ -86,7 +86,8 @@ class TelegramConnection(Connection):
 
             return parsed_config
 
-        except configparser.NoSectionError:
+        except (configparser.NoSectionError,
+                configparser.MissingSectionHeaderError):
             self.logger.warning("Config Parsing Failed. "
                                 "No credentials section in config file.")
             raise InvalidConfigException("Invalid Telegram Configuration File "
@@ -234,3 +235,6 @@ class TelegramConnection(Connection):
                 # The self.bot.get_update method may cause an
                 # Unauthorized Error if the bot is blocked by the user
                 update_id += 1
+
+            except telegram.error.TimedOut:
+                pass

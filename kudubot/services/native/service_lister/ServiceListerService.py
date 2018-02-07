@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import List, Dict
+from typing import Dict
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
 
@@ -49,15 +49,6 @@ class ServiceListerService(HelperService):
             "en": "/services",
             "de": "/dienste"
         }[language]
-
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        Defines required Services for this Service
-
-        :return: The list of required services
-        """
-        return []
 
     def determine_language(self, message: Message) -> str:
         """

@@ -17,44 +17,36 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import unittest
+from kudubot.entities.Message import Message
 from kudubot.services.BaseService import BaseService
-from kudubot.tests.helpers.DummyService import DummyService
 
 
-class UnitTests(unittest.TestCase):
+class EchoService(BaseService):
     """
-    Tests the Service class
+    Service that always replies to a user with the same message body that was
+    received
     """
 
-    def setUp(self):
+    def is_applicable_to(self, message: Message) -> bool:
         """
+        This service is always applicable
+        :param message: The message to check for applicability for
+        :return: True
+        """
+        return True
+
+    @staticmethod
+    def define_identifier() -> str:
+        """
+        Defines the identifier of the service
+        :return: "echo"
+        """
+        return "echo"
+
+    def handle_message(self, message: Message):
+        """
+        Replies with the original message text
+        :param message: The original message
         :return: None
         """
-        pass
-
-    def tearDown(self):
-        """
-        :return: None
-        """
-        pass
-
-    def test_abstract_methods(self):
-        """
-        Tests if the methods of the Service class are abstract
-        :return: None
-        """
-        dummy = DummyService([])
-
-        for method in [(BaseService.handle_message, 1),
-                       (BaseService.is_applicable_to, 1),
-                       (BaseService.define_identifier, -1)]:
-            try:
-
-                if method[1] == -1:
-                    method[0]()
-                elif method[1] == 1:
-                    method[0](dummy, dummy)
-                self.fail()
-            except NotImplementedError:
-                pass
+        self.reply("Echo", message.message_body, message)

@@ -60,14 +60,6 @@ class ExternalService(BaseService):
         if not os.path.isfile(self.executable_file):
             self.download_executable()
 
-    @staticmethod
-    def define_requirements() -> List[str]:
-        """
-        External Services can not have any dependencies
-        :return: []
-        """
-        return []
-
     def define_executable_file_url(self):
         """
         :return: An URL to the executable file

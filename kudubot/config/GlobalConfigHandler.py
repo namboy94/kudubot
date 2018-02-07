@@ -18,6 +18,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import sys
 import shutil
 import logging
 import importlib
@@ -65,6 +66,7 @@ class GlobalConfigHandler(object):
         self.external_services_executables_directory = \
             os.path.join(self.external_services_directory, "bin")
         self.logfile_directory = os.path.join(self.config_location, "logs")
+        self.modules_directory = os.path.join(self.config_location, "modules")
 
     def validate_config_directory(self) -> bool:
         """
@@ -102,6 +104,9 @@ class GlobalConfigHandler(object):
             elif not os.path.isdir(self.logfile_directory):
                 raise InvalidConfigException(
                     "Log File Directory does not exist")
+            elif not os.path.isdir(self.modules_directory):
+                raise InvalidConfigException(
+                    "Modules Directory does not exist")
             else:
                 self.logger.info("Configuration successfully checked")
                 return True
@@ -161,12 +166,26 @@ class GlobalConfigHandler(object):
             self.logger.info("Creating directory " + self.logfile_directory)
             os.makedirs(self.logfile_directory)
 
+        if not os.path.isdir(self.modules_directory):
+            self.logger.info("Creating directory " + self.modules_directory)
+            os.makedirs(self.modules_directory)
+
+    def delete_service_executables(self):
+        """
+        Deletes all executable service files
+
+        :return: None
+        """
+        shutil.rmtree(self.external_services_executables_directory)
+        os.makedirs(self.external_services_executables_directory)
+
     def load_connections(self) -> List[type]:
         """
         Loads all connections from the connections configuration file
 
         :return: A list of successfully imported Connection subclasses
         """
+        sys.path.append(self.modules_directory)
         from kudubot.connections.Connection import Connection
 
         self.logger.info("Loading connections")
@@ -185,39 +204,11 @@ class GlobalConfigHandler(object):
 
         :return: A list of successfully imported Service subclasses
         """
+        sys.path.append(self.modules_directory)
         self.logger.info("Loading Services")
         services = self.__load_import_config__(
             self.services_config_location, BaseService
         )
-
-        # Check if dependencies for each service are satisfied
-        # This loop structure is admittedly a bit weird,
-        # but there's a valid reason!
-        # Since we are removing Services with unsatisfied dependencies,
-        # we need to re-check all
-        # previous Services again if a Service is removed.
-        # This is done by directly modifying the index variable i
-        i = 0
-        while i < len(services):
-
-            service = services[i]
-
-            for dependency in service.define_requirements():
-
-                dependency_satisfied = False
-                for other_service in services:
-                    if other_service.define_identifier() == dependency:
-                        dependency_satisfied = True
-                        break
-
-                if not dependency_satisfied:
-                    self.logger.warning(
-                        "Dependency '" + dependency + "' for service '" +
-                        service.define_identifier() + "' is not satisfied")
-                    services.remove(service)
-                    i = -1
-                    break
-            i += 1
 
         if len(services) == 0:
             self.logger.warning("No services loaded")
@@ -241,15 +232,26 @@ class GlobalConfigHandler(object):
             if statement.startswith("@" + special_import):
 
                 try:
-                    statement = statement.split("@" + special_import + " ")[1]
-                    module_name = statement.split("::")[0].strip()
-                    class_name = statement.split("::")[1].strip()
+                    class_name = statement.split("@" + special_import + " ")[1]
                 except IndexError:
                     raise ImportError("Failed to import " + special_import +
                                       " module")
 
-                statement = import_path + module_name + "."
-                statement += class_name + " import " + class_name
+                module_name = class_name.rsplit("Service", 1)[0]
+                module_name = module_name.rsplit("Connection", 1)[0]
+                snake_case = ""
+
+                first = True
+                for char in module_name:
+                    if char.isupper() and not first:
+                        snake_case += "_"
+                        snake_case += char.lower()
+                    else:
+                        snake_case += char.lower()
+                        first = False
+
+                statement = import_path + snake_case + "." + class_name
+                statement += " import " + class_name
 
         if statement.startswith("import"):
             return importlib.import_module(statement.split("import ", 1)[1])
@@ -347,12 +349,3 @@ class GlobalConfigHandler(object):
                     )
 
         return modules
-
-    def delete_service_executables(self):
-        """
-        Deletes all executable service files
-
-        :return: None
-        """
-        shutil.rmtree(self.external_services_executables_directory)
-        os.makedirs(self.external_services_executables_directory)
