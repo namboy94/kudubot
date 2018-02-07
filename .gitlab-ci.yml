@@ -41,8 +41,7 @@ run_unit_tests_python_3_with_coverage:
   tags:
     - python3
   script:
-    - python3 setup.py nosetests
-      --with-coverage --cover-package=kudubot --cover-branches --cover-erase --cover-html --cover-inclusive
+    - bash unittest.sh
 
 build_external_services:
   stage: build
@@ -135,7 +134,4 @@ generate_sphinx_documentation:
     - sphinx
     - latex
   script:
-    - cd doc
-    - make buildsource
-    - make latexpdf
-    - make html
+    - bash unittest.sh
