@@ -17,8 +17,8 @@ test_pypirc_gen:
     - echo '  pypi' >> ~./pypirc
     - echo '' >> ~./pypirc
     - echo '[pypi]' >> ~./pypirc
-    - echo 'username: $PYPI_USERNAME' >> ~./pypirc
-    - echo 'password: $PYPI_PASSWORD' >> ~./pypirc
+    - echo $PYPI_USERNAME >> ~./pypirc
+    - echo $PYPI_PASSWORD >> ~./pypirc
     - echo '' >> ~./pypirc
 
 github_mirror:
@@ -81,14 +81,6 @@ pypi_dist:
     - python3
     - 3to2
   script:
-    - echo '[distutils]' > ~/.pypirc
-    - echo 'index-servers =' >> ~./pypirc
-    - echo '  pypi' >> ~./pypirc
-    - echo '' >> ~./pypirc
-    - echo '[pypi]' >> ~./pypirc
-    - echo 'username: $PYPI_USERNAME' >> ~./pypirc
-    - echo 'password: $PYPI_PASSWORD' >> ~./pypirc
-    - echo '' >> ~./pypirc
     - pip2 install twine --user
     - python3 setup.py sdist
     - twine upload dist/*
