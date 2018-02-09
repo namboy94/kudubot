@@ -1,3 +1,5 @@
+V 0.18.3:
+  - Fixed Rust bindings upload
 V 0.18.2:
   - Fixed CI tags
 V 0.18.1:
