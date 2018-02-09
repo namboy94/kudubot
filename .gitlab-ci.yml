@@ -7,20 +7,6 @@ stages:
   - botstart
   - docstats
 
-test_pypirc_gen:
-  stage: mirror
-  tags:
-    - linux
-  script:
-    - echo '[distutils]' > ~/.pypirc
-    - echo 'index-servers =' >> ~/.pypirc
-    - echo '  pypi' >> ~/.pypirc
-    - echo '' >> ~/.pypirc
-    - echo '[pypi]' >> ~/.pypirc
-    - echo $PYPI_USERNAME >> ~/.pypirc
-    - echo $PYPI_PASSWORD >> ~/.pypirc
-    - echo '' >> ~/.pypirc
-
 github_mirror:
   stage: mirror
   tags:
@@ -81,10 +67,16 @@ pypi_dist:
     - python3
     - 3to2
   script:
+    - echo '[distutils]' > ~/.pypirc
+    - echo 'index-servers =' >> ~/.pypirc
+    - echo '  pypi' >> ~/.pypirc
+    - echo '' >> ~/.pypirc
+    - echo '[pypi]' >> ~/.pypirc
+    - echo $PYPI_USERNAME >> ~/.pypirc
+    - echo $PYPI_PASSWORD >> ~/.pypirc
+    - echo '' >> ~/.pypirc
     - pip2 install twine --user
     - python3 setup.py sdist
-    - twine upload dist/*
-    - rm -rf dist
     - python3 setup.py bdist_wheel
     - twine upload dist/*
     - rm -rf dist
