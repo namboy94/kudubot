@@ -62,7 +62,7 @@ pypi_dist:
   only:
     - master
   tags:
-    - pip2
+    - python-pip
     - python2
     - python3
     - 3to2
@@ -75,7 +75,7 @@ pypi_dist:
     - echo $PYPI_USERNAME >> ~/.pypirc
     - echo $PYPI_PASSWORD >> ~/.pypirc
     - echo '' >> ~/.pypirc
-    - pip2 install twine --user
+    - pip install twine --user
     - python3 setup.py sdist
     - python3 setup.py bdist_wheel
     - twine upload dist/*
