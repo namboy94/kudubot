@@ -13,13 +13,13 @@ test_pypirc_gen:
     - linux
   script:
     - echo '[distutils]' > ~/.pypirc
-    - echo 'index-servers =' >> ~./pypirc
-    - echo '  pypi' >> ~./pypirc
-    - echo '' >> ~./pypirc
-    - echo '[pypi]' >> ~./pypirc
-    - echo $PYPI_USERNAME >> ~./pypirc
-    - echo $PYPI_PASSWORD >> ~./pypirc
-    - echo '' >> ~./pypirc
+    - echo 'index-servers =' >> ~/.pypirc
+    - echo '  pypi' >> ~/.pypirc
+    - echo '' >> ~/.pypirc
+    - echo '[pypi]' >> ~/.pypirc
+    - echo $PYPI_USERNAME >> ~/.pypirc
+    - echo $PYPI_PASSWORD >> ~/.pypirc
+    - echo '' >> ~/.pypirc
 
 github_mirror:
   stage: mirror
