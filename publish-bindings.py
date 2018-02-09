@@ -18,8 +18,8 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import sys
 from subprocess import Popen
-from kudubot import version
 
 
 def publish_rust():
@@ -28,6 +28,9 @@ def publish_rust():
 
     :return: None
     """
+
+    sys.path.append(".")
+    from kudubot import version
 
     cwd = os.getcwd()
     os.chdir(os.path.join("kudubot", "services", "bindings", "rust"))
