@@ -1,1 +1,1 @@
-recursive-include *.toml *.rs *.kt
+include version

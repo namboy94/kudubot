@@ -24,9 +24,9 @@ import requests
 from typing import Dict
 from kudubot.entities.Message import Message
 from kudubot.services.HelperService import HelperService
-from kudubot.services.native.anime_reminder.scraper import \
+from kudubot.services.internal.anime_reminder.scraper import \
     scrape_reddit_discussion_threads
-from kudubot.services.native.anime_reminder.database import \
+from kudubot.services.internal.anime_reminder.database import \
     initialize_database, store_subscription, delete_subscription, \
     get_subscriptions, thread_exists, store_thread
 

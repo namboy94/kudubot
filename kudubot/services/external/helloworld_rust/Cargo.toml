@@ -1,7 +1,0 @@
-[package]
-name = "helloworld_rust"
-version = "0.1.0"
-authors = ["Hermann Krumrey <hermann@krumreyh.com>"]
-
-[dependencies]
-kudubot-bindings = { path = "../../bindings/rust/" }

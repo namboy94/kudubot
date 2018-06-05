@@ -1,147 +1,61 @@
 stages:
-  - mirror
   - test
-  - build
-  - deploy
+  - stats
   - release
-  - botstart
-  - docstats
-
-github_mirror:
-  stage: mirror
-  tags:
-    - github_namboy94_push
-  script:
-    - git checkout master
-    - git pull
-    - git push git@github.com:namboy94/kudubot.git master -f
-    - git checkout develop
-    - git pull
-    - git push git@github.com:namboy94/kudubot.git develop -f
 
 stylecheck:
   stage: test
   tags:
-    - pycodestyle
+    - python3
   script:
-    - pycodestyle .
+    - python3 -m venv virtual && source virtual/bin/activate && pip install ci-scripts
+    - python-codestyle-check
 
-run_unit_tests_python_2:
-  stage: test
-  tags:
-    - python2
-    - 3to2
-  script:
-    - 3to2 . --write
-    - python2 setup.py test
-
-run_unit_tests_python_3_with_coverage:
+unittest:
   stage: test
   tags:
     - python3
+    - progstats
   script:
-    - bash unittest.sh
+    - python3 -m venv virtual && source virtual/bin/activate && pip install ci-scripts
+    - python-unittest
 
-build_external_services:
-  stage: build
-  only:
-    - master
-    - develop
-  tags:
-    - cargo
-    - python3
-  script:
-    - mkdir -p artifacts
-    - python3 build-external.py artifacts
-  artifacts:
-    paths:
-      - artifacts/*
-
-pypi_dist:
-  stage: deploy
-  only:
-    - master
-  tags:
-    - python-pip
-    - python2
-    - python3
-    - 3to2
-  script:
-    - echo '[distutils]' > ~/.pypirc
-    - echo 'index-servers =' >> ~/.pypirc
-    - echo '  pypi' >> ~/.pypirc
-    - echo '' >> ~/.pypirc
-    - echo '[pypi]' >> ~/.pypirc
-    - echo $PYPI_USERNAME >> ~/.pypirc
-    - echo $PYPI_PASSWORD >> ~/.pypirc
-    - echo '' >> ~/.pypirc
-    - pip install twine --user
-    - python3 setup.py sdist
-    - python3 setup.py bdist_wheel
-    - twine upload dist/*
-    - rm -rf dist
-    - 3to2 . --write
-    - python2 setup.py bdist_wheel
-    - twine upload dist/*
-
-distribute_bindings:
-  stage: deploy
-  only:
-    - master
-  tags:
-    - cargo
-    - python
-  script:
-    - python publish-bindings.py
-
-upload_release_to_github:
+release_upload:
   stage: release
   only:
     - master
   tags:
-    - python
+    - python3
   script:
-    - mkdir -p artifacts
-    - git clone https://gitlab.namibsun.net/namboy94/ci-scripts.git
-    - python ci-scripts/src/changelog-reader/changelog-reader.py -c CHANGELOG -d current_changelog
-    - python ci-scripts/src/github-release-uploader/github-release-uploader.py namboy94 kudubot $GITHUB_ACCESS_TOKEN
-      $(python3 setup.py -V) current_changelog artifacts -b master
+    - python3 -m venv virtual && source virtual/bin/activate && pip install ci-scripts
+    - github-release-upload $(cat version) "$(changelog-reader)"
+    - gitlab-release-upload $(cat version) "$(changelog-reader)"
 
-upload_release_to_gitlab:
+pypi_upload:
   stage: release
   only:
     - master
   tags:
-    - python
+    - python3
   script:
-    - mkdir -p artifacts
-    - git clone https://gitlab.namibsun.net/namboy94/ci-scripts.git
-    - python ci-scripts/src/changelog-reader/changelog-reader.py -c CHANGELOG -d  current_changelog
-    - python ci-scripts/src/gitlab-release-uploader/gitlab-release-uploader.py namboy94 kudubot $GITLAB_ACCESS_TOKEN
-      $(python3 setup.py -V) current_changelog artifacts -b master -u https://gitlab.namibsun.net
+    - python3 -m venv virtual && source virtual/bin/activate && pip install ci-scripts
+    - pypi-upload
 
-#start_whatsapp_and_telegram:
-#  stage: botstart
-#  only:
-#    - master
-#  tags:
-#    - kudubot-systemd
-#  script:
-#    - pip install --user --upgrade --upgrade-strategy only-if-needed kudubot
-#    - kudubot-config-gen -s --remove-executable-service-files
-#    - echo $WHATSAPP_CONFIG > $HOME/.kudubot/connection_config/whatsapp.conf
-#    - echo $TELEGRAM_CONFIG > $HOME/.kudubot/connection_config/telegram.conf
-#    - python build-external.py
-#    - sudo systemctl restart kudubot-whatsapp.service
-#    - sudo systemctl restart kudubot-telegram.service
-
-generate_sphinx_documentation:
-  stage: docstats
-  only:
-    - master
-    - develop
+gitstats:
+  stage: stats
   tags:
-    - sphinx
-    - latex
+    - python3
+    - gitstats
+    - progstats
   script:
-    - bash unittest.sh
+    - python3 -m venv virtual && source virtual/bin/activate && pip install ci-scripts
+    - gitstats-gen
+
+docgen:
+  stage: stats
+  tags:
+    - python3
+    - progstats
+  script:
+    - python3 -m venv virtual && source virtual/bin/activate && pip install ci-scripts
+    - sphinx-docgen

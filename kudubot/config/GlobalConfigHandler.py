@@ -225,7 +225,7 @@ class GlobalConfigHandler(object):
         """
 
         for special_import, import_path in {
-            "NATIVE": "from kudubot.services.native.",
+            "INTERNAL": "from kudubot.services.internal.",
             "CONNECTION": "from kudubot.connections."
         }.items():
 

@@ -1,4 +1,0 @@
-{
-    "build_commands": ["./gradlew", "build"],
-    "output_file": "build/libs/weather_kotlin.jar"
-}
