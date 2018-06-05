@@ -329,8 +329,8 @@ class EchoLayer(YowInterfaceLayer):
                 result_request_upload_iq_protocol_entity.getUrl(),
                 result_request_upload_iq_protocol_entity.getResumeOffset(),
                 success_fn,
-                EchoLayer.on_upload_error, EchoLayer.on_upload_progress,
-                async=False
+                EchoLayer.on_upload_error, EchoLayer.on_upload_progress
+                # async=False  Reserved keyword in python3.7+
             )
             media_uploader.start()
 

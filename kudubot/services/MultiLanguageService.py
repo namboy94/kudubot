@@ -100,7 +100,7 @@ class MultiLanguageService(BaseService):
         return supported
 
     def translate(self, text: str, language: str,
-                  translation_dict: Dict[str, Dict[str, str]]=None) -> str:
+                  translation_dict: Dict[str, Dict[str, str]] = None) -> str:
         """
         Translates text using the service's dictionary
         in the specified language

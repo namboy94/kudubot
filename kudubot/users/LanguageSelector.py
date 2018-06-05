@@ -69,7 +69,7 @@ class LanguageSelector(object):
             self.db.commit()
 
     def get_language_preference(self, contact: Contact, default: str = "en",
-                                db: sqlite3.Connection=None) -> str:
+                                db: sqlite3.Connection = None) -> str:
         """
         Retrieves a language from the user's preferences in the database
 

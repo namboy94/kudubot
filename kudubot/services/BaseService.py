@@ -185,7 +185,7 @@ class BaseService(object):
 
     # noinspection PyDefaultArgument
     def initialize_database_table(self, sql: List[str] = [],
-                                  initializer: callable=None):
+                                  initializer: callable = None):
         """
         Executes the provided SQL queries to create the database table(s).
 

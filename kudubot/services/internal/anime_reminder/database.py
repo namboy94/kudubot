@@ -125,7 +125,7 @@ def delete_subscription(user: int, show_name: str, db: sqlite3.Connection) \
 
 
 # noinspection SqlNoDataSourceInspection,SqlDialectInspection,SqlResolve
-def get_subscriptions(db: sqlite3.Connection, user: int=-1) \
+def get_subscriptions(db: sqlite3.Connection, user: int = -1) \
         -> List[Dict[str, str or int]]:
     """
     Fetches a list of subscriptions from the database, either for all users or
