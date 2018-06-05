@@ -1,11 +1,11 @@
 [Unit]
-Description=TelegramKudubot
+Description=KudubotTelegram
 After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python {PATH_TO_kudubot} telegram
-User={USER}
+ExecStart=/home/gitlab-runner/kudubot/bin/kudubot telegram
+User=gitlab-runner
 
 [Install]
 WantedBy=multi-user.target

@@ -1,11 +1,11 @@
 [Unit]
-Description=WhatsappKudubot
+Description=KudubotWhatsapp
 After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python {PATH_TO_kudubot} whatsapp
-User={USER}
+ExecStart=/home/gitlab-runner/kudubot/bin/kudubot whatapp
+User=gitlab-runner
 
 [Install]
 WantedBy=multi-user.target

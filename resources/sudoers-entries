@@ -1,0 +1,6 @@
+gitlab-runner ALL= NOPASSWD: /usr/bin/systemctl start kudubot-telegram.service
+gitlab-runner ALL= NOPASSWD: /usr/bin/systemctl stop kudubot-telegram.service
+gitlab-runner ALL= NOPASSWD: /usr/bin/systemctl restart kudubot-telegram.service
+gitlab-runner ALL= NOPASSWD: /usr/bin/systemctl start kudubot-whatsapp.service
+gitlab-runner ALL= NOPASSWD: /usr/bin/systemctl stop kudubot-whatsapp.service
+gitlab-runner ALL= NOPASSWD: /usr/bin/systemctl restart kudubot-whatsapp.service
