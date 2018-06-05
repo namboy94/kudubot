@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright 2015-2017 Hermann Krumrey
+"""LICENSE
+Copyright 2015 Hermann Krumrey <hermann@krumreyh.com>
 
 This file is part of kudubot.
 
@@ -16,7 +16,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-"""
+LICENSE"""
 
 import logging
 from typing import List
@@ -132,9 +132,9 @@ class BaseService(object):
                 if is_applicable_method(message):
                     self.logger.debug("Message is applicable")
                     return True
-                elif subclass == "authenticated":
-                    self.reply("Access Denied", "Access Denied ❌", message)
-                    return False
+                # elif subclass == "authenticated":
+                #     self.reply("Access Denied", "Access Denied ❌", message)
+                #     return False
 
         result = self.is_applicable_to(message)
         not_word = "" if result else "not"
@@ -185,7 +185,7 @@ class BaseService(object):
 
     # noinspection PyDefaultArgument
     def initialize_database_table(self, sql: List[str] = [],
-                                  initializer: callable=None):
+                                  initializer: callable = None):
         """
         Executes the provided SQL queries to create the database table(s).
 

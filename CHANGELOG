@@ -1,3 +1,5 @@
+V 0.19.0:
+  - Removed external services
 V 0.18.3:
   - Fixed Rust bindings upload
 V 0.18.2:

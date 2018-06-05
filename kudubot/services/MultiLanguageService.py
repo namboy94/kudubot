@@ -1,5 +1,5 @@
-"""
-Copyright 2015-2017 Hermann Krumrey
+"""LICENSE
+Copyright 2015 Hermann Krumrey <hermann@krumreyh.com>
 
 This file is part of kudubot.
 
@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-"""
+LICENSE"""
 
 from typing import Dict, List
 from kudubot.users.Contact import Contact
@@ -100,7 +100,7 @@ class MultiLanguageService(BaseService):
         return supported
 
     def translate(self, text: str, language: str,
-                  translation_dict: Dict[str, Dict[str, str]]=None) -> str:
+                  translation_dict: Dict[str, Dict[str, str]] = None) -> str:
         """
         Translates text using the service's dictionary
         in the specified language

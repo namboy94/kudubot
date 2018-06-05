@@ -17,47 +17,36 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
-from typing import List
-
 from kudubot.entities.Message import Message
 from kudubot.services.BaseService import BaseService
 
 
-class DummyService(BaseService):
+class EchoService(BaseService):
     """
-    A class that implements a Service for use in unit tests
+    Service that always replies to a user with the same message body that was
+    received
     """
 
-    @staticmethod
-    def define_requirements() -> List[str]:
-        return []
+    def is_applicable_to(self, message: Message) -> bool:
+        """
+        This service is always applicable
+        :param message: The message to check for applicability for
+        :return: True
+        """
+        return True
 
     @staticmethod
     def define_identifier() -> str:
-        return "dummyservice"
+        """
+        Defines the identifier of the service
+        :return: "echo"
+        """
+        return "echo"
 
     def handle_message(self, message: Message):
-        pass
-
-    def is_applicable_to(self, message: Message) -> bool:
-        pass
-
-
-class DummyServiceWithValidDependency(DummyService):
-    """
-    A Service that has itself (or DummyService) as its only dependency
-    """
-
-    @staticmethod
-    def define_requirements() -> List[str]:
-        return ["dummyservice"]
-
-
-class DummyServiceWithInvalidDependency(DummyService):
-    """
-    A service that has an invalid dependency
-    """
-
-    @staticmethod
-    def define_requirements() -> List[str]:
-        return ["otherservice"]
+        """
+        Replies with the original message text
+        :param message: The original message
+        :return: None
+        """
+        self.reply("Echo", message.message_body, message)
