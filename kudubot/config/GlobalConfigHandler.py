@@ -61,10 +61,6 @@ class GlobalConfigHandler(object):
         self.data_location = os.path.join(self.config_location, "data")
         self.specific_connection_config_location = \
             os.path.join(self.config_location, "connection_config")
-        self.external_services_directory = \
-            os.path.join(self.config_location, "external")
-        self.external_services_executables_directory = \
-            os.path.join(self.external_services_directory, "bin")
         self.logfile_directory = os.path.join(self.config_location, "logs")
         self.modules_directory = os.path.join(self.config_location, "modules")
 
@@ -94,13 +90,6 @@ class GlobalConfigHandler(object):
             elif not os.path.isdir(self.specific_connection_config_location):
                 raise InvalidConfigException(
                     "Connection Configuration directory does not exist")
-            elif not os.path.isdir(self.external_services_directory):
-                raise InvalidConfigException(
-                    "External Service directory does not exist")
-            elif not os.path.isdir(
-                    self.external_services_executables_directory):
-                raise InvalidConfigException(
-                    "External Service executable directory does not exist")
             elif not os.path.isdir(self.logfile_directory):
                 raise InvalidConfigException(
                     "Log File Directory does not exist")
@@ -151,17 +140,6 @@ class GlobalConfigHandler(object):
                 self.specific_connection_config_location)
             os.makedirs(self.specific_connection_config_location)
 
-        if not os.path.isdir(self.external_services_directory):
-            self.logger.info(
-                "Creating directory " + self.external_services_directory)
-            os.makedirs(self.external_services_directory)
-
-        if not os.path.isdir(self.external_services_executables_directory):
-            self.logger.info(
-                "Creating directory " +
-                self.external_services_executables_directory)
-            os.makedirs(self.external_services_executables_directory)
-
         if not os.path.isdir(self.logfile_directory):
             self.logger.info("Creating directory " + self.logfile_directory)
             os.makedirs(self.logfile_directory)
@@ -169,15 +147,6 @@ class GlobalConfigHandler(object):
         if not os.path.isdir(self.modules_directory):
             self.logger.info("Creating directory " + self.modules_directory)
             os.makedirs(self.modules_directory)
-
-    def delete_service_executables(self):
-        """
-        Deletes all executable service files
-
-        :return: None
-        """
-        shutil.rmtree(self.external_services_executables_directory)
-        os.makedirs(self.external_services_executables_directory)
 
     def load_connections(self) -> List[type]:
         """

@@ -57,12 +57,6 @@ class Connection(object):
         self.database_file_location = config_handler.data_location
         self.config_file_location = \
             config_handler.specific_connection_config_location
-        self.external_services_directory = os.path.join(
-            config_handler.external_services_directory, self.identifier
-        )
-
-        if not os.path.isdir(self.external_services_directory):
-            os.makedirs(self.external_services_directory)
 
         self.database_file_location = \
             os.path.join(self.database_file_location, self.identifier + ".db")

@@ -76,9 +76,6 @@ if __name__ == "__main__":
     if args.standard_connections:
         StandardConfigWriter(config_handler).write_standard_connection_config()
 
-    if args.remove_executable_service_files:
-        config_handler.delete_service_executables()
-
     if args.services is not None:
         services = args.services.split(",")
 
