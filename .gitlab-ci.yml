@@ -59,10 +59,13 @@ deploy_kudubot:
     - echo $KUDUBOT_TELEGRAM_CONFIG
     - cat ~/.kudubot/connection_config/telegram.conf
     - echo $KUDUBOT_TELEGRAM_CONFIG > ~/.kudubot/connection_config/telegram.conf
+    - cat ~/.kudubot/connection_config/telegram.conf
+    - echo "$KUDUBOT_TELEGRAM_CONFIG" > ~/.kudubot/connection_config/telegram.conf
     #- echo $KUDUBOT_WHATSAPP_CONFIG > ~/.kudubot/connection_config/whatsapp.conf
     - cat ~/.kudubot/connection_config/telegram.conf
     - sudo systemctl start kudubot-telegram.service
     #- sudo systemctl start kudubot-whatsapp.service
+    - cat ~/.kudubot/connection_config/telegram.conf
 
 release_upload:
   stage: release
