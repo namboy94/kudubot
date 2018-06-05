@@ -1,5 +1,5 @@
-"""
-Copyright 2015-2017 Hermann Krumrey
+"""LICENSE
+Copyright 2015 Hermann Krumrey <hermann@krumreyh.com>
 
 This file is part of kudubot.
 
@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
-"""
+LICENSE"""
 
 from typing import List
 
