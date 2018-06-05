@@ -132,9 +132,9 @@ class BaseService(object):
                 if is_applicable_method(message):
                     self.logger.debug("Message is applicable")
                     return True
-                elif subclass == "authenticated":
-                    self.reply("Access Denied", "Access Denied ❌", message)
-                    return False
+                # elif subclass == "authenticated":
+                #     self.reply("Access Denied", "Access Denied ❌", message)
+                #     return False
 
         result = self.is_applicable_to(message)
         not_word = "" if result else "not"

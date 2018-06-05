@@ -176,19 +176,16 @@ class AuthenticationManagerService(HelperService, AuthenticatedService):
         :return: True if the Message is applicable, False otherwise
         """
         language = self.determine_language(message)
-        print(self.define_command_name(language))
         if not self.starts_with_command_keyword(message, language):
             return False
 
         body = message.message_body.lower().split(" ")
 
         if len(body) == 2:
-            print("O")
             if body[1] == self.translate("@{LIST}", language):
                 return True
 
         elif len(body) == 3:
-            print("A")
             if body[1] in [
                 self.translate("@{BLACKLIST}", language),
                 self.translate("@{ADMIN_MAKE}", language)
@@ -199,5 +196,4 @@ class AuthenticationManagerService(HelperService, AuthenticatedService):
                 except ValueError:
                     return False
 
-        print("I")
         return False

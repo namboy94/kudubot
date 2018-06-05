@@ -23,7 +23,7 @@ import time
 import logging
 import argparse
 import traceback
-from kudubot import version
+import pkg_resources
 from kudubot.exceptions import InvalidConfigException
 from kudubot.connections.Connection import Connection
 from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
@@ -35,7 +35,8 @@ def main():  # pragma: no cover
     The Main Method of the Program that starts the Connection Listener in
     accordance with the command line arguments
     """
-    print("Kudubot Version " + version)
+    print("Kudubot Version " +
+          pkg_resources.get_distribution("kudubot").version)
 
     args = parse_args()
     config_handler = GlobalConfigHandler(args.config)
