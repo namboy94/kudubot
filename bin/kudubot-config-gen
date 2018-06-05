@@ -34,10 +34,6 @@ if __name__ == "__main__":
     parser.add_argument("--delete-old", action="store_true",
                         help="Can be used to completely wipe the "
                              "previous configuration.")
-    parser.add_argument("--standard-services", action="store_true",
-                        help="Generates the standard services configuration")
-    parser.add_argument("--standard-connections", action="store_true",
-                        help="Generates the standard connection configuration")
     parser.add_argument("--remove-executable-service-files",
                         action="store_true",
                         help="Deletes all executable service files. "
@@ -70,12 +66,6 @@ if __name__ == "__main__":
 
     config_handler.generate_configuration(args.delete_old)
 
-    if args.standard_services:
-        StandardConfigWriter(config_handler).write_standard_service_config()
-
-    if args.standard_connections:
-        StandardConfigWriter(config_handler).write_standard_connection_config()
-
     if args.services is not None:
         services = args.services.split(",")
 
@@ -89,6 +79,9 @@ if __name__ == "__main__":
         with open(config_handler.services_config_location, "a") as f:
             f.write(service_config)
 
+    else:
+        StandardConfigWriter(config_handler).write_standard_service_config()
+
     if args.connections:
         connections = args.connections.split(",")
 
@@ -101,3 +94,6 @@ if __name__ == "__main__":
 
         with open(config_handler.global_connection_config_location, "a") as f:
             f.write(connections_config)
+
+    else:
+        StandardConfigWriter(config_handler).write_standard_connection_config()
