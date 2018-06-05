@@ -31,7 +31,7 @@ if __name__ == "__main__":
         print("Configuration directory does not exist.")
         print("Execute "
               "\"kudubot-config-gen --destination ~/.kudubot-echo "
-              "--services EchoService --connections Cli,...\" "
+              "--services EchoService\" "
               "and set up the connection to use to continue")
         sys.exit(1)
 

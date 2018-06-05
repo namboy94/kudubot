@@ -61,7 +61,7 @@ For examples look at the [implemented services](kudubot/services/native).
 To see how to create a single-purpose bot, take a look at the echobot:
 
 * [starter script](bin/echobot)
-* [service](kudubot/services/native/echo)
+* [service](kudubot/services/internal/echo)
 
 
 ## Further Information

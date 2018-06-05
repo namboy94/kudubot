@@ -74,9 +74,9 @@ if __name__ == "__main__":
             if service.startswith("import ") and "from" in service:
                 service_config += service
             else:
-                service_config += "@NATIVE " + service
+                service_config += "@INTERNAL " + service
 
-        with open(config_handler.services_config_location, "a") as f:
+        with open(config_handler.services_config_location, "w") as f:
             f.write(service_config)
 
     else:
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             else:
                 connections_config += "@CONNECTION" + connection
 
-        with open(config_handler.global_connection_config_location, "a") as f:
+        with open(config_handler.global_connection_config_location, "w") as f:
             f.write(connections_config)
 
     else:
