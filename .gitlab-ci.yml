@@ -56,8 +56,11 @@ deploy_kudubot:
     - python3 -m venv ~/kudubot && source ~/kudubot/bin/activate && python setup.py install
     - rm ~/.kudubot/services.conf ~/.kudubot/connections.conf -f
     - kudubot-config-gen
+    - echo $KUDUBOT_TELEGRAM_CONFIG
+    - cat ~/.kudubot/connection_config/telegram.conf
     - echo $KUDUBOT_TELEGRAM_CONFIG > ~/.kudubot/connection_config/telegram.conf
     #- echo $KUDUBOT_WHATSAPP_CONFIG > ~/.kudubot/connection_config/whatsapp.conf
+    - cat ~/.kudubot/connection_config/telegram.conf
     - sudo systemctl start kudubot-telegram.service
     #- sudo systemctl start kudubot-whatsapp.service
 
