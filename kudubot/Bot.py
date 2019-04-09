@@ -21,7 +21,7 @@ import os
 import sqlite3
 from typing import Callable, Type
 from bokkichat.connection.Connection import Connection
-from bokkichat.message.Message import Message
+from bokkichat.entities.message.Message import Message
 
 
 class Bot:
