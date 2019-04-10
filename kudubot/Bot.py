@@ -20,6 +20,7 @@ LICENSE"""
 import os
 import logging
 from typing import Type
+from threading import Thread
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import sessionmaker
@@ -62,6 +63,8 @@ class Bot:
         self._sessionmaker = sessionmaker(bind=self.db_engine)
         self.db_session = self.create_db_session()
 
+        self.bg_thread = Thread(target=self.run_in_bg, daemon=True)
+
     def on_msg(self, message: Message, address: DbAddress):
         """
         The callback method is called for every received message.
@@ -71,6 +74,15 @@ class Bot:
         :return: None
         """
         raise NotImplementedError()
+
+    def run_in_bg(self):
+        """
+        Method that is started when the bot is started.
+        By default this does nothing, for functionality must be extended
+        by subclasses.
+        :return: None
+        """
+        pass
 
     def pre_callback(self, _: Connection, message: Message) -> bool:
         """
@@ -92,13 +104,14 @@ class Bot:
 
         def loop_callback(connection: Connection, message: Message):
 
-            self.logger.debug("Received message {}".format(message))
+            self.logger.info("Received message {}".format(message))
 
             if self.pre_callback(connection, message):
                 address = self.db_session.query(DbAddress)\
                     .filter_by(address=message.sender.address).first()
                 self.on_msg(message, address)
 
+        self.bg_thread.start()
         self.connection.loop(callback=loop_callback)
 
     def create_db_session(self) -> Session:

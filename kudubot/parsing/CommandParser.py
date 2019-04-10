@@ -52,7 +52,7 @@ class CommandParser:
                 raise ParseError("Incorrect command name")
 
             else:
-                return command_arg, valid_command.resolve_args(args)
+                return command_arg.upper(), valid_command.resolve_args(args)
 
         except IndexError:
             raise ParseError("Incorrect amount of arguments")
