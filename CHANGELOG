@@ -1,3 +1,6 @@
+V 0.21.0:
+  - Added background thread capabilities
+  - Added parsing capabilities
 V 0.20.0:
   - Redo as a wrapper around bokkichat
 V 0.19.0:
