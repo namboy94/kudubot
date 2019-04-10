@@ -18,7 +18,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
 import os
-from typing import Callable, Type
+from typing import Type, List
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import sessionmaker
@@ -27,6 +27,7 @@ from bokkichat.entities.message.Message import Message
 from bokkichat.entities.Address import Address
 from kudubot.db import Base
 from kudubot.db.Address import Address as DbAddress
+from kudubot.exceptions import ConfigurationError
 
 
 class Bot:
@@ -43,9 +44,12 @@ class Bot:
         self.connection = connection
         self.location = location
         if not os.path.isdir(location):
-            os.makedirs(location)
+            raise ConfigurationError("Invalid configuration directory")
 
         self.settings_file_path = os.path.join(location, "settings.json")
+        if not os.path.isfile(self.settings_file_path):
+            raise ConfigurationError("Missing settings")
+
         self.db_path = os.path.join(location, "data.db")
 
         self.db_engine = create_engine("sqlite:///{}".format(self.db_path))
@@ -54,33 +58,39 @@ class Bot:
         self._sessionmaker = sessionmaker(bind=self.db_engine)
         self.db_session = self.create_db_session()
 
-    def start(self, callback: Callable[[object, Connection, Message], None]):
+    def on_msg(self, message: Message, address: DbAddress):
         """
-        Starts the bot using a callback function
-        :param callback: The callback function to use.
-                         Gets the following arguments:
-                            - Bot
-                            - Connection
-                            - Message
+        The callback method is called for every received message.
+        This method defines the main functionality of a bot
+        :param message: The received message
+        :param address: The address of the sender in the database
         :return: None
         """
-        def loop_callback(connection: Connection, message: Message):
-            if self.pre_callback(connection, message):
-                callback(self, connection, message)
+        raise NotImplementedError()
 
-        self.connection.loop(callback=loop_callback)
-
-    # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def pre_callback(self, connection: Connection, message: Message) -> bool:
+    def pre_callback(self, _: Connection, message: Message) -> bool:
         """
         Prepares the callback and decides whether or not the callback
         is even executed
-        :param connection: The connection to use
+        :param _: The connection to use
         :param message: The message to check
         :return: True if the execution continues, False otherwise
         """
         self._store_in_address_book(message.sender)
         return True
+
+    def start(self):
+        """
+        Starts the bot using the implemented callback function
+        :return: None
+        """
+        def loop_callback(connection: Connection, message: Message):
+            if self.pre_callback(connection, message):
+                address = self.db_session.query(DbAddress)\
+                    .filter_by(address=message.sender.address).first()
+                self.on_msg(message, address)
+
+        self.connection.loop(callback=loop_callback)
 
     def create_db_session(self) -> Session:
         """
@@ -105,10 +115,32 @@ class Bot:
         :param location: The location of the bot configuration directory
         :return: The generated bot
         """
-        with open(os.path.join(location, "settings.json"), "r") as f:
+        settings_file = os.path.join(location, "settings.json")
+        if not os.path.isfile(settings_file):
+            raise ConfigurationError("Missing settings file")
+
+        with open(settings_file, "r") as f:
             serialized = f.read()
         connection = connection_cls.from_serialized_settings(serialized)
         return cls(connection, location)
+
+    @staticmethod
+    def create_config(connection_cls: Type[Connection], path: str):
+        """
+        Creates a configuration directory for a bot
+        :param connection_cls: The connection class for
+                               which to generate a config
+        :param path: The path of the configuration directory
+        :return: None
+        """
+        if not os.path.isdir(path):
+            os.makedirs(path)
+
+        settings_path = os.path.join(path, "settings.json")
+        settings = connection_cls.settings_cls().prompt()
+
+        with open(settings_path, "w") as f:
+            f.write(settings.serialize())
 
     def _store_in_address_book(self, address: Address):
         """
@@ -116,7 +148,7 @@ class Bot:
         :param address: The address to store
         :return: None
         """
-        exists = self.db_session.query(DbAddress)\
+        exists = self.db_session.query(DbAddress) \
             .filter_by(address=address.address).first()
 
         if not exists:

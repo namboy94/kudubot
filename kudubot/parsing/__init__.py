@@ -16,16 +16,3 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
-
-
-class ConfigurationError(Exception):
-    """
-    Exception that gets raised whenever a configuration error was found
-    """
-    pass
-
-
-class ParseError(Exception):
-    """
-    Exception that gets raised whenever a parsing error occurs
-    """
