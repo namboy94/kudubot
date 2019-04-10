@@ -18,7 +18,8 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
 import os
-from typing import Type, List
+import logging
+from typing import Type
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import sessionmaker
@@ -41,6 +42,9 @@ class Bot:
         :param connection: The connection the bot should use
         :param location: The location of config and DB files
         """
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.info("Initializing Bot")
+
         self.connection = connection
         self.location = location
         if not os.path.isdir(location):
@@ -84,7 +88,12 @@ class Bot:
         Starts the bot using the implemented callback function
         :return: None
         """
+        self.logger.info("Starting Bot")
+
         def loop_callback(connection: Connection, message: Message):
+
+            self.logger.debug("Received message {}".format(message))
+
             if self.pre_callback(connection, message):
                 address = self.db_session.query(DbAddress)\
                     .filter_by(address=message.sender.address).first()
