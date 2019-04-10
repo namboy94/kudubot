@@ -18,8 +18,14 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
 
-class InvalidConfigException(Exception):
+class ConfigurationError(Exception):
     """
-    An Exception that is raised whenever an invalid configuration is detected.
+    Exception that gets raised whenever a configuration error was found
     """
     pass
+
+
+class ParseError(Exception):
+    """
+    Exception that gets raised whenever a parsing error occurs
+    """

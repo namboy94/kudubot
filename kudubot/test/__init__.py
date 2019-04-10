@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """LICENSE
 Copyright 2015 Hermann Krumrey <hermann@krumreyh.com>
 
@@ -17,8 +16,3 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
-
-from kudubot.main import main
-
-if __name__ == "__main__":
-    main()

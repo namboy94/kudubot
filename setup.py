@@ -39,13 +39,10 @@ if __name__ == "__main__":
         url="https://gitlab.namibsun.net/namibsun/python/kudubot",
         license="GNU GPL3",
         packages=find_packages(),
-        scripts=list(map(lambda x: os.path.join("bin", x), os.listdir("bin"))),
         install_requires=[
             "typing",
-            "python-telegram-bot",
-            "yowsup2",
-            "requests",
-            "bs4"
+            "bokkichat",
+            "sqlalchemy"
         ],
         include_package_data=True,
         zip_safe=False

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """LICENSE
 Copyright 2015 Hermann Krumrey <hermann@krumreyh.com>
 
@@ -19,26 +17,26 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
-import os
-import sys
-from kudubot.main import main
+from kudubot.db import Base
+from sqlalchemy import Column, String, Integer
 
-if __name__ == "__main__":
 
-    config_dir = os.path.join(os.path.expanduser("~"), ".kudubot-echo")
+class Address(Base):
+    """
+    SQLAlchemy table that stores addresses
+    """
 
-    if not os.path.isdir(config_dir):
-        print("Configuration directory does not exist.")
-        print("Execute "
-              "\"kudubot-config-gen --destination ~/.kudubot-echo "
-              "--services EchoService\" "
-              "and set up the connection to use to continue")
-        sys.exit(1)
+    __tablename__ = "addressbook"
+    """
+    The table's name
+    """
 
-    if "-c" in sys.argv or "--config" in sys.argv:
-        print("Please don't manually specify a configuration directory")
-        sys.exit(1)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    """
+    The ID of the address
+    """
 
-    sys.argv.append("-c")
-    sys.argv.append(config_dir)
-    main()
+    address = Column(String(255), unique=True, nullable=False)
+    """
+    The address itself
+    """

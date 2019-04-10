@@ -17,28 +17,7 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
-import os
-import shutil
-from kudubot.config.GlobalConfigHandler import GlobalConfigHandler
+from sqlalchemy.ext.declarative import declarative_base
 
 
-def generate_test_environment() -> GlobalConfigHandler:
-    """
-    Generates the test environment
-
-    :return: The GlobalConfigHandler that points to the configuration
-    """
-
-    handler = GlobalConfigHandler("kudu-test")
-    handler.generate_configuration()
-    return handler
-
-
-def clean_up_test_environment():
-    """
-    Deletes the test environment
-
-    :return: None
-    """
-    if os.path.isdir("kudu-test"):
-        shutil.rmtree("kudu-test")
+Base = declarative_base()
