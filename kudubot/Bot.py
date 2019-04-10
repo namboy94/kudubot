@@ -18,10 +18,15 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
 import os
-import sqlite3
 from typing import Callable, Type
+from sqlalchemy import create_engine
+from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import sessionmaker
 from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
+from bokkichat.entities.Address import Address
+from kudubot.db import Base
+from kudubot.db.Address import Address as DbAddress
 
 
 class Bot:
@@ -42,7 +47,12 @@ class Bot:
 
         self.settings_file_path = os.path.join(location, "settings.json")
         self.db_path = os.path.join(location, "data.db")
-        self.db = self.db_connect()
+
+        self.db_engine = create_engine("sqlite:///{}".format(self.db_path))
+        Base.metadata.create_all(self.db_engine, checkfirst=True)
+
+        self._sessionmaker = sessionmaker(bind=self.db_engine)
+        self.db_session = self.create_db_session()
 
     def start(self, callback: Callable[[object, Connection, Message], None]):
         """
@@ -69,15 +79,15 @@ class Bot:
         :param message: The message to check
         :return: True if the execution continues, False otherwise
         """
-        # TODO do stuff
+        self._store_in_address_book(message.sender)
         return True
 
-    def db_connect(self) -> sqlite3.Connection:
+    def create_db_session(self) -> Session:
         """
-        Creates a new database connection
-        :return: The database connection
+        Creates a new database session
+        :return: The database session
         """
-        return sqlite3.connect(self.db_path)
+        return self._sessionmaker()
 
     def save_config(self):
         """
@@ -99,3 +109,17 @@ class Bot:
             serialized = f.read()
         connection = connection_cls.from_serialized_settings(serialized)
         return cls(connection, location)
+
+    def _store_in_address_book(self, address: Address):
+        """
+        Stores an address in the bot's address book
+        :param address: The address to store
+        :return: None
+        """
+        exists = self.db_session.query(DbAddress)\
+            .filter_by(address=address.address).first()
+
+        if not exists:
+            entry = DbAddress(address=address.address)
+            self.db_session.add(entry)
+            self.db_session.commit()

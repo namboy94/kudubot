@@ -41,7 +41,8 @@ if __name__ == "__main__":
         packages=find_packages(),
         install_requires=[
             "typing",
-            "bokkichat"
+            "bokkichat",
+            "sqlalchemy"
         ],
         include_package_data=True,
         zip_safe=False
