@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 from kudubot.parsing.Command import Command
 from kudubot.exceptions import ParseError
 
@@ -27,7 +27,7 @@ class CommandParser:
     A parser for bot commands
     """
 
-    def parse(self, text: str) -> Tuple[str, Dict[str, object]]:
+    def parse(self, text: str) -> Tuple[str, Dict[str, Any]]:
         """
         Parses a command
         :param text: The text to parse

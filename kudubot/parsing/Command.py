@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 
 
 class Command:
@@ -25,7 +25,7 @@ class Command:
     Class that defines a framework for bot commands
     """
 
-    def __init__(self, keyword: str, arg_info: List[Tuple[str, type]]):
+    def __init__(self, keyword: str, arg_info: List[Tuple[str, Any]]):
         """
         Intializes a command
         :param keyword: The keyword/command argument
@@ -57,7 +57,7 @@ class Command:
 
         return valid
 
-    def resolve_args(self, args: List[str]) -> Dict[str, object]:
+    def resolve_args(self, args: List[str]) -> Dict[str, Any]:
         """
         Converts a list of string arguments into a dictionary of
         arguments converted to their correct types and associated with the
