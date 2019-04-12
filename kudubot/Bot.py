@@ -19,7 +19,7 @@ LICENSE"""
 
 import os
 import logging
-from typing import Type
+from typing import Type, Optional
 from threading import Thread
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
@@ -29,6 +29,7 @@ from bokkichat.entities.message.Message import Message
 from bokkichat.entities.Address import Address
 from kudubot.db import Base
 from kudubot.db.Address import Address as DbAddress
+from kudubot.db.config.impl.SqlteConfig import SqliteConfig
 from kudubot.exceptions import ConfigurationError
 
 
@@ -37,11 +38,17 @@ class Bot:
     The Bot class automatically
     """
 
-    def __init__(self, connection: Connection, location: str):
+    def __init__(
+            self,
+            connection: Connection,
+            location: str,
+            db_uri: Optional[str] = None
+    ):
         """
         Initializes the bot
         :param connection: The connection the bot should use
         :param location: The location of config and DB files
+        :param db_uri: Specifies a custom database URI
         """
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info("Initializing Bot")
@@ -55,9 +62,12 @@ class Bot:
         if not os.path.isfile(self.settings_file_path):
             raise ConfigurationError("Missing settings")
 
-        self.db_path = os.path.join(location, "data.db")
+        self.sqlite_path = os.path.join(location, "data.db")
+        if db_uri is None:
+            db_uri = SqliteConfig(self.sqlite_path).to_uri()
+        self.db_uri = db_uri
 
-        self.db_engine = create_engine("sqlite:///{}".format(self.db_path))
+        self.db_engine = create_engine(self.db_uri)
         Base.metadata.create_all(self.db_engine, checkfirst=True)
 
         self._sessionmaker = sessionmaker(bind=self.db_engine)
