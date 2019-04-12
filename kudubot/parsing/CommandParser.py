@@ -94,6 +94,23 @@ class CommandParser:
         return args
 
     @property
+    def help_text(self) -> str:
+        """
+        :return: The help text for this parser
+        """
+        help_text = "!{}\n".format(self.name)
+        for command in self.commands:
+            help_text += "  " + str(command) + "\n"
+        return help_text.strip()
+
+    @property
+    def name(self) -> str:
+        """
+        :return: The name of the parser
+        """
+        raise NotImplementedError()
+
+    @property
     def commands(self) -> List[Command]:
         """
         Defines the commands the parser supports

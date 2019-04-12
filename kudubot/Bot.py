@@ -19,23 +19,24 @@ LICENSE"""
 
 import os
 import logging
-from typing import Type, Optional
+from typing import Type, Optional, List
 from threading import Thread
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import sessionmaker
 from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
-from bokkichat.entities.Address import Address
+from bokkichat.entities.message.TextMessage import TextMessage
 from kudubot.db import Base
-from kudubot.db.Address import Address as DbAddress
+from kudubot.db.Address import Address as Address
 from kudubot.db.config.impl.SqlteConfig import SqliteConfig
 from kudubot.exceptions import ConfigurationError
+from kudubot.parsing.CommandParser import CommandParser
 
 
 class Bot:
     """
-    The Bot class automatically
+    The Bot class offers an abstraction layer above
     """
 
     def __init__(
@@ -75,13 +76,27 @@ class Bot:
 
         self.bg_thread = Thread(target=self.run_in_bg, daemon=True)
 
-    def on_msg(self, message: Message, address: DbAddress):
+    def on_msg(self, message: Message, address: Address):
         """
         The callback method is called for every received message.
         This method defines the main functionality of a bot
         :param message: The received message
         :param address: The address of the sender in the database
         :return: None
+        """
+        raise NotImplementedError()
+
+    @property
+    def name(self) -> str:
+        """
+        :return: The name of the bot
+        """
+        raise NotImplementedError()
+
+    @property
+    def parsers(self) -> List[CommandParser]:
+        """
+        :return: A list of parser the bot supports for commands
         """
         raise NotImplementedError()
 
@@ -102,8 +117,11 @@ class Bot:
         :param message: The message to check
         :return: True if the execution continues, False otherwise
         """
-        self._store_in_address_book(message.sender)
-        return True
+        _continue = True
+        _continue = _continue and self._store_in_address_book(message)
+        _continue = _continue and self._handle_help_command(message)
+        _continue = _continue and self._handle_ping(message)
+        return _continue
 
     def start(self):
         """
@@ -117,7 +135,7 @@ class Bot:
             self.logger.info("Received message {}".format(message))
 
             if self.pre_callback(connection, message):
-                address = self.db_session.query(DbAddress)\
+                address = self.db_session.query(Address)\
                     .filter_by(address=message.sender.address).first()
                 self.on_msg(message, address)
 
@@ -174,16 +192,60 @@ class Bot:
         with open(settings_path, "w") as f:
             f.write(settings.serialize())
 
-    def _store_in_address_book(self, address: Address):
+    def _store_in_address_book(self, message: Message) -> bool:
         """
         Stores an address in the bot's address book
-        :param address: The address to store
-        :return: None
+        :param message: The received message
+        :return: Whether or not handling the message should continue
         """
-        exists = self.db_session.query(DbAddress) \
-            .filter_by(address=address.address).first()
+        exists = self.db_session.query(Address) \
+            .filter_by(address=message.sender.address).first()
 
-        if not exists:
-            entry = DbAddress(address=address.address)
+        if exists is None:
+            entry = Address(address=message.sender.address)
             self.db_session.add(entry)
             self.db_session.commit()
+        return True
+
+    def _handle_help_command(self, message: Message) -> bool:
+        """
+        Handles the /help command.
+        :param message: The message to check for a /help command
+        :return: Whether or not handling the message should continue
+        """
+        if message.is_text():
+            message = message  # type: TextMessage
+        else:
+            return True
+        
+        if message.body.lower().strip() == "/help":
+    
+            help_message = "Help message for {}\n\n".format(self.name)
+            for parser in self.parsers:
+                help_message += parser.help_text + "\n\n"
+    
+            reply = message.make_reply(
+                title="Help Message", body=help_message
+            )
+            self.connection.send(reply)
+            return False
+        else:
+            return True
+
+    def _handle_ping(self, message: Message) -> bool:
+        """
+        Handles PING messages
+        :param message: The message to analyze
+        :return: Whether or not handling the message should continue
+        """
+        if message.is_text():
+            message = message  # type: TextMessage
+        else:
+            return True
+
+        if message.body.lower().strip() == "ping":
+            reply = message.make_reply(title="Pong", body="Pong")
+            self.connection.send(reply)
+            return False
+        else:
+            return True
