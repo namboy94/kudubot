@@ -1,3 +1,6 @@
+V 0.22.0:
+  - Added ping capabilities
+  - Added help functionality
 V 0.21.0:
   - Added background thread capabilities
   - Added parsing capabilities

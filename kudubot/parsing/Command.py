@@ -74,3 +74,13 @@ class Command:
             resolved[key] = converted
 
         return resolved
+
+    def __str__(self) -> str:
+        """
+        :return: A string representation of the command.
+                 Useful for help messages
+        """
+        help_text = "/{}".format(self.keyword)
+        for name, _type in self.arg_info:
+            help_text += " {}<{}>".format(name, _type.__name__)
+        return help_text.lower()
