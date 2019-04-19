@@ -217,13 +217,13 @@ class Bot:
             message = message  # type: TextMessage
         else:
             return True
-        
+
         if message.body.lower().strip() == "/help":
-    
+
             help_message = "Help message for {}\n\n".format(self.name)
             for parser in self.parsers:
                 help_message += parser.help_text + "\n\n"
-    
+
             reply = message.make_reply(
                 title="Help Message", body=help_message
             )

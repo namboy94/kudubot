@@ -82,5 +82,5 @@ class Command:
         """
         help_text = "/{}".format(self.keyword)
         for name, _type in self.arg_info:
-            help_text += " {}<{}>".format(name, _type)
-        return help_text
+            help_text += " {}<{}>".format(name, _type.__name__)
+        return help_text.lower()
