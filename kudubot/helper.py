@@ -52,19 +52,19 @@ def cli_bot_start(bot_cls: Type[Bot], connection_cls: Type[Connection]):
 
     config_path = args.custom_dir
 
-    if args.initialize:
-        if not os.path.isdir(config_path):
-            os.makedirs(config_path)
-        bot_cls.create_config(connection_cls, config_path)
-
-    if not os.path.isdir(config_path):
-        print("Missing Configuration directory {}".format(config_path))
-        exit(1)
-
     if args.verbose:
         logging.basicConfig(level=logging.INFO)
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
+
+    if args.initialize:
+        if not os.path.isdir(config_path):
+            os.makedirs(config_path)
+        bot_cls.create_config(connection_cls, config_path)
+        print("Successfully generated configuration in " + config_path)
+
+    elif not os.path.isdir(config_path):
+        print("Missing Configuration directory {}" + config_path)
 
     else:
         try:
