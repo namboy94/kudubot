@@ -24,6 +24,7 @@ from threading import Thread
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import sessionmaker
+from bokkichat.exceptions import InvalidSettings
 from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
 from bokkichat.entities.message.TextMessage import TextMessage
@@ -232,7 +233,12 @@ class Bot:
 
         with open(connection_file, "r") as f:
             serialized = f.read()
-        connection = connection_cls.from_serialized_settings(serialized)
+
+        try:
+            connection = connection_cls.from_serialized_settings(serialized)
+        except InvalidSettings:
+            raise ConfigurationError("Invalid settings for connection")
+
         return cls(connection, location)
 
     @classmethod
