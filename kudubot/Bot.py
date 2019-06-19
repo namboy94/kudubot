@@ -66,13 +66,13 @@ class Bot:
 
         self.extras = {}
         self.extras_file_path = os.path.join(location, "extras.json")
-        if len(self.extra_config_args) > 0:
+        if len(self.extra_config_args()) > 0:
             if not os.path.isfile(self.extras_file_path):
                 raise ConfigurationError("Missing extra settings")
             else:
                 with open(self.extras_file_path, "r") as f:
                     self.extras = json.load(f)
-                    for arg in self.extra_config_args:
+                    for arg in self.extra_config_args():
                         if arg not in self.extras:
                             raise ConfigurationError(
                                 "Missing extra settings parameter " + arg
@@ -114,14 +114,6 @@ class Bot:
         :return: A list of parser the bot supports for commands
         """
         raise NotImplementedError()
-    
-    @property
-    def extra_config_args(self) -> List[str]:
-        """
-        :return: A list of additional settings parameters required for
-                 this bot. Will be stored in a separate extras.json file
-        """
-        return []
 
     def run_in_bg(self):
         """
@@ -219,6 +211,14 @@ class Bot:
             json.dump(self.extras, f)
 
     @classmethod
+    def extra_config_args(cls) -> List[str]:
+        """
+        :return: A list of additional settings parameters required for
+                 this bot. Will be stored in a separate extras.json file
+        """
+        return []
+
+    @classmethod
     def load(cls, connection_cls: Type[Connection], location: str):
         """
         Generates a Bot from the location.
@@ -226,17 +226,17 @@ class Bot:
         :param location: The location of the bot configuration directory
         :return: The generated bot
         """
-        settings_file = os.path.join(location, "connection.json")
-        if not os.path.isfile(settings_file):
-            raise ConfigurationError("Missing settings file")
+        connection_file = os.path.join(location, "connection.json")
+        if not os.path.isfile(connection_file):
+            raise ConfigurationError("Missing connection settings file")
 
-        with open(settings_file, "r") as f:
+        with open(connection_file, "r") as f:
             serialized = f.read()
         connection = connection_cls.from_serialized_settings(serialized)
         return cls(connection, location)
 
-    @staticmethod
-    def create_config(connection_cls: Type[Connection], path: str):
+    @classmethod
+    def create_config(cls, connection_cls: Type[Connection], path: str):
         """
         Creates a configuration directory for a bot
         :param connection_cls: The connection class for
@@ -247,11 +247,23 @@ class Bot:
         if not os.path.isdir(path):
             os.makedirs(path)
 
-        settings_path = os.path.join(path, "connection.json")
+        connection_path = os.path.join(path, "connection.json")
         settings = connection_cls.settings_cls().prompt()
 
-        with open(settings_path, "w") as f:
+        extras_path = os.path.join(path, "extras.json")
+        extras = {}
+
+        for arg in cls.extra_config_args():
+            while True:
+                resp = input("{}: ".format(arg)).strip()
+                if resp != "":
+                    extras[arg] = resp
+                    break
+
+        with open(connection_path, "w") as f:
             f.write(settings.serialize())
+        with open(extras_path, "w") as f:
+            json.dump(extras, f)
 
     def _store_in_address_book(self, message: Message) -> bool:
         """
