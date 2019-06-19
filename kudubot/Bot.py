@@ -261,7 +261,7 @@ class Bot:
 
         for arg in cls.extra_config_args():
             while True:
-                resp = input("{}: ".format(arg)).strip()
+                resp = input("(Extras){}: ".format(arg)).strip()
                 if resp != "":
                     extras[arg] = resp
                     break
