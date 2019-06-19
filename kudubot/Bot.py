@@ -101,19 +101,27 @@ class Bot:
         """
         raise NotImplementedError()
 
-    @property
-    def name(self) -> str:
+    @classmethod
+    def name(cls) -> str:
         """
         :return: The name of the bot
         """
         raise NotImplementedError()
 
-    @property
-    def parsers(self) -> List[CommandParser]:
+    @classmethod
+    def parsers(cls) -> List[CommandParser]:
         """
         :return: A list of parser the bot supports for commands
         """
         raise NotImplementedError()
+
+    @classmethod
+    def extra_config_args(cls) -> List[str]:
+        """
+        :return: A list of additional settings parameters required for
+                 this bot. Will be stored in a separate extras.json file
+        """
+        return []
 
     def run_in_bg(self):
         """
@@ -171,16 +179,16 @@ class Bot:
         body = message.body.strip().lower()
 
         selected_parser = None
-        if len(self.parsers) > 1:
+        if len(self.parsers()) > 1:
             if not body.startswith("!"):
                 return None
             else:
                 parser_name = body.split("!", 1)[1].split(" ", 1)[0]
-                for parser in self.parsers:
+                for parser in self.parsers():
                     if parser_name == parser.name:
                         selected_parser = parser
-        elif len(self.parsers) == 1:
-            selected_parser = self.parsers[0]
+        elif len(self.parsers()) == 1:
+            selected_parser = self.parsers()[0]
             
         if selected_parser is None:
             return None
@@ -209,14 +217,6 @@ class Bot:
             f.write(self.connection.settings.serialize())
         with open(self.extras_file_path, "w") as f:
             json.dump(self.extras, f)
-
-    @classmethod
-    def extra_config_args(cls) -> List[str]:
-        """
-        :return: A list of additional settings parameters required for
-                 this bot. Will be stored in a separate extras.json file
-        """
-        return []
 
     @classmethod
     def load(cls, connection_cls: Type[Connection], location: str):
@@ -294,7 +294,7 @@ class Bot:
         if message.body.lower().strip() == "/help":
 
             help_message = "Help message for {}\n\n".format(self.name)
-            for parser in self.parsers:
+            for parser in self.parsers():
                 help_message += parser.help_text + "\n\n"
 
             reply = message.make_reply(
