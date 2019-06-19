@@ -299,7 +299,7 @@ class Bot:
 
         if message.body.lower().strip() == "/help":
 
-            help_message = "Help message for {}\n\n".format(self.name)
+            help_message = "Help message for {}\n\n".format(self.name())
             for parser in self.parsers():
                 help_message += parser.help_text + "\n\n"
 
