@@ -11,6 +11,15 @@ services based on
 [bokkichat](https://gitlab.namibsun.net/namibsun/python/bokkichat)
 connections.
 
+# Implementing a kudubot
+
+The base of a kudubot is the ```Bot``` class in the ```kudubot.Bot``` module.
+Any kudubot implementation must extend that class.
+
+The following methods have to be implemented:
+
+```on_msg```, ```name```, ```parsers```
+
 ## Further Information
 
 * [Changelog](CHANGELOG)
