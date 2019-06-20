@@ -20,6 +20,10 @@ The following methods have to be implemented:
 
 ```on_msg```, ```name```, ```parsers```
 
+```on_msg``` is called whenever the bot receives a message. ```name```
+defines the name of the bot class. ```parsers``` returns a list of
+```CommandParser``` objects.
+
 ## Further Information
 
 * [Changelog](CHANGELOG)

@@ -165,7 +165,7 @@ class Bot:
 
         self.bg_thread.start()
         self.connection.loop(callback=loop_callback)
-        
+
     def parse(self, message: Message) \
             -> Optional[Tuple[CommandParser, str, Dict[str, Any]]]:
         """
@@ -192,7 +192,7 @@ class Bot:
                         body = body.split(" ", 1)[1]
         elif len(self.parsers()) == 1:
             selected_parser = self.parsers()[0]
-            
+
         if selected_parser is None:
             return None
 
