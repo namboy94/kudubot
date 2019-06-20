@@ -177,17 +177,19 @@ class Bot:
         if not message.is_text():
             return None
         message = cast(TextMessage, message)
-        body = message.body.strip().lower()
+        body = message.body.strip()
+        lower_body = body.lower()
 
         selected_parser = None
         if len(self.parsers()) > 1:
-            if not body.startswith("!"):
+            if not lower_body.startswith("!"):
                 return None
             else:
-                parser_name = body.split("!", 1)[1].split(" ", 1)[0]
+                parser_name = lower_body.split("!", 1)[1].split(" ", 1)[0]
                 for parser in self.parsers():
-                    if parser_name == parser.name:
+                    if parser_name == parser.name():
                         selected_parser = parser
+                        body = body.split(" ", 1)[1]
         elif len(self.parsers()) == 1:
             selected_parser = self.parsers()[0]
             
@@ -195,7 +197,7 @@ class Bot:
             return None
 
         try:
-            command, args = selected_parser.parse(message.body)
+            command, args = selected_parser.parse(body)
             return selected_parser, command, args
         except ParseError:
             pass
@@ -300,8 +302,10 @@ class Bot:
         if message.body.lower().strip() == "/help":
 
             help_message = "Help message for {}\n\n".format(self.name())
+
+            include_titles = len(self.parsers()) > 1
             for parser in self.parsers():
-                help_message += parser.help_text + "\n\n"
+                help_message += parser.help_text(include_titles) + "\n\n"
 
             reply = message.make_reply(
                 title="Help Message", body=help_message

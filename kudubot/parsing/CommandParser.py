@@ -43,7 +43,7 @@ class CommandParser:
             command_arg = command_arg.replace("/", "")
 
             valid_command = None
-            for command in self.commands:
+            for command in self.commands():
                 if command.validate(command_arg, args):
                     valid_command = command
                     break
@@ -52,7 +52,7 @@ class CommandParser:
                 raise ParseError("Incorrect command name")
 
             else:
-                return command_arg.upper(), valid_command.resolve_args(args)
+                return command_arg.lower(), valid_command.resolve_args(args)
 
         except IndexError:
             raise ParseError("Incorrect amount of arguments")
@@ -93,25 +93,33 @@ class CommandParser:
 
         return args
 
-    @property
-    def help_text(self) -> str:
+    @classmethod
+    def help_text(cls, include_title: bool = False) -> str:
         """
+        Generates a help message for the parser
+        :param include_title: Whether or not to include a title
         :return: The help text for this parser
         """
-        help_text = "!{}\n".format(self.name)
-        for command in self.commands:
-            help_text += "  " + str(command) + "\n"
+        if include_title:
+            help_text = "!{}\n".format(cls.name())
+        else:
+            help_text = ""
+
+        divider = "  " if include_title else ""
+
+        for command in cls.commands():
+            help_text += divider + str(command) + "\n"
         return help_text.strip()
 
-    @property
-    def name(self) -> str:
+    @classmethod
+    def name(cls) -> str:
         """
         :return: The name of the parser
         """
         raise NotImplementedError()
 
-    @property
-    def commands(self) -> List[Command]:
+    @classmethod
+    def commands(cls) -> List[Command]:
         """
         Defines the commands the parser supports
         :return: The list of commands
