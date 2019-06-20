@@ -61,6 +61,12 @@ class Bot:
         if not os.path.isdir(location):
             raise ConfigurationError("Invalid configuration directory")
 
+        self.logfile = os.path.join(location, "kudubot.log")
+        log_file_handler = logging.FileHandler(self.logfile)
+        log_file_handler.setLevel(logging.DEBUG)
+        self.logger.addHandler(log_file_handler)
+        self.connection.logger.addHandler(log_file_handler)
+
         self.connection_file_path = os.path.join(location, "connection.json")
         if not os.path.isfile(self.connection_file_path):
             raise ConfigurationError("Missing connection settings")
@@ -164,7 +170,16 @@ class Bot:
                 self.on_msg(message, address)
 
         self.bg_thread.start()
-        self.connection.loop(callback=loop_callback)
+
+        try:
+            self.connection.loop(callback=loop_callback)
+        except ConfigurationError as e:
+            raise e
+        except BaseException as e:
+            self.logger.error("Fatal Exception: {} {}: {}".format(
+                e, type(e), e.args
+            ))
+            raise e
 
     def parse(self, message: Message) \
             -> Optional[Tuple[CommandParser, str, Dict[str, Any]]]:
