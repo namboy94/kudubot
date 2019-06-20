@@ -1,3 +1,5 @@
+V 0.23.1:
+  - Added logfile support
 V 0.23.0:
   - Added helper function for quick setup of a new kudubot implementation
   - Changed properties to class methods
