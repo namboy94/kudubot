@@ -1,3 +1,6 @@
+V 0.23.0:
+  - Added helper function for quick setup of a new kudubot implementation
+  - Changed properties to class methods
 V 0.22.0:
   - Added ping capabilities
   - Added help functionality

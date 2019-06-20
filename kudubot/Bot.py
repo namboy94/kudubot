@@ -18,25 +18,27 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
 import os
+import json
 import logging
-from typing import Type, Optional, List
 from threading import Thread
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import sessionmaker
+from bokkichat.exceptions import InvalidSettings
 from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
 from bokkichat.entities.message.TextMessage import TextMessage
 from kudubot.db import Base
 from kudubot.db.Address import Address as Address
 from kudubot.db.config.impl.SqlteConfig import SqliteConfig
-from kudubot.exceptions import ConfigurationError
+from kudubot.exceptions import ConfigurationError, ParseError
 from kudubot.parsing.CommandParser import CommandParser
+from typing import Type, Optional, List, Tuple, Dict, Any, cast
 
 
 class Bot:
     """
-    The Bot class offers an abstraction layer above
+    The Bot class offers an abstraction layer above bokkichat
     """
 
     def __init__(
@@ -59,9 +61,23 @@ class Bot:
         if not os.path.isdir(location):
             raise ConfigurationError("Invalid configuration directory")
 
-        self.settings_file_path = os.path.join(location, "settings.json")
-        if not os.path.isfile(self.settings_file_path):
-            raise ConfigurationError("Missing settings")
+        self.connection_file_path = os.path.join(location, "connection.json")
+        if not os.path.isfile(self.connection_file_path):
+            raise ConfigurationError("Missing connection settings")
+
+        self.extras = {}
+        self.extras_file_path = os.path.join(location, "extras.json")
+        if len(self.extra_config_args()) > 0:
+            if not os.path.isfile(self.extras_file_path):
+                raise ConfigurationError("Missing extra settings")
+            else:
+                with open(self.extras_file_path, "r") as f:
+                    self.extras = json.load(f)
+                    for arg in self.extra_config_args():
+                        if arg not in self.extras:
+                            raise ConfigurationError(
+                                "Missing extra settings parameter " + arg
+                            )
 
         self.sqlite_path = os.path.join(location, "data.db")
         if db_uri is None:
@@ -86,19 +102,27 @@ class Bot:
         """
         raise NotImplementedError()
 
-    @property
-    def name(self) -> str:
+    @classmethod
+    def name(cls) -> str:
         """
         :return: The name of the bot
         """
         raise NotImplementedError()
 
-    @property
-    def parsers(self) -> List[CommandParser]:
+    @classmethod
+    def parsers(cls) -> List[CommandParser]:
         """
         :return: A list of parser the bot supports for commands
         """
         raise NotImplementedError()
+
+    @classmethod
+    def extra_config_args(cls) -> List[str]:
+        """
+        :return: A list of additional settings parameters required for
+                 this bot. Will be stored in a separate extras.json file
+        """
+        return []
 
     def run_in_bg(self):
         """
@@ -142,6 +166,44 @@ class Bot:
         self.bg_thread.start()
         self.connection.loop(callback=loop_callback)
 
+    def parse(self, message: Message) \
+            -> Optional[Tuple[CommandParser, str, Dict[str, Any]]]:
+        """
+        Parses the received message to check which parser and command
+        are applicable to the message.
+        :param message: The message to parse
+        :return: The resulting parser/command combination
+        """
+        if not message.is_text():
+            return None
+        message = cast(TextMessage, message)
+        body = message.body.strip()
+        lower_body = body.lower()
+
+        selected_parser = None
+        if len(self.parsers()) > 1:
+            if not lower_body.startswith("!"):
+                return None
+            else:
+                parser_name = lower_body.split("!", 1)[1].split(" ", 1)[0]
+                for parser in self.parsers():
+                    if parser_name == parser.name():
+                        selected_parser = parser
+                        body = body.split(" ", 1)[1]
+        elif len(self.parsers()) == 1:
+            selected_parser = self.parsers()[0]
+
+        if selected_parser is None:
+            return None
+
+        try:
+            command, args = selected_parser.parse(body)
+            return selected_parser, command, args
+        except ParseError:
+            pass
+
+        return None
+
     def create_db_session(self) -> Session:
         """
         Creates a new database session
@@ -154,8 +216,10 @@ class Bot:
         Saves the configuration for this bot
         :return: None
         """
-        with open(self.settings_file_path, "w") as f:
+        with open(self.connection_file_path, "w") as f:
             f.write(self.connection.settings.serialize())
+        with open(self.extras_file_path, "w") as f:
+            json.dump(self.extras, f)
 
     @classmethod
     def load(cls, connection_cls: Type[Connection], location: str):
@@ -165,17 +229,22 @@ class Bot:
         :param location: The location of the bot configuration directory
         :return: The generated bot
         """
-        settings_file = os.path.join(location, "settings.json")
-        if not os.path.isfile(settings_file):
-            raise ConfigurationError("Missing settings file")
+        connection_file = os.path.join(location, "connection.json")
+        if not os.path.isfile(connection_file):
+            raise ConfigurationError("Missing connection settings file")
 
-        with open(settings_file, "r") as f:
+        with open(connection_file, "r") as f:
             serialized = f.read()
-        connection = connection_cls.from_serialized_settings(serialized)
+
+        try:
+            connection = connection_cls.from_serialized_settings(serialized)
+        except InvalidSettings:
+            raise ConfigurationError("Invalid settings for connection")
+
         return cls(connection, location)
 
-    @staticmethod
-    def create_config(connection_cls: Type[Connection], path: str):
+    @classmethod
+    def create_config(cls, connection_cls: Type[Connection], path: str):
         """
         Creates a configuration directory for a bot
         :param connection_cls: The connection class for
@@ -186,11 +255,23 @@ class Bot:
         if not os.path.isdir(path):
             os.makedirs(path)
 
-        settings_path = os.path.join(path, "settings.json")
+        connection_path = os.path.join(path, "connection.json")
         settings = connection_cls.settings_cls().prompt()
 
-        with open(settings_path, "w") as f:
+        extras_path = os.path.join(path, "extras.json")
+        extras = {}
+
+        for arg in cls.extra_config_args():
+            while True:
+                resp = input("(Extras){}: ".format(arg)).strip()
+                if resp != "":
+                    extras[arg] = resp
+                    break
+
+        with open(connection_path, "w") as f:
             f.write(settings.serialize())
+        with open(extras_path, "w") as f:
+            json.dump(extras, f)
 
     def _store_in_address_book(self, message: Message) -> bool:
         """
@@ -220,9 +301,11 @@ class Bot:
 
         if message.body.lower().strip() == "/help":
 
-            help_message = "Help message for {}\n\n".format(self.name)
-            for parser in self.parsers:
-                help_message += parser.help_text + "\n\n"
+            help_message = "Help message for {}\n\n".format(self.name())
+
+            include_titles = len(self.parsers()) > 1
+            for parser in self.parsers():
+                help_message += parser.help_text(include_titles) + "\n\n"
 
             reply = message.make_reply(
                 title="Help Message", body=help_message
