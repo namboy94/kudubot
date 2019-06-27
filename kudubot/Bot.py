@@ -23,7 +23,7 @@ import logging
 from threading import Thread
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from bokkichat.exceptions import InvalidSettings
 from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
@@ -93,7 +93,7 @@ class Bot:
         self.db_engine = create_engine(self.db_uri)
         Base.metadata.create_all(self.db_engine, checkfirst=True)
 
-        self._sessionmaker = sessionmaker(bind=self.db_engine)
+        self.sessionmaker = scoped_session(sessionmaker(bind=self.db_engine))
         self.db_session = self.create_db_session()
 
         self.bg_thread = Thread(target=self.run_in_bg, daemon=True)
@@ -224,7 +224,7 @@ class Bot:
         Creates a new database session
         :return: The database session
         """
-        return self._sessionmaker()
+        return self.sessionmaker()
 
     def save_config(self):
         """
