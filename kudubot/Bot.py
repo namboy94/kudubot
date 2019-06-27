@@ -321,6 +321,7 @@ class Bot:
             include_titles = len(self.parsers()) > 1
             for parser in self.parsers():
                 help_message += parser.help_text(include_titles) + "\n\n"
+            help_message = help_message.replace("_", "\\_")  # Fix formatting
 
             reply = message.make_reply(
                 title="Help Message", body=help_message
