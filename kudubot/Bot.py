@@ -23,7 +23,7 @@ import logging
 from threading import Thread
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker
 from bokkichat.exceptions import InvalidSettings
 from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
@@ -93,8 +93,7 @@ class Bot:
         self.db_engine = create_engine(self.db_uri)
         Base.metadata.create_all(self.db_engine, checkfirst=True)
 
-        self.sessionmaker = scoped_session(sessionmaker(bind=self.db_engine))
-        self.db_session = self.create_db_session()
+        self.sessionmaker = sessionmaker(bind=self.db_engine)
 
         self.bg_thread = Thread(target=self.run_in_bg, daemon=True)
 
@@ -159,13 +158,14 @@ class Bot:
         :return: None
         """
         self.logger.info("Starting Bot")
+        db_session = self.create_db_session()
 
         def loop_callback(connection: Connection, message: Message):
 
             self.logger.info("Received message {}".format(message))
 
             if self.pre_callback(connection, message):
-                address = self.db_session.query(Address)\
+                address = db_session.query(Address)\
                     .filter_by(address=message.sender.address).first()
                 self.on_msg(message, address)
 
@@ -294,13 +294,14 @@ class Bot:
         :param message: The received message
         :return: Whether or not handling the message should continue
         """
-        exists = self.db_session.query(Address) \
+        db_session = self.create_db_session()
+        exists = db_session.query(Address) \
             .filter_by(address=message.sender.address).first()
 
         if exists is None:
             entry = Address(address=message.sender.address)
-            self.db_session.add(entry)
-            self.db_session.commit()
+            db_session.add(entry)
+            db_session.commit()
         return True
 
     def _handle_help_command(self, message: Message) -> bool:
