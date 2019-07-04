@@ -2,6 +2,7 @@ V 0.24.0:
   - Now uses scoped SQLAlchemy sessions using a sessionmaker
   - Redid the on_msg paradigm to reduce scaffolding in implementations
   - Improved error handling
+  - Removed deploy phase
 V 0.23.1:
   - Added logfile support
 V 0.23.0:
