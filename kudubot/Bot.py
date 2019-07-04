@@ -28,6 +28,7 @@ from bokkichat.exceptions import InvalidSettings
 from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
 from bokkichat.entities.message.TextMessage import TextMessage
+from bokkichat.entities.message.MediaMessage import MediaMessage
 from kudubot.db import Base
 from kudubot.db.Address import Address as Address
 from kudubot.db.config.impl.SqlteConfig import SqliteConfig
@@ -97,12 +98,98 @@ class Bot:
 
         self.bg_thread = Thread(target=self.run_in_bg, daemon=True)
 
-    def on_msg(self, message: Message, address: Address):
+    def on_msg(self, message: Message):
         """
         The callback method is called for every received message.
-        This method defines the main functionality of a bot
+        This method automatically delegates message handling to the
+        on_text and on_media methods.
+        This also creates a database session for those methods to use
+        that will avoid threading issues.
         :param message: The received message
-        :param address: The address of the sender in the database
+        :return: None
+        """
+        if not self.pre_callback(message):
+            return
+
+        try:
+            db_session = self.sessionmaker()
+            sender = db_session.query(Address)\
+                .filter_by(address=message.sender.address).first()
+
+            if message.is_text():
+                message = message  # type: TextMessage
+
+                parsed = self.parse(message)
+                if parsed is None:
+                    self.on_text(message, sender, db_session)
+                else:
+                    parser, command, args = parsed
+                    self.on_command(
+                        message,
+                        parser,
+                        command,
+                        args,
+                        sender,
+                        db_session
+                    )
+
+            elif message.is_media():
+                message = message  # type: MediaMessage
+
+                self.on_media(message, sender, db_session)
+            else:
+                pass
+        finally:
+            self.sessionmaker.remove()
+
+    def on_text(
+            self,
+            message: TextMessage,
+            sender: Address,
+            db_session: Session
+    ):
+        """
+        Handles text messages that aren't commands. Those are by default simply
+        ignored.
+        :param message: The received message
+        :param sender: The database Address object of the sender
+        :param db_session: A valid database session
+        :return: None
+        """
+        pass
+
+    def on_media(
+            self,
+            message: MediaMessage,
+            sender: Address,
+            db_session: Session
+    ):
+        """
+        Handles media messages. Those are by default simply ignored.
+        :param message: The received message
+        :param sender: The database Address object of the sender
+        :param db_session: A valid database session
+        :return: None
+        """
+        pass
+
+    def on_command(
+            self,
+            message: TextMessage,
+            parser: CommandParser,
+            command: str,
+            args: Dict[str, Any],
+            sender: Address,
+            db_session: Session
+    ):
+        """
+        Handles text messages that have been parsed as commands.
+        :param message: The original message
+        :param parser: The parser containing the command
+        :param command: The command name
+        :param args: The arguments of the command
+        :param sender: The database address of the sender
+        :param db_session: A valid database session
         :return: None
         """
         raise NotImplementedError()
@@ -138,18 +225,21 @@ class Bot:
         """
         pass
 
-    def pre_callback(self, _: Connection, message: Message) -> bool:
+    def pre_callback(self, message: Message) -> bool:
         """
         Prepares the callback and decides whether or not the callback
         is even executed
-        :param _: The connection to use
         :param message: The message to check
         :return: True if the execution continues, False otherwise
         """
         _continue = True
         _continue = _continue and self._store_in_address_book(message)
-        _continue = _continue and self._handle_help_command(message)
-        _continue = _continue and self._handle_ping(message)
+
+        if message.is_text():
+            message = message  # type: TextMessage
+            _continue = _continue and self._handle_help_command(message)
+            _continue = _continue and self._handle_ping(message)
+
         return _continue
 
     def start(self):
@@ -158,16 +248,10 @@ class Bot:
         :return: None
         """
         self.logger.info("Starting Bot")
-        db_session = self.create_db_session()
 
-        def loop_callback(connection: Connection, message: Message):
-
+        def loop_callback(_: Connection, message: Message):
             self.logger.info("Received message {}".format(message))
-
-            if self.pre_callback(connection, message):
-                address = db_session.query(Address)\
-                    .filter_by(address=message.sender.address).first()
-                self.on_msg(message, address)
+            self.on_msg(message)
 
         self.bg_thread.start()
 
@@ -218,20 +302,6 @@ class Bot:
             pass
 
         return None
-
-    def create_db_session(self) -> Session:
-        """
-        Creates a new database session
-        :return: The database session
-        """
-        return self.sessionmaker()
-
-    def remove_db_session(self):
-        """
-        Removes the scoped database session from the session maker
-        :return: None
-        """
-        self.sessionmaker.remove()
 
     def save_config(self):
         """
@@ -301,7 +371,7 @@ class Bot:
         :param message: The received message
         :return: Whether or not handling the message should continue
         """
-        db_session = self.create_db_session()
+        db_session = self.sessionmaker()
         exists = db_session.query(Address) \
             .filter_by(address=message.sender.address).first()
 
@@ -311,17 +381,12 @@ class Bot:
             db_session.commit()
         return True
 
-    def _handle_help_command(self, message: Message) -> bool:
+    def _handle_help_command(self, message: TextMessage) -> bool:
         """
         Handles the /help command.
         :param message: The message to check for a /help command
         :return: Whether or not handling the message should continue
         """
-        if message.is_text():
-            message = message  # type: TextMessage
-        else:
-            return True
-
         if message.body.lower().strip() == "/help":
 
             help_message = "Help message for {}\n\n".format(self.name())
@@ -339,17 +404,12 @@ class Bot:
         else:
             return True
 
-    def _handle_ping(self, message: Message) -> bool:
+    def _handle_ping(self, message: TextMessage) -> bool:
         """
         Handles PING messages
         :param message: The message to analyze
         :return: Whether or not handling the message should continue
         """
-        if message.is_text():
-            message = message  # type: TextMessage
-        else:
-            return True
-
         if message.body.lower().strip() == "ping":
             reply = message.make_reply(title="Pong", body="Pong")
             self.connection.send(reply)
