@@ -67,8 +67,18 @@ def cli_bot_start(bot_cls: Type[Bot], connection_cls: Type[Connection]):
         print("Missing Configuration directory {}" + config_path)
 
     else:
+
         try:
             bot = bot_cls.load(connection_cls, config_path)
-            bot.start()
         except ConfigurationError as e:
             print("Invalid Configuration: {}".format(e))
+            return
+
+        try:
+            bot.start()
+        except KeyboardInterrupt:
+            print("Execution aborted")
+        except BaseException as e:
+            bot.logger.error(
+                "Fatal Exception: {}\n{}".format(e, e.__traceback__)
+            )
