@@ -29,6 +29,8 @@ from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
 from bokkichat.entities.message.TextMessage import TextMessage
 from bokkichat.entities.message.MediaMessage import MediaMessage
+from bokkichat.connection.impl.TelegramBotConnection import \
+    TelegramBotConnection
 from kudubot.db import Base
 from kudubot.db.Address import Address as Address
 from kudubot.db.config.impl.SqlteConfig import SqliteConfig
@@ -394,7 +396,6 @@ class Bot:
             include_titles = len(self.parsers()) > 1
             for parser in self.parsers():
                 help_message += parser.help_text(include_titles) + "\n\n"
-            help_message = help_message.replace("_", "\\_")  # Fix formatting
 
             reply = message.make_reply(
                 title="Help Message", body=help_message
