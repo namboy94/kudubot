@@ -1,7 +1,6 @@
 stages:
   - test
   - stats
-  - deploy
   - release
 
 stylecheck:
@@ -39,33 +38,6 @@ docgen:
   script:
     - python3 -m venv virtual && source virtual/bin/activate && pip install ci-scripts
     - sphinx-docgen
-
-deploy_kudubot:
-  stage: deploy
-  only:
-    - master
-    - develop
-  tags:
-    - python3
-    - kudubot-telegram
-    #- kudubot-whatsapp
-  script:
-    - sudo systemctl stop kudubot-telegram.service
-    #- sudo systemctl stop kudubot-whatsapp.service
-    - rm -rf ~/kudubot
-    - python3 -m venv ~/kudubot && source ~/kudubot/bin/activate && python setup.py install
-    - rm ~/.kudubot/services.conf ~/.kudubot/connections.conf -f
-    - kudubot-config-gen
-    - echo $KUDUBOT_TELEGRAM_CONFIG
-    - cat ~/.kudubot/connection_config/telegram.conf
-    - echo $KUDUBOT_TELEGRAM_CONFIG > ~/.kudubot/connection_config/telegram.conf
-    - cat ~/.kudubot/connection_config/telegram.conf
-    - echo "$KUDUBOT_TELEGRAM_CONFIG" > ~/.kudubot/connection_config/telegram.conf
-    #- echo $KUDUBOT_WHATSAPP_CONFIG > ~/.kudubot/connection_config/whatsapp.conf
-    - cat ~/.kudubot/connection_config/telegram.conf
-    - sudo systemctl start kudubot-telegram.service
-    #- sudo systemctl start kudubot-whatsapp.service
-    - cat ~/.kudubot/connection_config/telegram.conf
 
 release_upload:
   stage: release
