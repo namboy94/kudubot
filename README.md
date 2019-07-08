@@ -11,18 +11,31 @@ services based on
 [bokkichat](https://gitlab.namibsun.net/namibsun/python/bokkichat)
 connections.
 
+# Installation
+
+Installing bokkichat is as simple as running ```pip install kudubot```, or
+```python setup.py install``` when installing from source.
+
 # Implementing a kudubot
 
-The base of a kudubot is the ```Bot``` class in the ```kudubot.Bot``` module.
-Any kudubot implementation must extend that class.
+To implement a kudubot, you'll need to create a class that inherits from
+```kudubot.Bot.Bot``` and implement the various on_X methods in the way
+you want the bot to react.
 
-The following methods have to be implemented:
+Kudubot is meant to react on commands like ```/send 123```. Those are
+modelled using CommandParser and Command objects. Those are used to
+automatically parse incoming text messages and are sent to ```on_command```.
 
-```on_msg```, ```name```, ```parsers```
+If you want complete manual control over what happens with incoming messages,
+override the ```on_msg``` method. If you only care about text messages, do the
+same for ```on_text```.
 
-```on_msg``` is called whenever the bot receives a message. ```name```
-defines the name of the bot class. ```parsers``` returns a list of
-```CommandParser``` objects.
+To get an idea of how to implement a kudubot, have a look at some of these
+sample projects:
+
+* [football-bot](https://gitlab.namibsun.net/namibsun/python/football-bot)
+* [securiphant](https://gitlab.namibsun.net/namibsun/python/securiphant)
+
 
 ## Further Information
 
