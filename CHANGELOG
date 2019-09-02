@@ -1,3 +1,5 @@
+V 0.25.0:
+  - Added init() feature
 V 0.24.2:
   - Uses docker for CI now
 V 0.24.1:
