@@ -29,8 +29,6 @@ from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
 from bokkichat.entities.message.TextMessage import TextMessage
 from bokkichat.entities.message.MediaMessage import MediaMessage
-from bokkichat.connection.impl.TelegramBotConnection import \
-    TelegramBotConnection
 from kudubot.db import Base
 from kudubot.db.Address import Address as Address
 from kudubot.db.config.impl.SqlteConfig import SqliteConfig
@@ -99,6 +97,14 @@ class Bot:
         self.sessionmaker = scoped_session(sessionmaker(bind=self.db_engine))
 
         self.bg_thread = Thread(target=self.run_in_bg, daemon=True)
+        self.init()
+
+    def init(self):
+        """
+        Additional init method that gets called at the end of __init__
+        :return: None
+        """
+        pass
 
     def on_msg(self, message: Message):
         """
