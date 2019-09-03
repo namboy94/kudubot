@@ -106,6 +106,28 @@ class Bot:
         """
         pass
 
+    def send_txt(
+            self,
+            receiver: Address,
+            body: str,
+            title: Optional[str] = ""
+    ):
+        """
+        Convenience function that allows easier sending of text messages
+        :param receiver: The receiver of the text message
+        :param body: The body of the text message
+        :param title: The (optional) title of the message
+        :return: None
+        """
+        self.connection.send(
+            TextMessage(
+                self.connection.address,
+                receiver,
+                body,
+                title
+            )
+        )
+
     def on_msg(self, message: Message):
         """
         The callback method is called for every received message.
@@ -125,7 +147,7 @@ class Bot:
                 .filter_by(address=message.sender.address).first()
 
             if message.is_text():
-                message = message  # type: TextMessage
+                message = cast(TextMessage, message)  # type: TextMessage
 
                 parsed = self.parse(message)
                 if parsed is None:
@@ -142,7 +164,7 @@ class Bot:
                     )
 
             elif message.is_media():
-                message = message  # type: MediaMessage
+                message = cast(MediaMessage, message)  # type: MediaMessage
 
                 self.on_media(message, sender, db_session)
             else:
@@ -244,7 +266,7 @@ class Bot:
         _continue = _continue and self._store_in_address_book(message)
 
         if message.is_text():
-            message = message  # type: TextMessage
+            message = cast(TextMessage, message)  # type: TextMessage
             _continue = _continue and self._handle_help_command(message)
             _continue = _continue and self._handle_ping(message)
 

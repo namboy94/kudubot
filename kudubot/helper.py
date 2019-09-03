@@ -20,6 +20,7 @@ LICENSE"""
 import os
 import argparse
 import logging
+import traceback
 from typing import Type
 from bokkichat.connection.Connection import Connection
 from kudubot.Bot import Bot
@@ -80,5 +81,8 @@ def cli_bot_start(bot_cls: Type[Bot], connection_cls: Type[Connection]):
             print("Execution aborted")
         except BaseException as e:
             bot.logger.error(
-                "Fatal Exception: {}\n{}".format(e, e.__traceback__)
+                "Fatal Exception: {}\n{}".format(
+                    e,
+                    "\n".join(traceback.format_tb(e.__traceback__))
+                )
             )
