@@ -1,3 +1,5 @@
+V 0.26.0:
+  - Added send_txt() convenience method
 V 0.25.0:
   - Added init() feature
 V 0.24.2:
