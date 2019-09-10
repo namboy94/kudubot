@@ -20,6 +20,7 @@ LICENSE"""
 import os
 import json
 import logging
+import traceback
 from threading import Thread
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
@@ -169,6 +170,13 @@ class Bot:
                 self.on_media(message, sender, db_session)
             else:
                 pass
+        except Exception as e:
+            self.logger.error(
+                "Exception during Message: {}\n{}".format(
+                    e,
+                    "\n".join(traceback.format_tb(e.__traceback__))
+                )
+            )
         finally:
             self.sessionmaker.remove()
 
