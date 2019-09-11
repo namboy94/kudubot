@@ -491,8 +491,9 @@ class Bot:
         :return: Whether or not handling the message should continue
         """
         if message.body.lower().strip() == "ping":
-            reply = message.make_reply(title="Pong", body="Pong")
-            self.connection.send(reply)
+            self.send_txt(message.sender, "Pong", "Pong")
+            if not self.bg_thread.is_alive():
+                self.send_txt(message.sender, "BG Thread is dead", "BG Thread")
             return False
         elif message.body.lower().strip() == "bg_ping":
             reply = "👍" if self.bg_thread.is_alive() else "👎"
