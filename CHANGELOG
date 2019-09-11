@@ -1,3 +1,6 @@
+V 0.28.0:
+  - Made background loop iteration based
+  - Ping now mentions if bg thread is dead
 V 0.27.0:
   - Improved logging
   - Added background ping

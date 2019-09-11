@@ -18,6 +18,7 @@ along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
 
 import os
+import time
 import json
 import logging
 import traceback
@@ -217,9 +218,10 @@ class Bot:
         """
         pass
 
+    # noinspection PyUnusedLocal
     def on_command(
             self,
-            _: CommandParser,
+            parser: CommandParser,
             command: str,
             args: Dict[str, Any],
             sender: Address,
@@ -231,7 +233,7 @@ class Bot:
         forwards the parameters to those methods if they exist.
         This mechanism can be used for simple bots that don't need more logic
         than a simple if "command" elif "other_command"... .
-        :param _: The parser containing the command
+        :param parser: The parser containing the command
         :param command: The command name
         :param args: The arguments of the command
         :param sender: The database address of the sender
@@ -269,12 +271,38 @@ class Bot:
         """
         return []
 
+    @property
+    def bg_pause(self) -> int:
+        """
+        The pause between background iterations
+        :return: The pause in seconds
+        """
+        return 60
+
     def run_in_bg(self):
         """
         Method that is started when the bot is started.
-        By default this does nothing, for functionality must be extended
-        by subclasses.
+        This executes the bg_iteration method every bg_pause seconds
         :return: None
+        """
+        counter = 0
+        while True:
+            db_session = self.sessionmaker()
+            self.bg_iteration(counter, db_session)
+            self.sessionmaker.remove()
+            counter += 1
+            time.sleep(self.bg_pause)
+
+    # noinspection PyUnusedLocal,PyMethodMayBeStatic
+    def bg_iteration(self, iteration: int, db_session: Session):
+        """
+        Executes a background iteration. By default this does nothing.
+        This is supposed to be overriden by child classes to implement
+        background functionality
+        :param iteration: The iteration count. Useful for differentiating
+                          between actions that have different repetition rates
+        :param db_session: The database session to use
+        :return:
         """
         pass
 
@@ -463,8 +491,9 @@ class Bot:
         :return: Whether or not handling the message should continue
         """
         if message.body.lower().strip() == "ping":
-            reply = message.make_reply(title="Pong", body="Pong")
-            self.connection.send(reply)
+            self.send_txt(message.sender, "Pong", "Pong")
+            if not self.bg_thread.is_alive():
+                self.send_txt(message.sender, "BG Thread is dead", "BG Thread")
             return False
         elif message.body.lower().strip() == "bg_ping":
             reply = "👍" if self.bg_thread.is_alive() else "👎"
