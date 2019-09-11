@@ -66,8 +66,15 @@ class Bot:
         self.logfile = os.path.join(location, "kudubot.log")
         log_file_handler = logging.FileHandler(self.logfile)
         log_file_handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+            "%(asctime)s [%(levelname)s] - %(name)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
+        log_file_handler.setFormatter(formatter)
         self.logger.addHandler(log_file_handler)
         self.connection.logger.addHandler(log_file_handler)
+        self.logger.setLevel(logging.DEBUG)
+        self.connection.logger.setLevel(logging.DEBUG)
 
         self.connection_file_path = os.path.join(location, "connection.json")
         if not os.path.isfile(self.connection_file_path):

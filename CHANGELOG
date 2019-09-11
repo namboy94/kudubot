@@ -1,3 +1,5 @@
+V 0.27.1:
+  - Improved logging
 V 0.27.0:
   - The bot no longer dies when an exception occurs in on_msg()
 V 0.26.0:
