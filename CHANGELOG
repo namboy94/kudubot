@@ -1,5 +1,7 @@
-V 0.27.1:
+V 0.28.0:
   - Improved logging
+  - Added background ping
+  - Added capability to easily write a command-based bot without long if/else clauses
 V 0.27.0:
   - The bot no longer dies when an exception occurs in on_msg()
 V 0.26.0:

@@ -163,7 +163,6 @@ class Bot:
                 else:
                     parser, command, args = parsed
                     self.on_command(
-                        message,
                         parser,
                         command,
                         args,
@@ -220,8 +219,7 @@ class Bot:
 
     def on_command(
             self,
-            message: TextMessage,
-            parser: CommandParser,
+            _: CommandParser,
             command: str,
             args: Dict[str, Any],
             sender: Address,
@@ -229,15 +227,25 @@ class Bot:
     ):
         """
         Handles text messages that have been parsed as commands.
-        :param message: The original message
-        :param parser: The parser containing the command
+        Automatically searches for 'on_X' methods in the bot and
+        forwards the parameters to those methods if they exist.
+        This mechanism can be used for simple bots that don't need more logic
+        than a simple if "command" elif "other_command"... .
+        :param _: The parser containing the command
         :param command: The command name
         :param args: The arguments of the command
         :param sender: The database address of the sender
         :param db_session: A valid database session
         :return: None
         """
-        raise NotImplementedError()
+        for prefix in ["on_", "_on_", "handle_", "_handle_"]:
+            try:
+                method = getattr(self, prefix + command)
+                method(sender, args, db_session)
+                return
+            except AttributeError:
+                pass
+        self.logger.warning("No method for command " + command)
 
     @classmethod
     def name(cls) -> str:
@@ -457,6 +465,10 @@ class Bot:
         if message.body.lower().strip() == "ping":
             reply = message.make_reply(title="Pong", body="Pong")
             self.connection.send(reply)
+            return False
+        elif message.body.lower().strip() == "bg_ping":
+            reply = "👍" if self.bg_thread.is_alive() else "👎"
+            self.send_txt(message.sender, reply, "Pong")
             return False
         else:
             return True
