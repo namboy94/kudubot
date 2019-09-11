@@ -287,11 +287,20 @@ class Bot:
         """
         counter = 0
         while True:
-            db_session = self.sessionmaker()
-            self.bg_iteration(counter, db_session)
-            self.sessionmaker.remove()
-            counter += 1
-            time.sleep(self.bg_pause)
+            try:
+                db_session = self.sessionmaker()
+                self.bg_iteration(counter, db_session)
+            except BaseException as e:
+                self.logger.error(
+                    "Exception in background thread: {}\n{}".format(
+                        e,
+                        "\n".join(traceback.format_tb(e.__traceback__))
+                    )
+                )
+            finally:
+                self.sessionmaker.remove()
+                counter += 1
+                time.sleep(self.bg_pause)
 
     # noinspection PyUnusedLocal,PyMethodMayBeStatic
     def bg_iteration(self, iteration: int, db_session: Session):
