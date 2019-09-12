@@ -1,3 +1,5 @@
+V 0.29.1:
+  - Less logging of exceptions
 V 0.29.0:
   - Made background thread more resilient
 V 0.28.0:

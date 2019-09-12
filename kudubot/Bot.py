@@ -348,11 +348,7 @@ class Bot:
         try:
             self.connection.loop(callback=loop_callback)
         except ConfigurationError as e:
-            raise e
-        except BaseException as e:
-            self.logger.error("Fatal Exception: {} {}: {}".format(
-                e, type(e), e.args
-            ))
+            print("Invalid Coniguration Detected")
             raise e
 
     def parse(self, message: Message) \
