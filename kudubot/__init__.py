@@ -16,3 +16,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with kudubot.  If not, see <http://www.gnu.org/licenses/>.
 LICENSE"""
+
+import pkg_resources
+
+
+sentry_dsn = "https://cc8787586ec047858ecff38befd67018@sentry.namibsun.net/4"
+"""
+The sentry DSN for this project
+"""
+
+
+version = pkg_resources.get_distribution("kudubot").version
+"""
+The current version of the package
+"""

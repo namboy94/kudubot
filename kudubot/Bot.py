@@ -31,6 +31,7 @@ from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
 from bokkichat.entities.message.TextMessage import TextMessage
 from bokkichat.entities.message.MediaMessage import MediaMessage
+from kudubot import version as kudubot_version
 from kudubot.db import Base
 from kudubot.db.Address import Address as Address
 from kudubot.db.config.impl.SqlteConfig import SqliteConfig
@@ -257,6 +258,13 @@ class Bot:
         raise NotImplementedError()
 
     @classmethod
+    def version(cls) -> str:
+        """
+        :return: The current version of the bot
+        """
+        raise NotImplementedError()
+
+    @classmethod
     def parsers(cls) -> List[CommandParser]:
         """
         :return: A list of parser the bot supports for commands
@@ -475,7 +483,8 @@ class Bot:
         """
         if message.body.lower().strip() == "/help":
 
-            help_message = "Help message for {}\n\n".format(self.name())
+            help_message = "Help message for:\n{} V{}\n(kudubot V{})\n\n"\
+                .format(self.name(), self.version(), kudubot_version)
 
             include_titles = len(self.parsers()) > 1
             for parser in self.parsers():
