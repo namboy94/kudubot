@@ -24,7 +24,8 @@ you want the bot to react.
 
 Kudubot is meant to react on commands like ```/send 123```. Those are
 modelled using CommandParser and Command objects. Those are used to
-automatically parse incoming text messages and are sent to ```on_command```.
+automatically parse incoming text messages and are sent to ```on_command```,
+which delegates them to ```on_<command name>``` methods by default.
 
 If you want complete manual control over what happens with incoming messages,
 override the ```on_msg``` method. If you only care about text messages, do the
