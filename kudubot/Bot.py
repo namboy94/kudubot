@@ -22,6 +22,7 @@ import time
 import json
 import logging
 import traceback
+from functools import wraps
 from threading import Thread
 from sentry_sdk import capture_exception
 from sqlalchemy import create_engine
@@ -38,13 +39,41 @@ from kudubot.db.Address import Address as Address
 from kudubot.db.config.impl.SqlteConfig import SqliteConfig
 from kudubot.exceptions import ConfigurationError, ParseError
 from kudubot.parsing.CommandParser import CommandParser
-from typing import Type, Optional, List, Tuple, Dict, Any, cast
+from typing import Type, Optional, List, Tuple, Dict, Any, cast, Callable
 
 
 class Bot:
     """
     The Bot class offers an abstraction layer above bokkichat
     """
+
+    # noinspection PyMethodParameters
+    def auth_required(func: Callable) -> Callable:
+        """
+        This is a decorator that makes it possible to restrict a user's access
+        to certain commands.
+        To use this, simply decorate an 'on_'-method with this decorator.
+        The method will then only be called if the is_authorized() method
+        returns True
+        :return: None
+        """
+        @wraps(func)
+        def wrapper(
+                self: Bot,
+                sender: Address,
+                args: Dict[str, Any],
+                db_session: Session
+        ):
+            status = self.is_authorized(sender, args, db_session)
+            if status:  # TODO FIX
+                self.send_txt(
+                    sender,
+                    self.unauthorized_message(),
+                    "Unauthorized"
+                )
+            else:
+                func(self, sender, args, db_session)
+        return wrapper
 
     def __init__(
             self,
@@ -289,14 +318,41 @@ class Bot:
         """
         return 60
 
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    def is_authorized(
+            self,
+            address: Address,
+            args: Dict[str, Any],
+            db_session: Session
+    ) -> bool:
+        """
+        Checks if a user is authorized
+        :param address: The user to check
+        :param args: possible command arguments
+        :param db_session: The database session to use
+        :return: True if authorized, False otherwise
+        """
+        return True
+
+    @classmethod
+    def unauthorized_message(cls) -> str:
+        """
+        :return: A custom message sent to a user if they tried to access
+                 a feature that requires authorization without being
+                 authorized
+        """
+        return "Unauthorized"
+
     def run_in_bg(self):
         """
         Method that is started when the bot is started.
         This executes the bg_iteration method every bg_pause seconds
         :return: None
         """
+        self.logger.info("Starting background thread")
         counter = 0
         while True:
+            self.logger.debug("Starting background iteration " + str(counter))
             try:
                 db_session = self.sessionmaker()
                 self.bg_iteration(counter, db_session)
