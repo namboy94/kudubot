@@ -21,19 +21,28 @@ import os
 import argparse
 import logging
 import traceback
-from typing import Type
+from typing import Type, Optional
+from sentry_sdk import init as init_sentry
+from sentry_sdk.integrations.logging import ignore_logger
 from bokkichat.connection.Connection import Connection
 from kudubot.Bot import Bot
 from kudubot.exceptions import ConfigurationError
 
 
-def cli_bot_start(bot_cls: Type[Bot], connection_cls: Type[Connection]):
+def cli_bot_start(
+        bot_cls: Type[Bot],
+        connection_cls: Type[Connection],
+        sentry_dsn: Optional[str] = None
+):
     """
     Implements a standard CLI interface for kudubot implementations
     :param bot_cls: The class of the bot to start
     :param connection_cls: The connection to use with the bot
+    :param sentry_dsn: Optional sentry DSN for exception logging
     :return: None
     """
+    if sentry_dsn is not None:
+        init_sentry(sentry_dsn)
 
     default_config_path = os.path.join(
         os.path.expanduser("~"),
@@ -74,6 +83,14 @@ def cli_bot_start(bot_cls: Type[Bot], connection_cls: Type[Connection]):
         except ConfigurationError as e:
             print("Invalid Configuration: {}".format(e))
             return
+
+        # Disable sentry notifications for error-level logging messages
+        # in kudubot, those will be sent another way
+        if sentry_dsn is not None:
+            init_sentry(sentry_dsn, release="{}-{}".format(
+                bot.name(), bot.version()
+            ))
+            ignore_logger(bot.logger.name)
 
         try:
             bot.start()

@@ -23,6 +23,7 @@ import json
 import logging
 import traceback
 from threading import Thread
+from sentry_sdk import capture_exception
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -31,6 +32,7 @@ from bokkichat.connection.Connection import Connection
 from bokkichat.entities.message.Message import Message
 from bokkichat.entities.message.TextMessage import TextMessage
 from bokkichat.entities.message.MediaMessage import MediaMessage
+from kudubot import version as kudubot_version
 from kudubot.db import Base
 from kudubot.db.Address import Address as Address
 from kudubot.db.config.impl.SqlteConfig import SqliteConfig
@@ -184,6 +186,7 @@ class Bot:
                     "\n".join(traceback.format_tb(e.__traceback__))
                 )
             )
+            capture_exception(e)
         finally:
             self.sessionmaker.remove()
 
@@ -257,6 +260,13 @@ class Bot:
         raise NotImplementedError()
 
     @classmethod
+    def version(cls) -> str:
+        """
+        :return: The current version of the bot
+        """
+        raise NotImplementedError()
+
+    @classmethod
     def parsers(cls) -> List[CommandParser]:
         """
         :return: A list of parser the bot supports for commands
@@ -297,6 +307,7 @@ class Bot:
                         "\n".join(traceback.format_tb(e.__traceback__))
                     )
                 )
+                capture_exception(e)
             finally:
                 self.sessionmaker.remove()
                 counter += 1
@@ -348,11 +359,7 @@ class Bot:
         try:
             self.connection.loop(callback=loop_callback)
         except ConfigurationError as e:
-            raise e
-        except BaseException as e:
-            self.logger.error("Fatal Exception: {} {}: {}".format(
-                e, type(e), e.args
-            ))
+            print("Invalid Coniguration Detected")
             raise e
 
     def parse(self, message: Message) \
@@ -479,7 +486,8 @@ class Bot:
         """
         if message.body.lower().strip() == "/help":
 
-            help_message = "Help message for {}\n\n".format(self.name())
+            help_message = "Help message for:\n{} V{}\n(kudubot V{})\n\n"\
+                .format(self.name(), self.version(), kudubot_version)
 
             include_titles = len(self.parsers()) > 1
             for parser in self.parsers():
