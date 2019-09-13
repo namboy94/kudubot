@@ -1,6 +1,7 @@
 V 0.30.0:
   - Less unnecessary logging of exceptions
   - Made version strings mandatory for bots
+  - Integrated sentry
 V 0.29.0:
   - Made background thread more resilient
 V 0.28.0:

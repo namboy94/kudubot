@@ -23,6 +23,7 @@ import json
 import logging
 import traceback
 from threading import Thread
+from sentry_sdk import capture_exception
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -185,6 +186,7 @@ class Bot:
                     "\n".join(traceback.format_tb(e.__traceback__))
                 )
             )
+            capture_exception(e)
         finally:
             self.sessionmaker.remove()
 
@@ -305,6 +307,7 @@ class Bot:
                         "\n".join(traceback.format_tb(e.__traceback__))
                     )
                 )
+                capture_exception(e)
             finally:
                 self.sessionmaker.remove()
                 counter += 1
