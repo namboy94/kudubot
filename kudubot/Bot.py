@@ -540,7 +540,7 @@ class Bot:
         :param message: The message to check for a /help command
         :return: Whether or not handling the message should continue
         """
-        if message.body.lower().strip() == "/help":
+        if message.body.lower().strip() in ["/help", "/start"]:
 
             help_message = "Help message for:\n{} V{}\n(kudubot V{})\n\n"\
                 .format(self.name(), self.version(), kudubot_version)

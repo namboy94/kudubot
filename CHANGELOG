@@ -1,5 +1,6 @@
 V 0.31.1:
   - Fixed minor issue when running uninitialized bot
+  - /start now shows help command
 V 0.31.0:
   - Added ways to make commands work only when authorized using decorators
 V 0.30.0:
