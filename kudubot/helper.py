@@ -74,7 +74,7 @@ def cli_bot_start(
         print("Successfully generated configuration in " + config_path)
 
     elif not os.path.isdir(config_path):
-        print("Missing Configuration directory {}" + config_path)
+        print("Missing Configuration directory " + config_path)
 
     else:
 
