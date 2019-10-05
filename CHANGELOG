@@ -1,3 +1,5 @@
+V 0.32.0:
+  - Fixed huge issue with authentication
 V 0.31.1:
   - Fixed minor issue when running uninitialized bot
   - /start now shows help command
