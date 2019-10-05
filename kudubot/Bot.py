@@ -64,8 +64,7 @@ class Bot:
                 args: Dict[str, Any],
                 db_session: Session
         ):
-            status = self.is_authorized(sender, args, db_session)
-            if status:  # TODO FIX
+            if not self.is_authorized(sender, args, db_session):
                 self.send_txt(
                     sender,
                     self.unauthorized_message(),
