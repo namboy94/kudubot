@@ -1,3 +1,5 @@
+V 0.33.0:
+  - Uses puffotter for starting CLI now
 V 0.32.0:
   - Fixed huge issue with authentication
 V 0.31.1:

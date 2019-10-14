@@ -43,7 +43,8 @@ if __name__ == "__main__":
             "typing",
             "bokkichat",
             "sqlalchemy",
-            "sentry-sdk"
+            "sentry-sdk",
+            "puffotter"
         ],
         include_package_data=True,
         zip_safe=False
